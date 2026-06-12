@@ -1,0 +1,17 @@
+{
+  "id": "2.32",
+  "name": "Output Trajectory is a Function",
+  "description": "Theorem stating that the output trajectory is a total, single-valued function from TZ to OZ, and equals RZ(STZ(f, x)(t)).",
+  "elements": [
+    {
+      "id": "2.32/theorem/trajectory_fns",
+      "type": "implication",
+      "text": "OTZ(f, x) ∈ FNS(TZ, OZ)."
+    },
+    {
+      "id": "2.32/theorem/trajectory_value",
+      "type": "implication",
+      "text": "OTZ(f, x)(t) = RZ(STZ(f, x)(t)) for any t ∈ TZ."
+    }
+  ]
+}

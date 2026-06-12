@@ -1,0 +1,42 @@
+{
+  "id": "2.5",
+  "name": "Examples of Systems",
+  "description": "Definition of example systems Zxk and verification of their components against the discrete system specification.",
+  "elements": [
+    {
+      "id": "2.5/entity/Zxk",
+      "type": "component",
+      "text": "Zxk is the name of a system whose definition is given in Appendix 3, for k ∈ [1, 168]."
+    },
+    {
+      "id": "2.5/entity/dsystems",
+      "type": "implication",
+      "text": "Zxk ∈ DSYSTEMS for every k ∈ [1, 168]."
+    },
+    {
+      "id": "2.5/proof/sz_nonempty",
+      "type": "constraint",
+      "text": "SZx2 is not empty."
+    },
+    {
+      "id": "2.5/proof/iz_nonempty",
+      "type": "constraint",
+      "text": "IZx2 is not empty."
+    },
+    {
+      "id": "2.5/proof/oz_nonempty",
+      "type": "constraint",
+      "text": "OZx2 is not empty."
+    },
+    {
+      "id": "2.5/proof/nz_function",
+      "type": "constraint",
+      "text": "NZx2 ∈ FNS(SZx2 × IZx2, SZx2) satisfying Definition A1.155."
+    },
+    {
+      "id": "2.5/proof/rz_function",
+      "type": "constraint",
+      "text": "RZx2 ∈ FNS(SZx2, OZx2) satisfying Definition A1.155."
+    }
+  ]
+}

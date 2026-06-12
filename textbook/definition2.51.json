@@ -1,0 +1,17 @@
+{
+  "id": "2.51",
+  "name": "Reachable State",
+  "description": "Definition of reachability of a state from another state in a discrete system.",
+  "elements": [
+    {
+      "id": "2.51/definition/reachable",
+      "type": "component",
+      "text": "The state y ∈ SZ is reachable from x ∈ SZ iff there exists f ∈ ITZ and t ∈ TZ such that y = STZ(f, x)(t)."
+    },
+    {
+      "id": "2.51/terminology/by_means_of",
+      "type": "component",
+      "text": "y is reachable from x by means of the input trajectory f at time t."
+    }
+  ]
+}

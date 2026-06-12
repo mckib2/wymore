@@ -1,0 +1,12 @@
+{
+  "id": "2.33",
+  "name": "System Experiments",
+  "description": "Definition of the set of system experiments EXZ as the Cartesian product of the complete input trajectories, states, and time scale.",
+  "elements": [
+    {
+      "id": "2.33/definition/system_experiments",
+      "type": "component",
+      "text": "EXZ = ITZ × SZ × TZ."
+    }
+  ]
+}

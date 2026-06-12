@@ -1,0 +1,17 @@
+{
+  "id": "a1.284",
+  "name": "Translation of a Function",
+  "description": "Definition of the function translation operator and closure under translation.",
+  "elements": [
+    {
+      "id": "a1.284/definition/translation_operator",
+      "type": "component",
+      "text": "f → r = {(t, a): t ∈ IJS++, t + r ∈ W, a ∈ A, a = f(t+r)}."
+    },
+    {
+      "id": "a1.284/definition/closed_under_translation",
+      "type": "component",
+      "text": "A set J ⊆ FNS(W, A) is closed under translation iff f ∈ J and r ∈ W implies f → r ∈ J."
+    }
+  ]
+}

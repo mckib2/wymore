@@ -1,0 +1,22 @@
+{
+  "id": "a1.292",
+  "name": "Concatenation of Functions",
+  "description": "Theorem defining the concatenation of two functions at a point and computing its piecewise values.",
+  "elements": [
+    {
+      "id": "a1.292/theorem/concatenation_fns",
+      "type": "implication",
+      "text": "CTN(f, r, g) ∈ FNS(V[0, r) ∪ W', A ∪ B)."
+    },
+    {
+      "id": "a1.292/theorem/concatenation_value_left",
+      "type": "implication",
+      "text": "CTN(f, r, g)(t) = f(t) if t ∈ V[0, r)."
+    },
+    {
+      "id": "a1.292/theorem/concatenation_value_right",
+      "type": "implication",
+      "text": "CTN(f, r, g)(t) = g(t - r) if t ∈ IJS[r, ∞) and t - r ∈ W."
+    }
+  ]
+}

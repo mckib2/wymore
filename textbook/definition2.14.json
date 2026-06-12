@@ -1,0 +1,32 @@
+{
+  "id": "2.14",
+  "name": "Nontrivial System",
+  "description": "Definition of a nontrivial discrete system with state-dependent transitions, state changes, and non-constant output.",
+  "elements": [
+    {
+      "id": "2.14/definition/nontrivial_system",
+      "type": "component",
+      "text": "The system Z is nontrivial if and only if conditions (i), (ii), and (iii) are satisfied."
+    },
+    {
+      "id": "2.14/requirement/state_dependent_transition",
+      "type": "constraint",
+      "text": "(i) there exist x1 ∈ SZ, x2 ∈ SZ, and p ∈ IZ, such that NZ(x1, p) ≠ NZ(x2, p) (the transition is state-dependent)."
+    },
+    {
+      "id": "2.14/requirement/active_transition",
+      "type": "constraint",
+      "text": "(ii) there exist x ∈ SZ and p ∈ IZ such that NZ(x, p) ≠ x (the state is not constant under all transitions)."
+    },
+    {
+      "id": "2.14/requirement/varying_output",
+      "type": "constraint",
+      "text": "(iii) #RNG(RZ) > 1 (the readout function is not constant, having a range size greater than 1)."
+    },
+    {
+      "id": "2.14/implication/trivial_system",
+      "type": "implication",
+      "text": "Z is trivial if Z is not nontrivial."
+    }
+  ]
+}

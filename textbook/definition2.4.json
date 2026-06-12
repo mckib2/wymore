@@ -1,0 +1,67 @@
+{
+  "id": "2.4",
+  "name": "Discrete System Specification",
+  "description": "Definition of a Wymorian discrete system as a quintuple with associated properties, constraints, and classification rules.",
+  "elements": [
+    {
+      "id": "2.4/component/Z",
+      "type": "interpretation",
+      "text": "Z is the name of the system."
+    },
+    {
+      "id": "2.4/component/SZ",
+      "type": "component",
+      "text": "SZ is the set of states of the discrete system Z."
+    },
+    {
+      "id": "2.4/constraint/sz_nonempty",
+      "type": "constraint",
+      "text": "SZ is a set not empty."
+    },
+    {
+      "id": "2.4/component/IZ",
+      "type": "component",
+      "text": "IZ is the set of inputs of the discrete system Z."
+    },
+    {
+      "id": "2.4/component/OZ",
+      "type": "component",
+      "text": "OZ is the set of outputs of the discrete system Z."
+    },
+    {
+      "id": "2.4/component/NZ",
+      "type": "component",
+      "text": "NZ is the next state function of the discrete system Z."
+    },
+    {
+      "id": "2.4/constraint/nz_signature",
+      "type": "constraint",
+      "text": "NZ ∈ FNS(SZ × IZ, SZ) if IZ is not empty; NZ ∈ FNS(SZ, SZ) if IZ is empty."
+    },
+    {
+      "id": "2.4/component/RZ",
+      "type": "component",
+      "text": "RZ is the readout function of the discrete system Z."
+    },
+    {
+      "id": "2.4/constraint/rz_signature",
+      "type": "constraint",
+      "text": "RZ ∈ FNS(SZ, OZ) if OZ is not empty; RZ = ∅ if OZ is empty."
+    },
+    {
+      "id": "2.4/implication/closed_system",
+      "type": "implication",
+      "text": "If both IZ and OZ are empty, the system Z is said to be closed."
+    },
+    {
+      "id": "2.4/implication/open_system",
+      "type": "implication",
+      "text": "If neither IZ nor OZ are empty, the system Z is said to be open."
+    },
+    {
+      "id": "2.4/component/TZ",
+      "type": "component",
+      "text": "The time scale of the discrete system Z is denoted TZ and is defined as follows: TZ = IJS++."
+    }
+  ]
+}

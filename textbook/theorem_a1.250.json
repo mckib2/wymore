@@ -1,0 +1,12 @@
+{
+  "id": "a1.250",
+  "name": "Preimage of Complement",
+  "description": "Theorem stating that the preimage of a complement is the complement of the preimage: f^-1(B - C) = A - f^-1(C).",
+  "elements": [
+    {
+      "id": "a1.250/theorem/preimage_complement",
+      "type": "implication",
+      "text": "If f ∈ FNS(A, B) and C ⊆ B, then f^-1(B - C) = A - f^-1(C)."
+    }
+  ]
+}

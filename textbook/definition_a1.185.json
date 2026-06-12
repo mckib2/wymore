@@ -1,0 +1,17 @@
+{
+  "id": "a1.185",
+  "name": "Strings and Length",
+  "description": "Definition of the set of all strings of elements of C and the string length function LTH.",
+  "elements": [
+    {
+      "id": "a1.185/definition/strings",
+      "type": "component",
+      "text": "STRINGS(C) = {f: f = ∅ or f ∈ FNS(IJS[0, n), C) for some n ∈ IJS+} (set of finite sequences)."
+    },
+    {
+      "id": "a1.185/definition/length",
+      "type": "component",
+      "text": "LTH(f) = 0 if f = ∅; LTH(f) = n if f ∈ FNS(IJS[0, n), C) for some n ∈ IJS+."
+    }
+  ]
+}

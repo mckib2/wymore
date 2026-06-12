@@ -1,0 +1,12 @@
+{
+  "id": "2.48",
+  "name": "Nonanticipatory Theorem",
+  "description": "Theorem stating that the state trajectory at time t depends only on the input trajectory restricted to the interval [0, t).",
+  "elements": [
+    {
+      "id": "2.48/theorem/nonanticipatory",
+      "type": "implication",
+      "text": "If Z ∈ DSYSTEMS, {(f, x, t), (g, x, t)} ⊆ EXZ and RSN(f, TZ[0, t)) = RSN(g, TZ[0, t)), then STZ(f, x)(t) = STZ(g, x)(t)."
+    }
+  ]
+}

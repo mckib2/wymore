@@ -1,0 +1,12 @@
+{
+  "id": "2.46",
+  "name": "Time Invariance of State Trajectory",
+  "description": "Theorem stating that translating the input trajectory by s and starting the system at state STZ(f, x)(s) yields the same state trajectory as the original system shifted by s.",
+  "elements": [
+    {
+      "id": "2.46/theorem/time_invariance",
+      "type": "implication",
+      "text": "STZ(f → s, STZ(f, x)(s))(t) = STZ(f, x)(s + t) for any f ∈ ITZ, x ∈ SZ, and s, t ∈ TZ."
+    }
+  ]
+}

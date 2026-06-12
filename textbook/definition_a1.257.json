@@ -1,0 +1,12 @@
+{
+  "id": "a1.257",
+  "name": "Function Restriction",
+  "description": "Definition of the restriction of a function to a subset of its domain.",
+  "elements": [
+    {
+      "id": "a1.257/definition/restriction",
+      "type": "component",
+      "text": "RSN(f, A') is exactly the same as f, but its domain is restricted to A'."
+    }
+  ]
+}

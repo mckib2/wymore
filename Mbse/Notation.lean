@@ -34,9 +34,9 @@ def elabWymoreSystem : CommandElab := fun stx => do
     let izCtors := izElems.getElems.map (fun e => mkIdent (toCtorName e))
     let ozCtors := ozElems.getElems.map (fun e => mkIdent (toCtorName e))
 
-    elabCommand (← `(command| inductive $szName:ident where $[| $szCtors:ident]* deriving Fintype))
-    elabCommand (← `(command| inductive $izName:ident where $[| $izCtors:ident]* deriving Fintype))
-    elabCommand (← `(command| inductive $ozName:ident where $[| $ozCtors:ident]* deriving Fintype))
+    elabCommand (← `(command| inductive $szName:ident where $[| $szCtors:ident]* deriving Fintype, DecidableEq, Repr))
+    elabCommand (← `(command| inductive $izName:ident where $[| $izCtors:ident]* deriving Fintype, DecidableEq, Repr))
+    elabCommand (← `(command| inductive $ozName:ident where $[| $ozCtors:ident]* deriving Fintype, DecidableEq, Repr))
 
     let mut nzS := #[]
     let mut nzI := #[]

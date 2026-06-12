@@ -1,0 +1,17 @@
+{
+  "id": "a1.218",
+  "name": "Domain and Range of a Function",
+  "description": "Definition of the domain (DMN) and range (RNG) of a function in the Wymorian set-theoretic context.",
+  "elements": [
+    {
+      "id": "a1.218/definition/domain",
+      "type": "component",
+      "text": "If f ∈ FNS(A, B), then the domain (DMN) of f is equal exactly to A."
+    },
+    {
+      "id": "a1.218/definition/range",
+      "type": "component",
+      "text": "The range (RNG) of the function f is a subset of B (RNG(f) ⊆ B) and may not be all of B."
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "a1.288",
+  "name": "Composition of Translations",
+  "description": "Theorem stating that successive translations by r and s is equivalent to a single translation by r + s.",
+  "elements": [
+    {
+      "id": "a1.288/theorem/translation_additivity",
+      "type": "implication",
+      "text": "(f → r) → s = f → (r + s) for any function f, and points r, s."
+    }
+  ]
+}

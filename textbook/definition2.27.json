@@ -1,0 +1,17 @@
+{
+  "id": "2.27",
+  "name": "State Trajectory",
+  "description": "Definition of the state trajectory STZ(f, x) of a system under input trajectory f and initial state x.",
+  "elements": [
+    {
+      "id": "2.27/definition/state_trajectory_recurrence",
+      "type": "component",
+      "text": "STZ(f, x) = {(t, y): t ∈ TZ, y ∈ SZ, y = x if t = 0; y = NZ(STZ(f, x)(t-1), f(t-1)) if t ≠ 0}."
+    },
+    {
+      "id": "2.27/definition/state_at_time_t",
+      "type": "component",
+      "text": "STZ(f, x)(t) is interpreted as the state of the system Z at time t given input f and initial state x."
+    }
+  ]
+}

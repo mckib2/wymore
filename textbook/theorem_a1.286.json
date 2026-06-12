@@ -1,0 +1,17 @@
+{
+  "id": "a1.286",
+  "name": "Properties of Translation",
+  "description": "Theorem establishing translation function existence and identity properties.",
+  "elements": [
+    {
+      "id": "a1.286/theorem/translation_fns",
+      "type": "implication",
+      "text": "f → r ∈ FNS(W', A) where W' = {s: s + r ∈ W}."
+    },
+    {
+      "id": "a1.286/theorem/translation_zero",
+      "type": "implication",
+      "text": "f → 0 = f."
+    }
+  ]
+}

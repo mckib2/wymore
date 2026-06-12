@@ -1,0 +1,12 @@
+{
+  "id": "a1.249",
+  "name": "Image of Preimage",
+  "description": "Theorem stating that the image of the preimage of a subset is a subset of that subset: f(f^-1(C)) ⊆ C.",
+  "elements": [
+    {
+      "id": "a1.249/theorem/subset_inclusion",
+      "type": "implication",
+      "text": "If f ∈ FNS(A, B) and C ⊆ B, then f(f^-1(C)) ⊆ C."
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "id": "2.29",
+  "name": "State Trajectory is a Function",
+  "description": "Theorem stating that the state trajectory is a total, single-valued function from TZ to SZ, satisfying FNS(TZ, SZ).",
+  "elements": [
+    {
+      "id": "2.29/theorem/trajectory_fns",
+      "type": "implication",
+      "text": "STZ(f, x) ∈ FNS(TZ, SZ) for any f ∈ ITZ and x ∈ SZ."
+    },
+    {
+      "id": "2.29/proof/subset",
+      "type": "implication",
+      "text": "Deduction (i): STZ(f, x) ⊆ TZ × SZ."
+    },
+    {
+      "id": "2.29/proof/totality",
+      "type": "implication",
+      "text": "Deduction (ii): For all t ∈ TZ, there exists y ∈ SZ such that (t, y) ∈ STZ(f, x)."
+    },
+    {
+      "id": "2.29/proof/single_valuedness",
+      "type": "implication",
+      "text": "Deduction (iii): If (t1, y1) ∈ STZ(f, x) and (t2, y2) ∈ STZ(f, x) and t1 = t2, then y1 = y2 (induction proof)."
+    }
+  ]
+}

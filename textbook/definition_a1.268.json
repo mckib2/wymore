@@ -1,0 +1,17 @@
+{
+  "id": "a1.268",
+  "name": "Composition of Functions",
+  "description": "Definition of function composition (g ∘ f)(x) = g(f(x)) and its set-theoretic generalization.",
+  "elements": [
+    {
+      "id": "a1.268/definition/composition_pointwise",
+      "type": "component",
+      "text": "The composition of g and f is defined at each point x in A as g(f(x)), denoted g ∘ f."
+    },
+    {
+      "id": "a1.268/definition/composition_set",
+      "type": "component",
+      "text": "g ∘ J denotes the set of all compositions of g with functions in J."
+    }
+  ]
+}

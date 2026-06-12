@@ -1,0 +1,12 @@
+{
+  "id": "2.30",
+  "name": "Output Trajectory",
+  "description": "Definition of the output trajectory of a system as the composition of the readout function RZ and the state trajectory.",
+  "elements": [
+    {
+      "id": "2.30/definition/output_trajectory_composition",
+      "type": "component",
+      "text": "OTZ(f, x) = RZ ∘ STZ(f, x) (where composition is defined in Definition A1.268)."
+    }
+  ]
+}

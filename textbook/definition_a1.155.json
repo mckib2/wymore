@@ -1,0 +1,22 @@
+{
+  "id": "a1.155",
+  "name": "Function Specification (FNS)",
+  "description": "Definition of the set of all total, single-valued functions from set A to set B.",
+  "elements": [
+    {
+      "id": "a1.155/requirement/relation",
+      "type": "constraint",
+      "text": "f ⊆ A × B (f is a relation between A and B)."
+    },
+    {
+      "id": "a1.155/requirement/totality",
+      "type": "constraint",
+      "text": "if a ∈ A, then there exists b ∈ B such that (a, b) ∈ f (the function is defined for every input in A)."
+    },
+    {
+      "id": "a1.155/requirement/single_valuedness",
+      "type": "constraint",
+      "text": "if (a, b) ∈ f and (c, d) ∈ f and a = c, then b = d (single-valuedness: each input maps to exactly one output)."
+    }
+  ]
+}

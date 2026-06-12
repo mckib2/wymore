@@ -1,0 +1,17 @@
+{
+  "id": "2.25",
+  "name": "Closure of Complete Input Trajectories",
+  "description": "Theorem stating that the set of complete input trajectories ITZ of a system is closed under translation and concatenation.",
+  "elements": [
+    {
+      "id": "2.25/theorem/translation_closed",
+      "type": "implication",
+      "text": "If Z ∈ DSYSTEMS and f ∈ ITZ, then f → t ∈ ITZ for any t ∈ TZ+."
+    },
+    {
+      "id": "2.25/theorem/concatenation_closed",
+      "type": "implication",
+      "text": "If Z ∈ DSYSTEMS, {f1, f2} ⊆ ITZ, and t ∈ TZ+, then CTN(f1, t, f2) ∈ ITZ."
+    }
+  ]
+}
