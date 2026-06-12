@@ -1,0 +1,12 @@
+{
+  "id": "2.65",
+  "name": "Output Port Structure",
+  "description": "Definition of the output port structure OSZ as the set of output ports paired with their respective output sets.",
+  "elements": [
+    {
+      "id": "2.65/definition/output_port_structure",
+      "type": "component",
+      "text": "OSZ = {(O1Z, B1), ..., (OnZ, Bn)} if OZ is a product, or {(OZ, OZ)} otherwise."
+    }
+  ]
+}

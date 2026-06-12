@@ -1,0 +1,27 @@
+{
+  "id": "2.70",
+  "name": "State Factor Sets and Structures",
+  "description": "Definition of state factor sets SFZ, state factor structure FSZ, component next state functions NjZ, and component state trajectories STjZ.",
+  "elements": [
+    {
+      "id": "2.70/definition/state_factor_sets",
+      "type": "component",
+      "text": "The set of factor sets of the state set of the system Z is SFZ: {S1Z, ..., SnZ} if SZ is a product, or {SZ} otherwise."
+    },
+    {
+      "id": "2.70/definition/state_factor_structure",
+      "type": "component",
+      "text": "The state factor set structure FSZ is {(S1Z, S1), ..., (SnZ, Sn)} if SZ is a product, or {(SZ, SZ)} otherwise."
+    },
+    {
+      "id": "2.70/definition/factor_next_state",
+      "type": "component",
+      "text": "NjZ = PJNj ∘ NZ is the jth component of the next state function."
+    },
+    {
+      "id": "2.70/definition/factor_state_trajectory",
+      "type": "component",
+      "text": "STjZ(f, x) = PJNj ∘ STZ(f, x) is the jth component of the state trajectory."
+    }
+  ]
+}

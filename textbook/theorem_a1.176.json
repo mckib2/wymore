@@ -1,0 +1,12 @@
+{
+  "id": "a1.176",
+  "name": "Projection Functions are Functions",
+  "description": "Theorem stating that projection functions over a Cartesian product are well-defined functions onto their coordinates or subsets of coordinates.",
+  "elements": [
+    {
+      "id": "a1.176/theorem/projection_functions",
+      "type": "component",
+      "text": "PJN(A, k) ∈ FNS(A, Ak) and PJN(A, I) ∈ FNS(A, B)."
+    }
+  ]
+}

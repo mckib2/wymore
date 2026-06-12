@@ -1,0 +1,12 @@
+{
+  "id": "a1.165",
+  "name": "Identity Function",
+  "description": "Definition of the identity function ID(A) over a set A.",
+  "elements": [
+    {
+      "id": "a1.165/definition/identity",
+      "type": "component",
+      "text": "ID(A) = {y: y = (x, x); x ∈ A} is the identity function over the set A."
+    }
+  ]
+}

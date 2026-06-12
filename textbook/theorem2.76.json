@@ -1,0 +1,27 @@
+{
+  "id": "2.76",
+  "name": "Equality of Readout Functions",
+  "description": "Theorem proving that readout functions are equal for two systems with properly aligned projective readout and identical state and output spaces.",
+  "elements": [
+    {
+      "id": "2.76/theorem/equal_readout",
+      "type": "implication",
+      "text": "If Z1 and Z2 are systems with properly aligned projective readout, SZ1 = SZ2 and OZ1 = OZ2, then RZ1 = RZ2."
+    },
+    {
+      "id": "2.76/proof/pointwise_projection",
+      "type": "component",
+      "text": "PJNi(RZ1(x)) = RiZ1(x) = PJNi(x) = RiZ2(x) = PJNi(RZ2(x)) for every state x and output port i."
+    },
+    {
+      "id": "2.76/proof/vector_equality",
+      "type": "component",
+      "text": "RZ1(x) = RZ2(x) for every state x by Theorem A1.178."
+    },
+    {
+      "id": "2.76/proof/function_equality",
+      "type": "component",
+      "text": "RZ1 = RZ2 by Theorem A1.163."
+    }
+  ]
+}

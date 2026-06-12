@@ -1,9 +1,22 @@
 # Proof Comparison Report: Textbook Set Theory vs. Lean Type Theory
 
-This report compiles the analyses of the proofs of core theorems in Wayne Wymore's Model-Based Systems Engineering (MBSE) textbook against their formalizations in Lean.
+This report compiles the analyses of the proofs of core theorems in Wayne Wymore's Model-Based Systems Engineering (MBSE) textbook against their formalizations in Lean 4. It highlights the fundamental differences in representation, induction strategies, and verification methods between textbook set theory and dependent type theory (DTT).
 
+---
 
-## Theorem 2.25: Closure of Complete Input Trajectories
+## Table of Contents
+1. [Theorem 2.25: Closure of Complete Input Trajectories under Translation and Concatenation](#1-theorem-225-closure-of-complete-input-trajectories)
+2. [Theorem 2.29: State Trajectory is a Function (Uniqueness)](#2-theorem-229-state-trajectory-is-a-function-uniqueness)
+3. [Theorem 2.32: Output Trajectory is a Function (Composition)](#3-theorem-232-output-trajectory-is-a-function-composition)
+4. [Theorem 2.46: Time Invariance of State Trajectory](#4-theorem-246-time-invariance-of-state-trajectory)
+5. [Theorem 2.48: Nonanticipatory Theorem](#5-theorem-248-nonanticipatory-theorem)
+6. [Theorem 2.76: Equality of Readout Functions](#6-theorem-276-equality-of-readout-functions)
+7. [Theorem 2.78: Construction of Projective Readout System](#7-theorem-278-construction-of-projective-readout-system)
+8. [Meta-Analysis and Synthesis](#8-meta-analysis-and-synthesis)
+
+---
+
+## 1. Theorem 2.25: Closure of Complete Input Trajectories
 
 ### Theorem Statement
 
@@ -11,12 +24,12 @@ This report compiles the analyses of the proofs of core theorems in Wayne Wymore
 > The set of complete input trajectories of a system is closed under translation and concatenation: If $Z \in \text{DSYSTEMS}$, $\{f_1, f_2\} \subseteq \text{ITZ}$, and $t \in \text{TZ}^+$, then
 > $$f_1 \rightarrow t \in \text{ITZ} \quad \text{and} \quad \text{CTN}(f_1, t, f_2) \in \text{ITZ}$$
 
-#### Lean Representation
-Definitions in [Mbse/Wymore.lean](file://Mbse/Wymore.lean):
-* `translate` at [Mbse/Wymore.lean:L308](file://Mbse/Wymore.lean#L308)
-* `concatenate` at [Mbse/Wymore.lean:L335](file://Mbse/Wymore.lean#L335)
-* `complete_trajectories_closed_under_translation` at [Mbse/Wymore.lean:L327](file://Mbse/Wymore.lean#L327)
-* `complete_trajectories_closed_under_concatenation` at [Mbse/Wymore.lean:L342](file://Mbse/Wymore.lean#L342)
+#### Lean 4 Representation
+Definitions in [Mbse/Wymore.lean](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean):
+* `translate` at [Mbse/Wymore.lean:L308](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L308)
+* `concatenate` at [Mbse/Wymore.lean:L335](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L335)
+* `complete_trajectories_closed_under_translation` at [Mbse/Wymore.lean:L327](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L327)
+* `complete_trajectories_closed_under_concatenation` at [Mbse/Wymore.lean:L342](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L342)
 
 ```lean
 def translate {A : Type} (f : Time → A) (r : Time) : Time → A :=
@@ -41,8 +54,8 @@ The textbook cites two mathematical dependencies to establish closure:
 
 Both proofs are correct and mathematically sound under set theory.
 
-#### Lean Verification
-In Lean, complete trajectories are represented as total functions of type `Time → A` (where `Time` is defined as `Nat`).
+#### Lean 4 Verification
+In Lean 4, complete trajectories are represented as total functions of type `Time → A` (where `Time` is defined as `Nat`).
 - Both `translate` and `concatenate` are defined as operations that return a function of type `Time → A`.
 - Because type theory models functions as primitives rather than subset relations, the fact that these operations return terms of type `Time → A` is verified statically by the Lean compiler at compile time.
 - No set-theoretic union or shifted domain existence proofs are required. The type system itself guarantees the closure property.
@@ -57,7 +70,7 @@ In Lean, complete trajectories are represented as total functions of type `Time 
 
 ---
 
-## Theorem 2.29: State Trajectory is a Function (Uniqueness)
+## 2. Theorem 2.29: State Trajectory is a Function (Uniqueness)
 
 ### Theorem Statement
 
@@ -65,9 +78,9 @@ In Lean, complete trajectories are represented as total functions of type `Time 
 > The state trajectory is a function: If $Z \in \text{DSYSTEMS}$, $f \in \text{ITZ}$, and $x \in \text{SZ}$, then $\text{STZ}(f, x) \in \text{FNS}(\text{TZ}, \text{SZ})$.
 
 #### Lean 4 Representation
-Definitions in [Mbse/Wymore.lean](file://Mbse/Wymore.lean):
-* `generateStateTrajectory` at [Mbse/Wymore.lean:L155](file://Mbse/Wymore.lean#L155)
-* `stateTrajectory_unique` at [Mbse/Wymore.lean:L213](file://Mbse/Wymore.lean#L213)
+Definitions in [Mbse/Wymore.lean](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean):
+* `generateStateTrajectory` at [Mbse/Wymore.lean:L155](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L155)
+* `stateTrajectory_unique` at [Mbse/Wymore.lean:L213](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L213)
 
 ```lean
 def generateStateTrajectory (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) : STZ SZ
@@ -95,7 +108,7 @@ The textbook proves that $\text{STZ}(f, x)$ satisfies the three conditions of a 
    - *Base Case* ($t = 0$): $y_1 = x = y_2$.
    - *Inductive Step*: Assumes $y_1 = y_2$ for $t$. For $t+1$, they both map to $\text{NZ}(\text{STZ}(f,x)(t), f(t))$, which must yield the same state because inputs and previous states are equal.
 
-#### Lean Verification
+#### Lean 4 Verification
 In dependent type theory, function well-formedness (totality and single-valuedness) is guaranteed by design:
 - The recursion engine checks that `generateStateTrajectory` terminates and covers all cases of the `Time` (natural number) domain. Thus, the function is total and single-valued by construction.
 - The theorem `stateTrajectory_unique` serves as the formal equivalent of Wymore's single-valuedness proof. It shows that any function `g` satisfying the recurrence relation is pointwise equal to the generated state trajectory.
@@ -111,7 +124,7 @@ In dependent type theory, function well-formedness (totality and single-valuedne
 
 ---
 
-## Theorem 2.32: Output Trajectory is a Function (Composition)
+## 3. Theorem 2.32: Output Trajectory is a Function (Composition)
 
 ### Theorem Statement
 
@@ -119,28 +132,28 @@ In dependent type theory, function well-formedness (totality and single-valuedne
 > The output trajectory is a function: If $Z \in \text{DSYSTEMS}$, $f \in \text{ITZ}$, $x \in \text{SZ}$, and $t \in \text{TZ}$, then $\text{OTZ}(f, x) \in \text{FNS}(\text{TZ}, \text{OZ})$ and $\text{OTZ}(f, x)(t) = \text{RZ}(\text{STZ}(f, x)(t))$.
 
 #### Lean 4 Representation
-Definitions in [Mbse/Wymore.lean](file://Mbse/Wymore.lean):
-* `generateOutputTrajectory` at [Mbse/Wymore.lean:L165](file://Mbse/Wymore.lean#L165)
+Definitions in [Mbse/Wymore.lean](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean):
+* `generateOutputTrajectory` at [Mbse/Wymore.lean:L165](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L165)
 
 ```lean
 def generateOutputTrajectory (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) : OTZ OZ :=
   fun t => Z.RZ (generateStateTrajectory Z s0 f t)
 ```
 
-### Proof Analysis
+### Proof Analysis & Erratum Discovery
 
-#### Textbook Proof
+#### Textbook Proof and Erratum
 The textbook proof states:
 > That $\text{OTZ}(f, x) \in \text{FNS}(\text{TZ}, \text{OZ})$ is a consequence of the facts that $\text{RZ} \in \text{FNS}(\text{SZ}, \text{OZ})$, by the definition at 2.4, and that $\text{STZ}(f, x) \in \text{FNS}(\text{TZ}, \text{SZ})$, by the theorems at 2.29 and A1.249. That $\text{OTZ}(f, x)(t) = \text{RZ}(\text{STZ}(f, x)(t))$ is a consequence of the theorem at A1.250.
 
-**Erratum**:
+**Erratum Discovery**:
 The textbook references **Theorems A1.249** and **A1.250** to justify function composition. However:
 - **Theorem A1.249** defines $f(f^{-1}(C)) \subseteq C$ (image of preimage inclusion).
 - **Theorem A1.250** defines $f^{-1}(B - C) = A - f^{-1}(C)$ (preimage of a complement).
 
 These theorems concern set images/preimages and complements, not function composition. This is a clear cross-reference numbering error in the original textbook. The correct citation should have referred to set-theoretic composition lemmas (such as Definition A1.268).
 
-#### Lean Verification
+#### Lean 4 Verification
 In type theory, function composition is natively defined:
 - `Z.RZ` has type `SZ → OZ`.
 - `generateStateTrajectory Z s0 f` has type `Time → SZ`.
@@ -157,7 +170,7 @@ In type theory, function composition is natively defined:
 
 ---
 
-## Theorem 2.46: Time Invariance of State Trajectory
+## 4. Theorem 2.46: Time Invariance of State Trajectory
 
 ### Theorem Statement
 
@@ -165,9 +178,9 @@ In type theory, function composition is natively defined:
 > If $Z \in \text{DSYSTEMS}$, $f \in \text{ITZ}$, $x \in \text{SZ}$, and $\{s, t\} \subseteq \text{TZ}$, then:
 > $$\text{STZ}(f \rightarrow s, \text{STZ}(f, x)(s))(t) = \text{STZ}(f, x)(s + t)$$
 
-#### Lean Representation
-Definitions in [Mbse/Wymore.lean](file://Mbse/Wymore.lean):
-* `stateTrajectory_time_invariance` at [Mbse/Wymore.lean:L407](file://Mbse/Wymore.lean#L407)
+#### Lean 4 Representation
+Definitions in [Mbse/Wymore.lean](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean):
+* `stateTrajectory_time_invariance` at [Mbse/Wymore.lean:L407](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L407)
 
 ```lean
 theorem stateTrajectory_time_invariance
@@ -188,7 +201,7 @@ theorem stateTrajectory_time_invariance
 ### Proof Analysis
 
 #### Textbook Proof
-The textbook employs a double induction strategy:
+The textbook employs a **double induction** strategy:
 1. **Base Case $s = 0$**: Proves the statement for all $t$ when $s=0$.
 2. **First Induction (on $t$, for $s = 1$)**:
    - Base case $t=0$: proven directly.
@@ -199,8 +212,8 @@ The textbook employs a double induction strategy:
 
 Wymore's proof is correct but complex, due to the need to prove translation compositions step-by-step over relational shifts.
 
-#### Lean Verification
-Lean collapses Wymore's double induction into a single induction on $t$ that generalizes over all $s$:
+#### Lean 4 Verification
+Lean collapses Wymore's double induction into a **single induction on $t$** that generalizes over all $s$:
 - **Base Case (`zero`)**: Both sides simplify definitionally to the state at time $s$. Closed automatically.
 - **Inductive Step (`succ`)**: Unfolds the successor step on both sides. Rewriting with the induction hypothesis `ih` leaves the input terms to prove: `translate f s t = f (s + t)`. By definition of `translate`, this reduces to `f (t + s) = f (s + t)`. This is resolved directly using the commutativity of natural number addition: `Nat.add_comm t s`.
 
@@ -214,7 +227,7 @@ Lean collapses Wymore's double induction into a single induction on $t$ that gen
 
 ---
 
-## Theorem 2.48: Nonanticipatory Theorem
+## 5. Theorem 2.48: Nonanticipatory Theorem
 
 ### Theorem Statement
 
@@ -227,10 +240,10 @@ Lean collapses Wymore's double induction into a single induction on $t$ that gen
 > $\text{STZ}(f, x)(t) = \text{STZ}(g, x)(t)$.
 
 #### Lean 4 Representation
-Definitions in [Mbse/Wymore.lean](file://Mbse/Wymore.lean):
-* `RSN` at [Mbse/Wymore.lean:L434](file://Mbse/Wymore.lean#L434)
-* `rsn_eq_iff` at [Mbse/Wymore.lean:L441](file://Mbse/Wymore.lean#L441)
-* `stateTrajectory_nonanticipatory` at [Mbse/Wymore.lean:L456](file://Mbse/Wymore.lean#L456)
+Definitions in [Mbse/Wymore.lean](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean):
+* `RSN` at [Mbse/Wymore.lean:L434](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L434)
+* `rsn_eq_iff` at [Mbse/Wymore.lean:L441](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L441)
+* `stateTrajectory_nonanticipatory` at [Mbse/Wymore.lean:L456](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L456)
 
 ```lean
 def RSN {A B : Type} (f : A → B) (S : Set A) : {a : A // a ∈ S} → B :=
@@ -263,7 +276,7 @@ theorem stateTrajectory_nonanticipatory
 ### Proof Analysis
 
 #### Textbook Proof
-The textbook employs strong induction on the time variable $t$:
+The textbook employs **strong induction** on the time variable $t$:
 - *Base Case* ($t = 0$): $\text{STZ}(f, x)(0) = x = \text{STZ}(g, x)(0)$ by definition.
 - *Inductive Step*: Assumes the theorem is true for all $t \le n$. For $n+1$, under the hypothesis $\text{RSN}(f, \text{TZ}[0, n+1)) = \text{RSN}(g, \text{TZ}[0, n+1))$, it deduces:
   1. $\text{RSN}(f, \text{TZ}[0, n)) = \text{RSN}(g, \text{TZ}[0, n))$
@@ -271,7 +284,7 @@ The textbook employs strong induction on the time variable $t$:
   
   Applying the induction hypothesis at $n$ yields $\text{STZ}(f, x)(n) = \text{STZ}(g, x)(n)$. Combining this with $f(n) = g(n)$ inside the state transition function $\text{NZ}$ proves the theorem for $n+1$.
 
-#### Lean Verification
+#### Lean 4 Verification
 Lean simplifies the induction strategy from strong induction to **standard mathematical induction** (`induction t`):
 - **Base Case (`zero`)**: Trivially holds as both sides reduce to `x`.
 - **Inductive Step (`succ`)**:
@@ -294,3 +307,152 @@ Standard induction suffices because the transition relation is a first-order rec
 | **Interval Shifting** | Set union separation of $\text{TZ}[0, n+1)$. | Pointwise separation via inequality cases. |
 
 ---
+
+## 6. Theorem 2.76: Equality of Readout Functions
+
+### Theorem Statement
+
+#### Textbook Statement
+> If $Z1$ and $Z2$ are systems with properly aligned projective readout, $SZ1 = SZ2$ and $OZ1 = OZ2$, then $RZ1 = RZ2$.
+
+#### Lean 4 Representation
+Definitions in [Mbse/Wymore.lean](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean):
+* `tuple_eq_projection` at [Mbse/Wymore.lean:L616](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L616)
+* `fun_eq_iff` at [Mbse/Wymore.lean:L625](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L625)
+* `readout_eq_of_properly_aligned` at [Mbse/Wymore.lean:L645](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L645)
+
+```lean
+theorem tuple_eq_projection {I : Type} {A : I → Type} (x : (i : I) → A i) :
+    x = fun i => PJN i x := by
+  rfl
+
+theorem fun_eq_iff {A B : Type} (f g : A → B) :
+    f = g ↔ ∀ x, f x = g x
+
+theorem readout_eq_of_properly_aligned {IZ IZ2 I : Type} {Val : I → Type}
+    (Z1 : DiscreteSystem ((i : I) → Val i) IZ ((i : I) → Val i))
+    (Z2 : DiscreteSystem ((i : I) → Val i) IZ2 ((i : I) → Val i))
+    (h1 : IsProperlyAlignedReadout Z1)
+    (h2 : IsProperlyAlignedReadout Z2) :
+    Z1.RZ = Z2.RZ := by
+  funext s
+  funext i
+  have r1 : portReadout Z1 i s = PJN i s := h1 i s
+  have r2 : portReadout Z2 i s = PJN i s := h2 i s
+  exact r1.trans r2.symm
+```
+
+### Proof Analysis
+
+#### Textbook Proof
+The textbook proves $RZ1 = RZ2$ by reasoning pointwise and applying vector/functional extensionality:
+1. **Pointwise projection equality**: For any state $x$ and output port coordinate $i$:
+   $$PJN_i(RZ_1(x)) = R_iZ_1(x) = PJN_i(x)$$
+   $$PJN_i(RZ_2(x)) = R_iZ_2(x) = PJN_i(x)$$
+   Thus, $PJN_i(RZ_1(x)) = PJN_i(RZ_2(x))$ for every coordinate $i$.
+2. **Vector projection equality (Theorem A1.178)**: Reconstructs the vectors from their equal projections to conclude:
+   $$RZ_1(x) = RZ_2(x) \quad \text{for every state } x$$
+3. **Function extensionality (Theorem A1.163)**: Moves from value equality to function equality:
+   $$RZ_1 = RZ_2$$
+
+This proof is correct and mathematically precise.
+
+#### Lean 4 Verification
+Lean represents and streamlines Wymore's proof steps natively:
+- **Pointwise coordinates**: Applying `funext s` and `funext i` introduces an arbitrary state `s` and coordinate `i` to prove `(Z1.RZ s) i = (Z2.RZ s) i`.
+- **Vector projection equality**: In Lean, a tuple is a dependent function mapping indices to values. The textbook’s Theorem A1.178 (vector projection equality) is equivalent to $\eta$-expansion (`x = fun i => PJN i x`), which is definitionally true (`rfl`) in DTT.
+- **Function extensionality**: The textbook's Theorem A1.163 is Lean's core principle of function extensionality, applied using the `funext` tactic.
+- **Resolution**:
+  - The readout for $Z1$ at coordinate $i$ is exactly `portReadout Z1 i s`.
+  - Under `h1` and `h2` (the properly aligned readouts), these are rewritten to `PJN i s`.
+  - The transitivity of equality (`r1.trans r2.symm`) completes the proof.
+
+### Comparison Summary
+
+| Feature | Textbook Set Theory | Lean Type Theory |
+|---|---|---|
+| **Function Extensionality** | Proved as a separate theorem (A1.163). | Native language construct (`funext` tactic). |
+| **Vector Projection Equality** | Proved as a separate theorem (A1.178). | Definitionally true via $\eta$-reduction (`rfl`). |
+| **Typing constraints** | Assumes $SZ1=SZ2$ and $OZ1=OZ2$ as equations. | Expressed in compile-time type signatures. |
+
+---
+
+## 7. Theorem 2.78: Construction of Projective Readout System
+
+### Theorem Statement
+
+#### Textbook Statement
+> If Z1 ∈ DSYSTEMS, m = #SFZ1, n = #OPZ1, SZ2 = {x: x ∈ × (O1Z1, ... , OnZ1, S1Z1, ... , SmZ1); PJN(1, ..., n)(x) = RZ1(PJN(n + 1, ..., n + m)(x))}, IZ2 = IZ1, OZ2 = OZ1, NZ2 = {((x,p),y): (x,p) ∈ SZ2 × IZ2; y ∈ SZ2; PJN(n + 1, ..., n + m)(y) = NZ1(PJN(n + 1, ..., n + m)(x),p); PJN(1, ..., n)(y) = RZ1(PJN(n + 1, ..., n + m)(y))}, RZ2 = PJN(SZ2, (1, ..., n)) and Z2 = (SZ2, IZ2, OZ2, NZ2, RZ2), then Z2 ∈ DSYSTEMS, RZ2 is a properly aligned projective readout function, and Z2 behaves equivalently to Z1.
+
+#### Lean 4 Representation
+Definitions in [Mbse/Wymore.lean](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean):
+* `pjn_is_fun` at [Mbse/Wymore.lean:L660](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L660)
+* `Z2State` at [Mbse/Wymore.lean:L668](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L668)
+* `Z2` at [Mbse/Wymore.lean:L695](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L695)
+* `z2_state_trajectory_equivalence` at [Mbse/Wymore.lean:L728](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L728)
+* `z2_output_trajectory_equivalence` at [Mbse/Wymore.lean:L743](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L743)
+
+```lean
+structure Z2State (SZ OZ : Type) (RZ : SZ → OZ) where
+  out : OZ
+  state : SZ
+  eq : out = RZ state
+
+def Z2State.equivSZ {SZ OZ : Type} (RZ : SZ → OZ) : Z2State SZ OZ RZ ≃ SZ
+
+def Z2 {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) : DiscreteSystem (Z2State SZ OZ Z.RZ) IZ OZ
+
+theorem z2_readout_projective {SZ IZ OutPort : Type} {OutPortVal : OutPort → Type}
+    (Z : DiscreteSystem SZ IZ ((op : OutPort) → OutPortVal op)) (op : OutPort)
+    (s2 : Z2State SZ ((op : OutPort) → OutPortVal op) Z.RZ) :
+    portReadout (Z2 Z) op s2 = s2.out op
+
+theorem z2_state_trajectory_equivalence {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f : ITZ IZ) (t : Time) :
+    (generateStateTrajectory (Z2 Z) ⟨Z.RZ x, x, rfl⟩ f t).state = generateStateTrajectory Z x f t
+
+theorem z2_output_trajectory_equivalence {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f : ITZ IZ) (t : Time) :
+    generateOutputTrajectory (Z2 Z) ⟨Z.RZ x, x, rfl⟩ f t = generateOutputTrajectory Z x f t
+```
+
+### Proof Analysis
+
+#### Textbook Proof
+The textbook proves $Z_2 \in DSYSTEMS$ and validates its trajectory equivalences:
+1. **System specifications**: Verifies non-emptiness of spaces and proves that the relations $NZ2$ and $RZ2$ satisfy the FNS (function space) properties. It uses Theorem A1.176 to show that projections are functions.
+2. **State trajectory equivalence**: Uses strong induction on time $t$ to prove $STZ_1(f, x)(t) = \text{PJN}(n+1, \dots, n+m)(STZ_2(f, y)(t))$.
+3. **Output trajectory equivalence**: Demonstrates $OTZ_1(f, x)(t) = OTZ_2(f, y)(t)$ by substituting the state trajectory projection equivalence and unfolding definitions.
+
+#### Lean 4 Verification
+Lean represents the state space extension and verifies its properties:
+- **State Isomorphism**: In set theory, $SZ_2$ is defined as a subset of a Cartesian product, requiring explicit verification that it is non-empty and finite. In Lean, we establish a constructive bijection `Z2State.equivSZ` showing that `Z2State` is isomorphic to `SZ`. This enables `sz_nonempty` and `sz_finite` to be derived directly from the original system’s fields using `Nonempty.map` and `Fintype.ofEquiv`, bypassing manual set-theoretic proofs.
+- **State Trajectory Equivalence**: Proved by induction on $t$. In the inductive step, unfolding the constructor `Z2` and beta-reducing via `dsimp` exposes the state projection. By unfolding `Z2` in the induction hypothesis `ih`, patterns match exactly, completing the induction.
+- **Output Trajectory Equivalence**: Resolved by rewriting with the `.eq` constraint field of the `Z2State` constructor, which proves the output component matches the readout of the state component, followed by rewriting with the state trajectory equivalence.
+- **Projection Functions**: In Lean, projections `PJN` are functions by definition, so proving they are functions is definitionally true (`trivial`).
+
+### Comparison Summary
+
+| Feature | Textbook Set Theory | Lean Type Theory |
+|---|---|---|
+| **State Space Definition** | Subset of a Cartesian product. | Isomorphic constructor type `Z2State`. |
+| **DSYSTEMS Soundness** | Proved by verifying non-emptiness and relation properties. | Inherited from the original system via type isomorphism. |
+| **Trajectory Equivalence** | Proved via strong induction on $t$. | Standard induction on $t$ utilizing constructor unfolding. |
+
+---
+
+## 8. Meta-Analysis and Synthesis
+
+Formalizing Wayne Wymore's textbook theorems in Lean 4 reveals key differences in how set theory and dependent type theory model and verify mathematical objects.
+
+### 1. Proof Simplification via Algebraic Types
+In set theory, functions are represented as sets of ordered pairs (relations). To prove properties like time invariance (Theorem 2.46) or function closure (Theorem 2.25), set theory requires complex calculations showing that shifting relations preserve their index sets. 
+In Lean 4, by modeling time scales as natural numbers and trajectories as total functions (`Time → A`), we leverage the algebraic properties of the natural numbers. Commutativity (`Nat.add_comm`) collapses Wymore's double induction on time invariance into a single-variable induction.
+
+### 2. Verification of Well-formedness by the Compiler
+Under set-theoretic frameworks, defining an object (such as state or output trajectories) requires a two-step process: defining a relation, and then proving that the relation satisfies the function properties of totality and single-valuedness (Theorem 2.29 and 2.32). 
+In type theory, the compiler enforces totality and termination checks directly on recursive definitions. As a result, well-formedness is established *by construction* at compile time. 
+
+### 3. Structural Extensionality
+Wymore's textbook features explicit theorems for function extensionality (Theorem A1.163) and tuple projection reconstruction (Theorem A1.178) because set theory does not have these properties built into its foundations. In DTT, functions and dependent products are primitive structures that satisfy extensionality principles. Lean automatically handles tuple decomposition and function pointwise equivalence via definitional equality (`rfl`) and the function extensionality axiom (`funext`), eliminating the need to cite or manually prove these helper theorems.
+
+### 4. Erratum Isolation
+Textbooks written in informal set theory are susceptible to cross-referencing and numbering errata, as observed in Theorem 2.32 (where set preimage lemmas A1.249 and A1.250 are erroneously cited for function composition). In Lean, the compiler enforces strict type checking. If a proof contains an invalid cross-reference, compilation fails, ensuring that only logically consistent proofs are admitted.

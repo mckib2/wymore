@@ -1,0 +1,12 @@
+{
+  "id": "2.59",
+  "name": "Input Port Structure",
+  "description": "Definition of the input port structure ISZ as the set of input ports paired with their respective input sets.",
+  "elements": [
+    {
+      "id": "2.59/definition/input_port_structure",
+      "type": "component",
+      "text": "ISZ = {(I1Z, A1), ..., (InZ, An)} if IZ is a product, or {(IZ, IZ)} otherwise."
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "id": "2.78",
+  "name": "Construction of Projective Readout System",
+  "description": "Theorem proving the construction and equivalence of a system Z2 with properly aligned projective readout to replace a given system Z1.",
+  "elements": [
+    {
+      "id": "2.78/theorem/system_construction",
+      "type": "component",
+      "text": "If Z1 ∈ DSYSTEMS, Z2 = (SZ2, IZ2, OZ2, NZ2, RZ2) is constructed as specified, then Z2 ∈ DSYSTEMS, RZ2 is properly aligned, and Z2 behaves equivalently to Z1."
+    },
+    {
+      "id": "2.78/proof/dsystems",
+      "type": "component",
+      "text": "Z2 ∈ DSYSTEMS is proven by showing non-emptiness of spaces and function requirements of NZ2 and RZ2."
+    },
+    {
+      "id": "2.78/proof/properly_aligned",
+      "type": "component",
+      "text": "RZ2 is a properly aligned projective readout function."
+    },
+    {
+      "id": "2.78/proof/exz_mapping",
+      "type": "component",
+      "text": "If (f, x, t) ∈ EXZ1, then (f, y, t) ∈ EXZ2 where y is the extended state."
+    },
+    {
+      "id": "2.78/proof/state_trajectory_projection",
+      "type": "component",
+      "text": "STZ1(f, x)(t) = PJN(n + 1, ..., n + m)(STZ2(f, y)(t)) is proved by induction on time t."
+    },
+    {
+      "id": "2.78/proof/output_trajectory_equality",
+      "type": "component",
+      "text": "OTZ1(f, x)(t) = OTZ2(f, y)(t) is proved using state trajectory equivalence."
+    }
+  ]
+}

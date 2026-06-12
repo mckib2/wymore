@@ -1,0 +1,12 @@
+{
+  "id": "a1.163",
+  "name": "Equality of Functions (Extensionality)",
+  "description": "Theorem stating that two functions are equal if and only if their domains of definition are equal and their values at every point in the domain are equal.",
+  "elements": [
+    {
+      "id": "a1.163/theorem/function_extensionality",
+      "type": "component",
+      "text": "If f ∈ FNS(A, D) and g ∈ FNS(J, K), then f = g if and only if A = J and f(x) = g(x) for every x ∈ A."
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "2.73",
+  "name": "State Readout and Projective Readout Types",
+  "description": "Definition of state readout, projective readout, and properly aligned projective readout functions.",
+  "elements": [
+    {
+      "id": "2.73/definition/state_readout",
+      "type": "component",
+      "text": "The system Z has state readout iff OSZ(B) = SZ and PJNB ∘ ID(SZ) for every output port B (i.e., output is the state)."
+    },
+    {
+      "id": "2.73/definition/projective_readout",
+      "type": "component",
+      "text": "The readout RZ is projective iff for every i, there exists j such that RiZ = PJN(SZ, SjZ)."
+    },
+    {
+      "id": "2.73/definition/properly_aligned_readout",
+      "type": "component",
+      "text": "The projective readout RZ is properly aligned iff for every i, RiZ = PJN(SZ, SiZ)."
+    }
+  ]
+}

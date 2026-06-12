@@ -1,0 +1,12 @@
+{
+  "id": "a1.178",
+  "name": "Equality of Vectors in terms of Projections",
+  "description": "Theorem stating that any vector x in a Cartesian product is equal to the tuple of its projections.",
+  "elements": [
+    {
+      "id": "a1.178/theorem/vector_projection_equality",
+      "type": "component",
+      "text": "If x ∈ A1 × ... × An, then x = (PJN(A, 1)(x), ..., PJN(A, n)(x))."
+    }
+  ]
+}

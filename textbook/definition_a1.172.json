@@ -1,0 +1,27 @@
+{
+  "id": "a1.172",
+  "name": "Projection Functions",
+  "description": "Definition of projection functions over a Cartesian product onto coordinates or sets of coordinates.",
+  "elements": [
+    {
+      "id": "a1.172/definition/projection_coordinate",
+      "type": "component",
+      "text": "PJN(A, i) is the projection function over the Cartesian product A onto the ith coordinate."
+    },
+    {
+      "id": "a1.172/definition/projection_set",
+      "type": "component",
+      "text": "PJN(A, Ai) is the projection function over the Cartesian product A onto the coordinate set Ai."
+    },
+    {
+      "id": "a1.172/definition/projection_subset",
+      "type": "component",
+      "text": "PJN(A, I) is the projection function over the Cartesian product A onto a subset of coordinates."
+    },
+    {
+      "id": "a1.172/definition/projection_abbreviations",
+      "type": "component",
+      "text": "Standard abbreviations for projection functions: PJN(A, i) = PJN(i) = PJNi."
+    }
+  ]
+}
