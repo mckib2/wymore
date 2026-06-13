@@ -1,0 +1,22 @@
+{
+  "id": "2.97",
+  "name": "FCNSY Output Trajectory at One Time Unit",
+  "description": "Theorem establishing that for Z = FCNSY(F, 1), the output at t + 1 is F(f(t)).",
+  "elements": [
+    {
+      "id": "2.97/theorem/output_value",
+      "type": "implication",
+      "text": "If Z = FCNSY(F, 1) and (f, x, t) \u2208 EXZ, then OTZ(f, x)(t + 1) = F(f(t))."
+    },
+    {
+      "id": "2.97/proof/t_zero",
+      "type": "component",
+      "text": "OTZ(f, x)(1) = RZ(STZ(f, x)(1)) = STZ(f, x)(1) = NZ(x, f(0)) = F(f(0))."
+    },
+    {
+      "id": "2.97/proof/arbitrary_t",
+      "type": "component",
+      "text": "The assertion holds for arbitrary t by applying the Time Invariance Theorem (Theorem 2.46)."
+    }
+  ]
+}

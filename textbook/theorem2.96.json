@@ -1,0 +1,12 @@
+{
+  "id": "2.96",
+  "name": "FCNSY has Two Parameters",
+  "description": "Theorem proving that the function computation system parameterization FCNSY has two parameters.",
+  "elements": [
+    {
+      "id": "2.96/theorem/parameter_count",
+      "type": "implication",
+      "text": "FCNSY is a system parameterization with two parameters."
+    }
+  ]
+}

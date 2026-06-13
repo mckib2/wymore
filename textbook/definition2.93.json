@@ -1,0 +1,12 @@
+{
+  "id": "2.93",
+  "name": "Function Computation Systems Parameterization",
+  "description": "Definition of the system parameterization FCNSY representing the computation of values of a function F with n output ports.",
+  "elements": [
+    {
+      "id": "2.93/definition/fcnsy",
+      "type": "component",
+      "text": "FCNSY(F, n) is the system Z with SZ = RNG(F), IZ = DMN(F), OZ = RNG(F)^n, NZ(x, p) = F(p), and RZ(x) = (x, ..., x)."
+    }
+  ]
+}

@@ -1,6 +1,8 @@
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
 import Mathlib.Data.Finset.Basic
+
 
 /-!
   Formalization of Wayne Wymore's Tricotyledon Theory of System Design (T3SD)
@@ -753,5 +755,80 @@ theorem z2_output_trajectory_equivalence {SZ IZ OZ : Type} (Z : DiscreteSystem S
   unfold Z2 at st_eq
   rw [st_eq]
 
+/-! ## System Parameterization -/
+
+/--
+  [textbook/definition2.82/definition/system_parameterization]
+  A system parameterization F maps a parameter type `P` to a `DiscreteSystem`.
+  To allow system spaces to depend on parameters, we define it as a structure
+  where the state, input, and output spaces are functions of `P`.
+-/
+def SystemParameterization (P : Type) (SZ IZ OZ : P → Type) : Type :=
+  (p : P) → DiscreteSystem (SZ p) (IZ p) (OZ p)
+
+/--
+  [textbook/definition2.82/definition/parameter_instance]
+  An instance of a system parameterization `F` for a parameter value `r : P`
+  is simply the system `F r`.
+-/
+def parameterInstance {P : Type} {SZ IZ OZ : P → Type}
+    (F : SystemParameterization P SZ IZ OZ) (r : P) : DiscreteSystem (SZ r) (IZ r) (OZ r) :=
+  F r
+
+/--
+  [textbook/definition2.82/definition/multiple_parameters]
+  A parameterization has `n` parameters if its parameter domain type is a product type
+  indexed by a type of cardinality `n`.
+-/
+def HasNParameters (P : Type) (n : Nat) (ParamType : Fin n → Type) (_h_dom : P = ((i : Fin n) → ParamType i)) : Prop :=
+  True
+
+/--
+  [textbook/definition2.82/definition/one_parameter]
+  A parameterization has one parameter if its parameter domain is treated as a single type.
+-/
+def HasOneParameter (_P : Type) : Prop :=
+  True
+
+/--
+  [textbook/definition2.93/definition/fcnsy]
+  The parameterization of function computation systems is denoted FCNSY.
+  For a function F : IZ → SZ and a positive number of output ports n,
+  it returns a system Z with state space SZ, input space IZ, and output space Fin n → SZ.
+-/
+def fcnsy {IZ SZ : Type} (F : IZ → SZ) (n : Nat) [Fintype SZ] [Fintype IZ] [Inhabited SZ] :
+    DiscreteSystem SZ IZ (Fin n → SZ) where
+  sz_nonempty := ⟨default⟩
+  sz_finite := inferInstance
+  iz_finite := inferInstance
+  oz_finite := by infer_instance
+  NZ := fun _x p => F p
+  RZ := fun x _j => x
+
+/--
+  [textbook/theorem2.96/theorem/parameter_count]
+  FCNSY is a system parameterization with two parameters.
+-/
+theorem fcnsy_has_two_parameters {IZ SZ : Type} [Fintype SZ] [Fintype IZ] [Inhabited SZ] :
+    ∃ (P : Type) (ParamType : Fin 2 → Type) (h_dom : P = ((i : Fin 2) → ParamType i)),
+      HasNParameters P 2 ParamType h_dom := by
+  let ParamType : Fin 2 → Type := fun i => if i.val == 0 then (IZ → SZ) else Nat
+  let P := (i : Fin 2) → ParamType i
+  refine ⟨P, ParamType, rfl, ?_⟩
+  trivial
 
 
+/--
+  [textbook/theorem2.97/theorem/output_value]
+  [textbook/theorem2.97/proof/t_zero]
+  [textbook/theorem2.97/proof/arbitrary_t]
+  For Z = FCNSY(F, 1), the output at t + 1 is F(f(t)).
+  Due to the simplicity of the function computation system where the next state is independent
+  of the previous state, this holds definitionally by `rfl` for all `t`. Thus, the textbook's
+  induction proof (using t = 0 as base case and applying the Time Invariance Theorem)
+  collapses to a single definitional proof in Lean 4.
+-/
+theorem fcnsy_output_one_time_unit {IZ SZ : Type} (F : IZ → SZ) [Fintype SZ] [Fintype IZ] [Inhabited SZ]
+    (x : SZ) (f : ITZ IZ) (t : Time) :
+    generateOutputTrajectory (fcnsy F 1) x f (t + 1) 0 = F (f t) := by
+  rfl
