@@ -1,7 +1,9 @@
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.Sigma
 import Mathlib.Data.Finset.Basic
+
 
 
 /-!
@@ -849,6 +851,12 @@ structure PortSystemVector (n : Nat) where
   OutPort : Fin n → Type
   OutPortVal : (i : Fin n) → OutPort i → Type
   Z : (i : Fin n) → DiscreteSystem (SZ i) ((p : Port i) → PortVal i p) ((op : OutPort i) → OutPortVal i op)
+  Port_finite : (i : Fin n) → Fintype (Port i)
+  PortVal_finite : (i : Fin n) → (p : Port i) → Fintype (PortVal i p)
+  OutPort_finite : (i : Fin n) → Fintype (OutPort i)
+  OutPortVal_finite : (i : Fin n) → (op : OutPort i) → Fintype (OutPortVal i op)
+  Port_decidable : (i : Fin n) → DecidableEq (Port i)
+  OutPort_decidable : (i : Fin n) → DecidableEq (OutPort i)
   distinct : ∀ (i j : Fin n), i ≠ j → ¬ HEq (Z i) (Z j)
 
 /--
@@ -1040,3 +1048,90 @@ theorem pure_feedback_not_other {n : Nat} (SCR : SystemCouplingRecipe n) (h : Is
 def IsMixed {n : Nat} (SCR : SystemCouplingRecipe n) : Prop :=
   ¬ IsSingular SCR ∧ ¬ IsConjunctive SCR ∧ ¬ IsCascade SCR ∧
   ¬ IsEssentiallyCascade SCR ∧ ¬ IsPureFeedback SCR
+
+/--
+  [textbook/definition3.40/definition/csy]
+  [textbook/definition3.40/definition/sz]
+  [textbook/definition3.40/definition/iz]
+  [textbook/definition3.40/definition/oz]
+  [textbook/definition3.40/definition/nz]
+  [textbook/definition3.40/definition/rz]
+  The parallel (conjunctive) composition of a connectable vector of systems.
+  Returns a new DiscreteSystem where:
+  - State space is the product of the component state spaces.
+  - Input space is the product of the input sets of all component input ports.
+  - Output space is the product of the output sets of all component output ports.
+  - NZ transitions each component system independently.
+  - RZ reads out each component port independently.
+-/
+def csy {n : Nat} (VSCR : PortSystemVector n) :
+    DiscreteSystem
+      ((i : Fin n) → VSCR.SZ i)
+      ((ip : Σ (i : Fin n), VSCR.Port i) → VSCR.PortVal ip.1 ip.2)
+      ((op : Σ (i : Fin n), VSCR.OutPort i) → VSCR.OutPortVal op.1 op.2) where
+  sz_nonempty := by
+    have h_non : ∀ i, Nonempty (VSCR.SZ i) := fun i => (VSCR.Z i).sz_nonempty
+    exact ⟨fun i => Classical.choice (h_non i)⟩
+  sz_finite := by
+    haveI : ∀ i, Fintype (VSCR.SZ i) := fun i => (VSCR.Z i).sz_finite
+    infer_instance
+  iz_finite := by
+    haveI : ∀ i, Fintype (VSCR.Port i) := VSCR.Port_finite
+    haveI : ∀ i, DecidableEq (VSCR.Port i) := VSCR.Port_decidable
+    haveI : ∀ (ip : Σ i, VSCR.Port i), Fintype (VSCR.PortVal ip.fst ip.snd) := fun ip => VSCR.PortVal_finite ip.fst ip.snd
+    infer_instance
+  oz_finite := by
+    haveI : ∀ i, Fintype (VSCR.OutPort i) := VSCR.OutPort_finite
+    haveI : ∀ i, DecidableEq (VSCR.OutPort i) := VSCR.OutPort_decidable
+    haveI : ∀ (op : Σ i, VSCR.OutPort i), Fintype (VSCR.OutPortVal op.fst op.snd) := fun op => VSCR.OutPortVal_finite op.fst op.snd
+    infer_instance
+  NZ := fun x p i => (VSCR.Z i).NZ (x i) (fun port => p ⟨i, port⟩)
+  RZ := fun x op => (VSCR.Z op.1).RZ (x op.1) op.2
+
+/--
+  [textbook/definition3.40/definition/ip_map]
+  Function mapping the input ports of the conjunctive system to the input ports
+  of the component systems (modeled as the identity function since they share the same type).
+-/
+def csy_IP_map {n : Nat} (VSCR : PortSystemVector n) :
+    (Σ (i : Fin n), VSCR.Port i) → (Σ (i : Fin n), VSCR.Port i) :=
+  ID _
+
+/--
+  [textbook/definition3.40/definition/inip_map]
+  The inverse mapping of the conjunctive system input ports to component input ports.
+-/
+def csy_INIP_map {n : Nat} (VSCR : PortSystemVector n) :
+    (Σ (i : Fin n), VSCR.Port i) → (Σ (i : Fin n), VSCR.Port i) :=
+  ID _
+
+/--
+  [textbook/definition3.40/definition/is_map]
+  The input port structure function of the conjunctive system (returns the value type of each port).
+-/
+def csy_IS_map {n : Nat} (VSCR : PortSystemVector n) (ip : Σ (i : Fin n), VSCR.Port i) : Type :=
+  VSCR.PortVal ip.1 ip.2
+
+/--
+  [textbook/definition3.40/definition/op_map]
+  Function mapping the output ports of the conjunctive system to the output ports
+  of the component systems (modeled as the identity function since they share the same type).
+-/
+def csy_OP_map {n : Nat} (VSCR : PortSystemVector n) :
+    (Σ (i : Fin n), VSCR.OutPort i) → (Σ (i : Fin n), VSCR.OutPort i) :=
+  ID _
+
+/--
+  [textbook/definition3.40/definition/inop_map]
+  The inverse mapping of the conjunctive system output ports to component output ports.
+-/
+def csy_INOP_map {n : Nat} (VSCR : PortSystemVector n) :
+    (Σ (i : Fin n), VSCR.OutPort i) → (Σ (i : Fin n), VSCR.OutPort i) :=
+  ID _
+
+/--
+  [textbook/definition3.40/definition/os_map]
+  The output port structure function of the conjunctive system (returns the value type of each port).
+-/
+def csy_OS_map {n : Nat} (VSCR : PortSystemVector n) (op : Σ (i : Fin n), VSCR.OutPort i) : Type :=
+  VSCR.OutPortVal op.1 op.2

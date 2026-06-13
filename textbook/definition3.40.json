@@ -1,0 +1,67 @@
+{
+  "id": "3.40",
+  "name": "Conjunctive System (Parallel Composition)",
+  "description": "Definition of the conjunctive system CSY(V) of a connectable vector of systems V, including state/input/output product spaces, next state/readout functions, and port mapping relations.",
+  "elements": [
+    {
+      "id": "3.40/definition/csy",
+      "type": "component",
+      "text": "CSY = {(V, Z): V is a connectable vector of systems; if V = Z1, then Z = Z1; if V = (Z1, ..., Zn), then Z = (SZ, IZ, OZ, NZ, RZ)."
+    },
+    {
+      "id": "3.40/definition/sz",
+      "type": "component",
+      "text": "SZ = ⅹ (SZ1, ..., SZn)."
+    },
+    {
+      "id": "3.40/definition/iz",
+      "type": "component",
+      "text": "IZ = ⅹ (I1Z1, ..., Ik1Z1, ..., I1Zn, ..., IknZn)."
+    },
+    {
+      "id": "3.40/definition/oz",
+      "type": "component",
+      "text": "OZ = ⅹ (O1Z1, ..., Om1Z1, ..., O1Zn, ..., OmnZn)."
+    },
+    {
+      "id": "3.40/definition/nz",
+      "type": "component",
+      "text": "NZ = {((x, p), y) : x ∈ SZ; p ∈ IZ; y ∈ SZ; if i ∈ IJS[1, n], then PJNi(y) = NZi(PJNi(x), PJNPZi(p))}."
+    },
+    {
+      "id": "3.40/definition/rz",
+      "type": "component",
+      "text": "RZ = {(x, q): x ∈ SZ; q ∈ OZ; if i ∈ IJS[1, n], then PJNOPZi(q) = RZi(PJNi(x))}."
+    },
+    {
+      "id": "3.40/definition/ip_map",
+      "type": "component",
+      "text": "IP& is a function mapping the input ports of the conjunctive system to the input ports of the component systems."
+    },
+    {
+      "id": "3.40/definition/inip_map",
+      "type": "component",
+      "text": "INIP& is the inverse function of IP&."
+    },
+    {
+      "id": "3.40/definition/is_map",
+      "type": "component",
+      "text": "IS& is the input port structure function of the conjunctive system."
+    },
+    {
+      "id": "3.40/definition/op_map",
+      "type": "component",
+      "text": "OP& is a function mapping the output ports of the conjunctive system to the output ports of the component systems."
+    },
+    {
+      "id": "3.40/definition/inop_map",
+      "type": "component",
+      "text": "INOP& is the inverse function of OP&."
+    },
+    {
+      "id": "3.40/definition/os_map",
+      "type": "component",
+      "text": "OS& is the output port structure function of the conjunctive system."
+    }
+  ]
+}
