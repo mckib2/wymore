@@ -194,6 +194,92 @@
 |------------|------|---------------|--------|----------------------|
 | `2.93/definition/fcnsy` | `component` | FCNSY(F, n) is the system Z with SZ = RNG(F), IZ = DMN(F), OZ = RNG(F)^n, NZ(x, p) = F(p), and RZ(x) = (x, ..., x). | ✅ Traced | `fcnsy` ([Mbse/Wymore.lean:793](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L793)) |
 
+### `textbook/definition3.11` — System Coupling Recipe
+
+- Structured source file: [textbook/definition3.11.json](file:///home/nicholas/uoa/sie699/textbook/definition3.11.json)
+- Description: *Definition of a system coupling recipe SCR, connected/unconnected input/output ports, and interfaces between component systems.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `3.11/definition/system_coupling_recipe` | `component` | A system coupling recipe is a pair denoted SCR = (VSCR, CSCR) where (i) VSCR is a connectable vector of systems and (ii) CSCR is a system connectivity for VSCR. | ✅ Traced | `SystemCouplingRecipe` ([Mbse/Wymore.lean:918](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L918)) |
+| `3.11/interpretation/vscr` | `interpretation` | VSCR is called the connectable vector of system components of SCR. | ✅ Traced | `SystemCouplingRecipe` ([Mbse/Wymore.lean:918](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L918)) |
+| `3.11/interpretation/cscr` | `interpretation` | CSCR is called the system connectivity of SCR. | ✅ Traced | `SystemCouplingRecipe` ([Mbse/Wymore.lean:918](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L918)) |
+| `3.11/definition/coscr` | `component` | COSCR = DMN(CSCR), if CSCR is a function or COSCR = ∅, if CSCR = ∅. | ✅ Traced | `COSCR` ([Mbse/Wymore.lean:930](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L930)) |
+| `3.11/definition/ciscr` | `component` | CISCR = RNG(CSCR), if CSCR is a function or CISCR = ∅, if CSCR = ∅. | ✅ Traced | `CISCR` ([Mbse/Wymore.lean:937](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L937)) |
+| `3.11/definition/uoscr` | `component` | UOSCR = ∪ {OPZ' : Z' ∈ VSCR} - COSCR. | ✅ Traced | `UOSCR` ([Mbse/Wymore.lean:944](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L944)) |
+| `3.11/definition/uiscr` | `component` | UISCR = ∪ {IPZ' : Z' ∈ VSCR} - CISCR. | ✅ Traced | `UISCR` ([Mbse/Wymore.lean:951](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L951)) |
+| `3.11/definition/interface` | `component` | The interface between Z' and Z'' specified by SCR, where Z' and Z'' are in VSCR, is the set of all pairs in CSCR involving only input ports and outputs of both Z' and Z''; that is, the interface between Z' and Z'' is (CSCR ∩ (OPZ' × IPZ'')) ∪ (CSCR ∩ (OPZ'' × IPZ')). | ✅ Traced | `SCRInterface` ([Mbse/Wymore.lean:958](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L958)) |
+
+### `textbook/definition3.15` — Conjunctive Coupling Recipe
+
+- Structured source file: [textbook/definition3.15.json](file:///home/nicholas/uoa/sie699/textbook/definition3.15.json)
+- Description: *Definition of a conjunctive system coupling recipe where the system connectivity set is empty.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `3.15/definition/conjunctive_scr` | `component` | The system coupling recipe SCR is conjunctive if and only if CSCR = ∅. | ✅ Traced | `IsConjunctive` ([Mbse/Wymore.lean:967](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L967)) |
+
+### `textbook/definition3.19` — Cascade and Essentially Cascade Coupling Recipes
+
+- Structured source file: [textbook/definition3.19.json](file:///home/nicholas/uoa/sie699/textbook/definition3.19.json)
+- Description: *Definitions of cascade and essentially cascade system coupling recipes.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `3.19/definition/cascade_scr` | `component` | The system coupling recipe SCR is cascade if and only if CSCR contains no feedback connections. | ✅ Traced | `IsCascade` ([Mbse/Wymore.lean:974](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L974)) |
+| `3.19/definition/essentially_cascade_scr` | `component` | The system coupling recipe SCR, where VSCR = (Z1, ..., Zn) for n ∈ IJS+, is 'essentially cascade' if there exists f ∈ FNS(IJS[1, n], 1TO1, ONTO, IJS[1, n]) such that if SCRf = ((Zf(1), ..., Zf(n)), CSCR), then SCRf is cascade. | ✅ Traced | `IsEssentiallyCascade` ([Mbse/Wymore.lean:981](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L981)) |
+
+### `textbook/definition3.26` — Singular Coupling Recipe
+
+- Structured source file: [textbook/definition3.26.json](file:///home/nicholas/uoa/sie699/textbook/definition3.26.json)
+- Description: *Definition of a singular system coupling recipe consisting of a single system and no connections.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `3.26/definition/singular_scr` | `component` | The system coupling recipe SCR is singular if and only if: (i) VSCR = Z for some system Z and (ii) CSCR = ∅. | ✅ Traced | `IsSingular` ([Mbse/Wymore.lean:989](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L989)) |
+
+### `textbook/definition3.29` — Pure Feedback Coupling Recipe
+
+- Structured source file: [textbook/definition3.29.json](file:///home/nicholas/uoa/sie699/textbook/definition3.29.json)
+- Description: *Definition of a pure feedback system coupling recipe consisting of a single system and nonempty connections.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `3.29/definition/pure_feedback_scr` | `component` | The system coupling recipe SCR is pure feedback if and only if: (i) VSCR = Z for some Z ∈ DSYSTEMS and (ii) CSCR ≠ ∅. | ✅ Traced | `IsPureFeedback` ([Mbse/Wymore.lean:998](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L998)) |
+
+### `textbook/definition3.3` — Connectable Vector of Systems
+
+- Structured source file: [textbook/definition3.3.json](file:///home/nicholas/uoa/sie699/textbook/definition3.3.json)
+- Description: *Definition of a connection vector of systems where all components are discrete systems and are pairwise distinct.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `3.3/definition/connection_vector` | `component` | VSCR is a connection vector of systems iff: (i) either VSCR ∈ DSYSTEMS or VSCR is an n-tuple for some n ∈ IJS+ of the form VSCR = (Z1, ..., Zn) for n ∈ IJS+ and Zi ∈ DSYSTEMS for every i ∈ IJS[1, n]. | ✅ Traced | `PortSystemVector` ([Mbse/Wymore.lean:838](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L838)) |
+| `3.3/requirement/pairwise_distinct` | `constraint` | (ii) if {i, j} ⊆ IJS[1, n] such that i ≠ j, then Zi ≠ Zj. | ✅ Traced | `PortSystemVector` ([Mbse/Wymore.lean:838](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L838)) |
+
+### `textbook/definition3.33` — Mixed Coupling Recipe
+
+- Structured source file: [textbook/definition3.33.json](file:///home/nicholas/uoa/sie699/textbook/definition3.33.json)
+- Description: *Definition of a mixed system coupling recipe as one that is not singular, conjunctive, cascade, essentially cascade, or pure feedback.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `3.33/definition/mixed_scr` | `component` | A system coupling recipe is mixed if it is not singular, conjunctive, cascade, essentially cascade, or pure feedback. | ✅ Traced | `IsMixed` ([Mbse/Wymore.lean:1035](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1035)) |
+
+### `textbook/definition3.7` — System Connectivity
+
+- Structured source file: [textbook/definition3.7.json](file:///home/nicholas/uoa/sie699/textbook/definition3.7.json)
+- Description: *Definition of a system connectivity CSCR for a connectable vector VSCR, including one-to-one mapping, domain and range restrictions, and the port compatibility condition.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `3.7/definition/connectivity_relation` | `component` | A set CSCR is a system connectivity for the connectable vector VSCR of systems if and only if: (i) either CSCR = ∅ or CSCR is a 1TO1 function. | ✅ Traced | `IsOneToOneRelation` ([Mbse/Wymore.lean:854](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L854))<br>`IsSystemConnectivity` ([Mbse/Wymore.lean:886](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L886)) |
+| `3.7/requirement/domain_subset` | `constraint` | (ii) DMN(CSCR) is a proper subset of ∪ {OPZ' : Z' ∈ VSCR}. | ✅ Traced | `IsProperDomain` ([Mbse/Wymore.lean:862](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L862))<br>`IsSystemConnectivity` ([Mbse/Wymore.lean:886](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L886)) |
+| `3.7/requirement/range_subset` | `constraint` | (iii) RNG(CSCR) is a proper subset of ∪ {IPZ' : Z' ∈ VSCR}. | ✅ Traced | `IsProperRange` ([Mbse/Wymore.lean:869](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L869))<br>`IsSystemConnectivity` ([Mbse/Wymore.lean:886](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L886)) |
+| `3.7/requirement/port_compatibility` | `constraint` | (iv) if (B, A) ∈ CSCR, where B ∈ OPZ', A ∈ IPZ'', Z' ∈ VSCR and Z'' ∈ VSCR, then OSZ'(B) = ISZ''(A) (the port compatibility condition). | ✅ Traced | `PortCompatibility` ([Mbse/Wymore.lean:876](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L876))<br>`IsSystemConnectivity` ([Mbse/Wymore.lean:886](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L886)) |
+| `3.7/definition/feedforward_connection` | `component` | A feedforward connection is a pair (B, A) ∈ CSCR, where, if VSCR = (Z1, ..., Zn), B ∈ OPZi and A ∈ IPZj, then i < j. | ✅ Traced | `IsFeedforward` ([Mbse/Wymore.lean:900](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L900)) |
+| `3.7/definition/feedback_connection` | `component` | A feedback connection is a pair (B, A) ∈ CSCR, where, if VSCR = (Z1, ..., Zn), B ∈ OPZi and A ∈ IPZj, then i ≥ j. | ✅ Traced | `IsFeedback` ([Mbse/Wymore.lean:909](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L909)) |
+
 ### `textbook/definition_a1.155` — Function Specification (FNS)
 
 - Structured source file: [textbook/definition_a1.155.json](file:///home/nicholas/uoa/sie699/textbook/definition_a1.155.json)
@@ -371,6 +457,17 @@
 | `2.97/proof/t_zero` | `component` | OTZ(f, x)(1) = RZ(STZ(f, x)(1)) = STZ(f, x)(1) = NZ(x, f(0)) = F(f(0)). | ✅ Traced | `fcnsy_output_one_time_unit` ([Mbse/Wymore.lean:821](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L821)) |
 | `2.97/proof/arbitrary_t` | `component` | The assertion holds for arbitrary t by applying the Time Invariance Theorem (Theorem 2.46). | ✅ Traced | `fcnsy_output_one_time_unit` ([Mbse/Wymore.lean:821](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L821)) |
 
+### `textbook/theorem3.31` — Pure Feedback System Coupling Recipes
+
+- Structured source file: [textbook/theorem3.31.json](file:///home/nicholas/uoa/sie699/textbook/theorem3.31.json)
+- Description: *Theorem and proof stating that pure feedback recipes are distinct from singular, conjunctive, and cascade recipes.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `3.31/theorem/class_in_themselves` | `implication` | If SCR is a pure feedback system coupling recipe, then SCR is neither singular, conjunctive, or cascade. | ✅ Traced | `pure_feedback_not_other` ([Mbse/Wymore.lean:1007](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1007)) |
+| `3.31/proof/not_singular_conjunctive` | `component` | SCR is neither singular or conjunctive because CSCR ≠ ∅ by the definition at 3.29. | ✅ Traced | `pure_feedback_not_other` ([Mbse/Wymore.lean:1007](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1007)) |
+| `3.31/proof/not_cascade` | `component` | SCR is not cascade, since CSCR must contain a pair of the form (B, A) where B is an output port of VSCR and A is an input port of VSCR, which is a feedback connection, by the definition at 3.7. | ✅ Traced | `pure_feedback_not_other` ([Mbse/Wymore.lean:1007](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1007)) |
+
 ### `textbook/theorem_a1.163` — Equality of Functions (Extensionality)
 
 - Structured source file: [textbook/theorem_a1.163.json](file:///home/nicholas/uoa/sie699/textbook/theorem_a1.163.json)
@@ -448,9 +545,9 @@
 
 ## 2. Completeness & Quality Summary
 
-- **Total Structured Definitions Tracked**: 42
-- **Total Individual Requirements/Elements**: 105
-- **Traced/Formalized Elements**: 105 (105/105)
+- **Total Structured Definitions Tracked**: 51
+- **Total Individual Requirements/Elements**: 130
+- **Traced/Formalized Elements**: 130 (130/130)
 - **Formalization Coverage Rate**: **100.0%**
 
 > [!TIP]

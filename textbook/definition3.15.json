@@ -1,0 +1,12 @@
+{
+  "id": "3.15",
+  "name": "Conjunctive Coupling Recipe",
+  "description": "Definition of a conjunctive system coupling recipe where the system connectivity set is empty.",
+  "elements": [
+    {
+      "id": "3.15/definition/conjunctive_scr",
+      "type": "component",
+      "text": "The system coupling recipe SCR is conjunctive if and only if CSCR = ∅."
+    }
+  ]
+}

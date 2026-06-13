@@ -1,0 +1,12 @@
+{
+  "id": "3.29",
+  "name": "Pure Feedback Coupling Recipe",
+  "description": "Definition of a pure feedback system coupling recipe consisting of a single system and nonempty connections.",
+  "elements": [
+    {
+      "id": "3.29/definition/pure_feedback_scr",
+      "type": "component",
+      "text": "The system coupling recipe SCR is pure feedback if and only if: (i) VSCR = Z for some Z ∈ DSYSTEMS and (ii) CSCR ≠ ∅."
+    }
+  ]
+}

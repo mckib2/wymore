@@ -1,0 +1,17 @@
+{
+  "id": "3.3",
+  "name": "Connectable Vector of Systems",
+  "description": "Definition of a connection vector of systems where all components are discrete systems and are pairwise distinct.",
+  "elements": [
+    {
+      "id": "3.3/definition/connection_vector",
+      "type": "component",
+      "text": "VSCR is a connection vector of systems iff: (i) either VSCR ∈ DSYSTEMS or VSCR is an n-tuple for some n ∈ IJS+ of the form VSCR = (Z1, ..., Zn) for n ∈ IJS+ and Zi ∈ DSYSTEMS for every i ∈ IJS[1, n]."
+    },
+    {
+      "id": "3.3/requirement/pairwise_distinct",
+      "type": "constraint",
+      "text": "(ii) if {i, j} ⊆ IJS[1, n] such that i ≠ j, then Zi ≠ Zj."
+    }
+  ]
+}

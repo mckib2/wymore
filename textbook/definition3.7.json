@@ -1,0 +1,37 @@
+{
+  "id": "3.7",
+  "name": "System Connectivity",
+  "description": "Definition of a system connectivity CSCR for a connectable vector VSCR, including one-to-one mapping, domain and range restrictions, and the port compatibility condition.",
+  "elements": [
+    {
+      "id": "3.7/definition/connectivity_relation",
+      "type": "component",
+      "text": "A set CSCR is a system connectivity for the connectable vector VSCR of systems if and only if: (i) either CSCR = ∅ or CSCR is a 1TO1 function."
+    },
+    {
+      "id": "3.7/requirement/domain_subset",
+      "type": "constraint",
+      "text": "(ii) DMN(CSCR) is a proper subset of ∪ {OPZ' : Z' ∈ VSCR}."
+    },
+    {
+      "id": "3.7/requirement/range_subset",
+      "type": "constraint",
+      "text": "(iii) RNG(CSCR) is a proper subset of ∪ {IPZ' : Z' ∈ VSCR}."
+    },
+    {
+      "id": "3.7/requirement/port_compatibility",
+      "type": "constraint",
+      "text": "(iv) if (B, A) ∈ CSCR, where B ∈ OPZ', A ∈ IPZ'', Z' ∈ VSCR and Z'' ∈ VSCR, then OSZ'(B) = ISZ''(A) (the port compatibility condition)."
+    },
+    {
+      "id": "3.7/definition/feedforward_connection",
+      "type": "component",
+      "text": "A feedforward connection is a pair (B, A) ∈ CSCR, where, if VSCR = (Z1, ..., Zn), B ∈ OPZi and A ∈ IPZj, then i < j."
+    },
+    {
+      "id": "3.7/definition/feedback_connection",
+      "type": "component",
+      "text": "A feedback connection is a pair (B, A) ∈ CSCR, where, if VSCR = (Z1, ..., Zn), B ∈ OPZi and A ∈ IPZj, then i ≥ j."
+    }
+  ]
+}

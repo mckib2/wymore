@@ -1,0 +1,22 @@
+{
+  "id": "3.31",
+  "name": "Pure Feedback System Coupling Recipes",
+  "description": "Theorem and proof stating that pure feedback recipes are distinct from singular, conjunctive, and cascade recipes.",
+  "elements": [
+    {
+      "id": "3.31/theorem/class_in_themselves",
+      "type": "implication",
+      "text": "If SCR is a pure feedback system coupling recipe, then SCR is neither singular, conjunctive, or cascade."
+    },
+    {
+      "id": "3.31/proof/not_singular_conjunctive",
+      "type": "component",
+      "text": "SCR is neither singular or conjunctive because CSCR ≠ ∅ by the definition at 3.29."
+    },
+    {
+      "id": "3.31/proof/not_cascade",
+      "type": "component",
+      "text": "SCR is not cascade, since CSCR must contain a pair of the form (B, A) where B is an output port of VSCR and A is an input port of VSCR, which is a feedback connection, by the definition at 3.7."
+    }
+  ]
+}

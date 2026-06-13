@@ -1,0 +1,12 @@
+{
+  "id": "3.26",
+  "name": "Singular Coupling Recipe",
+  "description": "Definition of a singular system coupling recipe consisting of a single system and no connections.",
+  "elements": [
+    {
+      "id": "3.26/definition/singular_scr",
+      "type": "component",
+      "text": "The system coupling recipe SCR is singular if and only if: (i) VSCR = Z for some system Z and (ii) CSCR = ∅."
+    }
+  ]
+}

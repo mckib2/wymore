@@ -1,0 +1,12 @@
+{
+  "id": "3.33",
+  "name": "Mixed Coupling Recipe",
+  "description": "Definition of a mixed system coupling recipe as one that is not singular, conjunctive, cascade, essentially cascade, or pure feedback.",
+  "elements": [
+    {
+      "id": "3.33/definition/mixed_scr",
+      "type": "component",
+      "text": "A system coupling recipe is mixed if it is not singular, conjunctive, cascade, essentially cascade, or pure feedback."
+    }
+  ]
+}

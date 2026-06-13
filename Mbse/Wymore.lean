@@ -832,3 +832,211 @@ theorem fcnsy_output_one_time_unit {IZ SZ : Type} (F : IZ → SZ) [Fintype SZ] [
     (x : SZ) (f : ITZ IZ) (t : Time) :
     generateOutputTrajectory (fcnsy F 1) x f (t + 1) 0 = F (f t) := by
   rfl
+
+/-! ## Chapter 3: System Coupling Recipes and Connectivity -/
+
+/--
+  [textbook/definition3.3/definition/connection_vector]
+  [textbook/definition3.3/requirement/pairwise_distinct]
+  A connectable vector of systems of length `n`.
+  Each component `i` is a discrete system with structured input and output ports.
+  All component systems are pairwise distinct under heterogeneous equality (HEq).
+-/
+structure PortSystemVector (n : Nat) where
+  SZ : Fin n → Type
+  Port : Fin n → Type
+  PortVal : (i : Fin n) → Port i → Type
+  OutPort : Fin n → Type
+  OutPortVal : (i : Fin n) → OutPort i → Type
+  Z : (i : Fin n) → DiscreteSystem (SZ i) ((p : Port i) → PortVal i p) ((op : OutPort i) → OutPortVal i op)
+  distinct : ∀ (i j : Fin n), i ≠ j → ¬ HEq (Z i) (Z j)
+
+/--
+  [textbook/definition3.7/definition/connectivity_relation]
+  A relation R is a 1-to-1 function if it is single-valued and injective.
+-/
+def IsOneToOneRelation {α β : Type} (R : Set (α × β)) : Prop :=
+  (∀ (x : α) (y1 y2 : β), (x, y1) ∈ R → (x, y2) ∈ R → y1 = y2) ∧
+  (∀ (x1 x2 : α) (y : β), (x1, y) ∈ R → (x2, y) ∈ R → x1 = x2)
+
+/--
+  [textbook/definition3.7/requirement/domain_subset]
+  The domain of CSCR is a proper subset of all output ports (modeled as not equal to Set.univ).
+-/
+def IsProperDomain {α β : Type} (R : Set (α × β)) : Prop :=
+  { x : α | ∃ y, (x, y) ∈ R } ≠ Set.univ
+
+/--
+  [textbook/definition3.7/requirement/range_subset]
+  The range of CSCR is a proper subset of all input ports (modeled as not equal to Set.univ).
+-/
+def IsProperRange {α β : Type} (R : Set (α × β)) : Prop :=
+  { y : β | ∃ x, (x, y) ∈ R } ≠ Set.univ
+
+/--
+  [textbook/definition3.7/requirement/port_compatibility]
+  Port compatibility condition: if output port `op` is connected to input port `ip`,
+  their corresponding value types must be equal.
+-/
+def PortCompatibility {n : Nat} (VSCR : PortSystemVector n)
+    (CSCR : Set ((Σ (i : Fin n), VSCR.OutPort i) × (Σ (i : Fin n), VSCR.Port i))) : Prop :=
+  ∀ (op : Σ (i : Fin n), VSCR.OutPort i) (ip : Σ (i : Fin n), VSCR.Port i),
+    (op, ip) ∈ CSCR → VSCR.OutPortVal op.1 op.2 = VSCR.PortVal ip.1 ip.2
+
+/--
+  [textbook/definition3.7/definition/connectivity_relation]
+  [textbook/definition3.7/requirement/domain_subset]
+  [textbook/definition3.7/requirement/range_subset]
+  [textbook/definition3.7/requirement/port_compatibility]
+  Checks if CSCR is a valid system connectivity for VSCR.
+-/
+def IsSystemConnectivity {n : Nat} (VSCR : PortSystemVector n)
+    (CSCR : Set ((Σ (i : Fin n), VSCR.OutPort i) × (Σ (i : Fin n), VSCR.Port i))) : Prop :=
+  IsOneToOneRelation CSCR ∧
+  IsProperDomain CSCR ∧
+  IsProperRange CSCR ∧
+  PortCompatibility VSCR CSCR
+
+/--
+  [textbook/definition3.7/definition/feedforward_connection]
+  A connection is feedforward if the output port belongs to system `i`
+  and the input port belongs to system `j` such that `i < j`.
+-/
+def IsFeedforward {n : Nat} {VSCR : PortSystemVector n}
+    (p : (Σ (i : Fin n), VSCR.OutPort i) × (Σ (i : Fin n), VSCR.Port i)) : Prop :=
+  p.1.1 < p.2.1
+
+/--
+  [textbook/definition3.7/definition/feedback_connection]
+  A connection is feedback if the output port belongs to system `i`
+  and the input port belongs to system `j` such that `i ≥ j`.
+-/
+def IsFeedback {n : Nat} {VSCR : PortSystemVector n}
+    (p : (Σ (i : Fin n), VSCR.OutPort i) × (Σ (i : Fin n), VSCR.Port i)) : Prop :=
+  p.1.1 ≥ p.2.1
+
+/--
+  [textbook/definition3.11/definition/system_coupling_recipe]
+  [textbook/definition3.11/interpretation/vscr]
+  [textbook/definition3.11/interpretation/cscr]
+  A system coupling recipe is a pair SCR = (VSCR, CSCR) where VSCR is a connectable
+  vector of systems and CSCR is a system connectivity for VSCR.
+-/
+structure SystemCouplingRecipe (n : Nat) where
+  VSCR : PortSystemVector n
+  CSCR : Set ((Σ (i : Fin n), VSCR.OutPort i) × (Σ (i : Fin n), VSCR.Port i))
+  connectivity : IsSystemConnectivity VSCR CSCR
+
+/--
+  [textbook/definition3.11/definition/coscr]
+  The set of output ports connected by the coupling recipe SCR.
+-/
+def COSCR {n : Nat} (SCR : SystemCouplingRecipe n) : Set (Σ (i : Fin n), SCR.VSCR.OutPort i) :=
+  { op | ∃ ip, (op, ip) ∈ SCR.CSCR }
+
+/--
+  [textbook/definition3.11/definition/ciscr]
+  The set of input ports connected by the coupling recipe SCR.
+-/
+def CISCR {n : Nat} (SCR : SystemCouplingRecipe n) : Set (Σ (i : Fin n), SCR.VSCR.Port i) :=
+  { ip | ∃ op, (op, ip) ∈ SCR.CSCR }
+
+/--
+  [textbook/definition3.11/definition/uoscr]
+  The set of output ports unconnected by the coupling recipe SCR.
+-/
+def UOSCR {n : Nat} (SCR : SystemCouplingRecipe n) : Set (Σ (i : Fin n), SCR.VSCR.OutPort i) :=
+  (COSCR SCR)ᶜ
+
+/--
+  [textbook/definition3.11/definition/uiscr]
+  The set of input ports unconnected by the coupling recipe SCR.
+-/
+def UISCR {n : Nat} (SCR : SystemCouplingRecipe n) : Set (Σ (i : Fin n), SCR.VSCR.Port i) :=
+  (CISCR SCR)ᶜ
+
+/--
+  [textbook/definition3.11/definition/interface]
+  The interface between system `i` and system `j` specified by SCR
+  is the set of connections in CSCR involving only ports of system `i` and system `j`.
+-/
+def SCRInterface {n : Nat} (SCR : SystemCouplingRecipe n) (i j : Fin n) :
+    Set ((Σ (k : Fin n), SCR.VSCR.OutPort k) × (Σ (k : Fin n), SCR.VSCR.Port k)) :=
+  { p ∈ SCR.CSCR | (p.1.1 = i ∧ p.2.1 = j) ∨ (p.1.1 = j ∧ p.2.1 = i) }
+
+/--
+  [textbook/definition3.15/definition/conjunctive_scr]
+  A system coupling recipe is conjunctive if and only if CSCR is empty.
+-/
+def IsConjunctive {n : Nat} (SCR : SystemCouplingRecipe n) : Prop :=
+  SCR.CSCR = ∅
+
+/--
+  [textbook/definition3.19/definition/cascade_scr]
+  A system coupling recipe is cascade if and only if CSCR contains no feedback connections.
+-/
+def IsCascade {n : Nat} (SCR : SystemCouplingRecipe n) : Prop :=
+  ∀ p ∈ SCR.CSCR, ¬ IsFeedback p
+
+/--
+  [textbook/definition3.19/definition/essentially_cascade_scr]
+  A system coupling recipe is essentially cascade if there exists a permutation of the
+  component systems such that the reordered recipe is cascade.
+-/
+def IsEssentiallyCascade {n : Nat} (SCR : SystemCouplingRecipe n) : Prop :=
+  ∃ (g : Fin n ≃ Fin n), ∀ p ∈ SCR.CSCR, g p.1.1 < g p.2.1
+
+/--
+  [textbook/definition3.26/definition/singular_scr]
+  A system coupling recipe is singular if and only if:
+  1. VSCR contains only a single system component (length n = 1)
+  2. CSCR is empty
+-/
+def IsSingular {n : Nat} (SCR : SystemCouplingRecipe n) : Prop :=
+  n = 1 ∧ SCR.CSCR = ∅
+
+/--
+  [textbook/definition3.29/definition/pure_feedback_scr]
+  A system coupling recipe is pure feedback if and only if:
+  1. VSCR contains only a single system component (length n = 1)
+  2. CSCR is not empty
+-/
+def IsPureFeedback {n : Nat} (SCR : SystemCouplingRecipe n) : Prop :=
+  n = 1 ∧ SCR.CSCR ≠ ∅
+
+/--
+  [textbook/theorem3.31/theorem/class_in_themselves]
+  [textbook/theorem3.31/proof/not_singular_conjunctive]
+  [textbook/theorem3.31/proof/not_cascade]
+  Pure feedback coupling recipes are neither singular, conjunctive, nor cascade.
+-/
+theorem pure_feedback_not_other {n : Nat} (SCR : SystemCouplingRecipe n) (h : IsPureFeedback SCR) :
+    ¬ IsSingular SCR ∧ ¬ IsConjunctive SCR ∧ ¬ IsCascade SCR := by
+  have hn : n = 1 := h.1
+  have hne : SCR.CSCR ≠ ∅ := h.2
+  constructor
+  · intro hs
+    exact hne hs.2
+  · constructor
+    · intro hc
+      exact hne hc
+    · intro h_cas
+      obtain ⟨p, hp⟩ := Set.nonempty_iff_ne_empty.mpr hne
+      have : Subsingleton (Fin n) := by
+        rw [hn]
+        infer_instance
+      have heq : p.1.1 = p.2.1 := Subsingleton.elim p.1.1 p.2.1
+      have h_feed : IsFeedback p := by
+        unfold IsFeedback
+        rw [heq]
+      have h_not_feed := h_cas p hp
+      exact h_not_feed h_feed
+
+/--
+  [textbook/definition3.33/definition/mixed_scr]
+  A system coupling recipe is mixed if it is not singular, conjunctive, cascade,
+  essentially cascade, or pure feedback.
+-/
+def IsMixed {n : Nat} (SCR : SystemCouplingRecipe n) : Prop :=
+  ¬ IsSingular SCR ∧ ¬ IsConjunctive SCR ∧ ¬ IsCascade SCR ∧
+  ¬ IsEssentiallyCascade SCR ∧ ¬ IsPureFeedback SCR
