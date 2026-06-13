@@ -781,7 +781,7 @@ def parameterInstance {P : Type} {SZ IZ OZ : P → Type}
   indexed by a type of cardinality `n`.
 -/
 def HasNParameters (P : Type) (n : Nat) (ParamType : Fin n → Type) (_h_dom : P = ((i : Fin n) → ParamType i)) : Prop :=
-  True
+  P = ((i : Fin n) → ParamType i)
 
 /--
   [textbook/definition2.82/definition/one_parameter]
@@ -815,7 +815,7 @@ theorem fcnsy_has_two_parameters {IZ SZ : Type} [Fintype SZ] [Fintype IZ] [Inhab
   let ParamType : Fin 2 → Type := fun i => if i.val == 0 then (IZ → SZ) else Nat
   let P := (i : Fin 2) → ParamType i
   refine ⟨P, ParamType, rfl, ?_⟩
-  trivial
+  exact rfl
 
 
 /--

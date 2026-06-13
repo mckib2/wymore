@@ -187,6 +187,15 @@ def add_trace(tag, item_name, rel_path, line_num, item_type, content, definition
                 matched_element_id = elem_id
                 break
                 
+    if base_def_key not in definitions:
+        print(f"⚠️ Warning: Reference to unknown textbook definition `{base_def_key}` in tag `[{tag}]` at {rel_path}:{line_num}", file=sys.stderr)
+    elif element_suffix:
+        # Check if the element suffix actually matched an ID in the definition
+        element_ids = [elem['id'] for elem in definitions[base_def_key].get('elements', [])]
+        matched_elem_exists = any(elem_id == element_suffix or elem_id.endswith(element_suffix) for elem_id in element_ids)
+        if not matched_elem_exists:
+            print(f"⚠️ Warning: Suffix `{element_suffix}` in tag `[{tag}]` does not match any element ID in `{base_def_key}` at {rel_path}:{line_num}", file=sys.stderr)
+
     if not matched_element_id:
         # Fallback to suffix key if no JSON element matched
         matched_element_id = element_suffix or "general"
