@@ -1,0 +1,27 @@
+{
+  "id": "3.45",
+  "name": "State and Output Trajectories of Conjunctive Systems",
+  "description": "Theorem and proof relating the state and output trajectories of a conjunctive system to those of its component systems.",
+  "elements": [
+    {
+      "id": "3.45/theorem/trajectories_relation",
+      "type": "implication",
+      "text": "The state and output trajectories of the conjunctive system Z are equal to the tuples of the component state and output trajectories under projected inputs."
+    },
+    {
+      "id": "3.45/proof/state_zero",
+      "type": "component",
+      "text": "The state trajectory relation is verified at time t = 0."
+    },
+    {
+      "id": "3.45/proof/state_induction",
+      "type": "component",
+      "text": "The state trajectory relation is verified for all t by induction."
+    },
+    {
+      "id": "3.45/proof/output_relation",
+      "type": "component",
+      "text": "The output trajectory relation is verified using the state trajectory relation."
+    }
+  ]
+}

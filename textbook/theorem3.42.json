@@ -1,0 +1,27 @@
+{
+  "id": "3.42",
+  "name": "Fundamental Theorem of Conjunctive Systems",
+  "description": "Theorem and proof establishing that the conjunctive system constructor CSY defines a valid system parameterization.",
+  "elements": [
+    {
+      "id": "3.42/theorem/csy_parameterization",
+      "type": "implication",
+      "text": "CSY is a system parameterization."
+    },
+    {
+      "id": "3.42/proof/dsystems",
+      "type": "component",
+      "text": "The conjunctive system Z belongs to DSYSTEMS, verifying the state, input, output, and transition/readout function conditions."
+    },
+    {
+      "id": "3.42/proof/existence",
+      "type": "component",
+      "text": "For every connectable vector of systems V, there exists Z ∈ DSYSTEMS such that (V, Z) ∈ CSY."
+    },
+    {
+      "id": "3.42/proof/uniqueness",
+      "type": "component",
+      "text": "If (V1, Z1) ∈ CSY and (V2, Z2) ∈ CSY and V1 = V2, then Z1 = Z2."
+    }
+  ]
+}

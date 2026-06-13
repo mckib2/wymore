@@ -15,7 +15,8 @@ This report compiles the analyses of the proofs of core theorems in Wayne Wymore
 8. [Theorem 2.96: FCNSY is a System Parameterization with Two Parameters](#8-theorem-296-fcnsy-is-a-system-parameterization-with-two-parameters)
 9. [Theorem 2.97: FCNSY Output Trajectory at One Time Unit](#9-theorem-297-fcnsy-output-trajectory-at-one-time-unit)
 10. [Theorem 3.31: Pure Feedback Coupling Recipes are in a Class by Themselves](#10-theorem-331-pure-feedback-coupling-recipes)
-11. [Meta-Analysis and Synthesis](#11-meta-analysis-and-synthesis)
+11. [Theorem 3.45: State and Output Trajectories of Conjunctive Systems](#11-theorem-345-state-and-output-trajectories-of-conjunctive-systems)
+12. [Meta-Analysis and Synthesis](#12-meta-analysis-and-synthesis)
 
 
 ---
@@ -563,7 +564,57 @@ Lean formalizes Wymore's set-theoretic index identity using type-theoretic subsi
 
 ---
 
-## 11. Meta-Analysis and Synthesis
+## 11. Theorem 3.45: State and Output Trajectories of Conjunctive Systems
+
+### Theorem Statement
+
+#### Textbook Statement
+> State and output trajectories of the conjunctive system in terms of state and output trajectories of the components: If $V$ is a connectable vector of systems, $Z = \text{CSY}(V)$, $f \in \text{ITZ}$, $x \in \text{SZ}$, $t \in \text{TZ}$, $Z' \in V$, $B' \in \text{OPZ}'$ and $B = \text{INOP\&}(V,Z)(B')$, then
+> $$\text{PJN}_{\text{SZ}'}(\text{STZ}(f, x)(t)) = \text{STZ}'(\text{PJN}_{\text{IPZ}'} \circ f, \text{PJN}_{\text{SZ}'}(x))(t)$$
+> and
+> $$\text{PJN}_B(\text{OTZ}(f, x)(t)) = \text{PJN}_{B'}(\text{OTZ}'(\text{PJN}_{\text{IPZ}'} \circ f, \text{PJN}_{\text{SZ}'}(x))(t))$$
+
+#### Lean 4 Representation
+Definitions in [Mbse/Wymore.lean](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean):
+* `csy_state_trajectory` at [Mbse/Wymore.lean:L1169](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1169)
+* `csy_output_trajectory` at [Mbse/Wymore.lean:L1190](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1190)
+
+```lean
+theorem csy_state_trajectory {n : Nat} (VSCR : PortSystemVector n) (x : (i : Fin n) → VSCR.SZ i)
+    (f : ITZ ((ip : Σ i, VSCR.Port i) → VSCR.PortVal ip.1 ip.2)) (t : Time) (i : Fin n) :
+    generateStateTrajectory (csy VSCR) x f t i =
+    generateStateTrajectory (VSCR.Z i) (x i) (fun t port => f t ⟨i, port⟩) t
+
+theorem csy_output_trajectory {n : Nat} (VSCR : PortSystemVector n) (x : (i : Fin n) → VSCR.SZ i)
+    (f : ITZ ((ip : Σ i, VSCR.Port i) → VSCR.PortVal ip.1 ip.2)) (t : Time) (i : Fin n) (B' : VSCR.OutPort i) :
+    generateOutputTrajectory (csy VSCR) x f t ⟨i, B'⟩ =
+    generateOutputTrajectory (VSCR.Z i) (x i) (fun t port => f t ⟨i, port⟩) t B'
+```
+
+### Proof Analysis
+
+#### Textbook Proof
+Wymore proves the trajectory relations in two steps:
+1. **State Trajectory:** Proved using induction on $t$. The base case is evaluated directly. In the inductive step, the definition of the parallel state transition function $\text{NZ}$ (Definition 3.40) is unfolded to project the next state, the induction hypothesis is applied to the state component, and the recurrence relation is reconstructed to complete the step.
+2. **Output Trajectory:** Stated to follow immediately from the state trajectory relation by applying the readout function.
+
+#### Lean 4 Verification
+In Lean 4, the proofs translate coordinate projections ($\text{PJN}$) into dependent function application and tag mappings:
+- **State Trajectory (`csy_state_trajectory`):** Proven by induction on `t` generalizing the system index `i`. In the inductive step, because the induction hypothesis `ih` is parameterized by `i`, rewriting it under the transition binder requires first constructing a function-level equality lemma `ih_fun` stating that the state trajectories are pointwise equal. Rewriting with `ih_fun` substitutes the state terms, and the rest reduces definitionally via lambda conversion.
+- **Output Trajectory (`csy_output_trajectory`):** Proven by unfolding `generateOutputTrajectory`, constructing a function-level trajectory helper using `csy_state_trajectory`, rewriting the state term, and resolving the remaining terms definitionally by reflexivity (`rfl`).
+
+### Comparison Summary
+
+| Feature | Textbook Set Theory | Lean Type Theory |
+|---|---|---|
+| **Projection Mapping** | Set-theoretic coordinate projections $\text{PJN}_{\text{SZ}'}$. | Dependent function application `x i` and `⟨i, port⟩` tags. |
+| **Induction Clause** | Verbal induction over time parameter $t \in \text{TZ}$. | Structural induction `induction t generalizing i`. |
+| **Inductive Rewrite** | Rewrites state variable projections directly. | Requires function-level helper `ih_fun` to rewrite under a binder. |
+| **Output Trajectory** | Stated to follow "immediately". | Proven via `csy_state_trajectory` and definitional computation (`rfl`). |
+
+---
+
+## 12. Meta-Analysis and Synthesis
 
 
 Formalizing Wayne Wymore's textbook theorems in Lean 4 reveals key differences in how set theory and dependent type theory model and verify mathematical objects.

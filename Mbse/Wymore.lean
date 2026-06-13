@@ -765,7 +765,7 @@ theorem z2_output_trajectory_equivalence {SZ IZ OZ : Type} (Z : DiscreteSystem S
   To allow system spaces to depend on parameters, we define it as a structure
   where the state, input, and output spaces are functions of `P`.
 -/
-def SystemParameterization (P : Type) (SZ IZ OZ : P → Type) : Type :=
+def SystemParameterization (P : Type u) (SZ IZ OZ : P → Type) : Type u :=
   (p : P) → DiscreteSystem (SZ p) (IZ p) (OZ p)
 
 /--
@@ -773,7 +773,7 @@ def SystemParameterization (P : Type) (SZ IZ OZ : P → Type) : Type :=
   An instance of a system parameterization `F` for a parameter value `r : P`
   is simply the system `F r`.
 -/
-def parameterInstance {P : Type} {SZ IZ OZ : P → Type}
+def parameterInstance {P : Type u} {SZ IZ OZ : P → Type}
     (F : SystemParameterization P SZ IZ OZ) (r : P) : DiscreteSystem (SZ r) (IZ r) (OZ r) :=
   F r
 
@@ -814,9 +814,9 @@ def fcnsy {IZ SZ : Type} (F : IZ → SZ) (n : Nat) [Fintype SZ] [Fintype IZ] [In
 theorem fcnsy_has_two_parameters {IZ SZ : Type} [Fintype SZ] [Fintype IZ] [Inhabited SZ] :
     ∃ (P : Type) (ParamType : Fin 2 → Type) (h_dom : P = ((i : Fin 2) → ParamType i)),
       HasNParameters P 2 ParamType h_dom := by
-  let ParamType : Fin 2 → Type := fun i => if i.val == 0 then (IZ → SZ) else Nat
-  let P := (i : Fin 2) → ParamType i
-  refine ⟨P, ParamType, rfl, ?_⟩
+  use (i : Fin 2) → if i.val == 0 then (IZ → SZ) else Nat
+  use fun i => if i.val == 0 then (IZ → SZ) else Nat
+  use rfl
   exact rfl
 
 
@@ -1135,3 +1135,66 @@ def csy_INOP_map {n : Nat} (VSCR : PortSystemVector n) :
 -/
 def csy_OS_map {n : Nat} (VSCR : PortSystemVector n) (op : Σ (i : Fin n), VSCR.OutPort i) : Type :=
   VSCR.OutPortVal op.1 op.2
+
+/--
+  [textbook/theorem_a1.219/theorem/vector_value_fns]
+  The product function of a family of functions, mapping the product domain
+  to the product codomain.
+-/
+def product_fun {I : Type} {A B : I → Type} (f : (i : I) → A i → B i) :
+    ((i : I) → A i) → ((i : I) → B i) :=
+  fun x i => f i (x i)
+
+/--
+  [textbook/theorem3.42/theorem/csy_parameterization]
+  [textbook/theorem3.42/proof/dsystems]
+  [textbook/theorem3.42/proof/existence]
+  [textbook/theorem3.42/proof/uniqueness]
+  The parallel composition `csy` defines a valid system parameterization.
+-/
+def csy_parameterization (n : Nat) :
+    SystemParameterization (PortSystemVector n)
+      (fun VSCR => (i : Fin n) → VSCR.SZ i)
+      (fun VSCR => (ip : Σ i, VSCR.Port i) → VSCR.PortVal ip.1 ip.2)
+      (fun VSCR => (op : Σ i, VSCR.OutPort i) → VSCR.OutPortVal op.1 op.2) :=
+  fun VSCR => csy VSCR
+
+/--
+  [textbook/theorem3.45/theorem/trajectories_relation]
+  [textbook/theorem3.45/proof/state_zero]
+  [textbook/theorem3.45/proof/state_induction]
+  The state trajectory of a conjunctive (parallel) system evaluated at component `i`
+  is equal to the state trajectory of the `i`-th component system running under projected inputs.
+-/
+theorem csy_state_trajectory {n : Nat} (VSCR : PortSystemVector n) (x : (i : Fin n) → VSCR.SZ i)
+    (f : ITZ ((ip : Σ i, VSCR.Port i) → VSCR.PortVal ip.1 ip.2)) (t : Time) (i : Fin n) :
+    generateStateTrajectory (csy VSCR) x f t i =
+    generateStateTrajectory (VSCR.Z i) (x i) (fun t port => f t ⟨i, port⟩) t := by
+  induction t generalizing i with
+  | zero => rfl
+  | succ t ih =>
+    simp only [generateStateTrajectory_succ]
+    have ih_fun : generateStateTrajectory (csy VSCR) x f t =
+        fun i => generateStateTrajectory (VSCR.Z i) (x i) (fun t port => f t ⟨i, port⟩) t := by
+      ext i
+      apply ih
+    rw [ih_fun]
+    rfl
+
+/--
+  [textbook/theorem3.45/theorem/trajectories_relation]
+  [textbook/theorem3.45/proof/output_relation]
+  The output trajectory of a conjunctive (parallel) system evaluated at component port `B'`
+  of system `i` is equal to the output trajectory of component `i` at port `B'` under projected inputs.
+-/
+theorem csy_output_trajectory {n : Nat} (VSCR : PortSystemVector n) (x : (i : Fin n) → VSCR.SZ i)
+    (f : ITZ ((ip : Σ i, VSCR.Port i) → VSCR.PortVal ip.1 ip.2)) (t : Time) (i : Fin n) (B' : VSCR.OutPort i) :
+    generateOutputTrajectory (csy VSCR) x f t ⟨i, B'⟩ =
+    generateOutputTrajectory (VSCR.Z i) (x i) (fun t port => f t ⟨i, port⟩) t B' := by
+  unfold generateOutputTrajectory
+  have h_st : generateStateTrajectory (csy VSCR) x f t =
+      fun i => generateStateTrajectory (VSCR.Z i) (x i) (fun t port => f t ⟨i, port⟩) t := by
+    ext i
+    apply csy_state_trajectory
+  rw [h_st]
+  rfl

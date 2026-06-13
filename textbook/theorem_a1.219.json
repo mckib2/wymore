@@ -1,0 +1,12 @@
+{
+  "id": "a1.219",
+  "name": "Function over Cartesian Product of Domains",
+  "description": "Theorem stating that the vector of values of a set of functions defines a function over the Cartesian product of their domains.",
+  "elements": [
+    {
+      "id": "a1.219/theorem/vector_value_fns",
+      "type": "implication",
+      "text": "If n ∈ IJS[2, ∞) and for every i ∈ IJS[1, n], fi is a function, then the product function f is a function from the product of domains to the product of ranges."
+    }
+  ]
+}

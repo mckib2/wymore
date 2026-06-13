@@ -488,6 +488,30 @@
 | `3.31/proof/not_singular_conjunctive` | `component` | SCR is neither singular or conjunctive because CSCR ≠ ∅ by the definition at 3.29. | ✅ Traced | `pure_feedback_not_other` ([Mbse/Wymore.lean:1015](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1015)) |
 | `3.31/proof/not_cascade` | `component` | SCR is not cascade, since CSCR must contain a pair of the form (B, A) where B is an output port of VSCR and A is an input port of VSCR, which is a feedback connection, by the definition at 3.7. | ✅ Traced | `pure_feedback_not_other` ([Mbse/Wymore.lean:1015](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1015)) |
 
+### `textbook/theorem3.42` — Fundamental Theorem of Conjunctive Systems
+
+- Structured source file: [textbook/theorem3.42.json](file:///home/nicholas/uoa/sie699/textbook/theorem3.42.json)
+- Description: *Theorem and proof establishing that the conjunctive system constructor CSY defines a valid system parameterization.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `3.42/theorem/csy_parameterization` | `implication` | CSY is a system parameterization. | ✅ Traced | `csy_parameterization` ([Mbse/Wymore.lean:1148](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1148)) |
+| `3.42/proof/dsystems` | `component` | The conjunctive system Z belongs to DSYSTEMS, verifying the state, input, output, and transition/readout function conditions. | ✅ Traced | `csy_parameterization` ([Mbse/Wymore.lean:1148](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1148)) |
+| `3.42/proof/existence` | `component` | For every connectable vector of systems V, there exists Z ∈ DSYSTEMS such that (V, Z) ∈ CSY. | ✅ Traced | `csy_parameterization` ([Mbse/Wymore.lean:1148](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1148)) |
+| `3.42/proof/uniqueness` | `component` | If (V1, Z1) ∈ CSY and (V2, Z2) ∈ CSY and V1 = V2, then Z1 = Z2. | ✅ Traced | `csy_parameterization` ([Mbse/Wymore.lean:1148](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1148)) |
+
+### `textbook/theorem3.45` — State and Output Trajectories of Conjunctive Systems
+
+- Structured source file: [textbook/theorem3.45.json](file:///home/nicholas/uoa/sie699/textbook/theorem3.45.json)
+- Description: *Theorem and proof relating the state and output trajectories of a conjunctive system to those of its component systems.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `3.45/theorem/trajectories_relation` | `implication` | The state and output trajectories of the conjunctive system Z are equal to the tuples of the component state and output trajectories under projected inputs. | ✅ Traced | `csy_state_trajectory` ([Mbse/Wymore.lean:1162](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1162))<br>`csy_output_trajectory` ([Mbse/Wymore.lean:1184](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1184)) |
+| `3.45/proof/state_zero` | `component` | The state trajectory relation is verified at time t = 0. | ✅ Traced | `csy_state_trajectory` ([Mbse/Wymore.lean:1162](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1162)) |
+| `3.45/proof/state_induction` | `component` | The state trajectory relation is verified for all t by induction. | ✅ Traced | `csy_state_trajectory` ([Mbse/Wymore.lean:1162](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1162)) |
+| `3.45/proof/output_relation` | `component` | The output trajectory relation is verified using the state trajectory relation. | ✅ Traced | `csy_output_trajectory` ([Mbse/Wymore.lean:1184](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1184)) |
+
 ### `textbook/theorem_a1.163` — Equality of Functions (Extensionality)
 
 - Structured source file: [textbook/theorem_a1.163.json](file:///home/nicholas/uoa/sie699/textbook/theorem_a1.163.json)
@@ -514,6 +538,15 @@
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
 | `a1.178/theorem/vector_projection_equality` | `component` | If x ∈ A1 × ... × An, then x = (PJN(A, 1)(x), ..., PJN(A, n)(x)). | ✅ Traced | `tuple_eq_projection` ([Mbse/Wymore.lean:620](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L620)) |
+
+### `textbook/theorem_a1.219` — Function over Cartesian Product of Domains
+
+- Structured source file: [textbook/theorem_a1.219.json](file:///home/nicholas/uoa/sie699/textbook/theorem_a1.219.json)
+- Description: *Theorem stating that the vector of values of a set of functions defines a function over the Cartesian product of their domains.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `a1.219/theorem/vector_value_fns` | `implication` | If n ∈ IJS[2, ∞) and for every i ∈ IJS[1, n], fi is a function, then the product function f is a function from the product of domains to the product of ranges. | ✅ Traced | `product_fun` ([Mbse/Wymore.lean:1139](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1139)) |
 
 ### `textbook/theorem_a1.249` — Image of Preimage
 
@@ -565,9 +598,9 @@
 
 ## 2. Completeness & Quality Summary
 
-- **Total Structured Definitions Tracked**: 52
-- **Total Individual Requirements/Elements**: 142
-- **Traced/Formalized Elements**: 142 (142/142)
+- **Total Structured Definitions Tracked**: 55
+- **Total Individual Requirements/Elements**: 151
+- **Traced/Formalized Elements**: 151 (151/151)
 - **Formalization Coverage Rate**: **100.0%**
 
 > [!TIP]
