@@ -14,7 +14,8 @@ This report compiles the analyses of the proofs of core theorems in Wayne Wymore
 7. [Theorem 2.78: Construction of Projective Readout System](#7-theorem-278-construction-of-projective-readout-system)
 8. [Theorem 2.96: FCNSY is a System Parameterization with Two Parameters](#8-theorem-296-fcnsy-is-a-system-parameterization-with-two-parameters)
 9. [Theorem 2.97: FCNSY Output Trajectory at One Time Unit](#9-theorem-297-fcnsy-output-trajectory-at-one-time-unit)
-10. [Meta-Analysis and Synthesis](#10-meta-analysis-and-synthesis)
+10. [Theorem 3.31: Pure Feedback Coupling Recipes are in a Class by Themselves](#10-theorem-331-pure-feedback-coupling-recipes)
+11. [Meta-Analysis and Synthesis](#11-meta-analysis-and-synthesis)
 
 
 ---
@@ -521,7 +522,48 @@ In Lean 4, the proof collapses to a single reflexivity proof (`rfl`):
 
 ---
 
-## 10. Meta-Analysis and Synthesis
+## 10. Theorem 3.31: Pure Feedback Coupling Recipes
+
+### Theorem Statement
+
+#### Textbook Statement
+> If SCR is a pure feedback system coupling recipe, then SCR is neither singular, conjunctive, or cascade.
+
+#### Lean 4 Representation
+Definitions in [Mbse/Wymore.lean](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean):
+* `pure_feedback_not_other` at [Mbse/Wymore.lean:L1013](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1013)
+
+```lean
+theorem pure_feedback_not_other {n : Nat} (SCR : SystemCouplingRecipe n) (h : IsPureFeedback SCR) :
+    ¬ IsSingular SCR ∧ ¬ IsConjunctive SCR ∧ ¬ IsCascade SCR
+```
+
+### Proof Analysis
+
+#### Textbook Proof
+The textbook argues by cases:
+1. **Not singular or conjunctive:** Since SCR is a pure feedback coupling recipe, its connectivity set $CSCR \neq \emptyset$ by Definition 3.29. Since singular and conjunctive recipes require $CSCR = \emptyset$, SCR cannot be singular or conjunctive.
+2. **Not cascade:** Since $CSCR \neq \emptyset$, there must be at least one connection pair $(B, A)$ in $CSCR$. Since the system vector has only one component ($n=1$), both ports must belong to the same component, meaning they share the same system index ($i = j$). Because $i = j$ implies $i \geq j$, this pair is a feedback connection by definition, so the recipe is not cascade.
+
+#### Lean 4 Verification
+Lean formalizes Wymore's set-theoretic index identity using type-theoretic subsingleton reasoning:
+- Pointwise elimination via `obtain ⟨p, hp⟩` on the non-emptiness of the set `SCR.CSCR` yields a connection pair `p`.
+- Because $n = 1$ is assumed, the system index type `Fin n` is `Fin 1`.
+- Lean's type class resolution infers the `Subsingleton (Fin 1)` instance. We invoke `Subsingleton.elim p.1.1 p.2.1` to establish that the source index and target index are equal: `p.1.1 = p.2.1`.
+- Unfolding `IsFeedback p` (which is `p.1.1 ≥ p.2.1`) simplifies to `p.1.1 ≥ p.1.1`, which is proven by reflexivity of the natural order.
+- Finally, the cascade hypothesis `h_cas` (asserting `∀ p ∈ CSCR, ¬ IsFeedback p`) is contradicted by applying it to `p`, completing the proof.
+
+### Comparison Summary
+
+| Feature | Textbook Set Theory | Lean Type Theory |
+|---|---|---|
+| **Nonemptiness** | Assumes existence of a pair. | Pointwise elimination via `obtain ⟨p, hp⟩` on set non-emptiness. |
+| **Port Index Identity** | Deduced via single component reasoning. | Formalized via the type class `Subsingleton (Fin 1)`. |
+| **Feedback Condition** | $i = j \implies i \geq j$. | Proven via `Subsingleton.elim` and reflexivity of Nat order. |
+
+---
+
+## 11. Meta-Analysis and Synthesis
 
 
 Formalizing Wayne Wymore's textbook theorems in Lean 4 reveals key differences in how set theory and dependent type theory model and verify mathematical objects.
