@@ -30,11 +30,11 @@ This report compiles the analyses of the proofs of core theorems in Wayne Wymore
 > $$f_1 \rightarrow t \in \text{ITZ} \quad \text{and} \quad \text{CTN}(f_1, t, f_2) \in \text{ITZ}$$
 
 #### Lean 4 Representation
-Definitions in [Mbse/Wymore.lean](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean):
-* `translate` at [Mbse/Wymore.lean:L308](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L308)
-* `concatenate` at [Mbse/Wymore.lean:L335](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L335)
-* `complete_trajectories_closed_under_translation` at [Mbse/Wymore.lean:L327](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L327)
-* `complete_trajectories_closed_under_concatenation` at [Mbse/Wymore.lean:L342](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L342)
+Definitions in [Mbse/Wymore.lean](Mbse/Wymore.lean):
+* `translate` at [Mbse/Wymore.lean:L308](Mbse/Wymore.lean#L308)
+* `concatenate` at [Mbse/Wymore.lean:L335](Mbse/Wymore.lean#L335)
+* `complete_trajectories_closed_under_translation` at [Mbse/Wymore.lean:L327](Mbse/Wymore.lean#L327)
+* `complete_trajectories_closed_under_concatenation` at [Mbse/Wymore.lean:L342](Mbse/Wymore.lean#L342)
 
 ```lean
 def translate {A : Type} (f : Time → A) (r : Time) : Time → A :=
@@ -83,9 +83,9 @@ In Lean 4, complete trajectories are represented as total functions of type `Tim
 > The state trajectory is a function: If $Z \in \text{DSYSTEMS}$, $f \in \text{ITZ}$, and $x \in \text{SZ}$, then $\text{STZ}(f, x) \in \text{FNS}(\text{TZ}, \text{SZ})$.
 
 #### Lean 4 Representation
-Definitions in [Mbse/Wymore.lean](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean):
-* `generateStateTrajectory` at [Mbse/Wymore.lean:L155](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L155)
-* `stateTrajectory_unique` at [Mbse/Wymore.lean:L213](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L213)
+Definitions in [Mbse/Wymore.lean](Mbse/Wymore.lean):
+* `generateStateTrajectory` at [Mbse/Wymore.lean:L155](Mbse/Wymore.lean#L155)
+* `stateTrajectory_unique` at [Mbse/Wymore.lean:L213](Mbse/Wymore.lean#L213)
 
 ```lean
 def generateStateTrajectory (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) : STZ SZ
@@ -137,8 +137,8 @@ In dependent type theory, function well-formedness (totality and single-valuedne
 > The output trajectory is a function: If $Z \in \text{DSYSTEMS}$, $f \in \text{ITZ}$, $x \in \text{SZ}$, and $t \in \text{TZ}$, then $\text{OTZ}(f, x) \in \text{FNS}(\text{TZ}, \text{OZ})$ and $\text{OTZ}(f, x)(t) = \text{RZ}(\text{STZ}(f, x)(t))$.
 
 #### Lean 4 Representation
-Definitions in [Mbse/Wymore.lean](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean):
-* `generateOutputTrajectory` at [Mbse/Wymore.lean:L165](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L165)
+Definitions in [Mbse/Wymore.lean](Mbse/Wymore.lean):
+* `generateOutputTrajectory` at [Mbse/Wymore.lean:L165](Mbse/Wymore.lean#L165)
 
 ```lean
 def generateOutputTrajectory (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) : OTZ OZ :=
@@ -184,8 +184,8 @@ In type theory, function composition is natively defined:
 > $$\text{STZ}(f \rightarrow s, \text{STZ}(f, x)(s))(t) = \text{STZ}(f, x)(s + t)$$
 
 #### Lean 4 Representation
-Definitions in [Mbse/Wymore.lean](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean):
-* `stateTrajectory_time_invariance` at [Mbse/Wymore.lean:L407](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L407)
+Definitions in [Mbse/Wymore.lean](Mbse/Wymore.lean):
+* `stateTrajectory_time_invariance` at [Mbse/Wymore.lean:L407](Mbse/Wymore.lean#L407)
 
 ```lean
 theorem stateTrajectory_time_invariance
@@ -245,10 +245,10 @@ Lean collapses Wymore's double induction into a **single induction on $t$** that
 > $\text{STZ}(f, x)(t) = \text{STZ}(g, x)(t)$.
 
 #### Lean 4 Representation
-Definitions in [Mbse/Wymore.lean](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean):
-* `RSN` at [Mbse/Wymore.lean:L434](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L434)
-* `rsn_eq_iff` at [Mbse/Wymore.lean:L441](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L441)
-* `stateTrajectory_nonanticipatory` at [Mbse/Wymore.lean:L456](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L456)
+Definitions in [Mbse/Wymore.lean](Mbse/Wymore.lean):
+* `RSN` at [Mbse/Wymore.lean:L434](Mbse/Wymore.lean#L434)
+* `rsn_eq_iff` at [Mbse/Wymore.lean:L441](Mbse/Wymore.lean#L441)
+* `stateTrajectory_nonanticipatory` at [Mbse/Wymore.lean:L456](Mbse/Wymore.lean#L456)
 
 ```lean
 def RSN {A B : Type} (f : A → B) (S : Set A) : {a : A // a ∈ S} → B :=
@@ -321,10 +321,10 @@ Standard induction suffices because the transition relation is a first-order rec
 > If $Z1$ and $Z2$ are systems with properly aligned projective readout, $SZ1 = SZ2$ and $OZ1 = OZ2$, then $RZ1 = RZ2$.
 
 #### Lean 4 Representation
-Definitions in [Mbse/Wymore.lean](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean):
-* `tuple_eq_projection` at [Mbse/Wymore.lean:L616](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L616)
-* `fun_eq_iff` at [Mbse/Wymore.lean:L625](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L625)
-* `readout_eq_of_properly_aligned` at [Mbse/Wymore.lean:L645](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L645)
+Definitions in [Mbse/Wymore.lean](Mbse/Wymore.lean):
+* `tuple_eq_projection` at [Mbse/Wymore.lean:L616](Mbse/Wymore.lean#L616)
+* `fun_eq_iff` at [Mbse/Wymore.lean:L625](Mbse/Wymore.lean#L625)
+* `readout_eq_of_properly_aligned` at [Mbse/Wymore.lean:L645](Mbse/Wymore.lean#L645)
 
 ```lean
 theorem tuple_eq_projection {I : Type} {A : I → Type} (x : (i : I) → A i) :
@@ -390,12 +390,12 @@ Lean represents and streamlines Wymore's proof steps natively:
 > If Z1 ∈ DSYSTEMS, m = #SFZ1, n = #OPZ1, SZ2 = {x: x ∈ × (O1Z1, ... , OnZ1, S1Z1, ... , SmZ1); PJN(1, ..., n)(x) = RZ1(PJN(n + 1, ..., n + m)(x))}, IZ2 = IZ1, OZ2 = OZ1, NZ2 = {((x,p),y): (x,p) ∈ SZ2 × IZ2; y ∈ SZ2; PJN(n + 1, ..., n + m)(y) = NZ1(PJN(n + 1, ..., n + m)(x),p); PJN(1, ..., n)(y) = RZ1(PJN(n + 1, ..., n + m)(y))}, RZ2 = PJN(SZ2, (1, ..., n)) and Z2 = (SZ2, IZ2, OZ2, NZ2, RZ2), then Z2 ∈ DSYSTEMS, RZ2 is a properly aligned projective readout function, and Z2 behaves equivalently to Z1.
 
 #### Lean 4 Representation
-Definitions in [Mbse/Wymore.lean](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean):
-* `pjn_is_fun` at [Mbse/Wymore.lean:L660](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L660)
-* `Z2State` at [Mbse/Wymore.lean:L668](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L668)
-* `Z2` at [Mbse/Wymore.lean:L695](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L695)
-* `z2_state_trajectory_equivalence` at [Mbse/Wymore.lean:L728](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L728)
-* `z2_output_trajectory_equivalence` at [Mbse/Wymore.lean:L743](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L743)
+Definitions in [Mbse/Wymore.lean](Mbse/Wymore.lean):
+* `pjn_is_fun` at [Mbse/Wymore.lean:L660](Mbse/Wymore.lean#L660)
+* `Z2State` at [Mbse/Wymore.lean:L668](Mbse/Wymore.lean#L668)
+* `Z2` at [Mbse/Wymore.lean:L695](Mbse/Wymore.lean#L695)
+* `z2_state_trajectory_equivalence` at [Mbse/Wymore.lean:L728](Mbse/Wymore.lean#L728)
+* `z2_output_trajectory_equivalence` at [Mbse/Wymore.lean:L743](Mbse/Wymore.lean#L743)
 
 ```lean
 structure Z2State (SZ OZ : Type) (RZ : SZ → OZ) where
@@ -452,9 +452,9 @@ Lean represents the state space extension and verifies its properties:
 > FCNSY is a system parameterization with two parameters.
 
 #### Lean 4 Representation
-Definitions in [Mbse/Wymore.lean](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean):
-* [fcnsy](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L799)
-* [fcnsy_has_two_parameters](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L812)
+Definitions in [Mbse/Wymore.lean](Mbse/Wymore.lean):
+* [fcnsy](Mbse/Wymore.lean#L799)
+* [fcnsy_has_two_parameters](Mbse/Wymore.lean#L812)
 
 ```lean
 def fcnsy {IZ SZ : Type} (F : IZ → SZ) (n : Nat) [Fintype SZ] [Fintype IZ] [Inhabited SZ] :
@@ -492,8 +492,8 @@ In Lean, we formalize this by showing that the parameter space $P$ of `fcnsy` is
 > If Z = FCNSY(F, 1) and (f, x, t) ∈ EXZ, then OTZ(f, x)(t + 1) = F(f(t)).
 
 #### Lean 4 Representation
-Definitions in [Mbse/Wymore.lean](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean):
-* [fcnsy_output_one_time_unit](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L830)
+Definitions in [Mbse/Wymore.lean](Mbse/Wymore.lean):
+* [fcnsy_output_one_time_unit](Mbse/Wymore.lean#L830)
 
 ```lean
 theorem fcnsy_output_one_time_unit {IZ SZ : Type} (F : IZ → SZ) [Fintype SZ] [Fintype IZ] [Inhabited SZ]
@@ -531,8 +531,8 @@ In Lean 4, the proof collapses to a single reflexivity proof (`rfl`):
 > If SCR is a pure feedback system coupling recipe, then SCR is neither singular, conjunctive, or cascade.
 
 #### Lean 4 Representation
-Definitions in [Mbse/Wymore.lean](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean):
-* `pure_feedback_not_other` at [Mbse/Wymore.lean:L1013](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1013)
+Definitions in [Mbse/Wymore.lean](Mbse/Wymore.lean):
+* `pure_feedback_not_other` at [Mbse/Wymore.lean:L1013](Mbse/Wymore.lean#L1013)
 
 ```lean
 theorem pure_feedback_not_other {n : Nat} (SCR : SystemCouplingRecipe n) (h : IsPureFeedback SCR) :
@@ -575,9 +575,9 @@ Lean formalizes Wymore's set-theoretic index identity using type-theoretic subsi
 > $$\text{PJN}_B(\text{OTZ}(f, x)(t)) = \text{PJN}_{B'}(\text{OTZ}'(\text{PJN}_{\text{IPZ}'} \circ f, \text{PJN}_{\text{SZ}'}(x))(t))$$
 
 #### Lean 4 Representation
-Definitions in [Mbse/Wymore.lean](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean):
-* `csy_state_trajectory` at [Mbse/Wymore.lean:L1169](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1169)
-* `csy_output_trajectory` at [Mbse/Wymore.lean:L1190](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1190)
+Definitions in [Mbse/Wymore.lean](Mbse/Wymore.lean):
+* `csy_state_trajectory` at [Mbse/Wymore.lean:L1169](Mbse/Wymore.lean#L1169)
+* `csy_output_trajectory` at [Mbse/Wymore.lean:L1190](Mbse/Wymore.lean#L1190)
 
 ```lean
 theorem csy_state_trajectory {n : Nat} (VSCR : PortSystemVector n) (x : (i : Fin n) → VSCR.SZ i)

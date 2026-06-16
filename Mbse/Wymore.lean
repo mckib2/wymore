@@ -31,26 +31,47 @@ structure DiscreteSystem (SZ : Type) (IZ : Type) (OZ : Type) where
     /-- Proof that the output space is finite (discrete system assumption) -/
     oz_finite : Fintype OZ
 
-    /-- [textbook/definition2.4/component/NZ] [textbook/definition2.4/constraint/nz_signature] Next State Function: NZ ∈ FNS(SZ × IZ, SZ) -/
+    /-- [textbook/definition2.4/component/NZ] [textbook/definition2.4/constraint/nz_signature|partial] Next State Function: NZ ∈ FNS(SZ × IZ, SZ).
+        Partial: the textbook's empty-input case (NZ ∈ FNS(SZ, SZ) if IZ empty) is not separately modeled;
+        with empty IZ this `SZ → IZ → SZ` is vacuous in its second argument. -/
     NZ : SZ → IZ → SZ
 
-    /-- [textbook/definition2.4/component/RZ] [textbook/definition2.4/constraint/rz_signature] Readout Function: RZ ∈ FNS(SZ, OZ) -/
+    /-- [textbook/definition2.4/component/RZ] [textbook/definition2.4/constraint/rz_signature|partial] Readout Function: RZ ∈ FNS(SZ, OZ).
+        Partial: the textbook's empty-output case (RZ = ∅ if OZ empty) is unrepresentable here, since a total
+        `RZ : SZ → OZ` with nonempty SZ forces OZ nonempty (see `discreteSystem_output_nonempty`). -/
     RZ : SZ → OZ
 
 /-- [textbook/definition2.4/component/TZ] The time scale TZ of the discrete system defined as IJS++ (natural numbers). -/
 abbrev Time := Nat
 
 /--
+  The graph relation of a function `f : A → B`, i.e. `{(a, b) | b = f a} ⊆ A × B`.
+-/
+def FunctionGraph {A B : Type} (f : A → B) : Set (A × B) :=
+  { p | p.2 = f p.1 }
+
+/--
   [textbook/definition_a1.155/requirement/relation]
   [textbook/definition_a1.155/requirement/totality]
   [textbook/definition_a1.155/requirement/single_valuedness]
-  In Lean's type theory, a function `f : A → B` inherently satisfies the FNS
-  (function space) properties defined in Definition A1.155:
-  1. Relation: It is represented by its graph relation `{(a, b) | b = f a} ⊆ A × B`.
-  2. Totality: For every element `a : A`, `f a` is defined.
-  3. Single-valuedness: If `(a, b)` and `(a, c)` are in the graph of `f`, then `b = c`.
+  A function `f : A → B` satisfies the FNS (function space) properties of Definition A1.155,
+  stated explicitly over its graph relation `{(a, b) | b = f a}`:
+  1. Relation: the graph is a subset of `A × B` (carried by the type of `FunctionGraph`).
+  2. Totality: for every `a : A` there is a `b : B` with `(a, b)` in the graph.
+  3. Single-valuedness: if `(a, b₁)` and `(a, b₂)` are in the graph, then `b₁ = b₂`.
 -/
-def SatisfiesFNS {A B : Type} (_f : A → B) : Prop := True
+def SatisfiesFNS {A B : Type} (f : A → B) : Prop :=
+  (∀ a : A, ∃ b : B, (a, b) ∈ FunctionGraph f) ∧
+  (∀ (a : A) (b₁ b₂ : B), (a, b₁) ∈ FunctionGraph f → (a, b₂) ∈ FunctionGraph f → b₁ = b₂)
+
+/-- Every Lean function satisfies the FNS properties (totality and single-valuedness). -/
+theorem satisfiesFNS_of_function {A B : Type} (f : A → B) : SatisfiesFNS f := by
+  constructor
+  · intro a
+    exact ⟨f a, rfl⟩
+  · intro a b₁ b₂ h₁ h₂
+    simp only [FunctionGraph, Set.mem_setOf_eq] at h₁ h₂
+    rw [h₁, h₂]
 
 /-- [textbook/definition2.4/implication/closed_system] A system is closed if both its input and output spaces are empty. -/
 def IsClosed {SZ IZ OZ : Type} (_Z : DiscreteSystem SZ IZ OZ) : Prop :=
@@ -61,11 +82,40 @@ def IsOpen {SZ IZ OZ : Type} (_Z : DiscreteSystem SZ IZ OZ) : Prop :=
   Nonempty IZ ∧ Nonempty OZ
 
 /--
+  In this encoding the readout `RZ : SZ → OZ` is total and `SZ` is nonempty, so the output
+  space is always inhabited. This makes explicit that the `DiscreteSystem` structure models
+  output-producing (open / Moore) systems; the closed/empty-output case of Definition 2.4
+  (`RZ = ∅ if OZ empty`) is out of scope by construction (see `not_isClosed`).
+-/
+theorem discreteSystem_output_nonempty {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
+    Nonempty OZ :=
+  ⟨Z.RZ (Classical.choice Z.sz_nonempty)⟩
+
+/--
+  No `DiscreteSystem` (as encoded) is closed: a closed system would require an empty output
+  space, which contradicts `discreteSystem_output_nonempty`. This turns the encoding's
+  limitation (Definition 2.4 closed systems are unrepresentable) into an explicit proved fact
+  rather than a silent gap.
+-/
+theorem not_isClosed {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) : ¬ IsClosed Z := by
+  intro h
+  exact h.2.false (Z.RZ (Classical.choice Z.sz_nonempty))
+
+/--
   [textbook/definition2.11/definition/finite_system]
   A Wymorian discrete system Z is finite if and only if SZ, IZ, and OZ are finite sets.
-  In our formalization, all systems are finite by construction (enforced by the Fintype instances).
+  In our formalization, all systems are finite by construction (enforced by the Fintype fields);
+  `discreteSystem_isFinite` proves this predicate holds for every system.
 -/
-def IsFinite {SZ IZ OZ : Type} (_Z : DiscreteSystem SZ IZ OZ) : Prop := True
+def IsFinite {SZ IZ OZ : Type} (_Z : DiscreteSystem SZ IZ OZ) : Prop :=
+  Finite SZ ∧ Finite IZ ∧ Finite OZ
+
+/-- Every `DiscreteSystem` is finite, since its state/input/output spaces carry `Fintype`. -/
+theorem discreteSystem_isFinite {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) : IsFinite Z :=
+  have := Z.sz_finite
+  have := Z.iz_finite
+  have := Z.oz_finite
+  ⟨Finite.of_fintype SZ, Finite.of_fintype IZ, Finite.of_fintype OZ⟩
 
 /--
   [textbook/definition2.11/definition/order_vector]
@@ -666,8 +716,8 @@ theorem readout_eq_of_properly_aligned {IZ IZ2 I : Type} {Val : I → Type}
   Projection functions are functions. In Lean, PJN is a function by definition.
 -/
 theorem pjn_is_fun {I : Type} {A : I → Type} (i : I) :
-    SatisfiesFNS (PJN i : ((j : I) → A j) → A i) := by
-  trivial
+    SatisfiesFNS (PJN i : ((j : I) → A j) → A i) :=
+  satisfiesFNS_of_function _
 
 /--
   State space of the constructed system Z2.
@@ -779,18 +829,20 @@ def parameterInstance {P : Type u} {SZ IZ OZ : P → Type}
 
 /--
   [textbook/definition2.82/definition/multiple_parameters]
-  A parameterization has `n` parameters if its parameter domain type is a product type
-  indexed by a type of cardinality `n`.
+  A parameterization has `n` parameters if its parameter domain type is (equivalent to) a
+  product type indexed by `Fin n`. Stated via an explicit type equivalence so the predicate
+  carries real content rather than restating its own hypothesis.
 -/
-def HasNParameters (P : Type) (n : Nat) (ParamType : Fin n → Type) (_h_dom : P = ((i : Fin n) → ParamType i)) : Prop :=
-  P = ((i : Fin n) → ParamType i)
+def HasNParameters (P : Type) (n : Nat) (ParamType : Fin n → Type) : Prop :=
+  Nonempty (P ≃ ((i : Fin n) → ParamType i))
 
 /--
   [textbook/definition2.82/definition/one_parameter]
-  A parameterization has one parameter if its parameter domain is treated as a single type.
+  A parameterization has one parameter if its parameter domain is (equivalent to) a single-factor
+  product, i.e. it has exactly one parameter factor.
 -/
-def HasOneParameter (_P : Type) : Prop :=
-  True
+def HasOneParameter (P : Type) : Prop :=
+  ∃ ParamType : Fin 1 → Type, HasNParameters P 1 ParamType
 
 /--
   [textbook/definition2.93/definition/fcnsy]
@@ -812,12 +864,9 @@ def fcnsy {IZ SZ : Type} (F : IZ → SZ) (n : Nat) [Fintype SZ] [Fintype IZ] [In
   FCNSY is a system parameterization with two parameters.
 -/
 theorem fcnsy_has_two_parameters {IZ SZ : Type} [Fintype SZ] [Fintype IZ] [Inhabited SZ] :
-    ∃ (P : Type) (ParamType : Fin 2 → Type) (h_dom : P = ((i : Fin 2) → ParamType i)),
-      HasNParameters P 2 ParamType h_dom := by
-  use (i : Fin 2) → if i.val == 0 then (IZ → SZ) else Nat
-  use fun i => if i.val == 0 then (IZ → SZ) else Nat
-  use rfl
-  exact rfl
+    ∃ (P : Type) (ParamType : Fin 2 → Type), HasNParameters P 2 ParamType := by
+  let ParamType : Fin 2 → Type := fun i => if i.val == 0 then (IZ → SZ) else Nat
+  exact ⟨(i : Fin 2) → ParamType i, ParamType, ⟨Equiv.refl _⟩⟩
 
 
 /--

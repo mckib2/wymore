@@ -7,601 +7,606 @@
 
 ### `textbook/definition2.11` — Finite System and Order Vector
 
-- Structured source file: [textbook/definition2.11.json](file:///home/nicholas/uoa/sie699/textbook/definition2.11.json)
+- Structured source file: [textbook/definition2.11.json](textbook/definition2.11.json)
 - Description: *Definition of a finite discrete system and its order vector containing the cardinalities of its state, input, and output spaces.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.11/definition/finite_system` | `component` | The system Z is finite if and only if SZ, IZ, and OZ are finite sets. | ✅ Traced | `IsFinite` ([Mbse/Wymore.lean:63](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L63)) |
-| `2.11/definition/order_vector` | `component` | The system Z is finite with order vector (k, m, n) if and only if (k, m, n) ∈ IJS+^3 and #SZ = k, #IZ = m, #OZ = n. | ✅ Traced | `HasOrderVector` ([Mbse/Wymore.lean:70](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L70)) |
+| `2.11/definition/finite_system` | `component` | The system Z is finite if and only if SZ, IZ, and OZ are finite sets. | ✅ Faithful | `IsFinite` ([Mbse/Wymore.lean:104](Mbse/Wymore.lean#L104))<br>`IsFinite` ([Mbse/CombinationalWymore.lean:54](Mbse/CombinationalWymore.lean#L54)) |
+| `2.11/definition/order_vector` | `component` | The system Z is finite with order vector (k, m, n) if and only if (k, m, n) ∈ IJS+^3 and #SZ = k, #IZ = m, #OZ = n. | ✅ Faithful | `HasOrderVector` ([Mbse/Wymore.lean:120](Mbse/Wymore.lean#L120))<br>`HasOrderVector` ([Mbse/CombinationalWymore.lean:61](Mbse/CombinationalWymore.lean#L61)) |
 
 ### `textbook/definition2.14` — Nontrivial System
 
-- Structured source file: [textbook/definition2.14.json](file:///home/nicholas/uoa/sie699/textbook/definition2.14.json)
+- Structured source file: [textbook/definition2.14.json](textbook/definition2.14.json)
 - Description: *Definition of a nontrivial discrete system with state-dependent transitions, state changes, and non-constant output.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.14/definition/nontrivial_system` | `component` | The system Z is nontrivial if and only if conditions (i), (ii), and (iii) are satisfied. | ✅ Traced | `IsNontrivial` ([Mbse/Wymore.lean:96](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L96)) |
-| `2.14/requirement/state_dependent_transition` | `constraint` | (i) there exist x1 ∈ SZ, x2 ∈ SZ, and p ∈ IZ, such that NZ(x1, p) ≠ NZ(x2, p) (the transition is state-dependent). | ✅ Traced | `IsNontrivial` ([Mbse/Wymore.lean:96](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L96)) |
-| `2.14/requirement/active_transition` | `constraint` | (ii) there exist x ∈ SZ and p ∈ IZ such that NZ(x, p) ≠ x (the state is not constant under all transitions). | ✅ Traced | `IsNontrivial` ([Mbse/Wymore.lean:96](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L96)) |
-| `2.14/requirement/varying_output` | `constraint` | (iii) #RNG(RZ) > 1 (the readout function is not constant, having a range size greater than 1). | ✅ Traced | `IsNontrivial` ([Mbse/Wymore.lean:96](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L96)) |
-| `2.14/implication/trivial_system` | `implication` | Z is trivial if Z is not nontrivial. | ✅ Traced | `IsTrivial` ([Mbse/Wymore.lean:113](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L113)) |
+| `2.14/definition/nontrivial_system` | `component` | The system Z is nontrivial if and only if conditions (i), (ii), and (iii) are satisfied. | ✅ Faithful | `IsNontrivial` ([Mbse/Wymore.lean:146](Mbse/Wymore.lean#L146))<br>`IsNontrivial` ([Mbse/CombinationalWymore.lean:72](Mbse/CombinationalWymore.lean#L72)) |
+| `2.14/requirement/state_dependent_transition` | `constraint` | (i) there exist x1 ∈ SZ, x2 ∈ SZ, and p ∈ IZ, such that NZ(x1, p) ≠ NZ(x2, p) (the transition is state-dependent). | ✅ Faithful | `IsNontrivial` ([Mbse/Wymore.lean:146](Mbse/Wymore.lean#L146)) |
+| `2.14/requirement/active_transition` | `constraint` | (ii) there exist x ∈ SZ and p ∈ IZ such that NZ(x, p) ≠ x (the state is not constant under all transitions). | ✅ Faithful | `IsNontrivial` ([Mbse/Wymore.lean:146](Mbse/Wymore.lean#L146)) |
+| `2.14/requirement/varying_output` | `constraint` | (iii) #RNG(RZ) > 1 (the readout function is not constant, having a range size greater than 1). | ✅ Faithful | `IsNontrivial` ([Mbse/Wymore.lean:146](Mbse/Wymore.lean#L146)) |
+| `2.14/implication/trivial_system` | `implication` | Z is trivial if Z is not nontrivial. | ✅ Faithful | `IsTrivial` ([Mbse/Wymore.lean:163](Mbse/Wymore.lean#L163))<br>`IsTrivial` ([Mbse/CombinationalWymore.lean:82](Mbse/CombinationalWymore.lean#L82)) |
 
 ### `textbook/definition2.23` — Input Trajectory
 
-- Structured source file: [textbook/definition2.23.json](file:///home/nicholas/uoa/sie699/textbook/definition2.23.json)
+- Structured source file: [textbook/definition2.23.json](textbook/definition2.23.json)
 - Description: *Definition of input trajectories as nonempty strings of inputs, and the set of complete input trajectories ITZ.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.23/definition/input_trajectory` | `component` | An input trajectory for the system Z is any nonempty string of elements of IZ (referencing Definition A1.185). | ✅ Traced | `InputTrajectory` ([Mbse/Wymore.lean:133](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L133)) |
-| `2.23/definition/complete_input_trajectory` | `component` | The set of complete input trajectories of the discrete system Z is denoted ITZ and is defined as follows: ITZ = FNS(TZ, IZ). | ✅ Traced | `ITZ` ([Mbse/Wymore.lean:142](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L142)) |
+| `2.23/definition/input_trajectory` | `component` | An input trajectory for the system Z is any nonempty string of elements of IZ (referencing Definition A1.185). | ✅ Faithful | `InputTrajectory` ([Mbse/Wymore.lean:183](Mbse/Wymore.lean#L183)) |
+| `2.23/definition/complete_input_trajectory` | `component` | The set of complete input trajectories of the discrete system Z is denoted ITZ and is defined as follows: ITZ = FNS(TZ, IZ). | ✅ Faithful | `ITZ` ([Mbse/Wymore.lean:192](Mbse/Wymore.lean#L192)) |
 
 ### `textbook/definition2.27` — State Trajectory
 
-- Structured source file: [textbook/definition2.27.json](file:///home/nicholas/uoa/sie699/textbook/definition2.27.json)
+- Structured source file: [textbook/definition2.27.json](textbook/definition2.27.json)
 - Description: *Definition of the state trajectory STZ(f, x) of a system under input trajectory f and initial state x.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.27/definition/state_trajectory_recurrence` | `component` | STZ(f, x) = {(t, y): t ∈ TZ, y ∈ SZ, y = x if t = 0; y = NZ(STZ(f, x)(t-1), f(t-1)) if t ≠ 0}. | ✅ Traced | `generateStateTrajectory` ([Mbse/Wymore.lean:151](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L151)) |
-| `2.27/definition/state_at_time_t` | `component` | STZ(f, x)(t) is interpreted as the state of the system Z at time t given input f and initial state x. | ✅ Traced | `generateStateTrajectory` ([Mbse/Wymore.lean:151](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L151)) |
+| `2.27/definition/state_trajectory_recurrence` | `component` | STZ(f, x) = {(t, y): t ∈ TZ, y ∈ SZ, y = x if t = 0; y = NZ(STZ(f, x)(t-1), f(t-1)) if t ≠ 0}. | ✅ Faithful | `generateStateTrajectory` ([Mbse/Wymore.lean:201](Mbse/Wymore.lean#L201)) |
+| `2.27/definition/state_at_time_t` | `component` | STZ(f, x)(t) is interpreted as the state of the system Z at time t given input f and initial state x. | ✅ Faithful | `generateStateTrajectory` ([Mbse/Wymore.lean:201](Mbse/Wymore.lean#L201)) |
 
 ### `textbook/definition2.30` — Output Trajectory
 
-- Structured source file: [textbook/definition2.30.json](file:///home/nicholas/uoa/sie699/textbook/definition2.30.json)
+- Structured source file: [textbook/definition2.30.json](textbook/definition2.30.json)
 - Description: *Definition of the output trajectory of a system as the composition of the readout function RZ and the state trajectory.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.30/definition/output_trajectory_composition` | `component` | OTZ(f, x) = RZ ∘ STZ(f, x) (where composition is defined in Definition A1.268). | ✅ Traced | `generateOutputTrajectory` ([Mbse/Wymore.lean:163](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L163)) |
+| `2.30/definition/output_trajectory_composition` | `component` | OTZ(f, x) = RZ ∘ STZ(f, x) (where composition is defined in Definition A1.268). | ✅ Faithful | `generateOutputTrajectory` ([Mbse/Wymore.lean:213](Mbse/Wymore.lean#L213)) |
 
 ### `textbook/definition2.33` — System Experiments
 
-- Structured source file: [textbook/definition2.33.json](file:///home/nicholas/uoa/sie699/textbook/definition2.33.json)
+- Structured source file: [textbook/definition2.33.json](textbook/definition2.33.json)
 - Description: *Definition of the set of system experiments EXZ as the Cartesian product of the complete input trajectories, states, and time scale.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.33/definition/system_experiments` | `component` | EXZ = ITZ × SZ × TZ. | ✅ Traced | `EXZ` ([Mbse/Wymore.lean:431](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L431)) |
+| `2.33/definition/system_experiments` | `component` | EXZ = ITZ × SZ × TZ. | ✅ Faithful | `EXZ` ([Mbse/Wymore.lean:481](Mbse/Wymore.lean#L481)) |
 
 ### `textbook/definition2.4` — Discrete System Specification
 
-- Structured source file: [textbook/definition2.4.json](file:///home/nicholas/uoa/sie699/textbook/definition2.4.json)
+- Structured source file: [textbook/definition2.4.json](textbook/definition2.4.json)
 - Description: *Definition of a Wymorian discrete system as a quintuple with associated properties, constraints, and classification rules.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.4/component/Z` | `interpretation` | Z is the name of the system. | ✅ Traced | `DiscreteSystem` ([Mbse/Wymore.lean:13](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L13)) |
-| `2.4/component/SZ` | `component` | SZ is the set of states of the discrete system Z. | ✅ Traced | `DiscreteSystem` ([Mbse/Wymore.lean:13](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L13)) |
-| `2.4/constraint/sz_nonempty` | `constraint` | SZ is a set not empty. | ✅ Traced | `DiscreteSystem.sz_nonempty` ([Mbse/Wymore.lean:22](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L22)) |
-| `2.4/component/IZ` | `component` | IZ is the set of inputs of the discrete system Z. | ✅ Traced | `DiscreteSystem` ([Mbse/Wymore.lean:13](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L13)) |
-| `2.4/component/OZ` | `component` | OZ is the set of outputs of the discrete system Z. | ✅ Traced | `DiscreteSystem` ([Mbse/Wymore.lean:13](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L13)) |
-| `2.4/component/NZ` | `component` | NZ is the next state function of the discrete system Z. | ✅ Traced | `DiscreteSystem.NZ` ([Mbse/Wymore.lean:34](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L34)) |
-| `2.4/constraint/nz_signature` | `constraint` | NZ ∈ FNS(SZ × IZ, SZ) if IZ is not empty; NZ ∈ FNS(SZ, SZ) if IZ is empty. | ✅ Traced | `DiscreteSystem.NZ` ([Mbse/Wymore.lean:34](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L34)) |
-| `2.4/component/RZ` | `component` | RZ is the readout function of the discrete system Z. | ✅ Traced | `DiscreteSystem.RZ` ([Mbse/Wymore.lean:37](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L37)) |
-| `2.4/constraint/rz_signature` | `constraint` | RZ ∈ FNS(SZ, OZ) if OZ is not empty; RZ = ∅ if OZ is empty. | ✅ Traced | `DiscreteSystem.RZ` ([Mbse/Wymore.lean:37](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L37)) |
-| `2.4/implication/closed_system` | `implication` | If both IZ and OZ are empty, the system Z is said to be closed. | ✅ Traced | `IsClosed` ([Mbse/Wymore.lean:55](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L55)) |
-| `2.4/implication/open_system` | `implication` | If neither IZ nor OZ are empty, the system Z is said to be open. | ✅ Traced | `IsOpen` ([Mbse/Wymore.lean:59](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L59)) |
-| `2.4/component/TZ` | `component` | The time scale of the discrete system Z is denoted TZ and is defined as follows: TZ = IJS++. | ✅ Traced | `Time` ([Mbse/Wymore.lean:40](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L40)) |
+| `2.4/component/Z` | `interpretation` | Z is the name of the system. | ✅ Faithful | `DiscreteSystem` ([Mbse/Wymore.lean:13](Mbse/Wymore.lean#L13)) |
+| `2.4/component/SZ` | `component` | SZ is the set of states of the discrete system Z. | ✅ Faithful | `DiscreteSystem` ([Mbse/Wymore.lean:13](Mbse/Wymore.lean#L13)) |
+| `2.4/constraint/sz_nonempty` | `constraint` | SZ is a set not empty. | ✅ Faithful | `DiscreteSystem.sz_nonempty` ([Mbse/Wymore.lean:22](Mbse/Wymore.lean#L22)) |
+| `2.4/component/IZ` | `component` | IZ is the set of inputs of the discrete system Z. | ✅ Faithful | `DiscreteSystem` ([Mbse/Wymore.lean:13](Mbse/Wymore.lean#L13)) |
+| `2.4/component/OZ` | `component` | OZ is the set of outputs of the discrete system Z. | ✅ Faithful | `DiscreteSystem` ([Mbse/Wymore.lean:13](Mbse/Wymore.lean#L13)) |
+| `2.4/component/NZ` | `component` | NZ is the next state function of the discrete system Z. | ✅ Faithful | `DiscreteSystem.NZ` ([Mbse/Wymore.lean:34](Mbse/Wymore.lean#L34)) |
+| `2.4/constraint/nz_signature` | `constraint` | NZ ∈ FNS(SZ × IZ, SZ) if IZ is not empty; NZ ∈ FNS(SZ, SZ) if IZ is empty. | ⚠️ Stub/Partial | `DiscreteSystem.NZ` ([Mbse/Wymore.lean:34](Mbse/Wymore.lean#L34)) _(partial)_ |
+| `2.4/component/RZ` | `component` | RZ is the readout function of the discrete system Z. | ✅ Faithful | `DiscreteSystem.RZ` ([Mbse/Wymore.lean:39](Mbse/Wymore.lean#L39)) |
+| `2.4/constraint/rz_signature` | `constraint` | RZ ∈ FNS(SZ, OZ) if OZ is not empty; RZ = ∅ if OZ is empty. | ⚠️ Stub/Partial | `DiscreteSystem.RZ` ([Mbse/Wymore.lean:39](Mbse/Wymore.lean#L39)) _(partial)_ |
+| `2.4/implication/closed_system` | `implication` | If both IZ and OZ are empty, the system Z is said to be closed. | ✅ Faithful | `IsClosed` ([Mbse/Wymore.lean:76](Mbse/Wymore.lean#L76))<br>`IsClosed` ([Mbse/CombinationalWymore.lean:45](Mbse/CombinationalWymore.lean#L45)) |
+| `2.4/implication/open_system` | `implication` | If neither IZ nor OZ are empty, the system Z is said to be open. | ✅ Faithful | `IsOpen` ([Mbse/Wymore.lean:80](Mbse/Wymore.lean#L80))<br>`IsOpen` ([Mbse/CombinationalWymore.lean:49](Mbse/CombinationalWymore.lean#L49)) |
+| `2.4/component/TZ` | `component` | The time scale of the discrete system Z is denoted TZ and is defined as follows: TZ = IJS++. | ✅ Faithful | `Time` ([Mbse/Wymore.lean:44](Mbse/Wymore.lean#L44)) |
 
 ### `textbook/definition2.5` — Examples of Systems
 
-- Structured source file: [textbook/definition2.5.json](file:///home/nicholas/uoa/sie699/textbook/definition2.5.json)
+- Structured source file: [textbook/definition2.5.json](textbook/definition2.5.json)
 - Description: *Definition of example systems Zxk and verification of their components against the discrete system specification.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.5/entity/Zxk` | `component` | Zxk is the name of a system whose definition is given in Appendix 3, for k ∈ [1, 168]. | ✅ Traced | `wymore_system Zx2 = (SZx2, IZx2, OZx2, NZx2, RZx2) where` ([Appendix3/Zx2.lean:12](file:///home/nicholas/uoa/sie699/Appendix3/Zx2.lean#L12)) |
-| `2.5/entity/dsystems` | `implication` | Zxk ∈ DSYSTEMS for every k ∈ [1, 168]. | ✅ Traced | `wymore_system Zx2 = (SZx2, IZx2, OZx2, NZx2, RZx2) where` ([Appendix3/Zx2.lean:12](file:///home/nicholas/uoa/sie699/Appendix3/Zx2.lean#L12)) |
-| `2.5/proof/sz_nonempty` | `constraint` | SZx2 is not empty. | ✅ Traced | `wymore_system Zx2 = (SZx2, IZx2, OZx2, NZx2, RZx2) where` ([Appendix3/Zx2.lean:12](file:///home/nicholas/uoa/sie699/Appendix3/Zx2.lean#L12)) |
-| `2.5/proof/iz_nonempty` | `constraint` | IZx2 is not empty. | ✅ Traced | `wymore_system Zx2 = (SZx2, IZx2, OZx2, NZx2, RZx2) where` ([Appendix3/Zx2.lean:12](file:///home/nicholas/uoa/sie699/Appendix3/Zx2.lean#L12)) |
-| `2.5/proof/oz_nonempty` | `constraint` | OZx2 is not empty. | ✅ Traced | `wymore_system Zx2 = (SZx2, IZx2, OZx2, NZx2, RZx2) where` ([Appendix3/Zx2.lean:12](file:///home/nicholas/uoa/sie699/Appendix3/Zx2.lean#L12)) |
-| `2.5/proof/nz_function` | `constraint` | NZx2 ∈ FNS(SZx2 × IZx2, SZx2) satisfying Definition A1.155. | ✅ Traced | `wymore_system Zx2 = (SZx2, IZx2, OZx2, NZx2, RZx2) where` ([Appendix3/Zx2.lean:12](file:///home/nicholas/uoa/sie699/Appendix3/Zx2.lean#L12)) |
-| `2.5/proof/rz_function` | `constraint` | RZx2 ∈ FNS(SZx2, OZx2) satisfying Definition A1.155. | ✅ Traced | `wymore_system Zx2 = (SZx2, IZx2, OZx2, NZx2, RZx2) where` ([Appendix3/Zx2.lean:12](file:///home/nicholas/uoa/sie699/Appendix3/Zx2.lean#L12)) |
+| `2.5/entity/Zxk` | `component` | Zxk is the name of a system whose definition is given in Appendix 3, for k ∈ [1, 168]. | ✅ Faithful | `Unknown` ([Appendix3/Zx2.lean:13](Appendix3/Zx2.lean#L13)) |
+| `2.5/entity/dsystems` | `implication` | Zxk ∈ DSYSTEMS for every k ∈ [1, 168]. | ✅ Faithful | `Unknown` ([Appendix3/Zx2.lean:14](Appendix3/Zx2.lean#L14)) |
+| `2.5/proof/sz_nonempty` | `constraint` | SZx2 is not empty. | ✅ Faithful | `zx2_sz_nonempty` ([Appendix3/Zx2.lean:28](Appendix3/Zx2.lean#L28)) |
+| `2.5/proof/iz_nonempty` | `constraint` | IZx2 is not empty. | ✅ Faithful | `zx2_iz_nonempty` ([Appendix3/Zx2.lean:31](Appendix3/Zx2.lean#L31)) |
+| `2.5/proof/oz_nonempty` | `constraint` | OZx2 is not empty. | ✅ Faithful | `zx2_oz_nonempty` ([Appendix3/Zx2.lean:34](Appendix3/Zx2.lean#L34)) |
+| `2.5/proof/nz_function` | `constraint` | NZx2 ∈ FNS(SZx2 × IZx2, SZx2) satisfying Definition A1.155. | ✅ Faithful | `zx2_nz_fns` ([Appendix3/Zx2.lean:37](Appendix3/Zx2.lean#L37)) |
+| `2.5/proof/rz_function` | `constraint` | RZx2 ∈ FNS(SZx2, OZx2) satisfying Definition A1.155. | ✅ Faithful | `zx2_rz_fns` ([Appendix3/Zx2.lean:41](Appendix3/Zx2.lean#L41)) |
 
 ### `textbook/definition2.51` — Reachable State
 
-- Structured source file: [textbook/definition2.51.json](file:///home/nicholas/uoa/sie699/textbook/definition2.51.json)
+- Structured source file: [textbook/definition2.51.json](textbook/definition2.51.json)
 - Description: *Definition of reachability of a state from another state in a discrete system.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.51/definition/reachable` | `component` | The state y ∈ SZ is reachable from x ∈ SZ iff there exists f ∈ ITZ and t ∈ TZ such that y = STZ(f, x)(t). | ✅ Traced | `Reachable` ([Mbse/Wymore.lean:235](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L235)) |
-| `2.51/terminology/by_means_of` | `component` | y is reachable from x by means of the input trajectory f at time t. | ✅ Traced | `Reachable` ([Mbse/Wymore.lean:235](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L235)) |
+| `2.51/definition/reachable` | `component` | The state y ∈ SZ is reachable from x ∈ SZ iff there exists f ∈ ITZ and t ∈ TZ such that y = STZ(f, x)(t). | ✅ Faithful | `Reachable` ([Mbse/Wymore.lean:285](Mbse/Wymore.lean#L285)) |
+| `2.51/terminology/by_means_of` | `component` | y is reachable from x by means of the input trajectory f at time t. | ✅ Faithful | `Reachable` ([Mbse/Wymore.lean:285](Mbse/Wymore.lean#L285)) |
 
 ### `textbook/definition2.55` — Input Ports and Port Trajectories
 
-- Structured source file: [textbook/definition2.55.json](file:///home/nicholas/uoa/sie699/textbook/definition2.55.json)
+- Structured source file: [textbook/definition2.55.json](textbook/definition2.55.json)
 - Description: *Definition of the set of input ports IPZ of a system Z and the input port trajectories generated by complete input trajectories.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.55/definition/input_ports` | `component` | The set of input ports of the system Z is denoted IPZ: {I1Z, ..., InZ} if IZ is a product, or {IZ} otherwise. | ✅ Traced | `IPZ` ([Mbse/Wymore.lean:503](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L503)) |
-| `2.55/definition/port_trajectory` | `component` | If #IPZ > 1, f ∈ ITZ, and j ∈ IJS[1, #IPZ], then PJN(IjZ) ∘ f is the IjZ input port trajectory generated by f. | ✅ Traced | `portTrajectory` ([Mbse/Wymore.lean:510](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L510)) |
+| `2.55/definition/input_ports` | `component` | The set of input ports of the system Z is denoted IPZ: {I1Z, ..., InZ} if IZ is a product, or {IZ} otherwise. | ✅ Faithful | `IPZ` ([Mbse/Wymore.lean:553](Mbse/Wymore.lean#L553)) |
+| `2.55/definition/port_trajectory` | `component` | If #IPZ > 1, f ∈ ITZ, and j ∈ IJS[1, #IPZ], then PJN(IjZ) ∘ f is the IjZ input port trajectory generated by f. | ✅ Faithful | `portTrajectory` ([Mbse/Wymore.lean:560](Mbse/Wymore.lean#L560)) |
 
 ### `textbook/definition2.59` — Input Port Structure
 
-- Structured source file: [textbook/definition2.59.json](file:///home/nicholas/uoa/sie699/textbook/definition2.59.json)
+- Structured source file: [textbook/definition2.59.json](textbook/definition2.59.json)
 - Description: *Definition of the input port structure ISZ as the set of input ports paired with their respective input sets.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.59/definition/input_port_structure` | `component` | ISZ = {(I1Z, A1), ..., (InZ, An)} if IZ is a product, or {(IZ, IZ)} otherwise. | ✅ Traced | `ISZ` ([Mbse/Wymore.lean:518](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L518)) |
+| `2.59/definition/input_port_structure` | `component` | ISZ = {(I1Z, A1), ..., (InZ, An)} if IZ is a product, or {(IZ, IZ)} otherwise. | ✅ Faithful | `ISZ` ([Mbse/Wymore.lean:568](Mbse/Wymore.lean#L568)) |
 
 ### `textbook/definition2.62` — Output Ports and Port Output Trajectories
 
-- Structured source file: [textbook/definition2.62.json](file:///home/nicholas/uoa/sie699/textbook/definition2.62.json)
+- Structured source file: [textbook/definition2.62.json](textbook/definition2.62.json)
 - Description: *Definition of the set of output ports OPZ, the readout RjZ for each port, and the port output trajectories OTjZ generated by complete input trajectories.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.62/definition/output_ports` | `component` | The set of output ports of the system Z is denoted OPZ: {O1Z, ..., OnZ} if OZ is a product, or {OZ} otherwise. | ✅ Traced | `OPZ` ([Mbse/Wymore.lean:525](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L525)) |
-| `2.62/definition/port_readout` | `component` | If #OPZ > 1 and j ∈ IJS[1, #OPZ], the readout to the jth output port is RjZ = PJN(OjZ) ∘ RZ. | ✅ Traced | `portReadout` ([Mbse/Wymore.lean:532](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L532)) |
-| `2.62/definition/port_output_trajectory` | `component` | If #OPZ > 1, f ∈ ITZ, x ∈ SZ and j ∈ IJS[1, #OPZ], then the OjZ output port trajectory is OTjZ(f, x) = PJN(OjZ) ∘ OTZ(f, x). | ✅ Traced | `portOutputTrajectory` ([Mbse/Wymore.lean:540](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L540)) |
+| `2.62/definition/output_ports` | `component` | The set of output ports of the system Z is denoted OPZ: {O1Z, ..., OnZ} if OZ is a product, or {OZ} otherwise. | ✅ Faithful | `OPZ` ([Mbse/Wymore.lean:575](Mbse/Wymore.lean#L575)) |
+| `2.62/definition/port_readout` | `component` | If #OPZ > 1 and j ∈ IJS[1, #OPZ], the readout to the jth output port is RjZ = PJN(OjZ) ∘ RZ. | ✅ Faithful | `portReadout` ([Mbse/Wymore.lean:582](Mbse/Wymore.lean#L582)) |
+| `2.62/definition/port_output_trajectory` | `component` | If #OPZ > 1, f ∈ ITZ, x ∈ SZ and j ∈ IJS[1, #OPZ], then the OjZ output port trajectory is OTjZ(f, x) = PJN(OjZ) ∘ OTZ(f, x). | ✅ Faithful | `portOutputTrajectory` ([Mbse/Wymore.lean:590](Mbse/Wymore.lean#L590)) |
 
 ### `textbook/definition2.65` — Output Port Structure
 
-- Structured source file: [textbook/definition2.65.json](file:///home/nicholas/uoa/sie699/textbook/definition2.65.json)
+- Structured source file: [textbook/definition2.65.json](textbook/definition2.65.json)
 - Description: *Definition of the output port structure OSZ as the set of output ports paired with their respective output sets.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.65/definition/output_port_structure` | `component` | OSZ = {(O1Z, B1), ..., (OnZ, Bn)} if OZ is a product, or {(OZ, OZ)} otherwise. | ✅ Traced | `OSZ` ([Mbse/Wymore.lean:548](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L548)) |
+| `2.65/definition/output_port_structure` | `component` | OSZ = {(O1Z, B1), ..., (OnZ, Bn)} if OZ is a product, or {(OZ, OZ)} otherwise. | ✅ Faithful | `OSZ` ([Mbse/Wymore.lean:598](Mbse/Wymore.lean#L598)) |
 
 ### `textbook/definition2.70` — State Factor Sets and Structures
 
-- Structured source file: [textbook/definition2.70.json](file:///home/nicholas/uoa/sie699/textbook/definition2.70.json)
+- Structured source file: [textbook/definition2.70.json](textbook/definition2.70.json)
 - Description: *Definition of state factor sets SFZ, state factor structure FSZ, component next state functions NjZ, and component state trajectories STjZ.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.70/definition/state_factor_sets` | `component` | The set of factor sets of the state set of the system Z is SFZ: {S1Z, ..., SnZ} if SZ is a product, or {SZ} otherwise. | ✅ Traced | `SFZ` ([Mbse/Wymore.lean:555](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L555)) |
-| `2.70/definition/state_factor_structure` | `component` | The state factor set structure FSZ is {(S1Z, S1), ..., (SnZ, Sn)} if SZ is a product, or {(SZ, SZ)} otherwise. | ✅ Traced | `FSZ` ([Mbse/Wymore.lean:562](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L562)) |
-| `2.70/definition/factor_next_state` | `component` | NjZ = PJNj ∘ NZ is the jth component of the next state function. | ✅ Traced | `factorNZ` ([Mbse/Wymore.lean:569](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L569)) |
-| `2.70/definition/factor_state_trajectory` | `component` | STjZ(f, x) = PJNj ∘ STZ(f, x) is the jth component of the state trajectory. | ✅ Traced | `factorStateTrajectory` ([Mbse/Wymore.lean:578](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L578)) |
+| `2.70/definition/state_factor_sets` | `component` | The set of factor sets of the state set of the system Z is SFZ: {S1Z, ..., SnZ} if SZ is a product, or {SZ} otherwise. | ✅ Faithful | `SFZ` ([Mbse/Wymore.lean:605](Mbse/Wymore.lean#L605)) |
+| `2.70/definition/state_factor_structure` | `component` | The state factor set structure FSZ is {(S1Z, S1), ..., (SnZ, Sn)} if SZ is a product, or {(SZ, SZ)} otherwise. | ✅ Faithful | `FSZ` ([Mbse/Wymore.lean:612](Mbse/Wymore.lean#L612)) |
+| `2.70/definition/factor_next_state` | `component` | NjZ = PJNj ∘ NZ is the jth component of the next state function. | ✅ Faithful | `factorNZ` ([Mbse/Wymore.lean:619](Mbse/Wymore.lean#L619)) |
+| `2.70/definition/factor_state_trajectory` | `component` | STjZ(f, x) = PJNj ∘ STZ(f, x) is the jth component of the state trajectory. | ✅ Faithful | `factorStateTrajectory` ([Mbse/Wymore.lean:628](Mbse/Wymore.lean#L628)) |
 
 ### `textbook/definition2.73` — State Readout and Projective Readout Types
 
-- Structured source file: [textbook/definition2.73.json](file:///home/nicholas/uoa/sie699/textbook/definition2.73.json)
+- Structured source file: [textbook/definition2.73.json](textbook/definition2.73.json)
 - Description: *Definition of state readout, projective readout, and properly aligned projective readout functions.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.73/definition/state_readout` | `component` | The system Z has state readout iff OSZ(B) = SZ and PJNB ∘ ID(SZ) for every output port B (i.e., output is the state). | ✅ Traced | `HasStateReadout` ([Mbse/Wymore.lean:592](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L592)) |
-| `2.73/definition/projective_readout` | `component` | The readout RZ is projective iff for every i, there exists j such that RiZ = PJN(SZ, SjZ). | ✅ Traced | `IsProjectiveReadout` ([Mbse/Wymore.lean:599](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L599)) |
-| `2.73/definition/properly_aligned_readout` | `component` | The projective readout RZ is properly aligned iff for every i, RiZ = PJN(SZ, SiZ). | ✅ Traced | `IsProperlyAlignedReadout` ([Mbse/Wymore.lean:610](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L610)) |
+| `2.73/definition/state_readout` | `component` | The system Z has state readout iff OSZ(B) = SZ and PJNB ∘ ID(SZ) for every output port B (i.e., output is the state). | ✅ Faithful | `HasStateReadout` ([Mbse/Wymore.lean:642](Mbse/Wymore.lean#L642)) |
+| `2.73/definition/projective_readout` | `component` | The readout RZ is projective iff for every i, there exists j such that RiZ = PJN(SZ, SjZ). | ✅ Faithful | `IsProjectiveReadout` ([Mbse/Wymore.lean:649](Mbse/Wymore.lean#L649)) |
+| `2.73/definition/properly_aligned_readout` | `component` | The projective readout RZ is properly aligned iff for every i, RiZ = PJN(SZ, SiZ). | ✅ Faithful | `IsProperlyAlignedReadout` ([Mbse/Wymore.lean:660](Mbse/Wymore.lean#L660)) |
 
 ### `textbook/definition2.82` — System Parameterization
 
-- Structured source file: [textbook/definition2.82.json](file:///home/nicholas/uoa/sie699/textbook/definition2.82.json)
+- Structured source file: [textbook/definition2.82.json](textbook/definition2.82.json)
 - Description: *Definition of a system parameterization F, parameter instances, and parameter counts (one or multiple parameters).*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.82/definition/system_parameterization` | `component` | A system parameterization is a function F such that RNG(F) ⊆ DSYSTEMS. | ✅ Traced | `SystemParameterization` ([Mbse/Wymore.lean:762](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L762)) |
-| `2.82/definition/parameter_instance` | `component` | If F is a system parameterization, r ∈ DMN(F) and Z = F(r), then Z is an instance of F. | ✅ Traced | `parameterInstance` ([Mbse/Wymore.lean:771](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L771)) |
-| `2.82/definition/multiple_parameters` | `component` | F has n parameters if DMN(F) is a subset of a Cartesian product P1 × ... × Pn. | ✅ Traced | `HasNParameters` ([Mbse/Wymore.lean:780](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L780)) |
-| `2.82/definition/one_parameter` | `component` | F has one parameter if DMN(F) is not a subset of a Cartesian product. | ✅ Traced | `HasOneParameter` ([Mbse/Wymore.lean:788](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L788)) |
+| `2.82/definition/system_parameterization` | `component` | A system parameterization is a function F such that RNG(F) ⊆ DSYSTEMS. | ✅ Faithful | `SystemParameterization` ([Mbse/Wymore.lean:812](Mbse/Wymore.lean#L812)) |
+| `2.82/definition/parameter_instance` | `component` | If F is a system parameterization, r ∈ DMN(F) and Z = F(r), then Z is an instance of F. | ✅ Faithful | `parameterInstance` ([Mbse/Wymore.lean:821](Mbse/Wymore.lean#L821)) |
+| `2.82/definition/multiple_parameters` | `component` | F has n parameters if DMN(F) is a subset of a Cartesian product P1 × ... × Pn. | ✅ Faithful | `HasNParameters` ([Mbse/Wymore.lean:830](Mbse/Wymore.lean#L830)) |
+| `2.82/definition/one_parameter` | `component` | F has one parameter if DMN(F) is not a subset of a Cartesian product. | ✅ Faithful | `HasOneParameter` ([Mbse/Wymore.lean:839](Mbse/Wymore.lean#L839)) |
 
 ### `textbook/definition2.93` — Function Computation Systems Parameterization
 
-- Structured source file: [textbook/definition2.93.json](file:///home/nicholas/uoa/sie699/textbook/definition2.93.json)
+- Structured source file: [textbook/definition2.93.json](textbook/definition2.93.json)
 - Description: *Definition of the system parameterization FCNSY representing the computation of values of a function F with n output ports.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.93/definition/fcnsy` | `component` | FCNSY(F, n) is the system Z with SZ = RNG(F), IZ = DMN(F), OZ = RNG(F)^n, NZ(x, p) = F(p), and RZ(x) = (x, ..., x). | ✅ Traced | `fcnsy` ([Mbse/Wymore.lean:795](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L795)) |
+| `2.93/definition/fcnsy` | `component` | FCNSY(F, n) is the system Z with SZ = RNG(F), IZ = DMN(F), OZ = RNG(F)^n, NZ(x, p) = F(p), and RZ(x) = (x, ..., x). | ✅ Faithful | `fcnsy` ([Mbse/Wymore.lean:847](Mbse/Wymore.lean#L847)) |
 
 ### `textbook/definition3.11` — System Coupling Recipe
 
-- Structured source file: [textbook/definition3.11.json](file:///home/nicholas/uoa/sie699/textbook/definition3.11.json)
+- Structured source file: [textbook/definition3.11.json](textbook/definition3.11.json)
 - Description: *Definition of a system coupling recipe SCR, connected/unconnected input/output ports, and interfaces between component systems.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.11/definition/system_coupling_recipe` | `component` | A system coupling recipe is a pair denoted SCR = (VSCR, CSCR) where (i) VSCR is a connectable vector of systems and (ii) CSCR is a system connectivity for VSCR. | ✅ Traced | `SystemCouplingRecipe` ([Mbse/Wymore.lean:926](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L926)) |
-| `3.11/interpretation/vscr` | `interpretation` | VSCR is called the connectable vector of system components of SCR. | ✅ Traced | `SystemCouplingRecipe` ([Mbse/Wymore.lean:926](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L926)) |
-| `3.11/interpretation/cscr` | `interpretation` | CSCR is called the system connectivity of SCR. | ✅ Traced | `SystemCouplingRecipe` ([Mbse/Wymore.lean:926](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L926)) |
-| `3.11/definition/coscr` | `component` | COSCR = DMN(CSCR), if CSCR is a function or COSCR = ∅, if CSCR = ∅. | ✅ Traced | `COSCR` ([Mbse/Wymore.lean:938](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L938)) |
-| `3.11/definition/ciscr` | `component` | CISCR = RNG(CSCR), if CSCR is a function or CISCR = ∅, if CSCR = ∅. | ✅ Traced | `CISCR` ([Mbse/Wymore.lean:945](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L945)) |
-| `3.11/definition/uoscr` | `component` | UOSCR = ∪ {OPZ' : Z' ∈ VSCR} - COSCR. | ✅ Traced | `UOSCR` ([Mbse/Wymore.lean:952](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L952)) |
-| `3.11/definition/uiscr` | `component` | UISCR = ∪ {IPZ' : Z' ∈ VSCR} - CISCR. | ✅ Traced | `UISCR` ([Mbse/Wymore.lean:959](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L959)) |
-| `3.11/definition/interface` | `component` | The interface between Z' and Z'' specified by SCR, where Z' and Z'' are in VSCR, is the set of all pairs in CSCR involving only input ports and outputs of both Z' and Z''; that is, the interface between Z' and Z'' is (CSCR ∩ (OPZ' × IPZ'')) ∪ (CSCR ∩ (OPZ'' × IPZ')). | ✅ Traced | `SCRInterface` ([Mbse/Wymore.lean:966](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L966)) |
+| `3.11/definition/system_coupling_recipe` | `component` | A system coupling recipe is a pair denoted SCR = (VSCR, CSCR) where (i) VSCR is a connectable vector of systems and (ii) CSCR is a system connectivity for VSCR. | ✅ Faithful | `SystemCouplingRecipe` ([Mbse/Wymore.lean:975](Mbse/Wymore.lean#L975)) |
+| `3.11/interpretation/vscr` | `interpretation` | VSCR is called the connectable vector of system components of SCR. | ✅ Faithful | `SystemCouplingRecipe` ([Mbse/Wymore.lean:975](Mbse/Wymore.lean#L975)) |
+| `3.11/interpretation/cscr` | `interpretation` | CSCR is called the system connectivity of SCR. | ✅ Faithful | `SystemCouplingRecipe` ([Mbse/Wymore.lean:975](Mbse/Wymore.lean#L975)) |
+| `3.11/definition/coscr` | `component` | COSCR = DMN(CSCR), if CSCR is a function or COSCR = ∅, if CSCR = ∅. | ✅ Faithful | `COSCR` ([Mbse/Wymore.lean:987](Mbse/Wymore.lean#L987)) |
+| `3.11/definition/ciscr` | `component` | CISCR = RNG(CSCR), if CSCR is a function or CISCR = ∅, if CSCR = ∅. | ✅ Faithful | `CISCR` ([Mbse/Wymore.lean:994](Mbse/Wymore.lean#L994)) |
+| `3.11/definition/uoscr` | `component` | UOSCR = ∪ {OPZ' : Z' ∈ VSCR} - COSCR. | ✅ Faithful | `UOSCR` ([Mbse/Wymore.lean:1001](Mbse/Wymore.lean#L1001)) |
+| `3.11/definition/uiscr` | `component` | UISCR = ∪ {IPZ' : Z' ∈ VSCR} - CISCR. | ✅ Faithful | `UISCR` ([Mbse/Wymore.lean:1008](Mbse/Wymore.lean#L1008)) |
+| `3.11/definition/interface` | `component` | The interface between Z' and Z'' specified by SCR, where Z' and Z'' are in VSCR, is the set of all pairs in CSCR involving only input ports and outputs of both Z' and Z''; that is, the interface between Z' and Z'' is (CSCR ∩ (OPZ' × IPZ'')) ∪ (CSCR ∩ (OPZ'' × IPZ')). | ✅ Faithful | `SCRInterface` ([Mbse/Wymore.lean:1015](Mbse/Wymore.lean#L1015)) |
 
 ### `textbook/definition3.15` — Conjunctive Coupling Recipe
 
-- Structured source file: [textbook/definition3.15.json](file:///home/nicholas/uoa/sie699/textbook/definition3.15.json)
+- Structured source file: [textbook/definition3.15.json](textbook/definition3.15.json)
 - Description: *Definition of a conjunctive system coupling recipe where the system connectivity set is empty.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.15/definition/conjunctive_scr` | `component` | The system coupling recipe SCR is conjunctive if and only if CSCR = ∅. | ✅ Traced | `IsConjunctive` ([Mbse/Wymore.lean:975](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L975)) |
+| `3.15/definition/conjunctive_scr` | `component` | The system coupling recipe SCR is conjunctive if and only if CSCR = ∅. | ✅ Faithful | `IsConjunctive` ([Mbse/Wymore.lean:1024](Mbse/Wymore.lean#L1024)) |
 
 ### `textbook/definition3.19` — Cascade and Essentially Cascade Coupling Recipes
 
-- Structured source file: [textbook/definition3.19.json](file:///home/nicholas/uoa/sie699/textbook/definition3.19.json)
+- Structured source file: [textbook/definition3.19.json](textbook/definition3.19.json)
 - Description: *Definitions of cascade and essentially cascade system coupling recipes.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.19/definition/cascade_scr` | `component` | The system coupling recipe SCR is cascade if and only if CSCR contains no feedback connections. | ✅ Traced | `IsCascade` ([Mbse/Wymore.lean:982](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L982)) |
-| `3.19/definition/essentially_cascade_scr` | `component` | The system coupling recipe SCR, where VSCR = (Z1, ..., Zn) for n ∈ IJS+, is 'essentially cascade' if there exists f ∈ FNS(IJS[1, n], 1TO1, ONTO, IJS[1, n]) such that if SCRf = ((Zf(1), ..., Zf(n)), CSCR), then SCRf is cascade. | ✅ Traced | `IsEssentiallyCascade` ([Mbse/Wymore.lean:989](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L989)) |
+| `3.19/definition/cascade_scr` | `component` | The system coupling recipe SCR is cascade if and only if CSCR contains no feedback connections. | ✅ Faithful | `IsCascade` ([Mbse/Wymore.lean:1031](Mbse/Wymore.lean#L1031)) |
+| `3.19/definition/essentially_cascade_scr` | `component` | The system coupling recipe SCR, where VSCR = (Z1, ..., Zn) for n ∈ IJS+, is 'essentially cascade' if there exists f ∈ FNS(IJS[1, n], 1TO1, ONTO, IJS[1, n]) such that if SCRf = ((Zf(1), ..., Zf(n)), CSCR), then SCRf is cascade. | ✅ Faithful | `IsEssentiallyCascade` ([Mbse/Wymore.lean:1038](Mbse/Wymore.lean#L1038)) |
 
 ### `textbook/definition3.26` — Singular Coupling Recipe
 
-- Structured source file: [textbook/definition3.26.json](file:///home/nicholas/uoa/sie699/textbook/definition3.26.json)
+- Structured source file: [textbook/definition3.26.json](textbook/definition3.26.json)
 - Description: *Definition of a singular system coupling recipe consisting of a single system and no connections.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.26/definition/singular_scr` | `component` | The system coupling recipe SCR is singular if and only if: (i) VSCR = Z for some system Z and (ii) CSCR = ∅. | ✅ Traced | `IsSingular` ([Mbse/Wymore.lean:997](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L997)) |
+| `3.26/definition/singular_scr` | `component` | The system coupling recipe SCR is singular if and only if: (i) VSCR = Z for some system Z and (ii) CSCR = ∅. | ✅ Faithful | `IsSingular` ([Mbse/Wymore.lean:1046](Mbse/Wymore.lean#L1046)) |
 
 ### `textbook/definition3.29` — Pure Feedback Coupling Recipe
 
-- Structured source file: [textbook/definition3.29.json](file:///home/nicholas/uoa/sie699/textbook/definition3.29.json)
+- Structured source file: [textbook/definition3.29.json](textbook/definition3.29.json)
 - Description: *Definition of a pure feedback system coupling recipe consisting of a single system and nonempty connections.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.29/definition/pure_feedback_scr` | `component` | The system coupling recipe SCR is pure feedback if and only if: (i) VSCR = Z for some Z ∈ DSYSTEMS and (ii) CSCR ≠ ∅. | ✅ Traced | `IsPureFeedback` ([Mbse/Wymore.lean:1006](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1006)) |
+| `3.29/definition/pure_feedback_scr` | `component` | The system coupling recipe SCR is pure feedback if and only if: (i) VSCR = Z for some Z ∈ DSYSTEMS and (ii) CSCR ≠ ∅. | ✅ Faithful | `IsPureFeedback` ([Mbse/Wymore.lean:1055](Mbse/Wymore.lean#L1055)) |
 
 ### `textbook/definition3.3` — Connectable Vector of Systems
 
-- Structured source file: [textbook/definition3.3.json](file:///home/nicholas/uoa/sie699/textbook/definition3.3.json)
+- Structured source file: [textbook/definition3.3.json](textbook/definition3.3.json)
 - Description: *Definition of a connection vector of systems where all components are discrete systems and are pairwise distinct.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.3/definition/connection_vector` | `component` | VSCR is a connection vector of systems iff: (i) either VSCR ∈ DSYSTEMS or VSCR is an n-tuple for some n ∈ IJS+ of the form VSCR = (Z1, ..., Zn) for n ∈ IJS+ and Zi ∈ DSYSTEMS for every i ∈ IJS[1, n]. | ✅ Traced | `PortSystemVector` ([Mbse/Wymore.lean:840](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L840)) |
-| `3.3/requirement/pairwise_distinct` | `constraint` | (ii) if {i, j} ⊆ IJS[1, n] such that i ≠ j, then Zi ≠ Zj. | ✅ Traced | `PortSystemVector` ([Mbse/Wymore.lean:840](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L840)) |
+| `3.3/definition/connection_vector` | `component` | VSCR is a connection vector of systems iff: (i) either VSCR ∈ DSYSTEMS or VSCR is an n-tuple for some n ∈ IJS+ of the form VSCR = (Z1, ..., Zn) for n ∈ IJS+ and Zi ∈ DSYSTEMS for every i ∈ IJS[1, n]. | ✅ Faithful | `PortSystemVector` ([Mbse/Wymore.lean:889](Mbse/Wymore.lean#L889)) |
+| `3.3/requirement/pairwise_distinct` | `constraint` | (ii) if {i, j} ⊆ IJS[1, n] such that i ≠ j, then Zi ≠ Zj. | ✅ Faithful | `PortSystemVector` ([Mbse/Wymore.lean:889](Mbse/Wymore.lean#L889)) |
 
 ### `textbook/definition3.33` — Mixed Coupling Recipe
 
-- Structured source file: [textbook/definition3.33.json](file:///home/nicholas/uoa/sie699/textbook/definition3.33.json)
+- Structured source file: [textbook/definition3.33.json](textbook/definition3.33.json)
 - Description: *Definition of a mixed system coupling recipe as one that is not singular, conjunctive, cascade, essentially cascade, or pure feedback.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.33/definition/mixed_scr` | `component` | A system coupling recipe is mixed if it is not singular, conjunctive, cascade, essentially cascade, or pure feedback. | ✅ Traced | `IsMixed` ([Mbse/Wymore.lean:1043](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1043)) |
+| `3.33/definition/mixed_scr` | `component` | A system coupling recipe is mixed if it is not singular, conjunctive, cascade, essentially cascade, or pure feedback. | ✅ Faithful | `IsMixed` ([Mbse/Wymore.lean:1092](Mbse/Wymore.lean#L1092)) |
 
 ### `textbook/definition3.40` — Conjunctive System (Parallel Composition)
 
-- Structured source file: [textbook/definition3.40.json](file:///home/nicholas/uoa/sie699/textbook/definition3.40.json)
+- Structured source file: [textbook/definition3.40.json](textbook/definition3.40.json)
 - Description: *Definition of the conjunctive system CSY(V) of a connectable vector of systems V, including state/input/output product spaces, next state/readout functions, and port mapping relations.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.40/definition/csy` | `component` | CSY = {(V, Z): V is a connectable vector of systems; if V = Z1, then Z = Z1; if V = (Z1, ..., Zn), then Z = (SZ, IZ, OZ, NZ, RZ). | ✅ Traced | `csy` ([Mbse/Wymore.lean:1052](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1052)) |
-| `3.40/definition/sz` | `component` | SZ = ⅹ (SZ1, ..., SZn). | ✅ Traced | `csy` ([Mbse/Wymore.lean:1052](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1052)) |
-| `3.40/definition/iz` | `component` | IZ = ⅹ (I1Z1, ..., Ik1Z1, ..., I1Zn, ..., IknZn). | ✅ Traced | `csy` ([Mbse/Wymore.lean:1052](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1052)) |
-| `3.40/definition/oz` | `component` | OZ = ⅹ (O1Z1, ..., Om1Z1, ..., O1Zn, ..., OmnZn). | ✅ Traced | `csy` ([Mbse/Wymore.lean:1052](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1052)) |
-| `3.40/definition/nz` | `component` | NZ = {((x, p), y) : x ∈ SZ; p ∈ IZ; y ∈ SZ; if i ∈ IJS[1, n], then PJNi(y) = NZi(PJNi(x), PJNPZi(p))}. | ✅ Traced | `csy` ([Mbse/Wymore.lean:1052](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1052)) |
-| `3.40/definition/rz` | `component` | RZ = {(x, q): x ∈ SZ; q ∈ OZ; if i ∈ IJS[1, n], then PJNOPZi(q) = RZi(PJNi(x))}. | ✅ Traced | `csy` ([Mbse/Wymore.lean:1052](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1052)) |
-| `3.40/definition/ip_map` | `component` | IP& is a function mapping the input ports of the conjunctive system to the input ports of the component systems. | ✅ Traced | `csy_IP_map` ([Mbse/Wymore.lean:1091](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1091)) |
-| `3.40/definition/inip_map` | `component` | INIP& is the inverse function of IP&. | ✅ Traced | `csy_INIP_map` ([Mbse/Wymore.lean:1100](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1100)) |
-| `3.40/definition/is_map` | `component` | IS& is the input port structure function of the conjunctive system. | ✅ Traced | `csy_IS_map` ([Mbse/Wymore.lean:1108](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1108)) |
-| `3.40/definition/op_map` | `component` | OP& is a function mapping the output ports of the conjunctive system to the output ports of the component systems. | ✅ Traced | `csy_OP_map` ([Mbse/Wymore.lean:1115](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1115)) |
-| `3.40/definition/inop_map` | `component` | INOP& is the inverse function of OP&. | ✅ Traced | `csy_INOP_map` ([Mbse/Wymore.lean:1124](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1124)) |
-| `3.40/definition/os_map` | `component` | OS& is the output port structure function of the conjunctive system. | ✅ Traced | `csy_OS_map` ([Mbse/Wymore.lean:1132](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1132)) |
+| `3.40/definition/csy` | `component` | CSY = {(V, Z): V is a connectable vector of systems; if V = Z1, then Z = Z1; if V = (Z1, ..., Zn), then Z = (SZ, IZ, OZ, NZ, RZ). | ✅ Faithful | `csy` ([Mbse/Wymore.lean:1101](Mbse/Wymore.lean#L1101)) |
+| `3.40/definition/sz` | `component` | SZ = ⅹ (SZ1, ..., SZn). | ✅ Faithful | `csy` ([Mbse/Wymore.lean:1101](Mbse/Wymore.lean#L1101)) |
+| `3.40/definition/iz` | `component` | IZ = ⅹ (I1Z1, ..., Ik1Z1, ..., I1Zn, ..., IknZn). | ✅ Faithful | `csy` ([Mbse/Wymore.lean:1101](Mbse/Wymore.lean#L1101)) |
+| `3.40/definition/oz` | `component` | OZ = ⅹ (O1Z1, ..., Om1Z1, ..., O1Zn, ..., OmnZn). | ✅ Faithful | `csy` ([Mbse/Wymore.lean:1101](Mbse/Wymore.lean#L1101)) |
+| `3.40/definition/nz` | `component` | NZ = {((x, p), y) : x ∈ SZ; p ∈ IZ; y ∈ SZ; if i ∈ IJS[1, n], then PJNi(y) = NZi(PJNi(x), PJNPZi(p))}. | ✅ Faithful | `csy` ([Mbse/Wymore.lean:1101](Mbse/Wymore.lean#L1101)) |
+| `3.40/definition/rz` | `component` | RZ = {(x, q): x ∈ SZ; q ∈ OZ; if i ∈ IJS[1, n], then PJNOPZi(q) = RZi(PJNi(x))}. | ✅ Faithful | `csy` ([Mbse/Wymore.lean:1101](Mbse/Wymore.lean#L1101)) |
+| `3.40/definition/ip_map` | `component` | IP& is a function mapping the input ports of the conjunctive system to the input ports of the component systems. | ✅ Faithful | `csy_IP_map` ([Mbse/Wymore.lean:1140](Mbse/Wymore.lean#L1140)) |
+| `3.40/definition/inip_map` | `component` | INIP& is the inverse function of IP&. | ✅ Faithful | `csy_INIP_map` ([Mbse/Wymore.lean:1149](Mbse/Wymore.lean#L1149)) |
+| `3.40/definition/is_map` | `component` | IS& is the input port structure function of the conjunctive system. | ✅ Faithful | `csy_IS_map` ([Mbse/Wymore.lean:1157](Mbse/Wymore.lean#L1157)) |
+| `3.40/definition/op_map` | `component` | OP& is a function mapping the output ports of the conjunctive system to the output ports of the component systems. | ✅ Faithful | `csy_OP_map` ([Mbse/Wymore.lean:1164](Mbse/Wymore.lean#L1164)) |
+| `3.40/definition/inop_map` | `component` | INOP& is the inverse function of OP&. | ✅ Faithful | `csy_INOP_map` ([Mbse/Wymore.lean:1173](Mbse/Wymore.lean#L1173)) |
+| `3.40/definition/os_map` | `component` | OS& is the output port structure function of the conjunctive system. | ✅ Faithful | `csy_OS_map` ([Mbse/Wymore.lean:1181](Mbse/Wymore.lean#L1181)) |
 
 ### `textbook/definition3.7` — System Connectivity
 
-- Structured source file: [textbook/definition3.7.json](file:///home/nicholas/uoa/sie699/textbook/definition3.7.json)
+- Structured source file: [textbook/definition3.7.json](textbook/definition3.7.json)
 - Description: *Definition of a system connectivity CSCR for a connectable vector VSCR, including one-to-one mapping, domain and range restrictions, and the port compatibility condition.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.7/definition/connectivity_relation` | `component` | A set CSCR is a system connectivity for the connectable vector VSCR of systems if and only if: (i) either CSCR = ∅ or CSCR is a 1TO1 function. | ✅ Traced | `IsOneToOneRelation` ([Mbse/Wymore.lean:862](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L862))<br>`IsSystemConnectivity` ([Mbse/Wymore.lean:894](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L894)) |
-| `3.7/requirement/domain_subset` | `constraint` | (ii) DMN(CSCR) is a proper subset of ∪ {OPZ' : Z' ∈ VSCR}. | ✅ Traced | `IsProperDomain` ([Mbse/Wymore.lean:870](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L870))<br>`IsSystemConnectivity` ([Mbse/Wymore.lean:894](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L894)) |
-| `3.7/requirement/range_subset` | `constraint` | (iii) RNG(CSCR) is a proper subset of ∪ {IPZ' : Z' ∈ VSCR}. | ✅ Traced | `IsProperRange` ([Mbse/Wymore.lean:877](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L877))<br>`IsSystemConnectivity` ([Mbse/Wymore.lean:894](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L894)) |
-| `3.7/requirement/port_compatibility` | `constraint` | (iv) if (B, A) ∈ CSCR, where B ∈ OPZ', A ∈ IPZ'', Z' ∈ VSCR and Z'' ∈ VSCR, then OSZ'(B) = ISZ''(A) (the port compatibility condition). | ✅ Traced | `PortCompatibility` ([Mbse/Wymore.lean:884](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L884))<br>`IsSystemConnectivity` ([Mbse/Wymore.lean:894](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L894)) |
-| `3.7/definition/feedforward_connection` | `component` | A feedforward connection is a pair (B, A) ∈ CSCR, where, if VSCR = (Z1, ..., Zn), B ∈ OPZi and A ∈ IPZj, then i < j. | ✅ Traced | `IsFeedforward` ([Mbse/Wymore.lean:908](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L908)) |
-| `3.7/definition/feedback_connection` | `component` | A feedback connection is a pair (B, A) ∈ CSCR, where, if VSCR = (Z1, ..., Zn), B ∈ OPZi and A ∈ IPZj, then i ≥ j. | ✅ Traced | `IsFeedback` ([Mbse/Wymore.lean:917](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L917)) |
+| `3.7/definition/connectivity_relation` | `component` | A set CSCR is a system connectivity for the connectable vector VSCR of systems if and only if: (i) either CSCR = ∅ or CSCR is a 1TO1 function. | ✅ Faithful | `IsOneToOneRelation` ([Mbse/Wymore.lean:911](Mbse/Wymore.lean#L911))<br>`IsSystemConnectivity` ([Mbse/Wymore.lean:943](Mbse/Wymore.lean#L943)) |
+| `3.7/requirement/domain_subset` | `constraint` | (ii) DMN(CSCR) is a proper subset of ∪ {OPZ' : Z' ∈ VSCR}. | ✅ Faithful | `IsProperDomain` ([Mbse/Wymore.lean:919](Mbse/Wymore.lean#L919))<br>`IsSystemConnectivity` ([Mbse/Wymore.lean:943](Mbse/Wymore.lean#L943)) |
+| `3.7/requirement/range_subset` | `constraint` | (iii) RNG(CSCR) is a proper subset of ∪ {IPZ' : Z' ∈ VSCR}. | ✅ Faithful | `IsProperRange` ([Mbse/Wymore.lean:926](Mbse/Wymore.lean#L926))<br>`IsSystemConnectivity` ([Mbse/Wymore.lean:943](Mbse/Wymore.lean#L943)) |
+| `3.7/requirement/port_compatibility` | `constraint` | (iv) if (B, A) ∈ CSCR, where B ∈ OPZ', A ∈ IPZ'', Z' ∈ VSCR and Z'' ∈ VSCR, then OSZ'(B) = ISZ''(A) (the port compatibility condition). | ✅ Faithful | `PortCompatibility` ([Mbse/Wymore.lean:933](Mbse/Wymore.lean#L933))<br>`IsSystemConnectivity` ([Mbse/Wymore.lean:943](Mbse/Wymore.lean#L943)) |
+| `3.7/definition/feedforward_connection` | `component` | A feedforward connection is a pair (B, A) ∈ CSCR, where, if VSCR = (Z1, ..., Zn), B ∈ OPZi and A ∈ IPZj, then i < j. | ✅ Faithful | `IsFeedforward` ([Mbse/Wymore.lean:957](Mbse/Wymore.lean#L957)) |
+| `3.7/definition/feedback_connection` | `component` | A feedback connection is a pair (B, A) ∈ CSCR, where, if VSCR = (Z1, ..., Zn), B ∈ OPZi and A ∈ IPZj, then i ≥ j. | ✅ Faithful | `IsFeedback` ([Mbse/Wymore.lean:966](Mbse/Wymore.lean#L966)) |
 
 ### `textbook/definition_a1.155` — Function Specification (FNS)
 
-- Structured source file: [textbook/definition_a1.155.json](file:///home/nicholas/uoa/sie699/textbook/definition_a1.155.json)
+- Structured source file: [textbook/definition_a1.155.json](textbook/definition_a1.155.json)
 - Description: *Definition of the set of all total, single-valued functions from set A to set B.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `a1.155/requirement/relation` | `constraint` | f ⊆ A × B (f is a relation between A and B). | ✅ Traced | `SatisfiesFNS` ([Mbse/Wymore.lean:43](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L43)) |
-| `a1.155/requirement/totality` | `constraint` | if a ∈ A, then there exists b ∈ B such that (a, b) ∈ f (the function is defined for every input in A). | ✅ Traced | `SatisfiesFNS` ([Mbse/Wymore.lean:43](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L43)) |
-| `a1.155/requirement/single_valuedness` | `constraint` | if (a, b) ∈ f and (c, d) ∈ f and a = c, then b = d (single-valuedness: each input maps to exactly one output). | ✅ Traced | `SatisfiesFNS` ([Mbse/Wymore.lean:43](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L43)) |
+| `a1.155/requirement/relation` | `constraint` | f ⊆ A × B (f is a relation between A and B). | ✅ Faithful | `SatisfiesFNS` ([Mbse/Wymore.lean:53](Mbse/Wymore.lean#L53)) |
+| `a1.155/requirement/totality` | `constraint` | if a ∈ A, then there exists b ∈ B such that (a, b) ∈ f (the function is defined for every input in A). | ✅ Faithful | `SatisfiesFNS` ([Mbse/Wymore.lean:53](Mbse/Wymore.lean#L53)) |
+| `a1.155/requirement/single_valuedness` | `constraint` | if (a, b) ∈ f and (c, d) ∈ f and a = c, then b = d (single-valuedness: each input maps to exactly one output). | ✅ Faithful | `SatisfiesFNS` ([Mbse/Wymore.lean:53](Mbse/Wymore.lean#L53)) |
 
 ### `textbook/definition_a1.165` — Identity Function
 
-- Structured source file: [textbook/definition_a1.165.json](file:///home/nicholas/uoa/sie699/textbook/definition_a1.165.json)
+- Structured source file: [textbook/definition_a1.165.json](textbook/definition_a1.165.json)
 - Description: *Definition of the identity function ID(A) over a set A.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `a1.165/definition/identity` | `component` | ID(A) = {y: y = (x, x); x ∈ A} is the identity function over the set A. | ✅ Traced | `ID` ([Mbse/Wymore.lean:586](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L586)) |
+| `a1.165/definition/identity` | `component` | ID(A) = {y: y = (x, x); x ∈ A} is the identity function over the set A. | ✅ Faithful | `ID` ([Mbse/Wymore.lean:636](Mbse/Wymore.lean#L636)) |
 
 ### `textbook/definition_a1.172` — Projection Functions
 
-- Structured source file: [textbook/definition_a1.172.json](file:///home/nicholas/uoa/sie699/textbook/definition_a1.172.json)
+- Structured source file: [textbook/definition_a1.172.json](textbook/definition_a1.172.json)
 - Description: *Definition of projection functions over a Cartesian product onto coordinates or sets of coordinates.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `a1.172/definition/projection_coordinate` | `component` | PJN(A, i) is the projection function over the Cartesian product A onto the ith coordinate. | ✅ Traced | `PJN` ([Mbse/Wymore.lean:486](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L486)) |
-| `a1.172/definition/projection_set` | `component` | PJN(A, Ai) is the projection function over the Cartesian product A onto the coordinate set Ai. | ✅ Traced | `PJN` ([Mbse/Wymore.lean:486](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L486)) |
-| `a1.172/definition/projection_subset` | `component` | PJN(A, I) is the projection function over the Cartesian product A onto a subset of coordinates. | ✅ Traced | `PJN_set` ([Mbse/Wymore.lean:496](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L496)) |
-| `a1.172/definition/projection_abbreviations` | `component` | Standard abbreviations for projection functions: PJN(A, i) = PJN(i) = PJNi. | ✅ Traced | `PJN` ([Mbse/Wymore.lean:486](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L486)) |
+| `a1.172/definition/projection_coordinate` | `component` | PJN(A, i) is the projection function over the Cartesian product A onto the ith coordinate. | ✅ Faithful | `PJN` ([Mbse/Wymore.lean:536](Mbse/Wymore.lean#L536)) |
+| `a1.172/definition/projection_set` | `component` | PJN(A, Ai) is the projection function over the Cartesian product A onto the coordinate set Ai. | ✅ Faithful | `PJN` ([Mbse/Wymore.lean:536](Mbse/Wymore.lean#L536)) |
+| `a1.172/definition/projection_subset` | `component` | PJN(A, I) is the projection function over the Cartesian product A onto a subset of coordinates. | ✅ Faithful | `PJN_set` ([Mbse/Wymore.lean:546](Mbse/Wymore.lean#L546)) |
+| `a1.172/definition/projection_abbreviations` | `component` | Standard abbreviations for projection functions: PJN(A, i) = PJN(i) = PJNi. | ✅ Faithful | `PJN` ([Mbse/Wymore.lean:536](Mbse/Wymore.lean#L536)) |
 
 ### `textbook/definition_a1.185` — Strings and Length
 
-- Structured source file: [textbook/definition_a1.185.json](file:///home/nicholas/uoa/sie699/textbook/definition_a1.185.json)
+- Structured source file: [textbook/definition_a1.185.json](textbook/definition_a1.185.json)
 - Description: *Definition of the set of all strings of elements of C and the string length function LTH.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `a1.185/definition/strings` | `component` | STRINGS(C) = {f: f = ∅ or f ∈ FNS(IJS[0, n), C) for some n ∈ IJS+} (set of finite sequences). | ✅ Traced | `STRINGS` ([Mbse/Wymore.lean:120](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L120)) |
-| `a1.185/definition/length` | `component` | LTH(f) = 0 if f = ∅; LTH(f) = n if f ∈ FNS(IJS[0, n), C) for some n ∈ IJS+. | ✅ Traced | `LTH` ([Mbse/Wymore.lean:127](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L127)) |
+| `a1.185/definition/strings` | `component` | STRINGS(C) = {f: f = ∅ or f ∈ FNS(IJS[0, n), C) for some n ∈ IJS+} (set of finite sequences). | ✅ Faithful | `STRINGS` ([Mbse/Wymore.lean:170](Mbse/Wymore.lean#L170)) |
+| `a1.185/definition/length` | `component` | LTH(f) = 0 if f = ∅; LTH(f) = n if f ∈ FNS(IJS[0, n), C) for some n ∈ IJS+. | ✅ Faithful | `LTH` ([Mbse/Wymore.lean:177](Mbse/Wymore.lean#L177)) |
 
 ### `textbook/definition_a1.218` — Domain and Range of a Function
 
-- Structured source file: [textbook/definition_a1.218.json](file:///home/nicholas/uoa/sie699/textbook/definition_a1.218.json)
+- Structured source file: [textbook/definition_a1.218.json](textbook/definition_a1.218.json)
 - Description: *Definition of the domain (DMN) and range (RNG) of a function in the Wymorian set-theoretic context.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `a1.218/definition/domain` | `component` | If f ∈ FNS(A, B), then the domain (DMN) of f is equal exactly to A. | ✅ Traced | `DMN` ([Mbse/Wymore.lean:82](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L82)) |
-| `a1.218/definition/range` | `component` | The range (RNG) of the function f is a subset of B (RNG(f) ⊆ B) and may not be all of B. | ✅ Traced | `RNG` ([Mbse/Wymore.lean:88](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L88)) |
+| `a1.218/definition/domain` | `component` | If f ∈ FNS(A, B), then the domain (DMN) of f is equal exactly to A. | ✅ Faithful | `DMN` ([Mbse/Wymore.lean:132](Mbse/Wymore.lean#L132)) |
+| `a1.218/definition/range` | `component` | The range (RNG) of the function f is a subset of B (RNG(f) ⊆ B) and may not be all of B. | ✅ Faithful | `RNG` ([Mbse/Wymore.lean:138](Mbse/Wymore.lean#L138)) |
 
 ### `textbook/definition_a1.257` — Function Restriction
 
-- Structured source file: [textbook/definition_a1.257.json](file:///home/nicholas/uoa/sie699/textbook/definition_a1.257.json)
+- Structured source file: [textbook/definition_a1.257.json](textbook/definition_a1.257.json)
 - Description: *Definition of the restriction of a function to a subset of its domain.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `a1.257/definition/restriction` | `component` | RSN(f, A') is exactly the same as f, but its domain is restricted to A'. | ✅ Traced | `RSN` ([Mbse/Wymore.lean:437](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L437)) |
+| `a1.257/definition/restriction` | `component` | RSN(f, A') is exactly the same as f, but its domain is restricted to A'. | ✅ Faithful | `RSN` ([Mbse/Wymore.lean:487](Mbse/Wymore.lean#L487)) |
 
 ### `textbook/definition_a1.268` — Composition of Functions
 
-- Structured source file: [textbook/definition_a1.268.json](file:///home/nicholas/uoa/sie699/textbook/definition_a1.268.json)
+- Structured source file: [textbook/definition_a1.268.json](textbook/definition_a1.268.json)
 - Description: *Definition of function composition (g ∘ f)(x) = g(f(x)) and its set-theoretic generalization.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `a1.268/definition/composition_pointwise` | `component` | The composition of g and f is defined at each point x in A as g(f(x)), denoted g ∘ f. | ✅ Traced | `compose` ([Mbse/Wymore.lean:374](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L374)) |
-| `a1.268/definition/composition_set` | `component` | g ∘ J denotes the set of all compositions of g with functions in J. | ✅ Traced | `compose` ([Mbse/Wymore.lean:374](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L374)) |
+| `a1.268/definition/composition_pointwise` | `component` | The composition of g and f is defined at each point x in A as g(f(x)), denoted g ∘ f. | ✅ Faithful | `compose` ([Mbse/Wymore.lean:424](Mbse/Wymore.lean#L424)) |
+| `a1.268/definition/composition_set` | `component` | g ∘ J denotes the set of all compositions of g with functions in J. | ✅ Faithful | `compose` ([Mbse/Wymore.lean:424](Mbse/Wymore.lean#L424)) |
 
 ### `textbook/definition_a1.284` — Translation of a Function
 
-- Structured source file: [textbook/definition_a1.284.json](file:///home/nicholas/uoa/sie699/textbook/definition_a1.284.json)
+- Structured source file: [textbook/definition_a1.284.json](textbook/definition_a1.284.json)
 - Description: *Definition of the function translation operator and closure under translation.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `a1.284/definition/translation_operator` | `component` | f → r = {(t, a): t ∈ IJS++, t + r ∈ W, a ∈ A, a = f(t+r)}. | ✅ Traced | `translate` ([Mbse/Wymore.lean:311](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L311)) |
-| `a1.284/definition/closed_under_translation` | `component` | A set J ⊆ FNS(W, A) is closed under translation iff f ∈ J and r ∈ W implies f → r ∈ J. | ✅ Traced | `complete_trajectories_closed_under_translation` ([Mbse/Wymore.lean:329](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L329)) |
+| `a1.284/definition/translation_operator` | `component` | f → r = {(t, a): t ∈ IJS++, t + r ∈ W, a ∈ A, a = f(t+r)}. | ✅ Faithful | `translate` ([Mbse/Wymore.lean:361](Mbse/Wymore.lean#L361)) |
+| `a1.284/definition/closed_under_translation` | `component` | A set J ⊆ FNS(W, A) is closed under translation iff f ∈ J and r ∈ W implies f → r ∈ J. | ✅ Faithful | `complete_trajectories_closed_under_translation` ([Mbse/Wymore.lean:379](Mbse/Wymore.lean#L379)) |
 
 ### `textbook/theorem2.25` — Closure of Complete Input Trajectories
 
-- Structured source file: [textbook/theorem2.25.json](file:///home/nicholas/uoa/sie699/textbook/theorem2.25.json)
+- Structured source file: [textbook/theorem2.25.json](textbook/theorem2.25.json)
 - Description: *Theorem stating that the set of complete input trajectories ITZ of a system is closed under translation and concatenation.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.25/theorem/translation_closed` | `implication` | If Z ∈ DSYSTEMS and f ∈ ITZ, then f → t ∈ ITZ for any t ∈ TZ+. | ✅ Traced | `complete_trajectories_closed_under_translation` ([Mbse/Wymore.lean:329](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L329)) |
-| `2.25/theorem/concatenation_closed` | `implication` | If Z ∈ DSYSTEMS, {f1, f2} ⊆ ITZ, and t ∈ TZ+, then CTN(f1, t, f2) ∈ ITZ. | ✅ Traced | `complete_trajectories_closed_under_concatenation` ([Mbse/Wymore.lean:346](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L346)) |
+| `2.25/theorem/translation_closed` | `implication` | If Z ∈ DSYSTEMS and f ∈ ITZ, then f → t ∈ ITZ for any t ∈ TZ+. | ✅ Faithful | `complete_trajectories_closed_under_translation` ([Mbse/Wymore.lean:379](Mbse/Wymore.lean#L379)) |
+| `2.25/theorem/concatenation_closed` | `implication` | If Z ∈ DSYSTEMS, {f1, f2} ⊆ ITZ, and t ∈ TZ+, then CTN(f1, t, f2) ∈ ITZ. | ✅ Faithful | `complete_trajectories_closed_under_concatenation` ([Mbse/Wymore.lean:396](Mbse/Wymore.lean#L396)) |
 
 ### `textbook/theorem2.29` — State Trajectory is a Function
 
-- Structured source file: [textbook/theorem2.29.json](file:///home/nicholas/uoa/sie699/textbook/theorem2.29.json)
+- Structured source file: [textbook/theorem2.29.json](textbook/theorem2.29.json)
 - Description: *Theorem stating that the state trajectory is a total, single-valued function from TZ to SZ, satisfying FNS(TZ, SZ).*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.29/theorem/trajectory_fns` | `implication` | STZ(f, x) ∈ FNS(TZ, SZ) for any f ∈ ITZ and x ∈ SZ. | ✅ Traced | `generateStateTrajectory` ([Mbse/Wymore.lean:151](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L151)) |
-| `2.29/proof/subset` | `implication` | Deduction (i): STZ(f, x) ⊆ TZ × SZ. | ✅ Traced | `generateStateTrajectory` ([Mbse/Wymore.lean:151](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L151)) |
-| `2.29/proof/totality` | `implication` | Deduction (ii): For all t ∈ TZ, there exists y ∈ SZ such that (t, y) ∈ STZ(f, x). | ✅ Traced | `generateStateTrajectory` ([Mbse/Wymore.lean:151](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L151)) |
-| `2.29/proof/single_valuedness` | `implication` | Deduction (iii): If (t1, y1) ∈ STZ(f, x) and (t2, y2) ∈ STZ(f, x) and t1 = t2, then y1 = y2 (induction proof). | ✅ Traced | `stateTrajectory_unique` ([Mbse/Wymore.lean:211](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L211)) |
+| `2.29/theorem/trajectory_fns` | `implication` | STZ(f, x) ∈ FNS(TZ, SZ) for any f ∈ ITZ and x ∈ SZ. | ✅ Faithful | `generateStateTrajectory` ([Mbse/Wymore.lean:201](Mbse/Wymore.lean#L201)) |
+| `2.29/proof/subset` | `implication` | Deduction (i): STZ(f, x) ⊆ TZ × SZ. | ✅ Faithful | `generateStateTrajectory` ([Mbse/Wymore.lean:201](Mbse/Wymore.lean#L201)) |
+| `2.29/proof/totality` | `implication` | Deduction (ii): For all t ∈ TZ, there exists y ∈ SZ such that (t, y) ∈ STZ(f, x). | ✅ Faithful | `generateStateTrajectory` ([Mbse/Wymore.lean:201](Mbse/Wymore.lean#L201)) |
+| `2.29/proof/single_valuedness` | `implication` | Deduction (iii): If (t1, y1) ∈ STZ(f, x) and (t2, y2) ∈ STZ(f, x) and t1 = t2, then y1 = y2 (induction proof). | ✅ Faithful | `stateTrajectory_unique` ([Mbse/Wymore.lean:261](Mbse/Wymore.lean#L261)) |
 
 ### `textbook/theorem2.32` — Output Trajectory is a Function
 
-- Structured source file: [textbook/theorem2.32.json](file:///home/nicholas/uoa/sie699/textbook/theorem2.32.json)
+- Structured source file: [textbook/theorem2.32.json](textbook/theorem2.32.json)
 - Description: *Theorem stating that the output trajectory is a total, single-valued function from TZ to OZ, and equals RZ(STZ(f, x)(t)).*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.32/theorem/trajectory_fns` | `implication` | OTZ(f, x) ∈ FNS(TZ, OZ). | ✅ Traced | `generateOutputTrajectory` ([Mbse/Wymore.lean:163](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L163)) |
-| `2.32/theorem/trajectory_value` | `implication` | OTZ(f, x)(t) = RZ(STZ(f, x)(t)) for any t ∈ TZ. | ✅ Traced | `generateOutputTrajectory` ([Mbse/Wymore.lean:163](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L163)) |
+| `2.32/theorem/trajectory_fns` | `implication` | OTZ(f, x) ∈ FNS(TZ, OZ). | ✅ Faithful | `generateOutputTrajectory` ([Mbse/Wymore.lean:213](Mbse/Wymore.lean#L213)) |
+| `2.32/theorem/trajectory_value` | `implication` | OTZ(f, x)(t) = RZ(STZ(f, x)(t)) for any t ∈ TZ. | ✅ Faithful | `generateOutputTrajectory` ([Mbse/Wymore.lean:213](Mbse/Wymore.lean#L213)) |
 
 ### `textbook/theorem2.46` — Time Invariance of State Trajectory
 
-- Structured source file: [textbook/theorem2.46.json](file:///home/nicholas/uoa/sie699/textbook/theorem2.46.json)
+- Structured source file: [textbook/theorem2.46.json](textbook/theorem2.46.json)
 - Description: *Theorem stating that translating the input trajectory by s and starting the system at state STZ(f, x)(s) yields the same state trajectory as the original system shifted by s.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.46/theorem/time_invariance` | `implication` | STZ(f → s, STZ(f, x)(s))(t) = STZ(f, x)(s + t) for any f ∈ ITZ, x ∈ SZ, and s, t ∈ TZ. | ✅ Traced | `stateTrajectory_time_invariance` ([Mbse/Wymore.lean:409](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L409)) |
+| `2.46/theorem/time_invariance` | `implication` | STZ(f → s, STZ(f, x)(s))(t) = STZ(f, x)(s + t) for any f ∈ ITZ, x ∈ SZ, and s, t ∈ TZ. | ✅ Faithful | `stateTrajectory_time_invariance` ([Mbse/Wymore.lean:459](Mbse/Wymore.lean#L459)) |
 
 ### `textbook/theorem2.48` — Nonanticipatory Theorem
 
-- Structured source file: [textbook/theorem2.48.json](file:///home/nicholas/uoa/sie699/textbook/theorem2.48.json)
+- Structured source file: [textbook/theorem2.48.json](textbook/theorem2.48.json)
 - Description: *Theorem stating that the state trajectory at time t depends only on the input trajectory restricted to the interval [0, t).*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.48/theorem/nonanticipatory` | `implication` | If Z ∈ DSYSTEMS, {(f, x, t), (g, x, t)} ⊆ EXZ and RSN(f, TZ[0, t)) = RSN(g, TZ[0, t)), then STZ(f, x)(t) = STZ(g, x)(t). | ✅ Traced | `stateTrajectory_nonanticipatory` ([Mbse/Wymore.lean:459](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L459)) |
+| `2.48/theorem/nonanticipatory` | `implication` | If Z ∈ DSYSTEMS, {(f, x, t), (g, x, t)} ⊆ EXZ and RSN(f, TZ[0, t)) = RSN(g, TZ[0, t)), then STZ(f, x)(t) = STZ(g, x)(t). | ✅ Faithful | `stateTrajectory_nonanticipatory` ([Mbse/Wymore.lean:509](Mbse/Wymore.lean#L509)) |
 
 ### `textbook/theorem2.76` — Equality of Readout Functions
 
-- Structured source file: [textbook/theorem2.76.json](file:///home/nicholas/uoa/sie699/textbook/theorem2.76.json)
+- Structured source file: [textbook/theorem2.76.json](textbook/theorem2.76.json)
 - Description: *Theorem proving that readout functions are equal for two systems with properly aligned projective readout and identical state and output spaces.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.76/theorem/equal_readout` | `implication` | If Z1 and Z2 are systems with properly aligned projective readout, SZ1 = SZ2 and OZ1 = OZ2, then RZ1 = RZ2. | ✅ Traced | `readout_eq_of_properly_aligned` ([Mbse/Wymore.lean:643](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L643)) |
-| `2.76/proof/pointwise_projection` | `component` | PJNi(RZ1(x)) = RiZ1(x) = PJNi(x) = RiZ2(x) = PJNi(RZ2(x)) for every state x and output port i. | ✅ Traced | `readout_eq_of_properly_aligned` ([Mbse/Wymore.lean:643](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L643)) |
-| `2.76/proof/vector_equality` | `component` | RZ1(x) = RZ2(x) for every state x by Theorem A1.178. | ✅ Traced | `readout_eq_of_properly_aligned` ([Mbse/Wymore.lean:643](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L643)) |
-| `2.76/proof/function_equality` | `component` | RZ1 = RZ2 by Theorem A1.163. | ✅ Traced | `readout_eq_of_properly_aligned` ([Mbse/Wymore.lean:643](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L643)) |
+| `2.76/theorem/equal_readout` | `implication` | If Z1 and Z2 are systems with properly aligned projective readout, SZ1 = SZ2 and OZ1 = OZ2, then RZ1 = RZ2. | ✅ Faithful | `readout_eq_of_properly_aligned` ([Mbse/Wymore.lean:693](Mbse/Wymore.lean#L693)) |
+| `2.76/proof/pointwise_projection` | `component` | PJNi(RZ1(x)) = RiZ1(x) = PJNi(x) = RiZ2(x) = PJNi(RZ2(x)) for every state x and output port i. | ✅ Faithful | `readout_eq_of_properly_aligned` ([Mbse/Wymore.lean:693](Mbse/Wymore.lean#L693)) |
+| `2.76/proof/vector_equality` | `component` | RZ1(x) = RZ2(x) for every state x by Theorem A1.178. | ✅ Faithful | `readout_eq_of_properly_aligned` ([Mbse/Wymore.lean:693](Mbse/Wymore.lean#L693)) |
+| `2.76/proof/function_equality` | `component` | RZ1 = RZ2 by Theorem A1.163. | ✅ Faithful | `readout_eq_of_properly_aligned` ([Mbse/Wymore.lean:693](Mbse/Wymore.lean#L693)) |
 
 ### `textbook/theorem2.78` — Construction of Projective Readout System
 
-- Structured source file: [textbook/theorem2.78.json](file:///home/nicholas/uoa/sie699/textbook/theorem2.78.json)
+- Structured source file: [textbook/theorem2.78.json](textbook/theorem2.78.json)
 - Description: *Theorem proving the construction and equivalence of a system Z2 with properly aligned projective readout to replace a given system Z1.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.78/theorem/system_construction` | `component` | If Z1 ∈ DSYSTEMS, Z2 = (SZ2, IZ2, OZ2, NZ2, RZ2) is constructed as specified, then Z2 ∈ DSYSTEMS, RZ2 is properly aligned, and Z2 behaves equivalently to Z1. | ✅ Traced | `Z2` ([Mbse/Wymore.lean:693](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L693)) |
-| `2.78/proof/dsystems` | `component` | Z2 ∈ DSYSTEMS is proven by showing non-emptiness of spaces and function requirements of NZ2 and RZ2. | ✅ Traced | `Z2` ([Mbse/Wymore.lean:693](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L693)) |
-| `2.78/proof/properly_aligned` | `component` | RZ2 is a properly aligned projective readout function. | ✅ Traced | `Z2` ([Mbse/Wymore.lean:693](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L693)) |
-| `2.78/proof/exz_mapping` | `component` | If (f, x, t) ∈ EXZ1, then (f, y, t) ∈ EXZ2 where y is the extended state. | ✅ Traced | `Z2` ([Mbse/Wymore.lean:719](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L719)) |
-| `2.78/proof/state_trajectory_projection` | `component` | STZ1(f, x)(t) = PJN(n + 1, ..., n + m)(STZ2(f, y)(t)) is proved by induction on time t. | ✅ Traced | `z2_state_trajectory_equivalence` ([Mbse/Wymore.lean:727](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L727)) |
-| `2.78/proof/output_trajectory_equality` | `component` | OTZ1(f, x)(t) = OTZ2(f, y)(t) is proved using state trajectory equivalence. | ✅ Traced | `z2_output_trajectory_equivalence` ([Mbse/Wymore.lean:744](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L744)) |
+| `2.78/theorem/system_construction` | `component` | If Z1 ∈ DSYSTEMS, Z2 = (SZ2, IZ2, OZ2, NZ2, RZ2) is constructed as specified, then Z2 ∈ DSYSTEMS, RZ2 is properly aligned, and Z2 behaves equivalently to Z1. | ✅ Faithful | `Z2` ([Mbse/Wymore.lean:743](Mbse/Wymore.lean#L743)) |
+| `2.78/proof/dsystems` | `component` | Z2 ∈ DSYSTEMS is proven by showing non-emptiness of spaces and function requirements of NZ2 and RZ2. | ✅ Faithful | `Z2` ([Mbse/Wymore.lean:743](Mbse/Wymore.lean#L743)) |
+| `2.78/proof/properly_aligned` | `component` | RZ2 is a properly aligned projective readout function. | ✅ Faithful | `Z2` ([Mbse/Wymore.lean:743](Mbse/Wymore.lean#L743)) |
+| `2.78/proof/exz_mapping` | `component` | If (f, x, t) ∈ EXZ1, then (f, y, t) ∈ EXZ2 where y is the extended state. | ✅ Faithful | `Z2` ([Mbse/Wymore.lean:769](Mbse/Wymore.lean#L769)) |
+| `2.78/proof/state_trajectory_projection` | `component` | STZ1(f, x)(t) = PJN(n + 1, ..., n + m)(STZ2(f, y)(t)) is proved by induction on time t. | ✅ Faithful | `z2_state_trajectory_equivalence` ([Mbse/Wymore.lean:777](Mbse/Wymore.lean#L777)) |
+| `2.78/proof/output_trajectory_equality` | `component` | OTZ1(f, x)(t) = OTZ2(f, y)(t) is proved using state trajectory equivalence. | ✅ Faithful | `z2_output_trajectory_equivalence` ([Mbse/Wymore.lean:794](Mbse/Wymore.lean#L794)) |
 
 ### `textbook/theorem2.96` — FCNSY has Two Parameters
 
-- Structured source file: [textbook/theorem2.96.json](file:///home/nicholas/uoa/sie699/textbook/theorem2.96.json)
+- Structured source file: [textbook/theorem2.96.json](textbook/theorem2.96.json)
 - Description: *Theorem proving that the function computation system parameterization FCNSY has two parameters.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.96/theorem/parameter_count` | `implication` | FCNSY is a system parameterization with two parameters. | ✅ Traced | `fcnsy_has_two_parameters` ([Mbse/Wymore.lean:810](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L810)) |
+| `2.96/theorem/parameter_count` | `implication` | FCNSY is a system parameterization with two parameters. | ✅ Faithful | `fcnsy_has_two_parameters` ([Mbse/Wymore.lean:862](Mbse/Wymore.lean#L862)) |
 
 ### `textbook/theorem2.97` — FCNSY Output Trajectory at One Time Unit
 
-- Structured source file: [textbook/theorem2.97.json](file:///home/nicholas/uoa/sie699/textbook/theorem2.97.json)
+- Structured source file: [textbook/theorem2.97.json](textbook/theorem2.97.json)
 - Description: *Theorem establishing that for Z = FCNSY(F, 1), the output at t + 1 is F(f(t)).*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.97/theorem/output_value` | `implication` | If Z = FCNSY(F, 1) and (f, x, t) ∈ EXZ, then OTZ(f, x)(t + 1) = F(f(t)). | ✅ Traced | `fcnsy_output_one_time_unit` ([Mbse/Wymore.lean:823](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L823)) |
-| `2.97/proof/t_zero` | `component` | OTZ(f, x)(1) = RZ(STZ(f, x)(1)) = STZ(f, x)(1) = NZ(x, f(0)) = F(f(0)). | ✅ Traced | `fcnsy_output_one_time_unit` ([Mbse/Wymore.lean:823](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L823)) |
-| `2.97/proof/arbitrary_t` | `component` | The assertion holds for arbitrary t by applying the Time Invariance Theorem (Theorem 2.46). | ✅ Traced | `fcnsy_output_one_time_unit` ([Mbse/Wymore.lean:823](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L823)) |
+| `2.97/theorem/output_value` | `implication` | If Z = FCNSY(F, 1) and (f, x, t) ∈ EXZ, then OTZ(f, x)(t + 1) = F(f(t)). | ✅ Faithful | `fcnsy_output_one_time_unit` ([Mbse/Wymore.lean:872](Mbse/Wymore.lean#L872)) |
+| `2.97/proof/t_zero` | `component` | OTZ(f, x)(1) = RZ(STZ(f, x)(1)) = STZ(f, x)(1) = NZ(x, f(0)) = F(f(0)). | ✅ Faithful | `fcnsy_output_one_time_unit` ([Mbse/Wymore.lean:872](Mbse/Wymore.lean#L872)) |
+| `2.97/proof/arbitrary_t` | `component` | The assertion holds for arbitrary t by applying the Time Invariance Theorem (Theorem 2.46). | ✅ Faithful | `fcnsy_output_one_time_unit` ([Mbse/Wymore.lean:872](Mbse/Wymore.lean#L872)) |
 
 ### `textbook/theorem3.31` — Pure Feedback System Coupling Recipes
 
-- Structured source file: [textbook/theorem3.31.json](file:///home/nicholas/uoa/sie699/textbook/theorem3.31.json)
+- Structured source file: [textbook/theorem3.31.json](textbook/theorem3.31.json)
 - Description: *Theorem and proof stating that pure feedback recipes are distinct from singular, conjunctive, and cascade recipes.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.31/theorem/class_in_themselves` | `implication` | If SCR is a pure feedback system coupling recipe, then SCR is neither singular, conjunctive, or cascade. | ✅ Traced | `pure_feedback_not_other` ([Mbse/Wymore.lean:1015](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1015)) |
-| `3.31/proof/not_singular_conjunctive` | `component` | SCR is neither singular or conjunctive because CSCR ≠ ∅ by the definition at 3.29. | ✅ Traced | `pure_feedback_not_other` ([Mbse/Wymore.lean:1015](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1015)) |
-| `3.31/proof/not_cascade` | `component` | SCR is not cascade, since CSCR must contain a pair of the form (B, A) where B is an output port of VSCR and A is an input port of VSCR, which is a feedback connection, by the definition at 3.7. | ✅ Traced | `pure_feedback_not_other` ([Mbse/Wymore.lean:1015](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1015)) |
+| `3.31/theorem/class_in_themselves` | `implication` | If SCR is a pure feedback system coupling recipe, then SCR is neither singular, conjunctive, or cascade. | ✅ Faithful | `pure_feedback_not_other` ([Mbse/Wymore.lean:1064](Mbse/Wymore.lean#L1064)) |
+| `3.31/proof/not_singular_conjunctive` | `component` | SCR is neither singular or conjunctive because CSCR ≠ ∅ by the definition at 3.29. | ✅ Faithful | `pure_feedback_not_other` ([Mbse/Wymore.lean:1064](Mbse/Wymore.lean#L1064)) |
+| `3.31/proof/not_cascade` | `component` | SCR is not cascade, since CSCR must contain a pair of the form (B, A) where B is an output port of VSCR and A is an input port of VSCR, which is a feedback connection, by the definition at 3.7. | ✅ Faithful | `pure_feedback_not_other` ([Mbse/Wymore.lean:1064](Mbse/Wymore.lean#L1064)) |
 
 ### `textbook/theorem3.42` — Fundamental Theorem of Conjunctive Systems
 
-- Structured source file: [textbook/theorem3.42.json](file:///home/nicholas/uoa/sie699/textbook/theorem3.42.json)
+- Structured source file: [textbook/theorem3.42.json](textbook/theorem3.42.json)
 - Description: *Theorem and proof establishing that the conjunctive system constructor CSY defines a valid system parameterization.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.42/theorem/csy_parameterization` | `implication` | CSY is a system parameterization. | ✅ Traced | `csy_parameterization` ([Mbse/Wymore.lean:1148](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1148)) |
-| `3.42/proof/dsystems` | `component` | The conjunctive system Z belongs to DSYSTEMS, verifying the state, input, output, and transition/readout function conditions. | ✅ Traced | `csy_parameterization` ([Mbse/Wymore.lean:1148](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1148)) |
-| `3.42/proof/existence` | `component` | For every connectable vector of systems V, there exists Z ∈ DSYSTEMS such that (V, Z) ∈ CSY. | ✅ Traced | `csy_parameterization` ([Mbse/Wymore.lean:1148](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1148)) |
-| `3.42/proof/uniqueness` | `component` | If (V1, Z1) ∈ CSY and (V2, Z2) ∈ CSY and V1 = V2, then Z1 = Z2. | ✅ Traced | `csy_parameterization` ([Mbse/Wymore.lean:1148](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1148)) |
+| `3.42/theorem/csy_parameterization` | `implication` | CSY is a system parameterization. | ✅ Faithful | `csy_parameterization` ([Mbse/Wymore.lean:1197](Mbse/Wymore.lean#L1197)) |
+| `3.42/proof/dsystems` | `component` | The conjunctive system Z belongs to DSYSTEMS, verifying the state, input, output, and transition/readout function conditions. | ✅ Faithful | `csy_parameterization` ([Mbse/Wymore.lean:1197](Mbse/Wymore.lean#L1197)) |
+| `3.42/proof/existence` | `component` | For every connectable vector of systems V, there exists Z ∈ DSYSTEMS such that (V, Z) ∈ CSY. | ✅ Faithful | `csy_parameterization` ([Mbse/Wymore.lean:1197](Mbse/Wymore.lean#L1197)) |
+| `3.42/proof/uniqueness` | `component` | If (V1, Z1) ∈ CSY and (V2, Z2) ∈ CSY and V1 = V2, then Z1 = Z2. | ✅ Faithful | `csy_parameterization` ([Mbse/Wymore.lean:1197](Mbse/Wymore.lean#L1197)) |
 
 ### `textbook/theorem3.45` — State and Output Trajectories of Conjunctive Systems
 
-- Structured source file: [textbook/theorem3.45.json](file:///home/nicholas/uoa/sie699/textbook/theorem3.45.json)
+- Structured source file: [textbook/theorem3.45.json](textbook/theorem3.45.json)
 - Description: *Theorem and proof relating the state and output trajectories of a conjunctive system to those of its component systems.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.45/theorem/trajectories_relation` | `implication` | The state and output trajectories of the conjunctive system Z are equal to the tuples of the component state and output trajectories under projected inputs. | ✅ Traced | `csy_state_trajectory` ([Mbse/Wymore.lean:1162](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1162))<br>`csy_output_trajectory` ([Mbse/Wymore.lean:1184](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1184)) |
-| `3.45/proof/state_zero` | `component` | The state trajectory relation is verified at time t = 0. | ✅ Traced | `csy_state_trajectory` ([Mbse/Wymore.lean:1162](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1162)) |
-| `3.45/proof/state_induction` | `component` | The state trajectory relation is verified for all t by induction. | ✅ Traced | `csy_state_trajectory` ([Mbse/Wymore.lean:1162](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1162)) |
-| `3.45/proof/output_relation` | `component` | The output trajectory relation is verified using the state trajectory relation. | ✅ Traced | `csy_output_trajectory` ([Mbse/Wymore.lean:1184](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1184)) |
+| `3.45/theorem/trajectories_relation` | `implication` | The state and output trajectories of the conjunctive system Z are equal to the tuples of the component state and output trajectories under projected inputs. | ✅ Faithful | `csy_state_trajectory` ([Mbse/Wymore.lean:1211](Mbse/Wymore.lean#L1211))<br>`csy_output_trajectory` ([Mbse/Wymore.lean:1233](Mbse/Wymore.lean#L1233)) |
+| `3.45/proof/state_zero` | `component` | The state trajectory relation is verified at time t = 0. | ✅ Faithful | `csy_state_trajectory` ([Mbse/Wymore.lean:1211](Mbse/Wymore.lean#L1211)) |
+| `3.45/proof/state_induction` | `component` | The state trajectory relation is verified for all t by induction. | ✅ Faithful | `csy_state_trajectory` ([Mbse/Wymore.lean:1211](Mbse/Wymore.lean#L1211)) |
+| `3.45/proof/output_relation` | `component` | The output trajectory relation is verified using the state trajectory relation. | ✅ Faithful | `csy_output_trajectory` ([Mbse/Wymore.lean:1233](Mbse/Wymore.lean#L1233)) |
 
 ### `textbook/theorem_a1.163` — Equality of Functions (Extensionality)
 
-- Structured source file: [textbook/theorem_a1.163.json](file:///home/nicholas/uoa/sie699/textbook/theorem_a1.163.json)
+- Structured source file: [textbook/theorem_a1.163.json](textbook/theorem_a1.163.json)
 - Description: *Theorem stating that two functions are equal if and only if their domains of definition are equal and their values at every point in the domain are equal.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `a1.163/theorem/function_extensionality` | `component` | If f ∈ FNS(A, D) and g ∈ FNS(J, K), then f = g if and only if A = J and f(x) = g(x) for every x ∈ A. | ✅ Traced | `fun_eq_iff` ([Mbse/Wymore.lean:629](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L629)) |
+| `a1.163/theorem/function_extensionality` | `component` | If f ∈ FNS(A, D) and g ∈ FNS(J, K), then f = g if and only if A = J and f(x) = g(x) for every x ∈ A. | ✅ Faithful | `fun_eq_iff` ([Mbse/Wymore.lean:679](Mbse/Wymore.lean#L679)) |
 
 ### `textbook/theorem_a1.176` — Projection Functions are Functions
 
-- Structured source file: [textbook/theorem_a1.176.json](file:///home/nicholas/uoa/sie699/textbook/theorem_a1.176.json)
+- Structured source file: [textbook/theorem_a1.176.json](textbook/theorem_a1.176.json)
 - Description: *Theorem stating that projection functions over a Cartesian product are well-defined functions onto their coordinates or subsets of coordinates.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `a1.176/theorem/projection_functions` | `component` | PJN(A, k) ∈ FNS(A, Ak) and PJN(A, I) ∈ FNS(A, B). | ✅ Traced | `pjn_is_fun` ([Mbse/Wymore.lean:664](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L664)) |
+| `a1.176/theorem/projection_functions` | `component` | PJN(A, k) ∈ FNS(A, Ak) and PJN(A, I) ∈ FNS(A, B). | ✅ Faithful | `pjn_is_fun` ([Mbse/Wymore.lean:714](Mbse/Wymore.lean#L714)) |
 
 ### `textbook/theorem_a1.178` — Equality of Vectors in terms of Projections
 
-- Structured source file: [textbook/theorem_a1.178.json](file:///home/nicholas/uoa/sie699/textbook/theorem_a1.178.json)
+- Structured source file: [textbook/theorem_a1.178.json](textbook/theorem_a1.178.json)
 - Description: *Theorem stating that any vector x in a Cartesian product is equal to the tuple of its projections.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `a1.178/theorem/vector_projection_equality` | `component` | If x ∈ A1 × ... × An, then x = (PJN(A, 1)(x), ..., PJN(A, n)(x)). | ✅ Traced | `tuple_eq_projection` ([Mbse/Wymore.lean:620](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L620)) |
+| `a1.178/theorem/vector_projection_equality` | `component` | If x ∈ A1 × ... × An, then x = (PJN(A, 1)(x), ..., PJN(A, n)(x)). | ✅ Faithful | `tuple_eq_projection` ([Mbse/Wymore.lean:670](Mbse/Wymore.lean#L670)) |
 
 ### `textbook/theorem_a1.219` — Function over Cartesian Product of Domains
 
-- Structured source file: [textbook/theorem_a1.219.json](file:///home/nicholas/uoa/sie699/textbook/theorem_a1.219.json)
+- Structured source file: [textbook/theorem_a1.219.json](textbook/theorem_a1.219.json)
 - Description: *Theorem stating that the vector of values of a set of functions defines a function over the Cartesian product of their domains.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `a1.219/theorem/vector_value_fns` | `implication` | If n ∈ IJS[2, ∞) and for every i ∈ IJS[1, n], fi is a function, then the product function f is a function from the product of domains to the product of ranges. | ✅ Traced | `product_fun` ([Mbse/Wymore.lean:1139](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L1139)) |
+| `a1.219/theorem/vector_value_fns` | `implication` | If n ∈ IJS[2, ∞) and for every i ∈ IJS[1, n], fi is a function, then the product function f is a function from the product of domains to the product of ranges. | ✅ Faithful | `product_fun` ([Mbse/Wymore.lean:1188](Mbse/Wymore.lean#L1188)) |
 
 ### `textbook/theorem_a1.249` — Image of Preimage
 
-- Structured source file: [textbook/theorem_a1.249.json](file:///home/nicholas/uoa/sie699/textbook/theorem_a1.249.json)
+- Structured source file: [textbook/theorem_a1.249.json](textbook/theorem_a1.249.json)
 - Description: *Theorem stating that the image of the preimage of a subset is a subset of that subset: f(f^-1(C)) ⊆ C.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `a1.249/theorem/subset_inclusion` | `implication` | If f ∈ FNS(A, B) and C ⊆ B, then f(f^-1(C)) ⊆ C. | ✅ Traced | `image_preimage_subset` ([Mbse/Wymore.lean:382](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L382)) |
+| `a1.249/theorem/subset_inclusion` | `implication` | If f ∈ FNS(A, B) and C ⊆ B, then f(f^-1(C)) ⊆ C. | ✅ Faithful | `image_preimage_subset` ([Mbse/Wymore.lean:432](Mbse/Wymore.lean#L432)) |
 
 ### `textbook/theorem_a1.250` — Preimage of Complement
 
-- Structured source file: [textbook/theorem_a1.250.json](file:///home/nicholas/uoa/sie699/textbook/theorem_a1.250.json)
+- Structured source file: [textbook/theorem_a1.250.json](textbook/theorem_a1.250.json)
 - Description: *Theorem stating that the preimage of a complement is the complement of the preimage: f^-1(B - C) = A - f^-1(C).*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `a1.250/theorem/preimage_complement` | `implication` | If f ∈ FNS(A, B) and C ⊆ B, then f^-1(B - C) = A - f^-1(C). | ✅ Traced | `preimage_complement` ([Mbse/Wymore.lean:390](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L390)) |
+| `a1.250/theorem/preimage_complement` | `implication` | If f ∈ FNS(A, B) and C ⊆ B, then f^-1(B - C) = A - f^-1(C). | ✅ Faithful | `preimage_complement` ([Mbse/Wymore.lean:440](Mbse/Wymore.lean#L440)) |
 
 ### `textbook/theorem_a1.286` — Properties of Translation
 
-- Structured source file: [textbook/theorem_a1.286.json](file:///home/nicholas/uoa/sie699/textbook/theorem_a1.286.json)
+- Structured source file: [textbook/theorem_a1.286.json](textbook/theorem_a1.286.json)
 - Description: *Theorem establishing translation function existence and identity properties.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `a1.286/theorem/translation_fns` | `implication` | f → r ∈ FNS(W', A) where W' = {s: s + r ∈ W}. | ✅ Traced | `translate_zero` ([Mbse/Wymore.lean:319](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L319)) |
-| `a1.286/theorem/translation_zero` | `implication` | f → 0 = f. | ✅ Traced | `translate_zero` ([Mbse/Wymore.lean:319](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L319)) |
+| `a1.286/theorem/translation_fns` | `implication` | f → r ∈ FNS(W', A) where W' = {s: s + r ∈ W}. | ✅ Faithful | `translate_zero` ([Mbse/Wymore.lean:369](Mbse/Wymore.lean#L369)) |
+| `a1.286/theorem/translation_zero` | `implication` | f → 0 = f. | ✅ Faithful | `translate_zero` ([Mbse/Wymore.lean:369](Mbse/Wymore.lean#L369)) |
 
 ### `textbook/theorem_a1.288` — Composition of Translations
 
-- Structured source file: [textbook/theorem_a1.288.json](file:///home/nicholas/uoa/sie699/textbook/theorem_a1.288.json)
+- Structured source file: [textbook/theorem_a1.288.json](textbook/theorem_a1.288.json)
 - Description: *Theorem stating that successive translations by r and s is equivalent to a single translation by r + s.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `a1.288/theorem/translation_additivity` | `implication` | (f → r) → s = f → (r + s) for any function f, and points r, s. | ✅ Traced | `translate_additivity` ([Mbse/Wymore.lean:398](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L398)) |
+| `a1.288/theorem/translation_additivity` | `implication` | (f → r) → s = f → (r + s) for any function f, and points r, s. | ✅ Faithful | `translate_additivity` ([Mbse/Wymore.lean:448](Mbse/Wymore.lean#L448)) |
 
 ### `textbook/theorem_a1.292` — Concatenation of Functions
 
-- Structured source file: [textbook/theorem_a1.292.json](file:///home/nicholas/uoa/sie699/textbook/theorem_a1.292.json)
+- Structured source file: [textbook/theorem_a1.292.json](textbook/theorem_a1.292.json)
 - Description: *Theorem defining the concatenation of two functions at a point and computing its piecewise values.*
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `a1.292/theorem/concatenation_fns` | `implication` | CTN(f, r, g) ∈ FNS(V[0, r) ∪ W', A ∪ B). | ✅ Traced | `concatenate` ([Mbse/Wymore.lean:338](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L338)) |
-| `a1.292/theorem/concatenation_value_left` | `implication` | CTN(f, r, g)(t) = f(t) if t ∈ V[0, r). | ✅ Traced | `concatenation_value_left` ([Mbse/Wymore.lean:353](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L353)) |
-| `a1.292/theorem/concatenation_value_right` | `implication` | CTN(f, r, g)(t) = g(t - r) if t ∈ IJS[r, ∞) and t - r ∈ W. | ✅ Traced | `concatenation_value_right` ([Mbse/Wymore.lean:362](file:///home/nicholas/uoa/sie699/Mbse/Wymore.lean#L362)) |
+| `a1.292/theorem/concatenation_fns` | `implication` | CTN(f, r, g) ∈ FNS(V[0, r) ∪ W', A ∪ B). | ✅ Faithful | `concatenate` ([Mbse/Wymore.lean:388](Mbse/Wymore.lean#L388)) |
+| `a1.292/theorem/concatenation_value_left` | `implication` | CTN(f, r, g)(t) = f(t) if t ∈ V[0, r). | ✅ Faithful | `concatenation_value_left` ([Mbse/Wymore.lean:403](Mbse/Wymore.lean#L403)) |
+| `a1.292/theorem/concatenation_value_right` | `implication` | CTN(f, r, g)(t) = g(t - r) if t ∈ IJS[r, ∞) and t - r ∈ W. | ✅ Faithful | `concatenation_value_right` ([Mbse/Wymore.lean:412](Mbse/Wymore.lean#L412)) |
 
 ## 2. Completeness & Quality Summary
 
 - **Total Structured Definitions Tracked**: 55
 - **Total Individual Requirements/Elements**: 151
-- **Traced/Formalized Elements**: 151 (151/151)
-- **Formalization Coverage Rate**: **100.0%**
+- **Linked Elements (any annotation)**: 151 (151/151)
+- **Faithful Elements (excludes stub/partial)**: 149 (149/151)
+- **Stub/Partial Elements**: 2
+- **Annotation Coverage Rate**: **100.0%**
+- **Faithful Coverage Rate**: **98.7%**
 
-> [!TIP]
-> 🎉 **100% Traceability and Coverage achieved!** All defined elements, constraints, and implications in the structured textbook specifications have matching formalized items in Lean.
+> Note: *Annotation coverage* counts any tagged link, including placeholders. *Faithful coverage* is the trustworthy figure: it excludes links explicitly marked `|stub` or `|partial`, which indicate the Lean artifact only partially captures (or stands in for) the textbook requirement.
+
+> [!NOTE]
+> Every element is linked, but some links are marked stub/partial. See the `⚠️ Stub/Partial` rows above for requirements that are not yet faithfully captured.

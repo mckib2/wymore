@@ -1,6 +1,6 @@
 name = "mbse"
 version = "0.1.0"
-defaultTargets = ["mbse"]
+defaultTargets = ["mbse", "Appendix3"]
 
 [[lean_lib]]
 name = "Mbse"

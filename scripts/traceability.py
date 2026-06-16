@@ -6,7 +6,11 @@ import json
 import argparse
 
 # Regex to find textbook definition/theorem tags: e.g., [textbook/definition2.4/component/SZ] or [textbook/theorem2.25/theorem/translation_closed]
-TAG_RE = re.compile(r'\[(textbook/[0-9a-zA-Z\.\-_]+(?:/[a-zA-Z0-9\.\-_/]+)?)\]')
+# An optional fidelity marker may be appended with a pipe: [textbook/.../x|stub] or [textbook/.../x|partial].
+# Without a marker, a link is treated as "faithful".
+TAG_RE = re.compile(r'\[(textbook/[0-9a-zA-Z\.\-_]+(?:/[a-zA-Z0-9\.\-_/]+)?(?:\|(?:stub|partial))?)\]')
+
+VALID_FIDELITIES = ('faithful', 'partial', 'stub')
 
 # Path config
 WORKSPACE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -157,6 +161,13 @@ def process_docstring(docstring_lines, all_lines, end_idx, rel_path, start_line_
         add_trace(tag, item_name, rel_path, start_line_num, item_type, docstring_text, definitions, traceability_map, lean_to_textbook)
 
 def add_trace(tag, item_name, rel_path, line_num, item_type, content, definitions, traceability_map, lean_to_textbook):
+    # Extract optional fidelity marker (e.g. textbook/.../x|partial). Default is faithful.
+    fidelity = 'faithful'
+    if '|' in tag:
+        tag, fidelity = tag.split('|', 1)
+        if fidelity not in VALID_FIDELITIES:
+            fidelity = 'faithful'
+
     # Parse tag structure, e.g. textbook/definition2.4/component/SZ
     parts = tag.split('/')
     if len(parts) < 3:
@@ -172,7 +183,8 @@ def add_trace(tag, item_name, rel_path, line_num, item_type, content, definition
         'file': rel_path,
         'line': line_num,
         'type': item_type,
-        'raw_tag': tag
+        'raw_tag': tag,
+        'fidelity': fidelity
     }
     
     if base_def_key not in traceability_map:
@@ -183,7 +195,8 @@ def add_trace(tag, item_name, rel_path, line_num, item_type, content, definition
     if base_def_key in definitions:
         for elem in definitions[base_def_key].get('elements', []):
             elem_id = elem['id']
-            if element_suffix and (elem_id == element_suffix or elem_id.endswith(element_suffix)):
+            # Exact match or path-boundary suffix match (avoid e.g. "rz" matching "nz_rz").
+            if element_suffix and (elem_id == element_suffix or elem_id.endswith('/' + element_suffix)):
                 matched_element_id = elem_id
                 break
                 
@@ -192,7 +205,7 @@ def add_trace(tag, item_name, rel_path, line_num, item_type, content, definition
     elif element_suffix:
         # Check if the element suffix actually matched an ID in the definition
         element_ids = [elem['id'] for elem in definitions[base_def_key].get('elements', [])]
-        matched_elem_exists = any(elem_id == element_suffix or elem_id.endswith(element_suffix) for elem_id in element_ids)
+        matched_elem_exists = any(elem_id == element_suffix or elem_id.endswith('/' + element_suffix) for elem_id in element_ids)
         if not matched_elem_exists:
             print(f"⚠️ Warning: Suffix `{element_suffix}` in tag `[{tag}]` does not match any element ID in `{base_def_key}` at {rel_path}:{line_num}", file=sys.stderr)
 
@@ -222,6 +235,7 @@ def generate_markdown_report(definitions, traceability_map):
         
         total_elements = 0
         traced_elements = 0
+        faithful_elements = 0
         
         for def_key in sorted(definitions.keys()):
             def_data = definitions[def_key]
@@ -229,7 +243,7 @@ def generate_markdown_report(definitions, traceability_map):
             json_rel_path = f"textbook/{def_filename}.json"
             
             f.write(f"### `{def_key}` — {def_data.get('name', 'Unnamed Definition')}\n\n")
-            f.write(f"- Structured source file: [{json_rel_path}](file://{os.path.join(TEXTBOOK_DIR, def_filename + '.json')})\n")
+            f.write(f"- Structured source file: [{json_rel_path}]({json_rel_path})\n")
             f.write(f"- Description: *{def_data.get('description', '')}*\n\n")
             
             f.write("| Element ID | Type | Textbook Text | Status | Linked Lean Elements |\n")
@@ -248,11 +262,18 @@ def generate_markdown_report(definitions, traceability_map):
                 
                 if links:
                     traced_elements += 1
-                    status_str = "✅ Traced"
+                    faithful_links = [l for l in links if l.get('fidelity', 'faithful') == 'faithful']
+                    if faithful_links:
+                        faithful_elements += 1
+                        status_str = "✅ Faithful"
+                    else:
+                        status_str = "⚠️ Stub/Partial"
                     link_strs = []
                     for link in links:
-                        link_loc = f"[{link['file']}:{link['line']}](file://{os.path.join(WORKSPACE_DIR, link['file'])}#L{link['line']})"
-                        link_strs.append(f"`{link['item']}` ({link_loc})")
+                        fid = link.get('fidelity', 'faithful')
+                        marker = '' if fid == 'faithful' else f" _({fid})_"
+                        link_loc = f"[{link['file']}:{link['line']}]({link['file']}#L{link['line']})"
+                        link_strs.append(f"`{link['item']}` ({link_loc}){marker}")
                     links_str = "<br>".join(link_strs)
                 else:
                     status_str = "❌ Untraced"
@@ -264,16 +285,29 @@ def generate_markdown_report(definitions, traceability_map):
         f.write("## 2. Completeness & Quality Summary\n\n")
         if total_elements > 0:
             coverage = (traced_elements / total_elements) * 100
+            faithful_coverage = (faithful_elements / total_elements) * 100
         else:
             coverage = 0.0
+            faithful_coverage = 0.0
             
+        stub_partial_elements = traced_elements - faithful_elements
         f.write(f"- **Total Structured Definitions Tracked**: {len(definitions)}\n")
         f.write(f"- **Total Individual Requirements/Elements**: {total_elements}\n")
-        f.write(f"- **Traced/Formalized Elements**: {traced_elements} ({traced_elements}/{total_elements})\n")
-        f.write(f"- **Formalization Coverage Rate**: **{coverage:.1f}%**\n")
+        f.write(f"- **Linked Elements (any annotation)**: {traced_elements} ({traced_elements}/{total_elements})\n")
+        f.write(f"- **Faithful Elements (excludes stub/partial)**: {faithful_elements} ({faithful_elements}/{total_elements})\n")
+        f.write(f"- **Stub/Partial Elements**: {stub_partial_elements}\n")
+        f.write(f"- **Annotation Coverage Rate**: **{coverage:.1f}%**\n")
+        f.write(f"- **Faithful Coverage Rate**: **{faithful_coverage:.1f}%**\n\n")
+        f.write("> Note: *Annotation coverage* counts any tagged link, including placeholders. "
+                "*Faithful coverage* is the trustworthy figure: it excludes links explicitly marked "
+                "`|stub` or `|partial`, which indicate the Lean artifact only partially captures (or "
+                "stands in for) the textbook requirement.\n")
         
-        if coverage == 100.0:
-            f.write("\n> [!TIP]\n> 🎉 **100% Traceability and Coverage achieved!** All defined elements, constraints, and implications in the structured textbook specifications have matching formalized items in Lean.")
+        if faithful_coverage == 100.0:
+            f.write("\n> [!TIP]\n> All defined elements have faithful formalized counterparts in Lean.")
+        elif coverage == 100.0:
+            f.write("\n> [!NOTE]\n> Every element is linked, but some links are marked stub/partial. "
+                    "See the `⚠️ Stub/Partial` rows above for requirements that are not yet faithfully captured.")
         else:
             f.write("\n> [!WARNING]\n> There are coverage gaps between the textbook specification and the Lean implementation. See the table(s) above to find untraced requirements.")
 
@@ -282,6 +316,7 @@ def generate_markdown_report(definitions, traceability_map):
 def run_verify(definitions, traceability_map):
     print("=== Verification Check ===")
     gaps = 0
+    stub_partial = 0
     
     for def_key, def_data in definitions.items():
         print(f"\nChecking definition: {def_key} ({def_data.get('name')})")
@@ -295,9 +330,15 @@ def run_verify(definitions, traceability_map):
                 print(f" ❌ Missing Lean link for element: `{elem_id}` ({elem.get('type')}) - \"{elem.get('text')}\"")
                 gaps += 1
             else:
-                print(f" ✅ Traced element: `{elem_id}` to {len(links)} Lean item(s).")
+                faithful_links = [l for l in links if l.get('fidelity', 'faithful') == 'faithful']
+                if faithful_links:
+                    print(f" ✅ Faithful element: `{elem_id}` to {len(links)} Lean item(s).")
+                else:
+                    fids = ", ".join(sorted({l.get('fidelity', 'faithful') for l in links}))
+                    print(f" ⚠️ Stub/Partial element: `{elem_id}` ({fids}) - not yet faithfully captured.")
+                    stub_partial += 1
                 
-    print(f"\nVerification complete. Found {gaps} coverage gaps/untraced requirements.")
+    print(f"\nVerification complete. Found {gaps} untraced requirements and {stub_partial} stub/partial (non-faithful) links.")
     return gaps
 
 def main():

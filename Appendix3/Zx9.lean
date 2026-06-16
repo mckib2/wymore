@@ -62,6 +62,13 @@ theorem zx9_fully_reachable (s0 s : SZx9) : Reachable Zx9 s0 s := by
     simp only [generateStateTrajectory_succ, generateStateTrajectory_zero]
     cases s0 <;> rfl
 
-/-- Zx9 is a nontrivial system. -/
+/-- Zx9 is a nontrivial system: it has a state-dependent transition, an active transition,
+    and more than one possible output. -/
 theorem zx9_is_nontrivial : IsNontrivial Zx9 := by
-  decide
+  unfold IsNontrivial
+  refine ⟨⟨SZx9.v2, SZx9.v1, IZx9.v8, by decide⟩, ⟨SZx9.v1, IZx9.v8, by decide⟩, ?_⟩
+  refine Finset.one_lt_card.mpr ⟨OZx9.v5, ?_, OZx9.v6, ?_, by decide⟩
+  · simp only [RNG, Finset.mem_image, Finset.mem_univ, true_and]
+    exact ⟨SZx9.v1, rfl⟩
+  · simp only [RNG, Finset.mem_image, Finset.mem_univ, true_and]
+    exact ⟨SZx9.v2, rfl⟩
