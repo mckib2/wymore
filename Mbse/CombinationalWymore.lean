@@ -13,6 +13,24 @@ In this framework:
 
 We compare the expressive and proving power of this combinational logic representation
 with the stateful `DiscreteSystem` of Wymore.
+
+## Dual API
+
+Combinational logic is exposed on two layers, both preserved intentionally:
+
+1. **Canonical zero-delay layer** (`CombinationalSystem`, `generateOutputTrajectory`): readout is
+   `RZ : IZ → OZ` with output at time `t` equal to `C.RZ (f t)` (`combinational_zero_delay`).
+2. **Moore embedding layer** (`combinationalToDelaySystem`): a base `DiscreteSystem` with 1-step delay
+   whose output at `t + 1` matches the canonical output at `t` (`delay_system_matches_combinational_trajectory`).
+   Uniqueness on the delay side reuses base Wymore (`delaySystem_outputTrajectory_unique`).
+
+## Encoding options (zero-delay I/O)
+
+| Option | Encoding | Input-dependent output at time `t`? |
+|---|---|---|
+| (A) `CombinationalSystem` | Mealy readout `RZ : IZ → OZ` | Yes: `C.RZ (f t)` |
+| (B) `combinationalToDelaySystem` | Moore with state `IZ`, 1-step lag | At `t + 1` only |
+| (C) Moore on `SingletonState` | `RZ : SingletonState → OZ` | **No** — output independent of input (`zeroDelayMooreOnSingleton_impossible`) |
 -/
 
 /-- The singleton state space containing only `s0`. -/
@@ -100,9 +118,7 @@ def HasOrderVector (C : CombinationalSystem IZ OZ) (k m n : Nat) : Prop :=
   are vacuous or inapplicable on the singleton state space and are intentionally omitted.
 -/
 def IsNontrivial (C : CombinationalSystem IZ OZ) : Prop :=
-  have : Fintype IZ := C.iz_finite
-  have : DecidableEq OZ := Classical.decEq OZ
-  Finset.card (RNG C.RZ) > 1
+  Finset.card (@RNG IZ OZ C.iz_finite (Classical.decEq OZ) C.RZ) > 1
 
 /--
   [textbook/definition2.14/implication/trivial_system]
@@ -151,12 +167,14 @@ theorem generateOutputTrajectory_valid (C : CombinationalSystem IZ OZ) (f : ITZ 
   intro t
   rfl
 
+/-- Direct proof on the singleton state space; state is constant regardless of input. -/
 theorem stateTrajectory_unique (C : CombinationalSystem IZ OZ) (f : ITZ IZ) (g : STZ SingletonState) (s_init : SingletonState)
     (h_valid : IsValidStateTrajectory C f g) :
     g = generateStateTrajectory C s_init f := by
   funext t
   exact h_valid t
 
+/-- Direct proof; also obtainable via delay embedding (see `delaySystem_outputTrajectory_unique`). -/
 theorem outputTrajectory_unique (C : CombinationalSystem IZ OZ) (f : ITZ IZ) (h : OTZ OZ)
     (h_valid : IsValidOutputTrajectory C f h) :
     h = generateOutputTrajectory C f := by
@@ -299,7 +317,65 @@ theorem outputTrajectory_nonanticipatory
   apply outputTrajectory_instantaneous
   exact h_agree t (le_refl t)
 
+/-! ## System experiments -/
+
+/--
+  [textbook/definition2.33/definition/system_experiments]
+  System experiments for combinational systems: input trajectory, initial (singleton) state, and time.
+  On the singleton state space, experiments reduce to `(f, s0, t)` with output `C.RZ (f t)`.
+-/
+abbrev CombinationalEXZ (IZ : Type) := EXZ SingletonState IZ
+
+/--
+  Run a combinational system experiment: output is the instantaneous readout at the experiment time.
+  An experiment `e = (f, s0, t)` produces `C.RZ (f t)`.
+-/
+def runExperiment (C : CombinationalSystem IZ OZ) (e : CombinationalEXZ IZ) : OZ :=
+  C.RZ (e.1 e.2.2)
+
+/-- Experiment output equals the generated output trajectory at the experiment time. -/
+theorem experiment_output (C : CombinationalSystem IZ OZ) (f : ITZ IZ) (s_init : SingletonState) (t : Time) :
+    runExperiment C (f, s_init, t) = generateOutputTrajectory C f t := rfl
+
+/-- Experiment state trajectory is constant (initial state is irrelevant on a singleton). -/
+theorem experiment_state (C : CombinationalSystem IZ OZ) (f : ITZ IZ) (s_init : SingletonState) (t : Time) :
+    generateStateTrajectory C s_init f t = s_init := by
+  cases s_init
+  rfl
+
+/-- All initial states yield the same experiment output (singleton state space). -/
+theorem experiment_initial_state_irrelevant (C : CombinationalSystem IZ OZ) (f : ITZ IZ) (s_init s_init' : SingletonState) (t : Time) :
+    runExperiment C (f, s_init, t) = runExperiment C (f, s_init', t) := by
+  cases s_init
+  cases s_init'
+  rfl
+
 /-! ## Projection and Ports -/
+
+/--
+  [textbook/definition2.55/definition/input_ports]
+  Input port index set for combinational systems (thin wrapper over base `IPZ`).
+-/
+abbrev IPZ (Port : Type) := _root_.IPZ Port
+
+/--
+  [textbook/definition2.59/definition/input_port_structure]
+  Input port structure for combinational systems (thin wrapper over base `ISZ`).
+-/
+abbrev ISZ (Port : Type) (PortVal : Port → Type) := _root_.ISZ Port PortVal
+
+/--
+  [textbook/definition2.55/definition/port_trajectory]
+  The `p`-th input port trajectory for combinational (Mealy) input trajectories.
+-/
+def portTrajectory {Port : Type} {PortVal : Port → Type}
+    (f : ITZ ((p : Port) → PortVal p)) (p : Port) : Time → PortVal p :=
+  _root_.portTrajectory f p
+
+@[simp]
+theorem portTrajectory_at_time {Port : Type} {PortVal : Port → Type}
+    (f : ITZ ((p : Port) → PortVal p)) (p : Port) (t : Time) :
+    portTrajectory f p t = f t p := rfl
 
 /-- Readout for the `op`-th output port of a combinational system. -/
 def portReadout {OutPort : Type} {OutPortVal : OutPort → Type}
@@ -311,13 +387,30 @@ def portOutputTrajectory {OutPort : Type} {OutPortVal : OutPort → Type}
     (ot : OTZ ((op : OutPort) → OutPortVal op)) (op : OutPort) : Time → OutPortVal op :=
   fun t => PJN op (ot t)
 
+/-- Port readout at time `t` equals the generated output trajectory on that port. -/
+theorem portReadout_at_time {OutPort : Type} {OutPortVal : OutPort → Type} {IZ : Type}
+    (C : CombinationalSystem IZ ((op : OutPort) → OutPortVal op)) (op : OutPort)
+    (f : ITZ IZ) (t : Time) :
+    portReadout C op (f t) = generateOutputTrajectory C f t op := rfl
+
+/-- Zero-delay combinational output: alias for `generateOutputTrajectory_val`. -/
+theorem combinational_zero_delay (C : CombinationalSystem IZ OZ) (f : ITZ IZ) (t : Time) :
+    generateOutputTrajectory C f t = C.RZ (f t) :=
+  generateOutputTrajectory_val C f t
+
 /-! ## Parameterization -/
 
-/-- A combinational system parameterization F maps a parameter type `P` to a `CombinationalSystem`. -/
+/--
+  [textbook/definition2.82/definition/system_parameterization]
+  A combinational system parameterization F maps a parameter type `P` to a `CombinationalSystem`.
+-/
 def CombinationalSystemParameterization (P : Type u) (IZ OZ : P → Type) : Type u :=
   (p : P) → CombinationalSystem (IZ p) (OZ p)
 
-/-- Instance of a combinational parameterization. -/
+/--
+  [textbook/definition2.82/definition/parameter_instance]
+  Instance of a combinational parameterization at parameter value `r`.
+-/
 def parameterInstance {P : Type u} {IZ OZ : P → Type}
     (F : CombinationalSystemParameterization P IZ OZ) (r : P) : CombinationalSystem (IZ r) (OZ r) :=
   F r
@@ -355,7 +448,10 @@ theorem fccsy_has_one_parameter {IZ OZ : Type} :
 
 /-! ## Parallel (Conjunctive) Composition -/
 
-/-- A vector of combinational systems with port-based interfaces. -/
+/--
+  [textbook/definition3.3/definition/connection_vector]
+  A vector of combinational systems with port-based interfaces.
+-/
 structure PortCombinationalSystemVector (n : Nat) where
   Port : Fin n → Type
   PortVal : (i : Fin n) → Port i → Type
@@ -398,12 +494,227 @@ theorem ccsy_output_trajectory {n : Nat} (VCS : PortCombinationalSystemVector n)
     generateOutputTrajectory (VCS.C i) (fun t port => f t ⟨i, port⟩) t B' := by
   rfl
 
-/-- ccsy defines a valid combinational system parameterization. -/
+/-- Parallel composition preserves finiteness of input and output spaces. -/
+theorem ccsy_isFinite {n : Nat} (VCS : PortCombinationalSystemVector n) :
+    IsFinite (ccsy VCS) :=
+  combinationalSystem_isFinite (ccsy VCS)
+
+lemma isNontrivial_iff_distinct_readouts {IZ OZ : Type} (C : CombinationalSystem IZ OZ) :
+    IsNontrivial C ↔ ∃ (a b : IZ), C.RZ a ≠ C.RZ b := by
+  classical
+  constructor
+  · intro h
+    unfold IsNontrivial at h
+    rcases Finset.one_lt_card.mp h with ⟨y1, hy1, y2, hy2, hyne⟩
+    obtain ⟨a, _, ha⟩ := Finset.mem_image.mp hy1
+    obtain ⟨b, _, hb⟩ := Finset.mem_image.mp hy2
+    exact ⟨a, b, fun heq => hyne (by rw [← ha, heq, hb])⟩
+  · intro ⟨a, b, hab⟩
+    unfold IsNontrivial
+    exact Finset.one_lt_card.mpr ⟨C.RZ a,
+      Finset.mem_image.mpr ⟨a, @Finset.mem_univ IZ C.iz_finite a, rfl⟩,
+      C.RZ b, Finset.mem_image.mpr ⟨b, @Finset.mem_univ IZ C.iz_finite b, rfl⟩, hab⟩
+
+/--
+  Parallel composition is nontrivial if any component is nontrivial: two global inputs that agree
+  everywhere except on component `i`'s ports induce different readouts on that component's outputs.
+-/
+theorem ccsy_isNontrivial_of_component {n : Nat} (VCS : PortCombinationalSystemVector n)
+    (i : Fin n) (h : IsNontrivial (VCS.C i))
+    [∀ j, Inhabited ((p : VCS.Port j) → VCS.PortVal j p)] :
+    IsNontrivial (ccsy VCS) := by
+  obtain ⟨a, b, hab⟩ := (isNontrivial_iff_distinct_readouts (VCS.C i)).mp h
+  rcases (Function.ne_iff (f₁ := (VCS.C i).RZ a) (f₂ := (VCS.C i).RZ b)).mp hab with ⟨B', hB'⟩
+  let defaultVal (j : Fin n) (port : VCS.Port j) : VCS.PortVal j port :=
+    (default : (p : VCS.Port j) → VCS.PortVal j p) port
+  let extendInput (a : (p : VCS.Port i) → VCS.PortVal i p) (ip : Σ (k : Fin n), VCS.Port k) :
+      VCS.PortVal ip.1 ip.2 :=
+    if h : ip.1 = i then
+      h ▸ a (cast (congrArg VCS.Port h) ip.2)
+    else
+      defaultVal ip.1 ip.2
+  let p_a := extendInput a
+  let p_b := extendInput b
+  have h_input_a : (fun port => p_a ⟨i, port⟩) = a := by
+    funext port
+    simp [p_a, extendInput]
+  have h_input_b : (fun port => p_b ⟨i, port⟩) = b := by
+    funext port
+    simp [p_b, extendInput]
+  have hRa : (ccsy VCS).RZ p_a ⟨i, B'⟩ = (VCS.C i).RZ a B' := by
+    dsimp [ccsy]
+    rw [h_input_a]
+  have hRb : (ccsy VCS).RZ p_b ⟨i, B'⟩ = (VCS.C i).RZ b B' := by
+    dsimp [ccsy]
+    rw [h_input_b]
+  have hout : (ccsy VCS).RZ p_a ≠ (ccsy VCS).RZ p_b := by
+    intro heq
+    apply hB'
+    rw [← hRa, ← hRb, congr_fun heq ⟨i, B'⟩]
+  exact (isNontrivial_iff_distinct_readouts (ccsy VCS)).mpr ⟨p_a, p_b, hout⟩
+
+/--
+  [textbook/theorem3.42/theorem/csy_parameterization]
+  `ccsy` defines a valid combinational system parameterization.
+-/
 def ccsy_parameterization (n : Nat) :
     CombinationalSystemParameterization (PortCombinationalSystemVector n)
       (fun VCS => (ip : Σ i, VCS.Port i) → VCS.PortVal ip.1 ip.2)
       (fun VCS => (op : Σ i, VCS.OutPort i) → VCS.OutPortVal op.1 op.2) :=
   fun VCS => ccsy VCS
+
+/-! ## Coupling recipes (Ch. 3) -/
+
+/--
+  [textbook/definition3.7/requirement/port_compatibility]
+  Port compatibility for combinational coupling: connected ports must have equal value types.
+-/
+def PortCompatibilityCombinational {n : Nat} (VCS : PortCombinationalSystemVector n)
+    (CCSCR : Set ((Σ (i : Fin n), VCS.OutPort i) × (Σ (i : Fin n), VCS.Port i))) : Prop :=
+  ∀ (op : Σ (i : Fin n), VCS.OutPort i) (ip : Σ (i : Fin n), VCS.Port i),
+    (op, ip) ∈ CCSCR → VCS.OutPortVal op.1 op.2 = VCS.PortVal ip.1 ip.2
+
+/--
+  [textbook/definition3.7/definition/connectivity_relation]
+  Valid system connectivity for a combinational system vector.
+-/
+def IsCombinationalSystemConnectivity {n : Nat} (VCS : PortCombinationalSystemVector n)
+    (CCSCR : Set ((Σ (i : Fin n), VCS.OutPort i) × (Σ (i : Fin n), VCS.Port i))) : Prop :=
+  IsOneToOneRelation CCSCR ∧
+  IsProperDomain CCSCR ∧
+  IsProperRange CCSCR ∧
+  PortCompatibilityCombinational VCS CCSCR
+
+/--
+  [textbook/definition3.11/definition/system_coupling_recipe]
+  A combinational coupling recipe pairs a connectable vector of combinational systems with a
+  connectivity relation. Execution for empty `CCSCR` is `ccsy CCR.VCS`; non-empty coupling is
+  classification-only in this module (mirroring base Wymore Ch. 3 scope).
+-/
+structure CombinationalCouplingRecipe (n : Nat) where
+  VCS : PortCombinationalSystemVector n
+  CCSCR : Set ((Σ (i : Fin n), VCS.OutPort i) × (Σ (i : Fin n), VCS.Port i))
+  connectivity : IsCombinationalSystemConnectivity VCS CCSCR
+
+/--
+  [textbook/definition3.7/definition/feedback_connection]
+  Feedback connection for combinational coupling recipes (output index ≥ input index).
+-/
+def IsFeedbackCombinational {n : Nat} {VCS : PortCombinationalSystemVector n}
+    (p : (Σ (i : Fin n), VCS.OutPort i) × (Σ (i : Fin n), VCS.Port i)) : Prop :=
+  p.1.1 ≥ p.2.1
+
+/--
+  [textbook/definition3.11/definition/coscr]
+  Output ports connected by the combinational coupling recipe.
+-/
+def CCOSCR {n : Nat} (CCR : CombinationalCouplingRecipe n) : Set (Σ (i : Fin n), CCR.VCS.OutPort i) :=
+  { op | ∃ ip, (op, ip) ∈ CCR.CCSCR }
+
+/--
+  [textbook/definition3.11/definition/ciscr]
+  Input ports connected by the combinational coupling recipe.
+-/
+def CCISCR {n : Nat} (CCR : CombinationalCouplingRecipe n) : Set (Σ (i : Fin n), CCR.VCS.Port i) :=
+  { ip | ∃ op, (op, ip) ∈ CCR.CCSCR }
+
+/--
+  [textbook/definition3.11/definition/uoscr]
+  Output ports unconnected by the combinational coupling recipe.
+-/
+def CUOSCR {n : Nat} (CCR : CombinationalCouplingRecipe n) : Set (Σ (i : Fin n), CCR.VCS.OutPort i) :=
+  (CCOSCR CCR)ᶜ
+
+/--
+  [textbook/definition3.11/definition/uiscr]
+  Input ports unconnected by the combinational coupling recipe.
+-/
+def CUISCR {n : Nat} (CCR : CombinationalCouplingRecipe n) : Set (Σ (i : Fin n), CCR.VCS.Port i) :=
+  (CCISCR CCR)ᶜ
+
+/--
+  [textbook/definition3.11/definition/interface]
+  Interface between systems `i` and `j` in a combinational coupling recipe.
+-/
+def CCSCRInterface {n : Nat} (CCR : CombinationalCouplingRecipe n) (i j : Fin n) :
+    Set ((Σ (k : Fin n), CCR.VCS.OutPort k) × (Σ (k : Fin n), CCR.VCS.Port k)) :=
+  { p ∈ CCR.CCSCR | (p.1.1 = i ∧ p.2.1 = j) ∨ (p.1.1 = j ∧ p.2.1 = i) }
+
+/--
+  [textbook/definition3.15/definition/conjunctive_scr]
+  A combinational coupling recipe is conjunctive if and only if `CCSCR` is empty.
+-/
+def IsConjunctiveCombinational {n : Nat} (CCR : CombinationalCouplingRecipe n) : Prop :=
+  CCR.CCSCR = ∅
+
+/--
+  [textbook/definition3.19/definition/cascade_scr]
+  A combinational coupling recipe is cascade if and only if `CCSCR` contains no feedback connections.
+-/
+def IsCascadeCombinational {n : Nat} (CCR : CombinationalCouplingRecipe n) : Prop :=
+  ∀ p ∈ CCR.CCSCR, ¬ IsFeedbackCombinational (VCS := CCR.VCS) p
+
+/--
+  [textbook/definition3.19/definition/essentially_cascade_scr]
+  A combinational coupling recipe is essentially cascade if a reordering of components yields cascade.
+-/
+def IsEssentiallyCascadeCombinational {n : Nat} (CCR : CombinationalCouplingRecipe n) : Prop :=
+  ∃ (g : Fin n ≃ Fin n), ∀ p ∈ CCR.CCSCR, g p.1.1 < g p.2.1
+
+/--
+  [textbook/definition3.26/definition/singular_scr]
+  A combinational coupling recipe is singular if and only if `n = 1` and `CCSCR` is empty.
+-/
+def IsSingularCombinational {n : Nat} (CCR : CombinationalCouplingRecipe n) : Prop :=
+  n = 1 ∧ CCR.CCSCR = ∅
+
+/--
+  [textbook/definition3.29/definition/pure_feedback_scr]
+  A combinational coupling recipe is pure feedback if and only if `n = 1` and `CCSCR` is nonempty.
+-/
+def IsPureFeedbackCombinational {n : Nat} (CCR : CombinationalCouplingRecipe n) : Prop :=
+  n = 1 ∧ CCR.CCSCR ≠ ∅
+
+/--
+  [textbook/theorem3.31/theorem/class_in_themselves]
+  Pure feedback combinational coupling recipes are neither singular, conjunctive, nor cascade.
+-/
+theorem pure_feedback_combinational_not_other {n : Nat} (CCR : CombinationalCouplingRecipe n)
+    (h : IsPureFeedbackCombinational CCR) :
+    ¬ IsSingularCombinational CCR ∧ ¬ IsConjunctiveCombinational CCR ∧ ¬ IsCascadeCombinational CCR := by
+  have hn : n = 1 := h.1
+  have hne : CCR.CCSCR ≠ ∅ := h.2
+  constructor
+  · intro hs
+    exact hne hs.2
+  · constructor
+    · intro hc
+      exact hne hc
+    · intro h_cas
+      obtain ⟨p, hp⟩ := Set.nonempty_iff_ne_empty.mpr hne
+      have : Subsingleton (Fin n) := by
+        rw [hn]
+        infer_instance
+      have heq : p.1.1 = p.2.1 := Subsingleton.elim p.1.1 p.2.1
+      have h_feed : IsFeedbackCombinational (VCS := CCR.VCS) p := by
+        unfold IsFeedbackCombinational
+        rw [heq]
+      have h_not_feed := h_cas p hp
+      exact h_not_feed h_feed
+
+/--
+  [textbook/definition3.33/definition/mixed_scr]
+  A combinational coupling recipe is mixed if it is not singular, conjunctive, cascade,
+  essentially cascade, or pure feedback.
+-/
+def IsMixedCombinational {n : Nat} (CCR : CombinationalCouplingRecipe n) : Prop :=
+  ¬ IsSingularCombinational CCR ∧ ¬ IsConjunctiveCombinational CCR ∧ ¬ IsCascadeCombinational CCR ∧
+  ¬ IsEssentiallyCascadeCombinational CCR ∧ ¬ IsPureFeedbackCombinational CCR
+
+/-- Alias for `generateOutputTrajectory_val` documenting the zero-delay readout composition. -/
+theorem outputTrajectory_eq_RZ_comp (C : CombinationalSystem IZ OZ) (f : ITZ IZ) (t : Time) :
+    generateOutputTrajectory C f t = C.RZ (f t) :=
+  generateOutputTrajectory_val C f t
 
 end Combinational
 
@@ -412,8 +723,11 @@ end Combinational
 /--
   Theorem: Any Moore-style `DiscreteSystem` restricted to `SingletonState` produces a
   constant output trajectory, completely independent of its input trajectory.
-  This highlights the fundamental representation limitation of stateful systems with
-  collapsed states.
+
+  Moore readout `RZ : SingletonState → OZ` cannot depend on the current input; the output at
+  every time is determined solely by the (unique) state visited. For non-constant input-dependent
+  maps, use `Combinational.CombinationalSystem` (zero-delay Mealy readout) or
+  `combinationalToDelaySystem` (Moore with 1-step lag).
 -/
 theorem singleton_state_discrete_system_is_constant {IZ OZ : Type}
     (Z : DiscreteSystem SingletonState IZ OZ) (s_init : SingletonState) (f g : ITZ IZ) (t : Time) :
@@ -422,6 +736,15 @@ theorem singleton_state_discrete_system_is_constant {IZ OZ : Type}
   cases (generateStateTrajectory Z s_init f t)
   cases (generateStateTrajectory Z s_init g t)
   rfl
+
+/--
+  Corollary in I/O language: zero-delay Moore encoding on `SingletonState` cannot distinguish
+  input trajectories. See module doc "Encoding options" for the three viable encodings.
+-/
+theorem zeroDelayMooreOnSingleton_impossible {IZ OZ : Type}
+    (Z : DiscreteSystem SingletonState IZ OZ) (s : SingletonState) (f g : ITZ IZ) (t : Time) :
+    generateOutputTrajectory Z s f t = generateOutputTrajectory Z s g t :=
+  singleton_state_discrete_system_is_constant Z s f g t
 
 /--
   To model a `Combinational.CombinationalSystem` using Wymore's `DiscreteSystem` without losing the
@@ -457,4 +780,52 @@ theorem delay_system_matches_combinational_trajectory {IZ OZ : Type} [Inhabited 
     (C : Combinational.CombinationalSystem IZ OZ) (x : IZ) (f : ITZ IZ) (t : Time) :
     generateOutputTrajectory (combinationalToDelaySystem C) x f (t + 1) =
       Combinational.generateOutputTrajectory C f t := by
+  rfl
+
+/--
+  Summary: input-dependent zero-delay output requires either combinational readout or a delayed
+  Moore system with nontrivial state. Moore on a singleton cannot express non-constant I/O.
+-/
+theorem zeroDelayRequiresCombinationalOrDelay {IZ OZ : Type} [Inhabited IZ]
+    (C : Combinational.CombinationalSystem IZ OZ) (f : ITZ IZ) (t : Time) :
+    Combinational.generateOutputTrajectory C f t = C.RZ (f t) ∧
+    generateOutputTrajectory (combinationalToDelaySystem C) default f (t + 1) =
+      Combinational.generateOutputTrajectory C f t :=
+  ⟨Combinational.generateOutputTrajectory_val C f t, delay_system_matches_combinational_trajectory C default f t⟩
+
+/-- State of the delayed Moore embedding at `t + 1` holds the input at time `t`. -/
+theorem delaySystem_state_at_time {IZ OZ : Type} [Inhabited IZ]
+    (C : Combinational.CombinationalSystem IZ OZ) (x : IZ) (f : ITZ IZ) (t : Time) :
+    generateStateTrajectory (combinationalToDelaySystem C) x f (t + 1) = f t := by
+  simp only [generateStateTrajectory_succ, combinationalToDelaySystem]
+
+/-- Delay-system output at `t + 1` derives combinational output at `t` via the embedding bridge. -/
+theorem delaySystem_derives_combinational_output {IZ OZ : Type} [Inhabited IZ]
+    (C : Combinational.CombinationalSystem IZ OZ) (x : IZ) (f : ITZ IZ) (t : Time) :
+    generateOutputTrajectory (combinationalToDelaySystem C) x f (t + 1) =
+      C.RZ (f t) := by
+  rw [delay_system_matches_combinational_trajectory, Combinational.generateOutputTrajectory_val]
+
+/--
+  Output trajectory uniqueness for the delay embedding at each time step, derived from base Wymore
+  `outputTrajectory_unique` and the combinational bridge.
+-/
+theorem delaySystem_outputTrajectory_unique {IZ OZ : Type} [Inhabited IZ]
+    (C : Combinational.CombinationalSystem IZ OZ) (x : IZ) (f : ITZ IZ)
+    (h : OTZ OZ) (h_valid : IsValidOutputTrajectory (combinationalToDelaySystem C)
+      (generateStateTrajectory (combinationalToDelaySystem C) x f) h) (t : Time) :
+    h t = generateOutputTrajectory (combinationalToDelaySystem C) x f t := by
+  rw [outputTrajectory_unique (combinationalToDelaySystem C)
+    (generateStateTrajectory (combinationalToDelaySystem C) x f) h h_valid t]
+  rfl
+
+/--
+  Valid delay-system output at `t + 1` equals combinational output at `t`.
+-/
+theorem delaySystem_valid_implies_combinational_valid {IZ OZ : Type} [Inhabited IZ]
+    (C : Combinational.CombinationalSystem IZ OZ) (x : IZ) (f : ITZ IZ) (h : OTZ OZ)
+    (h_valid : IsValidOutputTrajectory (combinationalToDelaySystem C)
+      (generateStateTrajectory (combinationalToDelaySystem C) x f) h) (t : Time) :
+    h (t + 1) = Combinational.generateOutputTrajectory C f t := by
+  rw [h_valid (t + 1), Combinational.generateOutputTrajectory_val, delaySystem_state_at_time]
   rfl
