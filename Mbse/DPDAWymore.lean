@@ -10,9 +10,11 @@ It upgrades the state space to a structured memory space (Control State × LIFO 
 allowing the formalization of context-free behaviors while maintaining compatibility
 with Wymore's trajectory-matching philosophy.
 
+## Formal model
+
 We formalize the 7-tuple: ZDPDA = (S, P, STfin, Γ, z0, FDPDA, GDPDA)
 where S/P define input/output spaces, STfin is the finite control states,
-Γ is the LIFO stack alphabet, z0 is the empty conditions, and F/G are the
+Γ is the LIFO stack alphabet, z0 is the empty-stack baseline marker, and F/G are the
 stack-aware transition and readout functions.
 
 The transition function `F` is *partial* (returns `Option`). This lets us express the genuine
@@ -22,6 +24,38 @@ as a free consequence of `F` being a total function. We additionally give a fini
 acceptance relation (`Reaches`) and the recognized `Language`, and a bounded-stack reduction to
 Wymore's `DiscreteSystem` with a proved behavioral-equivalence theorem (valid while the stack
 stays within the bound).
+
+## Coverage summary
+
+**Implemented:** 7-tuple spec, snapshot trajectories, soundness/uniqueness, `IsDeterministic`,
+`Reaches` / `Language` (final-state acceptance), `toBoundedDiscreteSystem` +
+`bounded_output_agrees`.
+
+**Intentionally omitted** (see [formalization_roadmap.md](../formalization_roadmap.md) §3):
+Wymore open/closed/finite classification, reachability, state equivalence, morphisms,
+time invariance / nonanticipation, ports, parameterization, Ch. 3 coupling, worked examples.
+
+## Integration with other modules
+
+- **Base [Wymore](Wymore.lean):** `toBoundedDiscreteSystem` maps a depth-bounded DPDA into
+  `DiscreteSystem (Q × BoundedStack Γ max_depth) (Option I) O`. Unbounded stacks cannot live in
+  `DiscreteSystem` directly because it requires `Fintype SZ`.
+- **[GeneralizedWymore](GeneralizedWymore.lean):** Both use `Time → Option IS` input streams
+  (`ITZ_opt` here, `ITZW` there). Unification is deferred to the roadmap.
+
+## Semantic caveats
+
+- **`stepSnapshot` halt-on-`none`:** When `F` is undefined, the machine self-loops (stays in place).
+  Trajectories remain total; this is not a rejecting halt.
+- **`peek` on empty stack:** Returns `z0`, so `[]` and `[z0]` are indistinguishable at the top.
+  Classic DPDAs avoid this by never popping the bottom marker. A formal `WellFormedStack`
+  invariant is on the roadmap.
+- **`Language` acceptance mode:** By **final control state**, not by empty stack.
+- **Bounded reduction:** Beyond `max_depth`, `List.take` truncation is **lossy** unless
+  `bounded_output_agrees`'s depth hypothesis holds.
+
+See [formalization_roadmap.md](../formalization_roadmap.md) for backlog and
+[formalization_roadmap.md §6](formalization_roadmap.md#6-rigor-verification) for the proof-honesty checklist.
 -/
 
 namespace DPDA
@@ -202,7 +236,8 @@ def stepInput (D : DPDASystem STfin IS OZ Γ) (snap : Snapshot STfin Γ) (a : IS
 /--
   The standard DPDA determinism condition: whenever an ε-move is available at control state `q`
   with stack top `Z`, no input-consuming move is available there. This guarantees that the
-  computation on a given input word is unambiguous.
+  computation on a given input word is unambiguous. Currently used by `deterministic_no_conflict`;
+  a uniqueness-of-run theorem is on the roadmap ([formalization_roadmap.md](../formalization_roadmap.md) §3).
 -/
 def IsDeterministic (D : DPDASystem STfin IS OZ Γ) : Prop :=
   ∀ (q : STfin) (Z : Γ), (D.F q none Z).isSome = true → ∀ a : IS, D.F q (some a) Z = none
@@ -228,6 +263,12 @@ theorem deterministic_no_conflict (D : DPDASystem STfin IS OZ Γ) (hD : IsDeterm
 while consuming exactly the input word `w` (ε-moves consume nothing). Using a relation (rather
 than a recursive run function) sidesteps non-termination from ε-loops. -/
 
+/-!
+`Reaches D c w c'` — finite-word transition closure: from configuration `c`, consume exactly
+word `w` (ε-moves via `stepEps` consume nothing) and arrive at `c'`. Used for language
+acceptance; not yet linked to time-step trajectories `generateStateTrajectory` (roadmap P1).
+-/
+
 inductive Reaches (D : DPDASystem STfin IS OZ Γ) :
     Snapshot STfin Γ → List IS → Snapshot STfin Γ → Prop
   | refl (c : Snapshot STfin Γ) : Reaches D c [] c
@@ -237,12 +278,15 @@ inductive Reaches (D : DPDASystem STfin IS OZ Γ) :
       stepInput D c a = some c' → Reaches D c' w c'' → Reaches D c (a :: w) c''
 
 /-- A word `w` is accepted from initial control state `q0` if some computation consuming `w`
-    ends in a control state satisfying `accept` (acceptance by final state). -/
+    ends in a control state satisfying `accept` (acceptance by final state).
+    Partial vs textbook PDAs: empty-stack acceptance is not modeled; see roadmap §3. -/
 def Accepts (D : DPDASystem STfin IS OZ Γ) (q0 : STfin) (accept : STfin → Prop) (w : List IS) :
     Prop :=
   ∃ (q : STfin) (s : Stack Γ), Reaches D (q0, [D.z0]) w (q, s) ∧ accept q
 
-/-- The language recognized by the DPDA from `q0` with accepting predicate `accept`. -/
+/-- The language recognized by the DPDA from `q0` with accepting predicate `accept`.
+    Word-level semantics (`Reaches`); no equivalence to `generateStateTrajectory` yet
+    (roadmap P1). -/
 def Language (D : DPDASystem STfin IS OZ Γ) (q0 : STfin) (accept : STfin → Prop) :
     Set (List IS) :=
   { w | Accepts D q0 accept w }

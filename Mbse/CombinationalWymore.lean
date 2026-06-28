@@ -50,6 +50,21 @@ def IsClosed (_C : CombinationalSystem IZ OZ) : Prop :=
 def IsOpen (_C : CombinationalSystem IZ OZ) : Prop :=
   Nonempty IZ ∧ Nonempty OZ
 
+/-- A concrete closed combinational system: empty input and output.
+    Unlike base `DiscreteSystem` (`not_isClosed`), closed systems are representable here
+    because readout is `IZ → OZ` with no forced nonempty output space. -/
+def closedSystem : CombinationalSystem Empty Empty where
+  iz_finite := inferInstance
+  oz_finite := inferInstance
+  RZ := fun e => e.elim
+
+theorem closedSystem_isClosed : IsClosed closedSystem :=
+  ⟨inferInstance, inferInstance⟩
+
+/-- Closed (empty-input, empty-output) combinational systems are constructible.
+    Contrast `not_isClosed`, which proves no base `DiscreteSystem` can be closed. -/
+theorem exists_closed_combinationalSystem : ∃ (C : CombinationalSystem Empty Empty), IsClosed C :=
+  ⟨closedSystem, closedSystem_isClosed⟩
 
 /--
   [textbook/definition2.11/definition/finite_system]
@@ -78,9 +93,11 @@ def HasOrderVector (C : CombinationalSystem IZ OZ) (k m n : Nat) : Prop :=
   m ≥ 1 ∧ n ≥ 1
 
 /--
-  [textbook/definition2.14/definition/nontrivial_system]
+  [textbook/definition2.14/definition/nontrivial_system|partial]
   A combinational system is nontrivial if and only if its readout has varying outputs
   (the size of the range of the readout function C.RZ is greater than 1).
+  Partial: Def 2.14 also requires state-dependent and active transitions; those clauses
+  are vacuous or inapplicable on the singleton state space and are intentionally omitted.
 -/
 def IsNontrivial (C : CombinationalSystem IZ OZ) : Prop :=
   have : Fintype IZ := C.iz_finite
@@ -94,11 +111,13 @@ def IsNontrivial (C : CombinationalSystem IZ OZ) : Prop :=
 def IsTrivial (C : CombinationalSystem IZ OZ) : Prop :=
   ¬ IsNontrivial C
 
-/-- Generates the state trajectory for a combinational system (always constant s0). -/
+/-- [textbook/definition2.27/definition/state_trajectory_recurrence]
+    Generates the state trajectory for a combinational system (always constant s0). -/
 def generateStateTrajectory (_C : CombinationalSystem IZ OZ) (_s_init : SingletonState) (_f : ITZ IZ) : STZ SingletonState :=
   fun _ => SingletonState.s0
 
-/-- Generates the output trajectory for a combinational system (instantaneous readout). -/
+/-- [textbook/definition2.30/definition/output_trajectory_composition]
+    Generates the output trajectory for a combinational system (instantaneous readout). -/
 def generateOutputTrajectory (C : CombinationalSystem IZ OZ) (f : ITZ IZ) : OTZ OZ :=
   fun t => C.RZ (f t)
 
@@ -146,8 +165,11 @@ theorem outputTrajectory_unique (C : CombinationalSystem IZ OZ) (f : ITZ IZ) (h 
 
 /-! ## System-Theoretic Properties -/
 
-/-- Reachability in a combinational system, mirroring the base file: `s` is reachable from
-    `s_init` if some input trajectory drives the (singleton) state trajectory to `s` at some time. -/
+/-- [textbook/definition2.51/definition/reachable]
+    Reachability in a combinational system, mirroring the base file: `s` is reachable from
+    `s_init` if some input trajectory drives the (singleton) state trajectory to `s` at some time.
+    Degenerate: on a singleton state space every state is reachable from every state at time 0
+    (`reachable_always`); this predicate carries no distinguishing information. -/
 def Reachable (C : CombinationalSystem IZ OZ) (s_init s : SingletonState) : Prop :=
   ∃ (f : ITZ IZ) (t : Time), generateStateTrajectory C s_init f t = s
 
@@ -161,11 +183,9 @@ theorem reachable_self (C : CombinationalSystem IZ OZ) [Inhabited IZ] (s_init : 
     Reachable C s_init s_init :=
   reachable_always C s_init s_init
 
-/-- State equivalence in a combinational system. Because a combinational system's output never
-    depends on the (single) internal state, observational equivalence is degenerate, so we use
-    the finest sensible relation: equality of states. This is a genuine equivalence relation
-    (not a vacuous `True`), and `stateEquiv_always` shows every pair is equivalent because the
-    state space is a singleton. -/
+/-- State equivalence in a combinational system: syntactic equality on the singleton state space.
+    This is **not** the base Wymore observational `StateEquiv` (identical output trajectories under
+    all inputs). For behavioral equivalence of combinational systems, use `InputObsEquiv`. -/
 def StateEquiv (_C : CombinationalSystem IZ OZ) (s1 s2 : SingletonState) : Prop :=
   s1 = s2
 
@@ -186,7 +206,26 @@ theorem stateEquiv_symm (C : CombinationalSystem IZ OZ) (s1 s2 : SingletonState)
 theorem stateEquiv_trans (C : CombinationalSystem IZ OZ) (s1 s2 s3 : SingletonState)
     (h12 : StateEquiv C s1 s2) (h23 : StateEquiv C s2 s3) :
     StateEquiv C s1 s3 :=
-  h12.trans h23
+    h12.trans h23
+
+/-! ## Behavioral (input-output) equivalence -/
+
+/-- Two combinational systems are behaviorally equivalent if they agree on every input.
+    This is the meaningful observational notion for zero-memory systems; base `StateEquiv`
+    on `SingletonState` is degenerate (all states equal). -/
+def InputObsEquiv (C1 C2 : CombinationalSystem IZ OZ) : Prop :=
+  ∀ i, C1.RZ i = C2.RZ i
+
+theorem inputObsEquiv_refl (C : CombinationalSystem IZ OZ) : InputObsEquiv C C :=
+  fun _ => rfl
+
+theorem inputObsEquiv_symm (C1 C2 : CombinationalSystem IZ OZ)
+    (h : InputObsEquiv C1 C2) : InputObsEquiv C2 C1 :=
+  fun i => (h i).symm
+
+theorem inputObsEquiv_trans (C1 C2 C3 : CombinationalSystem IZ OZ)
+    (h12 : InputObsEquiv C1 C2) (h23 : InputObsEquiv C2 C3) : InputObsEquiv C1 C3 :=
+  fun i => (h12 i).trans (h23 i)
 
 /-! ## Morphisms -/
 
@@ -286,7 +325,8 @@ def parameterInstance {P : Type u} {IZ OZ : P → Type}
 /-! ## fccsy (Function Computation Combinational System) -/
 
 /--
-  The combinational version of a function computation system.
+  [textbook/definition2.93/definition/fcnsy]
+  The combinational version of a function computation system (zero-delay analogue of `fcnsy`).
   Directly evaluates F on the input with zero delay.
 -/
 def fccsy {IZ OZ : Type} (F : IZ → OZ) [Fintype IZ] [Fintype OZ] : CombinationalSystem IZ OZ where
@@ -299,6 +339,19 @@ theorem fccsy_output_instantaneous {IZ OZ : Type} (F : IZ → OZ) [Fintype IZ] [
     (f : ITZ IZ) (t : Time) :
     generateOutputTrajectory (fccsy F) f t = F (f t) := by
   rfl
+
+/-- [textbook/definition2.82/definition/one_parameter]
+    `fccsy` is parameterized by a single function `F : IZ → OZ`. -/
+theorem fccsy_has_one_parameter {IZ OZ : Type} :
+    HasOneParameter (IZ → OZ) := by
+  let ParamType : Fin 1 → Type := fun _ => IZ → OZ
+  refine ⟨ParamType, ⟨{
+    toFun := fun f _i => f
+    invFun := fun g => g ⟨0, by decide⟩
+    left_inv := fun _ => rfl
+    right_inv := fun g => funext fun i => by
+      rw [Subsingleton.elim i ⟨0, by decide⟩]
+  }⟩⟩
 
 /-! ## Parallel (Conjunctive) Composition -/
 
@@ -317,7 +370,8 @@ structure PortCombinationalSystemVector (n : Nat) where
   OutPort_decidable : (i : Fin n) → DecidableEq (OutPort i)
   distinct : ∀ (i j : Fin n), i ≠ j → ¬ HEq (C i) (C j)
 
-/-- Parallel composition of combinational systems. -/
+/-- [textbook/definition3.40/definition/csy]
+    Parallel (conjunctive) composition of combinational systems. -/
 def ccsy {n : Nat} (VCS : PortCombinationalSystemVector n) :
     CombinationalSystem
       ((ip : Σ (i : Fin n), VCS.Port i) → VCS.PortVal ip.1 ip.2)
@@ -334,9 +388,10 @@ def ccsy {n : Nat} (VCS : PortCombinationalSystemVector n) :
     infer_instance
   RZ := fun p op => (VCS.C op.1).RZ (fun port => p ⟨op.1, port⟩) op.2
 
-/-- Output trajectory of parallel composition evaluated at port `B'` of system `i`
+/-- [textbook/theorem3.45/theorem/trajectories_relation]
+    Output trajectory of parallel composition evaluated at port `B'` of system `i`
     is identical to the output trajectory of components under projected input.
-    Proven strictly by definition (`rfl`). -/
+    Proven strictly by definition (`rfl`) — intentional zero-proof-power win for combinational logic. -/
 theorem ccsy_output_trajectory {n : Nat} (VCS : PortCombinationalSystemVector n)
     (f : ITZ ((ip : Σ i, VCS.Port i) → VCS.PortVal ip.1 ip.2)) (t : Time) (i : Fin n) (B' : VCS.OutPort i) :
     generateOutputTrajectory (ccsy VCS) f t ⟨i, B'⟩ =
@@ -387,4 +442,19 @@ def combinationalToDelaySystem {IZ OZ : Type} (C : Combinational.CombinationalSy
 theorem delay_system_output {IZ OZ : Type} [Inhabited IZ] (C : Combinational.CombinationalSystem IZ OZ)
     (x : IZ) (f : ITZ IZ) (t : Time) :
     generateOutputTrajectory (combinationalToDelaySystem C) x f (t + 1) = C.RZ (f t) := by
+  rfl
+
+/-- At `t = 0` the delayed Moore system outputs `C.RZ x` (the initial state as readout),
+    not the combinational response to `f 0`. The 1-step offset begins at `t + 1`. -/
+theorem delay_system_initial_output {IZ OZ : Type} [Inhabited IZ]
+    (C : Combinational.CombinationalSystem IZ OZ) (x : IZ) (f : ITZ IZ) :
+    generateOutputTrajectory (combinationalToDelaySystem C) x f 0 = C.RZ x := by
+  rfl
+
+/-- Full trajectory correspondence: delayed Moore output at `t + 1` equals instantaneous
+    combinational output at `t`. -/
+theorem delay_system_matches_combinational_trajectory {IZ OZ : Type} [Inhabited IZ]
+    (C : Combinational.CombinationalSystem IZ OZ) (x : IZ) (f : ITZ IZ) (t : Time) :
+    generateOutputTrajectory (combinationalToDelaySystem C) x f (t + 1) =
+      Combinational.generateOutputTrajectory C f t := by
   rfl

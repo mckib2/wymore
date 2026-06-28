@@ -12,8 +12,8 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.11/definition/finite_system` | `component` | The system Z is finite if and only if SZ, IZ, and OZ are finite sets. | ✅ Faithful | `IsFinite` ([Mbse/Wymore.lean:104](Mbse/Wymore.lean#L104))<br>`IsFinite` ([Mbse/CombinationalWymore.lean:54](Mbse/CombinationalWymore.lean#L54)) |
-| `2.11/definition/order_vector` | `component` | The system Z is finite with order vector (k, m, n) if and only if (k, m, n) ∈ IJS+^3 and #SZ = k, #IZ = m, #OZ = n. | ✅ Faithful | `HasOrderVector` ([Mbse/Wymore.lean:120](Mbse/Wymore.lean#L120))<br>`HasOrderVector` ([Mbse/CombinationalWymore.lean:61](Mbse/CombinationalWymore.lean#L61)) |
+| `2.11/definition/finite_system` | `component` | The system Z is finite if and only if SZ, IZ, and OZ are finite sets. | ✅ Faithful | `IsFinite` ([Mbse/Wymore.lean:104](Mbse/Wymore.lean#L104))<br>`IsFinite` ([Mbse/CombinationalWymore.lean:69](Mbse/CombinationalWymore.lean#L69)) |
+| `2.11/definition/order_vector` | `component` | The system Z is finite with order vector (k, m, n) if and only if (k, m, n) ∈ IJS+^3 and #SZ = k, #IZ = m, #OZ = n. | ✅ Faithful | `HasOrderVector` ([Mbse/Wymore.lean:120](Mbse/Wymore.lean#L120))<br>`HasOrderVector` ([Mbse/CombinationalWymore.lean:84](Mbse/CombinationalWymore.lean#L84)) |
 
 ### `textbook/definition2.14` — Nontrivial System
 
@@ -22,11 +22,11 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.14/definition/nontrivial_system` | `component` | The system Z is nontrivial if and only if conditions (i), (ii), and (iii) are satisfied. | ✅ Faithful | `IsNontrivial` ([Mbse/Wymore.lean:146](Mbse/Wymore.lean#L146))<br>`IsNontrivial` ([Mbse/CombinationalWymore.lean:72](Mbse/CombinationalWymore.lean#L72)) |
+| `2.14/definition/nontrivial_system` | `component` | The system Z is nontrivial if and only if conditions (i), (ii), and (iii) are satisfied. | ✅ Faithful | `IsNontrivial` ([Mbse/Wymore.lean:146](Mbse/Wymore.lean#L146))<br>`IsNontrivial` ([Mbse/CombinationalWymore.lean:95](Mbse/CombinationalWymore.lean#L95)) _(partial)_ |
 | `2.14/requirement/state_dependent_transition` | `constraint` | (i) there exist x1 ∈ SZ, x2 ∈ SZ, and p ∈ IZ, such that NZ(x1, p) ≠ NZ(x2, p) (the transition is state-dependent). | ✅ Faithful | `IsNontrivial` ([Mbse/Wymore.lean:146](Mbse/Wymore.lean#L146)) |
 | `2.14/requirement/active_transition` | `constraint` | (ii) there exist x ∈ SZ and p ∈ IZ such that NZ(x, p) ≠ x (the state is not constant under all transitions). | ✅ Faithful | `IsNontrivial` ([Mbse/Wymore.lean:146](Mbse/Wymore.lean#L146)) |
 | `2.14/requirement/varying_output` | `constraint` | (iii) #RNG(RZ) > 1 (the readout function is not constant, having a range size greater than 1). | ✅ Faithful | `IsNontrivial` ([Mbse/Wymore.lean:146](Mbse/Wymore.lean#L146)) |
-| `2.14/implication/trivial_system` | `implication` | Z is trivial if Z is not nontrivial. | ✅ Faithful | `IsTrivial` ([Mbse/Wymore.lean:163](Mbse/Wymore.lean#L163))<br>`IsTrivial` ([Mbse/CombinationalWymore.lean:82](Mbse/CombinationalWymore.lean#L82)) |
+| `2.14/implication/trivial_system` | `implication` | Z is trivial if Z is not nontrivial. | ✅ Faithful | `IsTrivial` ([Mbse/Wymore.lean:163](Mbse/Wymore.lean#L163))<br>`IsTrivial` ([Mbse/CombinationalWymore.lean:107](Mbse/CombinationalWymore.lean#L107)) |
 
 ### `textbook/definition2.23` — Input Trajectory
 
@@ -45,7 +45,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.27/definition/state_trajectory_recurrence` | `component` | STZ(f, x) = {(t, y): t ∈ TZ, y ∈ SZ, y = x if t = 0; y = NZ(STZ(f, x)(t-1), f(t-1)) if t ≠ 0}. | ✅ Faithful | `generateStateTrajectory` ([Mbse/Wymore.lean:201](Mbse/Wymore.lean#L201)) |
+| `2.27/definition/state_trajectory_recurrence` | `component` | STZ(f, x) = {(t, y): t ∈ TZ, y ∈ SZ, y = x if t = 0; y = NZ(STZ(f, x)(t-1), f(t-1)) if t ≠ 0}. | ✅ Faithful | `generateStateTrajectory` ([Mbse/Wymore.lean:201](Mbse/Wymore.lean#L201))<br>`generateStateTrajectory` ([Mbse/CombinationalWymore.lean:114](Mbse/CombinationalWymore.lean#L114)) |
 | `2.27/definition/state_at_time_t` | `component` | STZ(f, x)(t) is interpreted as the state of the system Z at time t given input f and initial state x. | ✅ Faithful | `generateStateTrajectory` ([Mbse/Wymore.lean:201](Mbse/Wymore.lean#L201)) |
 
 ### `textbook/definition2.30` — Output Trajectory
@@ -55,7 +55,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.30/definition/output_trajectory_composition` | `component` | OTZ(f, x) = RZ ∘ STZ(f, x) (where composition is defined in Definition A1.268). | ✅ Faithful | `generateOutputTrajectory` ([Mbse/Wymore.lean:213](Mbse/Wymore.lean#L213)) |
+| `2.30/definition/output_trajectory_composition` | `component` | OTZ(f, x) = RZ ∘ STZ(f, x) (where composition is defined in Definition A1.268). | ✅ Faithful | `generateOutputTrajectory` ([Mbse/Wymore.lean:213](Mbse/Wymore.lean#L213))<br>`generateOutputTrajectory` ([Mbse/CombinationalWymore.lean:119](Mbse/CombinationalWymore.lean#L119)) |
 
 ### `textbook/definition2.33` — System Experiments
 
@@ -108,7 +108,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.51/definition/reachable` | `component` | The state y ∈ SZ is reachable from x ∈ SZ iff there exists f ∈ ITZ and t ∈ TZ such that y = STZ(f, x)(t). | ✅ Faithful | `Reachable` ([Mbse/Wymore.lean:285](Mbse/Wymore.lean#L285)) |
+| `2.51/definition/reachable` | `component` | The state y ∈ SZ is reachable from x ∈ SZ iff there exists f ∈ ITZ and t ∈ TZ such that y = STZ(f, x)(t). | ✅ Faithful | `Reachable` ([Mbse/Wymore.lean:285](Mbse/Wymore.lean#L285))<br>`Reachable` ([Mbse/CombinationalWymore.lean:168](Mbse/CombinationalWymore.lean#L168)) |
 | `2.51/terminology/by_means_of` | `component` | y is reachable from x by means of the input trajectory f at time t. | ✅ Faithful | `Reachable` ([Mbse/Wymore.lean:285](Mbse/Wymore.lean#L285)) |
 
 ### `textbook/definition2.55` — Input Ports and Port Trajectories
@@ -183,7 +183,7 @@
 | `2.82/definition/system_parameterization` | `component` | A system parameterization is a function F such that RNG(F) ⊆ DSYSTEMS. | ✅ Faithful | `SystemParameterization` ([Mbse/Wymore.lean:812](Mbse/Wymore.lean#L812)) |
 | `2.82/definition/parameter_instance` | `component` | If F is a system parameterization, r ∈ DMN(F) and Z = F(r), then Z is an instance of F. | ✅ Faithful | `parameterInstance` ([Mbse/Wymore.lean:821](Mbse/Wymore.lean#L821)) |
 | `2.82/definition/multiple_parameters` | `component` | F has n parameters if DMN(F) is a subset of a Cartesian product P1 × ... × Pn. | ✅ Faithful | `HasNParameters` ([Mbse/Wymore.lean:830](Mbse/Wymore.lean#L830)) |
-| `2.82/definition/one_parameter` | `component` | F has one parameter if DMN(F) is not a subset of a Cartesian product. | ✅ Faithful | `HasOneParameter` ([Mbse/Wymore.lean:839](Mbse/Wymore.lean#L839)) |
+| `2.82/definition/one_parameter` | `component` | F has one parameter if DMN(F) is not a subset of a Cartesian product. | ✅ Faithful | `HasOneParameter` ([Mbse/Wymore.lean:839](Mbse/Wymore.lean#L839))<br>`fccsy_has_one_parameter` ([Mbse/CombinationalWymore.lean:343](Mbse/CombinationalWymore.lean#L343)) |
 
 ### `textbook/definition2.93` — Function Computation Systems Parameterization
 
@@ -192,7 +192,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.93/definition/fcnsy` | `component` | FCNSY(F, n) is the system Z with SZ = RNG(F), IZ = DMN(F), OZ = RNG(F)^n, NZ(x, p) = F(p), and RZ(x) = (x, ..., x). | ✅ Faithful | `fcnsy` ([Mbse/Wymore.lean:847](Mbse/Wymore.lean#L847)) |
+| `2.93/definition/fcnsy` | `component` | FCNSY(F, n) is the system Z with SZ = RNG(F), IZ = DMN(F), OZ = RNG(F)^n, NZ(x, p) = F(p), and RZ(x) = (x, ..., x). | ✅ Faithful | `fcnsy` ([Mbse/Wymore.lean:847](Mbse/Wymore.lean#L847))<br>`fccsy` ([Mbse/CombinationalWymore.lean:327](Mbse/CombinationalWymore.lean#L327)) |
 
 ### `textbook/definition3.11` — System Coupling Recipe
 
@@ -273,7 +273,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.40/definition/csy` | `component` | CSY = {(V, Z): V is a connectable vector of systems; if V = Z1, then Z = Z1; if V = (Z1, ..., Zn), then Z = (SZ, IZ, OZ, NZ, RZ). | ✅ Faithful | `csy` ([Mbse/Wymore.lean:1101](Mbse/Wymore.lean#L1101)) |
+| `3.40/definition/csy` | `component` | CSY = {(V, Z): V is a connectable vector of systems; if V = Z1, then Z = Z1; if V = (Z1, ..., Zn), then Z = (SZ, IZ, OZ, NZ, RZ). | ✅ Faithful | `csy` ([Mbse/Wymore.lean:1101](Mbse/Wymore.lean#L1101))<br>`ccsy` ([Mbse/CombinationalWymore.lean:373](Mbse/CombinationalWymore.lean#L373)) |
 | `3.40/definition/sz` | `component` | SZ = ⅹ (SZ1, ..., SZn). | ✅ Faithful | `csy` ([Mbse/Wymore.lean:1101](Mbse/Wymore.lean#L1101)) |
 | `3.40/definition/iz` | `component` | IZ = ⅹ (I1Z1, ..., Ik1Z1, ..., I1Zn, ..., IknZn). | ✅ Faithful | `csy` ([Mbse/Wymore.lean:1101](Mbse/Wymore.lean#L1101)) |
 | `3.40/definition/oz` | `component` | OZ = ⅹ (O1Z1, ..., Om1Z1, ..., O1Zn, ..., OmnZn). | ✅ Faithful | `csy` ([Mbse/Wymore.lean:1101](Mbse/Wymore.lean#L1101)) |
@@ -429,7 +429,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.48/theorem/nonanticipatory` | `implication` | If Z ∈ DSYSTEMS, {(f, x, t), (g, x, t)} ⊆ EXZ and RSN(f, TZ[0, t)) = RSN(g, TZ[0, t)), then STZ(f, x)(t) = STZ(g, x)(t). | ✅ Faithful | `stateTrajectory_nonanticipatory` ([Mbse/Wymore.lean:509](Mbse/Wymore.lean#L509)) |
+| `2.48/theorem/nonanticipatory` | `implication` | If Z ∈ DSYSTEMS, {(f, x, t), (g, x, t)} ⊆ EXZ and RSN(f, TZ[0, t)) = RSN(g, TZ[0, t)), then STZ(f, x)(t) = STZ(g, x)(t). | ✅ Faithful | `stateTrajectory_nonanticipatory` ([Mbse/Wymore.lean:509](Mbse/Wymore.lean#L509))<br>`stateTrajectory_nonanticipatory` ([Mbse/GeneralizedWymore.lean:128](Mbse/GeneralizedWymore.lean#L128)) |
 
 ### `textbook/theorem2.76` — Equality of Readout Functions
 
@@ -507,7 +507,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.45/theorem/trajectories_relation` | `implication` | The state and output trajectories of the conjunctive system Z are equal to the tuples of the component state and output trajectories under projected inputs. | ✅ Faithful | `csy_state_trajectory` ([Mbse/Wymore.lean:1211](Mbse/Wymore.lean#L1211))<br>`csy_output_trajectory` ([Mbse/Wymore.lean:1233](Mbse/Wymore.lean#L1233)) |
+| `3.45/theorem/trajectories_relation` | `implication` | The state and output trajectories of the conjunctive system Z are equal to the tuples of the component state and output trajectories under projected inputs. | ✅ Faithful | `csy_state_trajectory` ([Mbse/Wymore.lean:1211](Mbse/Wymore.lean#L1211))<br>`csy_output_trajectory` ([Mbse/Wymore.lean:1233](Mbse/Wymore.lean#L1233))<br>`ccsy_output_trajectory` ([Mbse/CombinationalWymore.lean:391](Mbse/CombinationalWymore.lean#L391)) |
 | `3.45/proof/state_zero` | `component` | The state trajectory relation is verified at time t = 0. | ✅ Faithful | `csy_state_trajectory` ([Mbse/Wymore.lean:1211](Mbse/Wymore.lean#L1211)) |
 | `3.45/proof/state_induction` | `component` | The state trajectory relation is verified for all t by induction. | ✅ Faithful | `csy_state_trajectory` ([Mbse/Wymore.lean:1211](Mbse/Wymore.lean#L1211)) |
 | `3.45/proof/output_relation` | `component` | The output trajectory relation is verified using the state trajectory relation. | ✅ Faithful | `csy_output_trajectory` ([Mbse/Wymore.lean:1233](Mbse/Wymore.lean#L1233)) |
