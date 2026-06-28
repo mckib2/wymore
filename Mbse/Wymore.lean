@@ -192,6 +192,13 @@ variable {SZ IZ OZ : Type}
 /-- [textbook/definition2.23/definition/complete_input_trajectory] The set of all possible complete Input Trajectories ITZ = FNS(TZ, IZ) -/
 abbrev ITZ (IZ : Type) := Time → IZ
 
+/--
+  [textbook/definition2.23/definition/complete_input_trajectory|partial]
+  Generalized complete input trajectory: at each time the system either receives an input
+  (`some i`) or takes an autonomous step (`none`). Shared by `GeneralizedWymore` and `DPDA`.
+-/
+abbrev ITZW (IZ : Type) := Time → Option IZ
+
 -- The set of all possible State Trajectories
 abbrev STZ (SZ : Type) := Time → SZ
 

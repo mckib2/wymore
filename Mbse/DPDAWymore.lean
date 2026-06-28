@@ -27,21 +27,21 @@ stays within the bound).
 
 ## Coverage summary
 
-**Implemented:** 7-tuple spec, snapshot trajectories, soundness/uniqueness, `IsDeterministic`,
-`Reaches` / `Language` (final-state acceptance), `toBoundedDiscreteSystem` +
-`bounded_output_agrees`.
+**Implemented:** 7-tuple spec, snapshot trajectories, soundness/uniqueness, time invariance /
+nonanticipation, `IsDeterministic`, `Reaches` / `Language` (final-state acceptance),
+`toBoundedDiscreteSystem` + `bounded_output_agrees` + bounded uniqueness / `IsFinite` corollaries.
 
 **Intentionally omitted** (see [formalization_roadmap.md](../formalization_roadmap.md) §3):
-Wymore open/closed/finite classification, reachability, state equivalence, morphisms,
-time invariance / nonanticipation, ports, parameterization, Ch. 3 coupling, worked examples.
+Wymore reachability, state equivalence, morphisms, ports, parameterization, Ch. 3 coupling,
+worked examples, `Reaches` ↔ trajectory bridge.
 
 ## Integration with other modules
 
 - **Base [Wymore](Wymore.lean):** `toBoundedDiscreteSystem` maps a depth-bounded DPDA into
   `DiscreteSystem (Q × BoundedStack Γ max_depth) (Option I) O`. Unbounded stacks cannot live in
   `DiscreteSystem` directly because it requires `Fintype SZ`.
-- **[GeneralizedWymore](GeneralizedWymore.lean):** Both use `Time → Option IS` input streams
-  (`ITZ_opt` here, `ITZW` there). Unification is deferred to the roadmap.
+- **[GeneralizedWymore](GeneralizedWymore.lean):** Both use the shared base type `ITZW IS =
+  Time → Option IS` (`ITZ_opt` is a DPDA-local alias).
 
 ## Semantic caveats
 
@@ -61,6 +61,7 @@ See [formalization_roadmap.md](../formalization_roadmap.md) for backlog and
 namespace DPDA
 
 /--
+  [textbook/definition2.4|partial]
   A Deterministic Pushdown Automaton (DPDA) system within the Wymore framework.
   It is defined as a 7-tuple: ZDPDA = (S, P, STfin, Γ, z0, FDPDA, GDPDA)
 -/
@@ -123,8 +124,8 @@ def updateStack (s : Stack Γ) (new_top : List Γ) : Stack Γ :=
   | [] => new_top
   | _ :: rest => new_top ++ rest
 
-/-- Input trajectory over Option IS (interleaved event/epsilon stream). -/
-abbrev ITZ_opt (IS : Type) := Time → Option IS
+/-- Input trajectory over Option IS (interleaved event/epsilon stream); alias of base `ITZW`. -/
+abbrev ITZ_opt (IS : Type) := ITZW IS
 
 /--
   One synchronous step of the snapshot. If the transition function is undefined (`none`) the
@@ -139,25 +140,62 @@ def stepSnapshot (D : DPDASystem STfin IS OZ Γ) (snap : Snapshot STfin Γ) (inp
     | none => (q, s)
     | some (q', new_top) => (q', updateStack s new_top)
 
-/-- Generates the snapshot trajectory (state trajectory) of the DPDA. -/
-def generateStateTrajectory (D : DPDASystem STfin IS OZ Γ) (q0 : STfin) (f : ITZ_opt IS) :
-    Time → Snapshot STfin Γ
-  | 0 => (q0, [D.z0])
-  | t + 1 => stepSnapshot D (generateStateTrajectory D q0 f t) (f t)
+/-- State trajectory from an arbitrary initial snapshot (not necessarily `(q0, [z0])`). -/
+def generateStateTrajectoryFrom (D : DPDASystem STfin IS OZ Γ) (snap0 : Snapshot STfin Γ)
+    (f : ITZ_opt IS) : Time → Snapshot STfin Γ
+  | 0 => snap0
+  | t + 1 => stepSnapshot D (generateStateTrajectoryFrom D snap0 f t) (f t)
 
-/-- Generates the output trajectory of the DPDA. -/
+/--
+  [textbook/definition2.27/definition/state_trajectory_recurrence|partial]
+  Generates the snapshot trajectory (state trajectory) of the DPDA from control state `q0`.
+-/
+def generateStateTrajectory (D : DPDASystem STfin IS OZ Γ) (q0 : STfin) (f : ITZ_opt IS) :
+    Time → Snapshot STfin Γ :=
+  generateStateTrajectoryFrom D (q0, [D.z0]) f
+
+theorem generateStateTrajectoryFrom_zero (D : DPDASystem STfin IS OZ Γ)
+    (snap0 : Snapshot STfin Γ) (f : ITZ_opt IS) :
+    generateStateTrajectoryFrom D snap0 f 0 = snap0 := rfl
+
+theorem generateStateTrajectoryFrom_succ (D : DPDASystem STfin IS OZ Γ)
+    (snap0 : Snapshot STfin Γ) (f : ITZ_opt IS) (t : Time) :
+    generateStateTrajectoryFrom D snap0 f (t + 1) =
+      stepSnapshot D (generateStateTrajectoryFrom D snap0 f t) (f t) := rfl
+
+theorem generateStateTrajectory_eq_from (D : DPDASystem STfin IS OZ Γ) (q0 : STfin) (f : ITZ_opt IS)
+    (t : Time) :
+    generateStateTrajectory D q0 f t = generateStateTrajectoryFrom D (q0, [D.z0]) f t :=
+  rfl
+
+/--
+  [textbook/definition2.30/definition/output_trajectory_composition|partial]
+  Generates the output trajectory of the DPDA.
+-/
 def generateOutputTrajectory (D : DPDASystem STfin IS OZ Γ) (q0 : STfin) (f : ITZ_opt IS) :
     Time → OZ :=
   fun t =>
     let (q, s) := generateStateTrajectory D q0 f t
     D.G q (peek D.z0 s)
 
-/-- Predicate for a valid state trajectory. -/
+/-- Output readout along a trajectory from an arbitrary initial snapshot. -/
+def generateOutputTrajectoryFrom (D : DPDASystem STfin IS OZ Γ) (snap0 : Snapshot STfin Γ)
+    (f : ITZ_opt IS) (t : Time) : OZ :=
+  let (q, s) := generateStateTrajectoryFrom D snap0 f t
+  D.G q (peek D.z0 s)
+
+theorem generateOutputTrajectory_eq_from (D : DPDASystem STfin IS OZ Γ) (q0 : STfin)
+    (f : ITZ_opt IS) (t : Time) :
+    generateOutputTrajectory D q0 f t =
+      generateOutputTrajectoryFrom D (q0, [D.z0]) f t := by
+  simp only [generateOutputTrajectory, generateOutputTrajectoryFrom, generateStateTrajectory_eq_from]
+
+/-- [textbook/definition2.27/definition/state_trajectory_recurrence|partial] Predicate for a valid state trajectory. -/
 def IsValidStateTrajectory (D : DPDASystem STfin IS OZ Γ) (f : ITZ_opt IS)
     (g : Time → Snapshot STfin Γ) : Prop :=
   ∀ t : Time, g (t + 1) = stepSnapshot D (g t) (f t)
 
-/-- Predicate for a valid output trajectory. -/
+/-- [textbook/definition2.30/definition/output_trajectory_composition|partial] Predicate for a valid output trajectory. -/
 def IsValidOutputTrajectory (D : DPDASystem STfin IS OZ Γ) (g : Time → Snapshot STfin Γ)
     (h : Time → OZ) : Prop :=
   ∀ t : Time,
@@ -167,14 +205,18 @@ def IsValidOutputTrajectory (D : DPDASystem STfin IS OZ Γ) (g : Time → Snapsh
 /-! ## Simp Lemmas -/
 
 @[simp]
-theorem generateStateTrajectory_zero (D : DPDASystem STfin IS OZ Γ) (q0 : STfin) (f : ITZ_opt IS) :
-    generateStateTrajectory D q0 f 0 = (q0, [D.z0]) := rfl
+theorem dpda_generateStateTrajectory_zero (D : DPDASystem STfin IS OZ Γ) (q0 : STfin) (f : ITZ_opt IS) :
+    generateStateTrajectory D q0 f 0 = (q0, [D.z0]) := by
+  unfold generateStateTrajectory
+  exact generateStateTrajectoryFrom_zero D (q0, [D.z0]) f
 
 @[simp]
-theorem generateStateTrajectory_succ (D : DPDASystem STfin IS OZ Γ) (q0 : STfin) (f : ITZ_opt IS)
+theorem dpda_generateStateTrajectory_succ (D : DPDASystem STfin IS OZ Γ) (q0 : STfin) (f : ITZ_opt IS)
     (t : Time) :
     generateStateTrajectory D q0 f (t + 1) =
-      stepSnapshot D (generateStateTrajectory D q0 f t) (f t) := rfl
+      stepSnapshot D (generateStateTrajectory D q0 f t) (f t) := by
+  unfold generateStateTrajectory
+  exact generateStateTrajectoryFrom_succ D (q0, [D.z0]) f t
 
 /-! ## Soundness and Uniqueness Theorems -/
 
@@ -188,6 +230,10 @@ theorem generateOutputTrajectory_valid (D : DPDASystem STfin IS OZ Γ) (q0 : STf
   intro t
   rfl
 
+/--
+  [textbook/theorem2.29/proof/single_valuedness|partial]
+  Given an initial control state and input trajectory, the snapshot trajectory is unique.
+-/
 theorem stateTrajectory_unique (D : DPDASystem STfin IS OZ Γ) (f : ITZ_opt IS)
     (g : Time → Snapshot STfin Γ) (q0 : STfin)
     (h_init : g 0 = (q0, [D.z0]))
@@ -197,13 +243,56 @@ theorem stateTrajectory_unique (D : DPDASystem STfin IS OZ Γ) (f : ITZ_opt IS)
   induction t with
   | zero => exact h_init
   | succ t ih =>
-    rw [h_valid t, generateStateTrajectory_succ, ih]
+    rw [h_valid t, dpda_generateStateTrajectory_succ, ih]
 
+/-- [textbook/theorem2.32/theorem/trajectory_value|partial] Output trajectory is uniquely determined by the snapshot trajectory. -/
 theorem outputTrajectory_unique (D : DPDASystem STfin IS OZ Γ) (g : Time → Snapshot STfin Γ)
     (h : Time → OZ) (h_valid : IsValidOutputTrajectory D g h) :
     ∀ t, h t = D.G (g t).1 (peek D.z0 (g t).2) := by
   intro t
   exact h_valid t
+
+/-! ## Time invariance and nonanticipation (ported from the base engine) -/
+
+/-- [textbook/theorem2.46/theorem/time_invariance] The snapshot trajectory engine is time invariant. -/
+theorem stateTrajectory_time_invariance
+    (D : DPDASystem STfin IS OZ Γ) (snap0 : Snapshot STfin Γ) (f : ITZ_opt IS) (s t : Time) :
+    generateStateTrajectoryFrom D (generateStateTrajectoryFrom D snap0 f s) (translate f s) t =
+    generateStateTrajectoryFrom D snap0 f (s + t) := by
+  induction t with
+  | zero => simp only [generateStateTrajectoryFrom_zero, Nat.add_zero]
+  | succ t ih =>
+    simp only [generateStateTrajectoryFrom_succ]
+    rw [ih]
+    unfold translate
+    congr 1
+    exact congrArg f (Nat.add_comm t s)
+
+/-- [textbook/theorem2.48/theorem/nonanticipatory] The snapshot at time `t` depends only on the
+    input restricted to `[0, t)`. -/
+theorem stateTrajectory_nonanticipatory
+    (D : DPDASystem STfin IS OZ Γ) (q0 : STfin) (f g : ITZ_opt IS) (t : Time)
+    (h_agree : RSN f {i | i < t} = RSN g {i | i < t}) :
+    generateStateTrajectory D q0 f t = generateStateTrajectory D q0 g t := by
+  induction t with
+  | zero => simp only [dpda_generateStateTrajectory_zero]
+  | succ t ih =>
+    simp only [dpda_generateStateTrajectory_succ]
+    rw [rsn_eq_iff] at h_agree
+    have h_lt : ∀ i < t, f i = g i := fun i hi =>
+      h_agree i (Nat.lt_trans hi (Nat.lt_succ_self t))
+    have h_eq : f t = g t := h_agree t (Nat.lt_succ_self t)
+    have h_rsn_t : RSN f {i | i < t} = RSN g {i | i < t} := by
+      rw [rsn_eq_iff]; exact h_lt
+    rw [ih h_rsn_t, h_eq]
+
+/-- Output trajectory time invariance, derived from the snapshot time-invariance theorem. -/
+theorem outputTrajectory_time_invariance
+    (D : DPDASystem STfin IS OZ Γ) (snap0 : Snapshot STfin Γ) (f : ITZ_opt IS) (s t : Time) :
+    generateOutputTrajectoryFrom D (generateStateTrajectoryFrom D snap0 f s) (translate f s) t =
+    generateOutputTrajectoryFrom D snap0 f (s + t) := by
+  simp only [generateOutputTrajectoryFrom]
+  rw [stateTrajectory_time_invariance D snap0 f s t]
 
 /-! ## Determinism
 
@@ -359,8 +448,12 @@ def boundedInit {Q I O G : Type}
     exact List.length_take_le _ _⟩)
 
 /--
+  [textbook/definition2.4|partial]
   If stack depth is bounded, the infinite snapshot space collapses into a finite set,
   allowing a DPDA to be converted into a standard Wymorian `DiscreteSystem`.
+
+  Corollaries: `bounded_system_isFinite`, `bounded_stateTrajectory_unique`,
+  `bounded_outputTrajectory_unique`, `bounded_output_agrees`.
 
   When the transition function is undefined the bounded system halts in place. When a push would
   exceed `max_depth` the new stack is truncated (`List.take`); this is a *lossy* approximation,
@@ -440,7 +533,7 @@ theorem bounded_state_agrees
   | zero =>
     intro _hbound
     refine ⟨rfl, ?_⟩
-    simp only [_root_.generateStateTrajectory_zero, generateStateTrajectory_zero, boundedInit]
+    simp only [_root_.generateStateTrajectory_zero, dpda_generateStateTrajectory_zero, boundedInit]
     exact List.take_of_length_le (by simpa using hmd)
   | succ t ih =>
     intro hbound
@@ -449,13 +542,13 @@ theorem bounded_state_agrees
     obtain ⟨ih1, ih2⟩ := ih hboundt
     have hfit : (stepSnapshot D (generateStateTrajectory D q0 f t) (f t)).2.length ≤ max_depth := by
       have h := hbound (t + 1) (Nat.le_refl _)
-      rwa [generateStateTrajectory_succ] at h
+      rwa [dpda_generateStateTrajectory_succ] at h
     have hstep := bounded_step_agrees D max_depth
       (generateStateTrajectory D q0 f t)
       (_root_.generateStateTrajectory (toBoundedDiscreteSystem D max_depth)
         (boundedInit D max_depth q0) f t)
       ih1 ih2 (f t) hfit
-    simpa only [_root_.generateStateTrajectory_succ, generateStateTrajectory_succ] using hstep
+    simpa only [_root_.generateStateTrajectory_succ, dpda_generateStateTrajectory_succ] using hstep
 
 /--
   Behavioral equivalence: while the DPDA's stack stays within `max_depth` up to time `t`, the
@@ -480,6 +573,43 @@ theorem bounded_output_agrees
       = D.G (generateStateTrajectory D q0 f t).1
           (peek D.z0 (generateStateTrajectory D q0 f t).2) := rfl
   rw [eL, eR, h1, h2]
+
+/-- [textbook/definition2.11/definition/finite_system] The bounded reduction yields a finite Wymore system. -/
+theorem bounded_system_isFinite
+    (D : DPDASystem Q I O G) (max_depth : Nat) :
+    IsFinite (toBoundedDiscreteSystem D max_depth) :=
+  discreteSystem_isFinite (toBoundedDiscreteSystem D max_depth)
+
+/--
+  State trajectory uniqueness for the bounded `DiscreteSystem`, derived from base Wymore
+  `stateTrajectory_unique`.
+-/
+theorem bounded_stateTrajectory_unique
+    (D : DPDASystem Q I O G) (max_depth : Nat) (q0 : Q) (f : ITZ_opt I)
+    (g : Time → Q × BoundedStack G max_depth)
+    (h_init : g 0 = boundedInit D max_depth q0)
+    (h_valid : _root_.IsValidStateTrajectory (toBoundedDiscreteSystem D max_depth) f g) :
+    ∀ t, g t = _root_.generateStateTrajectory (toBoundedDiscreteSystem D max_depth)
+        (boundedInit D max_depth q0) f t :=
+  _root_.stateTrajectory_unique (toBoundedDiscreteSystem D max_depth) f g (boundedInit D max_depth q0)
+    h_init h_valid
+
+/--
+  Output trajectory uniqueness for the bounded embedding at each time step, derived from base
+  Wymore `outputTrajectory_unique`.
+-/
+theorem bounded_outputTrajectory_unique
+    (D : DPDASystem Q I O G) (max_depth : Nat) (q0 : Q) (f : ITZ_opt I)
+    (h : Time → O)
+    (h_valid : _root_.IsValidOutputTrajectory (toBoundedDiscreteSystem D max_depth)
+      (_root_.generateStateTrajectory (toBoundedDiscreteSystem D max_depth)
+        (boundedInit D max_depth q0) f) h) (t : Time) :
+    h t = _root_.generateOutputTrajectory (toBoundedDiscreteSystem D max_depth)
+        (boundedInit D max_depth q0) f t := by
+  rw [_root_.outputTrajectory_unique (toBoundedDiscreteSystem D max_depth)
+    (_root_.generateStateTrajectory (toBoundedDiscreteSystem D max_depth)
+        (boundedInit D max_depth q0) f) h h_valid t]
+  rfl
 
 end Bounded
 

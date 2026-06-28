@@ -51,10 +51,10 @@ structure WymoreSystem (SZ : Type) (IZ : Type) (OZ : Type) where
 
 variable {SZ IZ OZ : Type}
 
-/-- A (complete) generalized input trajectory: at each time the system either receives an input
-    (`some i`) or takes an autonomous step (`none`). This type is inhabited even when `IZ` is
-    empty (by `fun _ => none`), which is what makes autonomous systems expressible. -/
-abbrev ITZW (IZ : Type) := Time → Option IZ
+/-! ## Trajectory engine
+
+`ITZW` is defined in the base module as `Time → Option IZ` (autonomous steps via `none`).
+-/
 
 /-! ## Trajectory engine -/
 
