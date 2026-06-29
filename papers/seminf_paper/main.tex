@@ -1,0 +1,442 @@
+\PassOptionsToPackage{table}{xcolor}
+\documentclass[11pt,letterpaper]{article}
+
+% ---------- Core layout ----------
+\usepackage[
+  letterpaper,
+  left=0.6in,right=0.6in,top=0.6in,bottom=0.6in,
+  headheight=85pt,headsep=-45pt
+]{geometry}
+\raggedbottom
+\usepackage{graphicx}
+\graphicspath{{./}{figures/}}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usetikzlibrary{arrows,positioning,shapes,fit,backgrounds}
+
+% ---------- Captions & float spacing ----------
+\usepackage{caption}
+\captionsetup{
+  font={sf,bf,footnotesize},
+  labelfont={sf,bf,footnotesize},
+  justification=centering,
+  labelsep=period,
+  hypcap=false
+}
+\setlength{\textfloatsep}{8pt}
+\setlength{\floatsep}{6pt}
+\setlength{\intextsep}{8pt}
+\setlength{\abovecaptionskip}{12pt}
+\setlength{\belowcaptionskip}{1pt}
+
+% ---------- Tables / lists ----------
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\setlist{nosep}
+\usepackage[table]{xcolor}
+\definecolor{tableheader}{HTML}{D9D9D9}
+\newcolumntype{P}[1]{>{\sffamily\centering\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\sffamily\centering\arraybackslash}X}
+\newcolumntype{A}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{M}[1]{>{\raggedright\arraybackslash}m{#1}}
+
+% ---------- Fonts ----------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{PTSerif}
+\usepackage[scaled]{helvet}
+\renewcommand{\sfdefault}{phv}
+\newcommand{\headingfont}{\sffamily}
+
+% ---------- Headings ----------
+\usepackage{titlesec}
+\setcounter{secnumdepth}{0}
+
+% Heading 1
+\titleformat{\section}
+  {\headingfont\bfseries\raggedright\fontsize{18pt}{18pt}\selectfont}{}{0.75em}{}
+% Heading 2
+\titleformat{\subsection}
+  {\headingfont\bfseries\raggedright\fontsize{15pt}{16pt}\selectfont}{}{0.75em}{}
+% Heading 3
+\titleformat{\subsubsection}
+  {\headingfont\bfseries\raggedright\fontsize{12pt}{14pt}\selectfont}{}{0.75em}{}
+
+% Heading spacing
+\titlespacing*{\section}{0pt}{7pt}{6pt}
+\titlespacing*{\subsection}{0pt}{7pt}{6pt}
+\titlespacing*{\subsubsection}{0pt}{7pt}{6pt}
+
+\newcommand{\miniheading}[1]{%
+  \par\noindent{\headingfont\bfseries\fontsize{12pt}{14pt}\selectfont #1}\par\vspace{4pt}%
+}
+
+% ---------- Paragraphing ----------
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 1pt minus 1pt}
+
+% ---------- Page numbers ----------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhfoffset[R]{18pt}
+\setlength{\footskip}{18pt}
+\fancyfoot[R]{\sffamily\bfseries\footnotesize \thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% INCOSE logo
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \fancyhfoffset[R]{18pt}
+  \fancyhead[R]{%
+    \smash{\raisebox{0pt}[0pt][0pt]{
+      \begingroup\setlength{\fboxsep}{20pt}
+        \colorbox{white}{\includegraphics[height=0.6in]{template-images/incose-logo.jpg}}%
+      \endgroup
+    }}
+  }
+  \fancyfoot[R]{\sffamily\bfseries\footnotesize \thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+
+% ---------- Title Formatting ----------
+\makeatletter
+\@ifundefined{theauthor}{}{\let\theauthor\relax}
+\makeatother
+\usepackage{titling}
+\pretitle{\headingfont\bfseries\fontsize{24pt}{26pt}\selectfont\raggedright}
+\posttitle{\par\vspace{-.3in}}
+\preauthor{}\postauthor{}
+\author{\mbox{}}
+\date{}
+\setlength{\droptitle}{-3.2\baselineskip}
+
+% ---------- Author cards ----------
+\definecolor{authorcardgray}{HTML}{EFEFEF}
+\newcommand{\authorcard}[5]{%
+  {\headingfont\bfseries\fontsize{12pt}{14pt}\selectfont #1}\par
+  {\headingfont\bfseries\fontsize{12pt}{14pt}\selectfont #2}\par
+  {\headingfont\bfseries\fontsize{12pt}{14pt}\selectfont #3}\par
+  {\headingfont\bfseries\fontsize{12pt}{14pt}\selectfont #4}\par
+  {\headingfont\bfseries\fontsize{12pt}{14pt}\selectfont #5}\par
+}
+
+\makeatletter
+\newcommand{\authorpic}[1]{%
+    \includegraphics[width=0.6in,height=0.6in,keepaspectratio,clip]{#1}%
+}
+\makeatother
+
+\newcommand{\authorbioentry}[3]{%
+  \noindent\begin{tabular}{@{}m{0.5in} M{\dimexpr\columnwidth-0.5in\relax}@{}}
+    \authorpic{#1} & \textbf{#2}\par #3
+  \end{tabular}\par\medskip
+}
+
+\usepackage{csquotes}
+\usepackage[style=numeric,backend=biber]{biblatex}
+\addbibresource{refs.bib}
+
+\usepackage{changepage}
+\newenvironment{highlight}[1][0.25in]{%
+  \begin{adjustwidth}{#1}{#1}\itshape}{\end{adjustwidth}}
+
+\usepackage{multicol}
+\setlength{\columnsep}{18pt}
+\usepackage[hidelinks]{hyperref}
+
+\title{Semantic Interface Requirements: A Multidisciplinary Literature Review}
+
+\begin{document}
+\maketitle
+\thispagestyle{firstpage}
+
+\noindent
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} A{0.48\textwidth} A{0.48\textwidth}}
+  \authorcard{Nicholas McKibben}{University of Arizona}{Dept. of Systems \& Industrial Eng.}{Tucson, AZ, USA}{nmckibben@arizona.edu} &
+  \authorcard{Paul Wach}{University of Arizona}{Dept. of Systems \& Industrial Eng.}{Tucson, AZ, USA}{pwach@arizona.edu} \\
+  \multicolumn{2}{@{}c@{}}{\rule{0pt}{0.9\baselineskip}} \\[-0.2\baselineskip]
+  \authorcard{Larry Head}{University of Arizona}{Dept. of Systems \& Industrial Eng.}{Tucson, AZ, USA}{klhead@arizona.edu} &
+  \authorcard{Alejandro Salado}{University of Arizona}{Dept. of Systems \& Industrial Eng.}{Tucson, AZ, USA}{asalado@arizona.edu}
+\end{tabular*}
+
+\begin{multicols*}{2}
+
+The specification of interfaces, defining the boundaries across which disparate entities exchange information, represents a fundamental challenge across cognitive science, computer science, and systems engineering. Historically, systems design has prioritized syntactic interfaces—the structural shape, format, and physical protocols required to transmit data from a producer to a consumer. However, as architectures have evolved toward distributed, autonomous, and highly interdependent models, the literature demonstrates a critical paradigm shift toward semantic interface requirements. These requirements govern not merely the shape of the data, but its intrinsic meaning, operational context, and behavioral constraints.
+
+The research surrounding semantic interface requirements is deeply multidisciplinary. It originates in the theoretical modeling of biolinguistics and functional programming, scales through Component-Based Software Engineering (CBSE) and formal mathematical modeling, and currently dominates literature in Model-Based Systems Engineering (MBSE), distributed data architecture (data contracts), and Cyber-Physical Systems (CPS) interoperability.
+
+\section{Theoretical Foundations: From Biolinguistics to Programming Language Semantics}
+The concept of a ``semantic interface'' originates in the cognitive sciences and biolinguistics, specifically within generative grammar frameworks. In minimalist syntactic theory, the structure-building operation known as ``Merge'' concatenates lexical items into syntactic objects. The literature posits that these syntactic derivations must ultimately be interpreted by the sensory-motor and conceptual-intentional systems. Consequently, any uninterpretable features (such as unvalued noun features) must be deleted or valued before reaching the semantic interface; otherwise, the derivation fails. This biological necessity—that syntactic structures must satisfy strict semantic interpretation requirements to be functionally viable—serves as the conceptual blueprint for artificial computational interfaces. For example, linguistic studies on focus particles (e.g., the word ``only'') demonstrate that structural position (syntax) is strictly constrained by a semantic requirement dictating that focused constituents must remain within the scope of specific operators to be interpretable by the semantic interface.
+
+\subsection{Semantic Requirements in Early and Modern Programming Paradigms}
+In computer science, this principle was first formalized in functional and object-oriented programming languages designed to overcome the brittleness of purely syntactic APIs. Languages such as OBJ2 and FOOPS introduced the systematic use of parameterized (generic) modules to enhance code reusability and maintainability. Unlike contemporary languages that relied solely on syntactic interface declarations, the interface declarations of OBJ2 generics contained explicit semantic requirements. Actual modules were required to satisfy these semantic constraints—evaluated through underlying equational logic and rewrite rules—before they could be meaningfully substituted into a larger system.
+
+This foundational approach has evolved into modern static reflection and generic programming paradigms, most notably materialized in C++ concepts. In modern C++, generic functions restrict admissible arguments based on semantic requirements rather than mere structural type shapes. These semantic constraints are verified at compile-time, shifting error detection away from dynamic runtime execution to the static compilation phase.
+
+\begingroup
+\renewcommand{\arraystretch}{1.5}
+\begin{tabularx}{\columnwidth}{@{}P{0.3\columnwidth}YY@{}}
+    \rowcolor{tableheader}
+    \headingfont\bfseries Concept Dimension & \headingfont\bfseries Description of Semantic Interface Enforcement in C++ \\
+    \addlinespace[4pt]
+    Use Patterns & Concepts express operations that arguments must support, stating not only that an operation (e.g., equality comparison) is syntactically valid, but that its semantic return type is correct (e.g., boolean). \\
+    \addlinespace[4pt]
+    Static vs. Dynamic & Enforces static polymorphism (compile-time selection) rather than dynamic OOP dispatch, allowing generic programming to operate on compile-time verifiable semantic contracts without explicit inheritance structures. \\
+    \addlinespace[4pt]
+    Value Arguments & Enables compile-time enforcement of semantic constraints on values (e.g., mandating a minimum buffer size and structural condition for a generic storage allocation). \\
+    \addlinespace[4pt]
+    Type-Matching & Instantiation enforces the presence and behavioral semantics of required operations, preventing subtle misinstantiation risks such as unsafe narrowing conversions that cause information loss. \\
+\end{tabularx}
+\captionof{table}{Dimensions of semantic interface enforcement via C++ concepts.}
+\label{tab:table1}
+\endgroup
+By encoding both syntactic shapes and semantic interface requirements as precise, compile-time predicates, developers create highly robust application programming interfaces (APIs) that eliminate the overhead and ambiguity associated with runtime validation.
+
+\section{Component-Based Software Engineering (CBSE)}
+The transition from monolithic applications to modular, distributed systems necessitated the formalization of Component-Based Software Engineering (CBSE). The CBSE literature defines a component as an independent, deployable, and executable entity that interacts with its environment exclusively through well-defined, publicly accessible interfaces.
+
+The specification of these interfaces is dual-faceted, requiring both a ``Provides'' interface and a ``Requires'' interface. The ``Provides'' interface defines the services, operations, and semantic guarantees the component offers to external consumers. Conversely, the ``Requires'' interface explicitly outlines the external services and semantic conditions that must be present in the deployment environment for the component to function correctly. This separation allows for high reusability, as the ``Requires'' interface dictates what semantic services are needed without coupling the component to how those services are implemented.
+
+However, because components are often developed independently for reuse, their integration through sequential, hierarchical, or additive composition frequently encounters architectural mismatches. The literature identifies three principal categories of interface incompatibility:
+
+\begingroup
+\renewcommand{\arraystretch}{1.5}
+\begin{tabularx}{\columnwidth}{@{}P{0.3\columnwidth}YY@{}}
+    \rowcolor{tableheader}
+    \headingfont\bfseries Incompatibility Type & \headingfont\bfseries Description of the Interface Mismatch \\
+    \addlinespace[4pt]
+    Parameter Incompatibility & Operations across components share identical names but utilize differing underlying data types or parameter structures. \\
+    \addlinespace[4pt]
+    Operation Incompatibility & The semantic intent of the operations is identical, but the nomenclature exposed in the interfaces is structurally different. \\
+    \addlinespace[4pt]
+    Operation Incompleteness & The "Provides" interface of one component fulfills only a subset of the semantic "Requires" interface of the dependent component. \\
+\end{tabularx}
+\captionof{table}{Primary interface incompatibilities in component composition.}
+\label{tab:table2}
+\endgroup
+Resolving these mismatches requires moving beyond syntactic compatibility (matching operation names and parameter types) to semantic compatibility (ensuring the meaning, measurement units, and state transitions of the parameters are correct). Engineers typically resolve these incompatibilities by developing semantic adaptors—glue code that reconciles the interface semantics and state abstractions between two independently developed components without altering their internal implementations.
+
+\subsection{The Ada Semantic Interface Specification (ASIS)}
+A highly mature and extensively researched application of semantic interface requirements exists in the Ada Semantic Interface Specification (ASIS). Developed and standardized as ISO/IEC 15291:1999, ASIS provides a layered, open, and vendor-independent callable interface architecture designed to expose the rich semantic and syntactic information residing within an Ada compilation environment.
+
+Prior to the formalization of ASIS, software engineering tools requiring semantic data—such as automated code monitors, correctness verifiers, and dependency tree analyzers—were forced to interface with proprietary, highly complex internal representations like DIANA. DIANA trees were notoriously difficult to navigate, and their structures varied significantly between compiler vendors. Furthermore, compiler upgrades frequently broke existing interface integrations, rendering semantic analysis tools highly brittle and costly to maintain.
+
+ASIS solved this interoperability crisis by establishing a secondary standard that abstracted compiler-specific internal representations into a uniform logical syntax tree. The ASIS architecture is built upon three core logical abstractions:
+
+\miniheading{Context}
+Serves as a logical handle for the entire Ada environment, establishing the parameters, terms, and conditions under which semantic inquiries can be executed.
+\miniheading{Compilation\_Unit}
+Provides a macroscopic, "black-box" abstraction of individual compilation units, exposing metadata such as timestamps and structural relationships to external libraries.
+\miniheading{Element}
+Allows the compilation unit to be decomposed into a "white-box" semantic tree, enabling granular analysis of declarations, expressions, definitions, and statements.
+The literature emphasizes that the development of ASIS was governed by nine rigorous design criteria to ensure its viability as an international semantic interface standard:
+
+\begingroup
+\renewcommand{\arraystretch}{1.5}
+\begin{tabularx}{\columnwidth}{@{}P{0.3\columnwidth}YY@{}}
+    \rowcolor{tableheader}
+    \headingfont\bfseries ASIS Design Criterion & \headingfont\bfseries Purpose within the Semantic Interface Architecture \\
+    \addlinespace[4pt]
+    Wide Acceptance & Designed to support a vast ecosystem of tools, reducing training time for developers and ensuring applicability across different vendor platforms. \\
+    \addlinespace[4pt]
+    Transportability & Ensures that the semantic analysis capability can be migrated seamlessly between different computing hardware and operating environments. \\
+    \addlinespace[4pt]
+    Uniformity \& Cohesiveness & Maintains logical consistency across all properties, concepts, and operations, providing a coherent user experience. \\
+    \addlinespace[4pt]
+    Implementability & Structured such that any Ada compiler vendor can implement the ASIS layer with a reasonable expenditure of engineering effort. \\
+    \addlinespace[4pt]
+    State of Technology & Continually updated to ensure that semantic querying remains efficient and compatible with modern software engineering practices. \\
+    \addlinespace[4pt]
+    Extensibility & Permits future extensions to utilize the core ASIS design model and abstractions without breaking legacy implementations. \\
+    \addlinespace[4pt]
+    Ada Terminology \& Style & Adapts strictly to the nomenclature and stylistic guidelines defined in the Ada Reference Manual to ensure domain consistency. \\
+    \addlinespace[4pt]
+    Performance & Optimized to ensure execution efficiency from both the client application's perspective and the compiler's implementation view. \\
+    \addlinespace[4pt]
+    Minimal Set of Interfaces & Provides a concise set of primitive operations, allowing clients to build complex, layered secondary queries on top of the base implementation. \\
+\end{tabularx}
+\captionof{table}{The nine core design criteria governing the Ada Semantic Interface Specification.}
+\label{tab:table3}
+\endgroup
+By adhering to these requirements, ASIS enabled a proliferation of portable code analysis tools (e.g., gnatelim, gnatstub, gnatcheck) that significantly enhanced the discipline, architectural integrity, and safety verification of critical software systems.
+
+\section{Formal Methods and Mathematical Specification of Semantic Interfaces}
+While language-specific implementations like ASIS provide practical tools for software analysis, the broader discipline of systems engineering relies on mathematical formalisms to prove the correctness of interactive systems prior to implementation. A seminal framework in this area is the FOCUS theory, developed extensively by Manfred Broy, which provides a strict, model-based engineering method for distributed interactive systems based on High-Order Logic (HOL).
+
+\subsection{The FOCUS Theory of System Interaction}
+In the FOCUS framework, the structure of a system is defined by a static hierarchy of components, each possessing a syntactic interface composed of typed input channels (I) and output channels (O). However, the syntactic interface only defines the topology of communication; the true behavior of the component is dictated by its semantic interface.
+
+The semantic interface is mathematically formalized as a set-valued mapping from the space of all possible input communication histories to the space of all possible output communication histories. Using the concept of streams to represent continuous or discrete histories of message passing, the semantic interface of a component is denoted by the function $F:I \to \wp(O)$. This mathematical formulation enables engineers to specify highly complex, nondeterministic behaviors, where a single input history may validly result in multiple potential output histories depending on the internal state of the system.
+
+The literature highlights several critical axioms required to validate a semantic interface within this framework:
+
+\miniheading{Strong Causality}
+A foundational timing property ensuring that a component's output at a specific time interval t+1 depends solely on the input received up to time t. This guarantees that the system possesses a proper forward-moving time flow and cannot react to future inputs—a physical impossibility that would invalidate real-world cyber-physical implementations.
+\miniheading{Interaction Refinement}
+System development is an iterative process requiring refinement. Interaction refinement allows engineers to alter the syntactic interface of a component (e.g., modifying the number of channels or the message sorts) while preserving the underlying semantic flow of causality and interaction granularity. If a component is replaced by a refined version, the mathematical projection of the new component's behavior onto the original syntactic interface must remain faithful, proving that the original semantic requirements are still satisfied.
+\miniheading{Compatibility and Deadlock Freedom}
+In a composed system, two or more interacting components are deemed semantically compatible only if any sequence of services requested by one component can be safely provided by the other, ensuring that the interleaving of requests does not result in systemic deadlocks.
+\subsection{Addressing Uncertainty with Fuzzy Logic}
+A primary limitation of traditional formal methods like FOCUS is their reliance on two-valued, boolean logic. In a two-valued system, a semantic specification is either strictly valid or invalid; behavior is either realizable or non-realizable. However, natural language requirements generated by human stakeholders inherently contain vagueness, ambiguity, and imprecision.
+
+To bridge the gap between vague natural language requirements and rigid formal specifications, researchers have extended the FOCUS theory using fuzzy set theory. By mapping reference sets to the unit interval [0,1] via membership functions, fuzzy logic extensions allow for qualitative formal specifications. This permits systems engineers to evaluate the degree of realizability or the degree of safety property fulfillment, accommodating uncertainty during the early phases of requirement elicitation before the semantic interface is refined into a strict two-valued implementation.
+
+\subsection{Message Sequence Charts (MSC)}
+Parallel to functional formalisms, the telecommunications and real-time systems domains utilize Message Sequence Charts (MSC), standardized under ITU-T Z.120, to visually and formally specify communication behaviors. MSCs provide a trace language that defines the semantic interface requirements governing the interchange of messages between independent instances.
+
+The semantic requirements within MSCs are highly formalized, utilizing binding rules, state-update rules, and well-formedness predicates (e.g., Wf1–Wf4) to map data strings to external languages. MSCs enforce strict time supervision constraints and define protocols for message loss and local conditions, ensuring that the expected behavioral traces of a telecommunication switching system are explicitly defined and verifiable prior to the generation of executable code.
+
+\section{Ontology-Driven Requirements and Model-Based Systems Engineering (MBSE)}
+A dominant theme in contemporary systems engineering literature is the ongoing evolution from Document-Centric Systems Engineering (DCSE) to Model-Based Systems Engineering (MBSE), and the subsequent advancement toward Semantic-Based Systems Engineering (SBSE). This evolution is motivated by the inherent flaws of natural language requirement documents, which consistently suffer from underspecification, internal contradictions, and syntax that permits multiple, conflicting interpretations.
+
+To achieve a single Authoritative Source of Truth (ASoT), the literature proposes integrating formal ontologies into the requirements engineering lifecycle. An ontology, in this context, is a formal, explicit specification of a shared domain conceptualization, modeled as a directed labeled graph that defines concepts, attributes, and logical relationships.
+
+\subsection{The System and Attributes Ontology (SAO) Architecture}
+To extract semantic meaning from natural language, researchers have developed ``requirement boilerplates''—standardized textual templates containing predefined placeholders. Rather than allowing free-text entry, systems engineers populate these placeholders strictly with terms extracted from a validated domain ontology.
+
+The architecture governing this process is typically modular and hierarchical. A foundational framework detailed in the literature revolves around the System and Attributes Ontology (SAO), which serves as an upper ontology dictating the core semantic relationships permissible within the system design. The SAO enforces a multi-perspective semantic modeling approach:
+
+\miniheading{Data Perspective}
+Defines input/output data semantics, containment hierarchies, and structural interface connections to external systems.
+\miniheading{Functional Perspective}
+Models how the system manipulates data via functions, establishing explicit producer-consumer relationships across defined connections.
+\miniheading{Behavioral Perspective}
+Captures state-based dynamics, documenting system states, transitional triggers, and the conditions required for execution.
+To manage the complexity of industrial-scale systems, the SAO is integrated into a broader ontological ecosystem:
+
+\begingroup
+\renewcommand{\arraystretch}{1.5}
+\begin{tabularx}{\columnwidth}{@{}P{0.3\columnwidth}YY@{}}
+    \rowcolor{tableheader}
+    \headingfont\bfseries Ontology Layer & \headingfont\bfseries Function within the Semantic Requirements Framework \\
+    \addlinespace[4pt]
+    System and Attributes Ontology (SAO) & Acts as the upper ontology, providing the core glossary and abstract concepts (e.g., system, function, interface, state) ensuring broad semantic interoperability. \\
+    \addlinespace[4pt]
+    Domain-Specific Ontologies (DSO) & Imports SAO classes and specializes them for the specific technical domain of the system under design. \\
+    \addlinespace[4pt]
+    Requirement Boilerplate Ontology (RBO) & Encodes the structural templates (Prefix, Main, Suffix), imposing syntax constraints to promote well-formed specifications and reduce human error. \\
+    \addlinespace[4pt]
+    Lexicographic Ontology (LO) & Contains synonym and antonym definitions mapped to boilerplates, accommodating natural language paraphrasing while preserving strict semantic consistency. \\
+    \addlinespace[4pt]
+    Requirements Definition Ontology (RDO) & The top-level repository that aggregates all lower ontologies, defining mappings and identifying erroneous artifacts (e.g., IncompleteRequirement, InconsistentRequirement) through automated logical inference. \\
+\end{tabularx}
+\captionof{table}{The modular ontology architecture for semantic requirements engineering.}
+\label{tab:table4}
+\endgroup
+By constraining natural language within this rigid ontological stack, engineers can execute automated semantic analyses to detect specification flaws early in the design phase, drastically reducing the cost of late-stage verification failures.
+
+\subsection{Semantic Interoperability in the Space Domain (ESA and OSMoSE)}
+The aerospace sector presents a highly complex application environment for semantic interface requirements. The European Space Agency (ESA) utilizes MBSE to manage the collaborative, iterative development of spacecraft across highly decentralized contractor networks. A primary challenge for ESA is that the governing European Cooperation for Space Standardization (ECSS) guidelines dictate what must be accomplished, but they lack the formal semantics required to dictate how systems interoperate in a machine-readable format.
+
+To achieve true digital continuity, ESA launched the Overall Semantic Modeling for Space System Engineering (OSMoSE) initiative. OSMoSE establishes a top-level Space System Ontology (SSO) that extracts and formalizes the implicit semantics buried within ECSS text. Because different engineering contractors utilize varying MBSE tools (e.g., Capella, Cameo Systems Modeler, Enterprise Architect), OSMoSE relies on local tool adapters that map proprietary modeling languages directly to the shared SSO.
+
+The ESA MBSE Methodology aligns these semantic models into a unified Systems Modeling Language (SysML) architecture, stratifying the spacecraft design into specific layers: Mission Specification, System of Interest (SoI) Context, Functional Design, Physical Design, Transversal Interfaces, and Requirements mapping.
+
+Crucially, this ontological alignment redefines the very concept of an interface. In legacy ECSS documents, interfaces were loosely defined as ``internal'' or ``external''. The ontology-driven methodology introduces strict semantic constructs such as ``Interface Nature'' and ``Interface End.'' These constructs guarantee that whenever two elements of a spacecraft are joined, the interface mathematically defines the precise physical loads, electrical power flows, and data requirements, completely independent of the actual joining technology.
+
+\section{Semantic Data Contracts in Modern Data Engineering}
+While systems engineers focus on cyber-physical integration, data engineers face parallel challenges in managing the flow of information across highly distributed enterprise data pipelines (e.g., data mesh architectures). In these environments, upstream software engineers frequently alter database schemas or service outputs, resulting in catastrophic ``breaking changes'' that silently corrupt downstream machine learning models and analytical dashboards. To establish reliable boundaries between data producers and data consumers, the industry has widely adopted the ``Data Contract''.
+
+\subsection{Moving from Syntactic Schemas to Semantic Meaning}
+The literature draws a sharp distinction between syntactic schemas and semantic contracts. Syntactic contracts—often implemented via JSON Schema, Apache Avro, or Protocol Buffers—define only the physical shape of the data. They ensure that required fields exist and that data types (e.g., string, integer) match expectations. However, syntactic validation cannot prevent semantic drift. If an upstream service begins measuring distance in kilometers instead of miles, the data remains syntactically valid (a floating-point number), but the semantic meaning has radically changed, causing severe failures in downstream logic.
+
+A true data contract supplements structural definitions with robust semantic constraints and governance metadata.
+
+\begingroup
+\renewcommand{\arraystretch}{1.5}
+\begin{tabularx}{\columnwidth}{@{}P{0.3\columnwidth}YY@{}}
+    \rowcolor{tableheader}
+    \headingfont\bfseries Data Contract Component & \headingfont\bfseries Function within the Semantic Boundary \\
+    \addlinespace[4pt]
+    Schema Definition & The canonical structural format (e.g., YAML, Avro), explicit column lists, data types, and primary key assignments. \\
+    \addlinespace[4pt]
+    Semantic Constraints & Explicit validation rules dictating valid value sets (e.g., status must be PENDING or SHIPPED), logical bounding ranges (e.g., percentages strictly between 0 and 100), and business logic nullability limits. \\
+    \addlinespace[4pt]
+    Metadata and Lineage & Contextual definitions of what fields mean in reality, source system tracking, units of measurement, and algorithmic definitions of business metrics. \\
+    \addlinespace[4pt]
+    Service Level Agreements (SLAs) & Operational guarantees regarding data freshness, delivery latency, and availability windows. \\
+    \addlinespace[4pt]
+    Governance and Ownership & Codified accountability assigning specific maintenance responsibilities to producer teams, along with security and privacy restrictions (e.g., anonymization of PII). \\
+\end{tabularx}
+\captionof{table}{Core elements of an enforceable semantic data contract.}
+\label{tab:table5}
+\endgroup
+\subsection{Executable Enforcement and Shift-Left Validation}
+To be effective, data contracts cannot exist merely as passive documentation; they must be executable artifacts integrated directly into the software development lifecycle. The literature emphasizes the necessity of ``shift-left'' enforcement, meaning the contract is validated at the producer level.
+
+When a data producer attempts to deploy a code change via a Continuous Integration/Continuous Deployment (CI/CD) pipeline, automated tools evaluate the proposed data output against the semantic contract. If a semantic constraint is violated (e.g., a required field is dropped, or an invalid enum value is introduced), the build fails instantly, preventing the anomaly from ever reaching the production data warehouse. This automated enforcement breaks down organizational silos by transforming implicit, tribal assumptions into explicit, code-enforced guarantees.
+
+\section{Cyber-Physical Systems (CPS) and Internet of Things (IoT) Interoperability}
+The proliferation of the Internet of Things (IoT) and Cyber-Physical Systems (CPS) has introduced unprecedented levels of heterogeneity into systems engineering. Modern smart cities, agricultural sensor networks, and industrial automation facilities rely on diverse edge devices, fog computing nodes, and cloud infrastructures produced by competing vendors using disparate communication protocols. Without standardized semantic interfaces, the data generated by an IoT ecosystem remains siloed, rendering combinatorial innovation impossible.
+
+The literature universally agrees that achieving horizontal integration requires moving beyond technical and syntactic interoperability (which merely guarantee physical connectivity and message formatting) to achieve semantic interoperability—the ability for receiving systems to comprehend the meaning, units, and context of sensor payloads.
+
+\subsection{Standardization Frameworks and Ontologies}
+To overcome vendor fragmentation, several standardization frameworks and ontologies have been introduced:
+
+\miniheading{BIG IoT API}
+A framework that utilizes Semantic Web technologies to enable cross-platform and cross-domain access. By offering a standardized API coupled with semantic descriptions of platform information sources, developers can seamlessly integrate heterogeneous data (e.g., combining environmental air-quality data from multiple city platforms) into a single overarching application.
+\miniheading{SAREF (Smart Applications REFerence ontology)}
+Developed by ETSI, SAREF provides a highly specialized semantic representation for smart appliances and devices. It allows smart building management systems to understand the capabilities, functions, and services of diverse sensors, ensuring clear semantic relationships between physical BPS (Building Performance Simulation) models and live IoT observations.
+\miniheading{NGSI-LD (Next Generation Service Interfaces-Linked Data)}
+Extensively implemented in smart city data hubs, NGSI-LD defines minimal interoperable mechanisms (MIMs). It establishes standard APIs and common data models that satisfy both syntactic and semantic requirements, acting as a pivotal point of interoperability for exchanging data across municipal stakeholders.
+\miniheading{Functional Mockup Interface (FMI)}
+In the realm of industrial cyber-physical simulation, FMI standardizes the exchange of dynamic models. By utilizing impedance as the core interface semantics, FMI treats physical structures as first-class entities, allowing state-based tools to co-simulate complex mechanical, electrical, and thermal interactions without relying on proprietary solvers.
+For autonomous robotics and embodied workflows, semantic interfaces are often stratified to decouple physical hardware from logical control. The Semantic Layer enforces transport-agnostic schemas that make spatial frames, unit systems, and timestamps explicit, eliminating semantic drift between a robot's perception and control stacks. The Interaction Layer enforces a stack-independent invocation contract that standardizes timeout handling and failure envelopes, while the Adapter Layer operationalizes simulation-to-reality portability by binding these semantic abstractions directly to backend hardware APIs (e.g., ROS 2, OPC UA).
+
+\subsection{Semantic Contract-Guided Edge Potential Scheduling (STEPS)}
+As IoT networks transition into ``Networked AI'' environments operating over the end-edge-cloud continuum, the management of latency-sensitive tasks requires highly dynamic resource scheduling. Traditional scheduling relies on fixed numerical parameters (e.g., explicit delay tolerances or energy budgets), which users struggle to articulate accurately.
+
+To bridge the gap between human intent and machine execution, the literature proposes the Semantic Contract-Guided Edge Potential Scheduling (STEPS) framework. In STEPS, a Large Language Model (LLM)-assisted parser interprets natural language requests from users and extracts semantic service requirements. Because LLM outputs inherently contain ambiguity, the parser calculates a quantitative ``confidence score'' representing the semantic uncertainty of the extraction.
+
+These semantics are combined with task attributes to construct an executable semantic contract. This contract guides an edge-scheduling engine formulated as an exact potential game, determining execution-node placement, computing-resource provisioning, and bandwidth allocation via a distributed Nash equilibrium. By utilizing semantic contracts as the interface between user intent and edge resource allocation, STEPS maintains robust adaptation and stability even under non-stationary environmental drift.
+
+\section{Domain-Specific Applications and the Cost of Semantic Mismatches}
+The theoretical imperative for semantic interface requirements is sharply illustrated by the catastrophic consequences of their absence in specific industry domains.
+
+In healthcare informatics, interoperability between Electronic Health Records (EHRs) is largely governed by Health Level Seven (HL7) standards. HL7 Version 2 achieved widespread syntactic interoperability, ensuring that medical messages could be successfully transmitted and parsed over TCP/IP. However, HL7 v2 lacked an explicit semantic information model, relying instead on highly customizable fields and optional data segments. Consequently, two syntactically compliant hospital systems could interpret the exact same message entirely differently based on local clinical workflows.
+
+This semantic void required healthcare IT departments to develop highly brittle, point-to-point interface engines to manually map and translate data semantics between systems. The resulting fragmentation in patient records forces clinicians to manually cross-reference data, leading to severe cognitive overload, increased data entry errors, and critical delays in real-time medical decision-making. To resolve this, modern standards such as HL7 v3 (utilizing the Reference Information Model) and FHIR (Fast Healthcare Interoperability Resources) attempt to embed strict semantic interface requirements directly into the data exchange protocols.
+
+Similarly, in defense and maritime operations, the analysis of Open Source Intelligence (OSINT) and Multi-INT data streams requires robust semantic interoperability. Military decision-makers rely on distributed analytic applications to process vast arrays of structured and unstructured data to form a contextual understanding of adversarial threats. However, traditional systems rely on relatively static ontologies. When the operational context changes rapidly, static ontologies fail to adapt, resulting in significant information loss at system boundaries and leading to incorrect targeting or analysis. Current research seeks to deploy spatiotemporal ontologies and knowledge graphs capable of reasoning over multimodal data streams to preserve latent semantic contexts in highly deceptive, noisy environments.
+
+\section{Known Gaps and Limitations in Specification and Use}
+Despite the widespread advancement of ontologies, data contracts, and formal mathematical models, the literature identifies several critical gaps and unresolved limitations regarding the specification and practical use of semantic interface requirements.
+
+\subsubsection{1. The Rigidity of Top-Down Ontologies vs. Agile Industrial Practice}
+A persistent challenge in ontology-driven interoperability is the reliance on rigid, top-down models. While Ontology Design Patterns (ODPs) attempt to establish common fragments across systems, they are typically handcrafted by human experts and struggle to scale. As the size of enterprise knowledge graphs increases, top-down ontologies frequently suffer from overlapping concepts and conflicting terminology. Furthermore, formal logic-based service specification languages are widely perceived as ``heavy-weight'' by industry practitioners. Developers often reject the massive overhead required to define semantic interfaces formally for every potential use case, preferring informal, agile standards, which inadvertently perpetuates ad-hoc, manual integration efforts.
+
+\subsubsection{2. Disconnects in Logical Verification (OWA vs. CWA)}
+When executing semantic verification on ontology-aligned data, systems engineers are forced to navigate conflicting logical assumptions. Standard Description Logic (DL) reasoning operates under the Open-World Assumption (OWA), which dictates that the absence of a fact does not imply its falsity. Consequently, DL reasoning is incapable of validating existence constraints or minimum cardinality limits (e.g., ensuring a component possesses at least one specific interface connection). To bypass this limitation, engineers must construct highly complex, multi-pronged verification frameworks that overlay Closed-World Assumption (CWA) tools—such as the Shapes Constraint Language (SHACL)—on top of the OWA ontology, significantly complicating the data modeling and validation pipeline.
+
+\subsubsection{3. Semantic Uncertainty and LLM Hallucinations}
+The emerging practice of utilizing Large Language Models (LLMs) to automatically extract semantic interface requirements from natural language standards introduces severe reliability risks. Literature indicates that LLMs fundamentally lack domain-specific contextual understanding, leading to outputs plagued by hallucinations and semantic inconsistencies. When utilizing LLMs to generate system architecture models (e.g., in SysML v2) or resource scheduling contracts, the translation from qualitative intent to quantitative execution parameters creates ``semantic uncertainty''. Without rigorous human-in-the-loop verification and complex feedback loops to monitor alignment drift, LLM-generated semantic contracts are not sufficiently reliable for mission-critical systems engineering.
+
+\subsubsection{4. Organizational Friction in Contract Enforcement}
+Within data engineering, the theoretical concept of the data contract is robust, but its operational execution frequently encounters deep organizational friction. For a semantic data contract to be effective, it must be enforced via CI/CD pipelines at the point of data production. However, data producers (e.g., backend software engineers) operate with high autonomy and are organizationally decoupled from data consumers (e.g., data scientists). Forcing autonomous production teams to adopt rigid semantic validation checks, provide continuous metadata, and accept broken builds due to downstream analytical dependencies requires an immense cultural shift. Without this organizational buy-in, contracts degrade into ignored documentation.
+
+\subsubsection{5. The Lack of Standardized Fault Diagnosability}
+Finally, while semantic requirement specifications (such as the SAO boilerplate architecture) excel at inconsistency detection during early-stage validation, they remain disconnected from downstream fault handling operations. The literature indicates that translating a semantically validated system interface model into actionable diagnosability artifacts—such as Failure Mode and Effects Analysis (FMEA), automated fault tree generation, or dynamic failure recovery models—remains a highly manual, bespoke, and error-prone engineering task.
+
+
+\nocite{*}
+\section{References}
+\printbibliography[heading=none]
+
+% ---------- Biography ----------
+\section*{Biography}
+\authorbioentry{template-images/author1_pic.jpg}{Nicholas McKibben}{TODO}
+\authorbioentry{template-images/author2_pic.jpg}{Paul Wach}{TODO}
+\authorbioentry{template-images/author2_pic.jpg}{Larry Head}{TODO}
+\authorbioentry{template-images/author3_pic.jpg}{Alejandro Salado}{TODO}
+
+\end{multicols*}
+
+\end{document}

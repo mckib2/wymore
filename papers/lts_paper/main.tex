@@ -13,6 +13,7 @@
 
 % =================================================================
 
+\PassOptionsToPackage{table}{xcolor}
 \documentclass[11pt,letterpaper]{article} % Remove this line if using A4 size.
 %\documentclass[11pt,a4]{article} % A4 is also accepted and is typically used for non-US submissions.
 
@@ -162,10 +163,10 @@
 }
 \makeatother
 
-% ---------- References: APA via biblatex/biber ----------
+% ---------- References: Numeric via biblatex/biber ----------
 \let\theauthor\relax
 \usepackage{csquotes}
-\usepackage[style=apa,backend=biber]{biblatex}
+\usepackage[style=numeric,backend=biber]{biblatex}
 \addbibresource{refs.bib}
 
 % ---------- Highlight callouts ----------
