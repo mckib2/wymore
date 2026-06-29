@@ -690,7 +690,7 @@ noncomputable def Z2State.equivSZ {SZ OZ : Type} (RZ : SZ → Option OZ) (h : �
   toFun s2 := s2.state
   invFun s := Z2State.mkFrom RZ h s
   left_inv := fun ⟨o, s, ho⟩ => by
-    simp [Z2State.mkFrom, Classical.choose_spec, ho]
+    simp [Z2State.mkFrom, ho]
   right_inv _ := rfl
 
 def AlwaysOutputs {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) : Prop :=

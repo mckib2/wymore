@@ -1,0 +1,426 @@
+% =================================================================
+% INCOSE Conference LaTeX Template V1.2 (Release Date: November 4th, 2025)
+% Copyright (c) 2025 INCOSE
+% 
+% This template is provided for use in preparing manuscripts for
+% INCOSE conferences. You may use, modify, and 
+% distribute this template for academic and professional purposes.
+% 
+% This template is provided "as is" without warranty of any kind.
+% The author(s) disclaim all warranties, express or implied,
+% including but not limited to warranties of merchantability and
+% fitness for a particular purpose.
+
+% =================================================================
+
+\documentclass[11pt,letterpaper]{article} % Remove this line if using A4 size.
+%\documentclass[11pt,a4]{article} % A4 is also accepted and is typically used for non-US submissions.
+
+% ---------- Core layout ----------
+\usepackage[
+  letterpaper,
+  left=0.6in,right=0.6in,top=0.6in,bottom=0.6in,
+  headheight=85pt,headsep=-45pt
+]{geometry}
+\raggedbottom
+\usepackage{graphicx}
+\graphicspath{{./}{figures/}}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usetikzlibrary{arrows,positioning,shapes,fit,backgrounds}
+
+% ---------- Captions & float spacing ----------
+\usepackage{caption}
+\captionsetup{
+  font={sf,bf,footnotesize},
+  labelfont={sf,bf,footnotesize},
+  justification=centering,
+  labelsep=period,
+  hypcap=false
+}
+\setlength{\textfloatsep}{8pt}
+\setlength{\floatsep}{6pt}
+\setlength{\intextsep}{8pt}
+\setlength{\abovecaptionskip}{12pt}
+\setlength{\belowcaptionskip}{1pt}
+
+% ---------- Tables / lists ----------
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\setlist{nosep}
+\usepackage[table]{xcolor}
+\definecolor{tableheader}{HTML}{D9D9D9}
+\newcolumntype{P}[1]{>{\sffamily\centering\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\sffamily\centering\arraybackslash}X}
+\newcolumntype{A}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{M}[1]{>{\raggedright\arraybackslash}m{#1}}
+
+% ---------- Fonts ----------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{PTSerif}
+\usepackage[scaled]{helvet}
+\renewcommand{\sfdefault}{phv}
+\newcommand{\headingfont}{\sffamily}
+
+% ---------- Headings ----------
+\usepackage{titlesec}
+\setcounter{secnumdepth}{0}
+
+% Heading 1
+\titleformat{\section}
+  {\headingfont\bfseries\raggedright\fontsize{18pt}{18pt}\selectfont}{}{0.75em}{}
+% Heading 2
+\titleformat{\subsection}
+  {\headingfont\bfseries\raggedright\fontsize{15pt}{16pt}\selectfont}{}{0.75em}{}
+% Heading 3
+\titleformat{\subsubsection}
+  {\headingfont\bfseries\raggedright\fontsize{12pt}{14pt}\selectfont}{}{0.75em}{}
+
+% Heading spacing
+\titlespacing*{\section}{0pt}{7pt}{6pt}
+\titlespacing*{\subsection}{0pt}{7pt}{6pt}
+\titlespacing*{\subsubsection}{0pt}{7pt}{6pt}
+
+\newcommand{\miniheading}[1]{%
+  \par\noindent{\headingfont\bfseries\fontsize{12pt}{14pt}\selectfont #1}\par\vspace{4pt}%
+}
+
+% ---------- Paragraphing ----------
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 1pt minus 1pt}
+
+% ---------- Page numbers ----------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhfoffset[R]{18pt}
+\setlength{\footskip}{18pt}
+\fancyfoot[R]{\sffamily\bfseries\footnotesize \thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% INCOSE logo
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \fancyhfoffset[R]{18pt}
+  \fancyhead[R]{%
+    \smash{\raisebox{0pt}[0pt][0pt]{
+      \begingroup\setlength{\fboxsep}{20pt}
+        \colorbox{white}{\includegraphics[height=0.6in]{template-images/incose-logo.jpg}}%
+      \endgroup
+    }}
+  }
+  \fancyfoot[R]{\sffamily\bfseries\footnotesize \thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+% ---------- Title Formatting ----------
+\makeatletter
+\@ifundefined{theauthor}{}{\let\theauthor\relax}
+\makeatother
+\usepackage{titling}
+\pretitle{\headingfont\bfseries\fontsize{24pt}{26pt}\selectfont\raggedright}
+\posttitle{\par\vspace{-.3in}}
+\preauthor{}\postauthor{}
+\author{\mbox{}}
+\date{}
+\setlength{\droptitle}{-3.2\baselineskip}
+
+% ---------- Author cards ----------
+\newcommand{\authorcard}[5]{%
+  {\headingfont\bfseries\fontsize{12pt}{14pt}\selectfont #1}\par
+  {\headingfont\bfseries\fontsize{12pt}{14pt}\selectfont #2}\par
+  {\headingfont\bfseries\fontsize{12pt}{14pt}\selectfont #3}\par
+  {\headingfont\bfseries\fontsize{12pt}{14pt}\selectfont #4}\par
+  {\headingfont\bfseries\fontsize{12pt}{14pt}\selectfont #5}\par
+}
+
+% ---------- Biography photo placeholder and entry ----------
+
+\makeatletter
+\newcommand{\authorpic}[1]{%
+    \includegraphics[width=0.6in,height=0.6in,keepaspectratio,clip]{#1}%
+}
+\makeatother
+
+\newcommand{\authorbioentry}[3]{%
+  \noindent\begin{tabular}{@{}m{0.5in} M{\dimexpr\columnwidth-0.5in\relax}@{}}
+    \authorpic{#1} & \textbf{#2}\par #3
+  \end{tabular}\par\medskip
+}
+
+% ---------- Safe figure include ----------
+\makeatletter
+\newcommand{\colfig}[2][]{%
+  \IfFileExists{#2}{\includegraphics[width=\linewidth,#1]{#2}}{%
+    \fbox{\parbox[b][1.5in][c]{\linewidth}{\centering \textit{Missing figure: }#2}}}%
+}
+\makeatother
+
+% ---------- References: APA via biblatex/biber ----------
+\let\theauthor\relax
+\usepackage{csquotes}
+\usepackage[style=apa,backend=biber]{biblatex}
+\addbibresource{refs.bib}
+
+% ---------- Highlight callouts ----------
+\usepackage{changepage}
+\newenvironment{highlight}[1][0.25in]{%
+  \begin{adjustwidth}{#1}{#1}\itshape}{\end{adjustwidth}}
+
+% ---------- Two-column setup ----------
+\usepackage{multicol}
+\setlength{\columnsep}{18pt}
+
+% ---------- Hyperlinks ----------
+\usepackage[hidelinks]{hyperref}
+
+% =========================
+% ===== Title & Authors ===
+% =========================
+\title{Beyond Static MBSE: A Traceable Pipeline from LTL Requirements to Executable Physical Architectures}
+
+\begin{document}
+\maketitle
+\thispagestyle{firstpage}
+
+% ---- Authors ----
+\noindent
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} A{0.48\textwidth} A{0.48\textwidth}}
+  \authorcard{Nicholas McKibben}{University of Arizona}{Dept. of Systems \& Industrial Eng.}{Tucson, AZ, USA}{nmckibben@arizona.edu} &
+  \authorcard{Paul Wach}{University of Arizona}{Dept. of Systems \& Industrial Eng.}{Tucson, AZ, USA}{pwach@arizona.edu} \\
+  \multicolumn{2}{@{}c@{}}{\rule{0pt}{0.9\baselineskip}} \\[-0.2\baselineskip]
+  \authorcard{Larry Head}{University of Arizona}{Dept. of Systems \& Industrial Eng.}{Tucson, AZ, USA}{klhead@arizona.edu} &
+  \authorcard{Alejandro Salado}{University of Arizona}{Dept. of Systems \& Industrial Eng.}{Tucson, AZ, USA}{asalado@arizona.edu}
+\end{tabular*}
+\vspace{.25in}
+
+% ---- Two columns begin immediately after authors ----
+\begin{multicols*}{2}
+\raggedcolumns
+
+% ---- Copyright ----
+{\headingfont\bfseries\fontsize{8pt}{12pt}\selectfont
+Copyright~\textcopyright~ \the\year{} by the author(s). Permission granted to INCOSE to publish and use.}
+\\
+
+% =========================
+% ===== Abstract/Keywords =
+% =========================
+\phantomsection
+\miniheading{Abstract}
+This working draft serves as a collaborative workspace to establish the outline, draft content, and key discussion prompts for Paper 1. We propose a formal systems engineering pipeline that bridges requirements to physical realization by introducing a three-tiered Buildability Cotyledon refinement: Conceptual, Logical, and Physical. The Conceptual layer models abstract concurrent behavior as a Labeled Transition System (LTS), which is verified against Linear Temporal Logic (LTL) specifications. The transition to the Logical layer—modeled as Wymore's deterministic 5-tuple discrete system—is validated using weak bisimulation under the Synchrony Hypothesis. Finally, the Platform layer refines the logic into resource-constrained Colored Petri Nets (CPNs), establishing end-to-end mathematical traceability.
+
+\phantomsection
+\subsubsection{Keywords}
+Model-Based Systems Engineering (MBSE), Labeled Transition Systems (LTS), Tricotyledon Theory of System Design, Linear Temporal Logic (LTL), Weak Bisimulation, Cyber-Physical Systems (CPS).
+
+% =========================
+% ===== Main Content ======
+% =========================
+\section{Introduction}
+This section introduces the foundational concepts and states the core research challenge for Paper 1.
+
+\miniheading{Section Goals and Content Structure:}
+\begin{itemize}
+    \item \textbf{Explain static MBSE limitations:} Discuss why current MBSE tools (such as SysML diagrams) lack rigorous computable semantics and mathematical traceability.
+    \item \textbf{Introduce the Three Refinement Layers:} Define the Conceptual (LTS), Logical (Wymorean FSM), and Physical (CPN) tiers. Explain how they bridge abstract requirements to concrete hardware/software.
+    \item \textbf{Lean 4 Implementation Link:} Connect this workflow to our Lean 4 formalization repository, which validates Wymore's discrete trajectory calculations.
+\end{itemize}
+
+\miniheading{Discussion Prompts for the Team:}
+\begin{itemize}
+    \item How can we best present the role of the LTS in capturing early-stage non-determinism before interfaces are fixed?
+    \item How does this refinement chain align with standard processes in the INCOSE Handbook \parencite{INCOSE2023}?
+\end{itemize}
+
+\section{Methodology}
+This section details the formal definitions of each layer and the mathematical bridges connecting them.
+
+\subsection{Verification Pipeline Comparison}
+Figure~\ref{fig:comparison} contrasts classical constructive verification with the proposed pipeline.
+
+\end{multicols*}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[auto, >=stealth, thick,
+    block/.style={draw=blue!60, fill=blue!5, rectangle, rounded corners, minimum width=2.8cm, minimum height=1.1cm, align=center, thick},
+    model/.style={draw=orange!60, fill=orange!5, rectangle, rounded corners, minimum width=2.8cm, minimum height=1.1cm, align=center, thick},
+    arrow/.style={->, >=stealth, thick, draw=black!70},
+    biarrow/.style={<->, >=stealth, thick, draw=black!70},
+    dashedarrow/.style={<->, >=stealth, dashed, thick, draw=blue!80}
+  ]
+    
+    % Draw part A: Classical
+    \begin{scope}
+      \node (req1) [block] {Stakeholder\\Requirements};
+      \node (zspec) [model, right=2.4cm of req1] {Specification\\System $Z_{\text{spec}}$};
+      \node (zimpl) [model, below=1.0cm of zspec] {Implementation\\System $Z_{\text{impl}}$};
+      
+      \path[arrow] (req1) -- node[above, font=\footnotesize] {formalize} (zspec);
+      \path[arrow] (zimpl) -- node[right=3pt, font=\footnotesize] {Morphism $h$} (zspec);
+      
+      \node[above=0.3cm of zspec, font=\headingfont\bfseries] {A. Classical Constructive T3SD};
+    \end{scope}
+    
+    % Draw part B: Proposed
+    \begin{scope}[xshift=9.8cm]
+      \node (ltl) [block] {LTL Formula\\$\Phi$};
+      \node (lts) [model, right=2.4cm of ltl] {Conceptual\\LTS $\mathcal{L}$};
+      \node (wym) [model, below=1.0cm of lts] {Logical\\5-Tuple $Z$};
+      
+      \path[dashedarrow] (ltl) -- node[above=2pt, font=\footnotesize, align=center] {$\models$ Model Checking} (lts);
+      \path[biarrow] (lts) -- node[right=3pt, font=\footnotesize, align=left] {$\approx$ Bisimulation} (wym);
+      
+      \node[above=0.3cm of lts, font=\headingfont\bfseries] {B. Proposed Assertional};
+    \end{scope}
+  \end{tikzpicture}
+  \caption{Classical Constructive Morphisms vs. Proposed Assertional Verification Pipeline.}
+  \label{fig:comparison}
+\end{figure}
+
+\begin{multicols*}{2}
+
+\miniheading{Key Differences (Table~\ref{tab:comparison}):}
+\begin{itemize}
+    \item \textbf{Causality:} LTS actions are symmetric, while Wymore uses asymmetric I/O trajectories.
+    \item \textbf{Determinism:} LTS handles non-determinism, while Wymore requires deterministic state functions.
+\end{itemize}
+
+\begingroup
+\renewcommand{\arraystretch}{1.5}
+\begin{tabularx}{\columnwidth}{@{}P{0.3\columnwidth}YY@{}}
+    \rowcolor{tableheader}
+    \headingfont\bfseries Feature & \headingfont\bfseries Wymore 5-Tuple & \headingfont\bfseries LTS \\
+    \addlinespace[4pt]
+    Interface & Asymmetric I/O & Symmetric Actions \\
+    \addlinespace[4pt]
+    Determinism & Deterministic ($\delta$) & Non-deterministic \\
+    \addlinespace[4pt]
+    Observability & State Readout ($\rho$) & Transition Events \\
+\end{tabularx}
+\captionof{table}{Structural Comparison Summary}
+\label{tab:comparison}
+\endgroup
+\vspace{6pt}
+
+\subsection{Relationship Between Layers and Cotyledons}
+Figure~\ref{fig:cotyledons_mapping} outlines how the conceptual, logical, and platform layers relate to the Functionality and Buildability Cotyledons.
+
+\end{multicols*}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[auto, >=stealth, thick,
+    cotyledon/.style={draw=blue!60, fill=blue!5, rectangle, rounded corners, inner sep=12pt, thick, align=center, minimum width=3.4cm},
+    layer/.style={draw=orange!60, fill=orange!5, rectangle, rounded corners, minimum width=4.8cm, minimum height=1.3cm, align=center, thick}
+  ]
+    
+    % Left side: Functionality Cotyledon
+    \node (fun) [cotyledon, minimum height=5.5cm] {
+      \textbf{Functionality Cotyledon}\\
+      \textit{(Declarative Intent)}\\
+      \vspace{0.8cm}\\
+      LTL / FO-LTL\\
+      Formulas $\Phi$\\
+      \small{$G(\text{Req} \rightarrow F \text{Ack})$}
+    };
+    
+    % Right side Refinement Layers (Buildability Cotyledon)
+    \node (lts) [layer, right=3.5cm of fun, yshift=1.8cm] {
+      \textbf{Conceptual Layer (LTS $\mathcal{L}$)}\\
+      \footnotesize{Symmetric actions, non-deterministic behavior}
+    };
+    
+    \node (wym) [layer, below=1.0cm of lts] {
+      \textbf{Logical Layer (Wymore 5-Tuple $Z$)}\\
+      \footnotesize{Partitioned I/O, deterministic trajectories}
+    };
+    
+    \node (plat) [layer, below=1.0cm of wym] {
+      \textbf{Platform/Physical Layer ($P$)}\\
+      \footnotesize{Data types, protocols, CPU/bus constraints (CPN)}
+    };
+    
+    % Boundary box for Buildability Cotyledon
+    \begin{scope}[on background layer]
+      \node (build_box) [draw=gray!40, fill=gray!3, dashed, rectangle, rounded corners, fit=(lts) (plat), inner sep=15pt] {};
+    \end{scope}
+    
+    \node (build_label) [above=0.2cm of build_box.north, font=\headingfont\bfseries] {Buildability Cotyledon (Refinement Space)};
+    
+    % Connections
+    \path[<->, dashed, draw=blue!80, line width=1.2pt] (fun.east |- lts.west) -- node[above=2pt, pos=0.33, align=center, font=\footnotesize\bfseries] {$\models$ Model Checking} (lts.west);
+    
+    \path[<->, draw=orange!80, line width=1.1pt] (lts) -- node[right=3pt, align=left, font=\footnotesize] {$\approx$ Weak Bisimulation\\(Synchrony Hypothesis)} (wym);
+    
+    \path[->, draw=orange!80, line width=1.1pt] (wym) -- node[right=3pt, align=left, font=\footnotesize] {Technology Mapping\\(Resource Allocation)} (plat);
+    
+  \end{tikzpicture}
+  \caption{Relationships Between the Proposed Refinement Layers and Cotyledons.}
+  \label{fig:cotyledons_mapping}
+\end{figure}
+
+\begin{multicols*}{2}
+
+\miniheading{Discussion Prompts:}
+\begin{itemize}
+    \item How should we model continuous variables?
+    \item What is the best strategy to formalize the bisimulation bridge theorem in Lean 4?
+\end{itemize}
+
+\section{Results: Criteria for a Candidate Case Study}
+Rather than committing to a specific target system, this section outlines the required properties of a candidate case study to validate our proposed three-tiered refinement pipeline (LTS $\rightarrow$ Wymore $\rightarrow$ CPN). A strong case study must exhibit the following attributes:
+
+\miniheading{1. Concurrent Action-to-I/O Refinement:}
+The system must start with symmetric concurrent interactions (e.g. handshake protocols) at the Conceptual LTS level, which are refined into partitioned Inputs and Outputs at the Logical Wymorean level. This validates the bisimulation bridge theorem and shows how asymmetric interfaces can be derived formally.
+
+\miniheading{2. Tick-Based Synchrony Mapping:}
+The case study must transition from event-driven conceptual transitions to time-driven, clock-ticked logical trajectories. This allows demonstrating how to align time ticks with event intervals (under the Synchrony Hypothesis) and verifying that the bisimulation holds under this alignment.
+
+\miniheading{3. Resource Constraint Mapping (CPN Integration):}
+The logical 5-tuple must be mapped to physical constraints at the Platform level (e.g., bus transmission delays, CPU execution times, or battery/power constraints). Representing these physical attributes as Colored Petri Net (CPN) tokens demonstrates how functional requirements are preserved under hardware limitations.
+
+\miniheading{4. Decoupled Verification Boundaries:}
+The case study should feature requirements that can be checked independently at the abstract level ($G(\text{Req} \rightarrow F \text{Ack})$) so that changing physical allocation (e.g., changing bus baud rates or processor core speeds) only requires re-verifying the local platform mapping, rather than re-proving the whole system.
+
+
+\section{Discussion}
+This section will critically analyze the theoretical and practical implications.
+
+\miniheading{Key points to expand upon:}
+\begin{itemize}
+    \item \textbf{Decoupling of Intent and Structure:} Changing state variable layouts or implementation protocols does not break verification, as only the bisimulation mapping needs to be re-evaluated.
+    \item \textbf{The Synchrony Hypothesis:} Wymore's 5-tuple operates on time-driven trajectories (ticking clocks), whereas the LTS is event-driven. We need a rigorous discussion on standardizing time ticks to bridge these paradigms \parencite{LynchTuttle1987}.
+\end{itemize}
+
+\section{Conclusions \& Recommendations}
+This section summarizes the overall contribution.
+
+\miniheading{Proposed Contribution Statement:}
+The paper establishes a formal verification workflow that modernizes T3SD. By replacing rigid constructive morphisms with assertional LTL model checking on LTS, we bridge systems engineering requirements with automated verification.
+
+\section{Acknowledgements}
+This work is supported by our Lean 4 MBSE formalization project team.
+
+\newpage
+\nocite{*}
+\section{References}
+\printbibliography[heading=none]
+
+% ---------- Biography ----------
+\section*{Biography}
+\authorbioentry{template-images/author1_pic.jpg}{Nicholas McKibben}{TODO}
+\authorbioentry{template-images/author2_pic.jpg}{Paul Wach}{TODO}
+\authorbioentry{template-images/author2_pic.jpg}{Larry Head}{TODO}
+\authorbioentry{template-images/author3_pic.jpg}{Alejandro Salado}{TODO}
+
+\end{multicols*}
+
+\end{document}

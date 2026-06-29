@@ -1,0 +1,386 @@
+% =================================================================
+% INCOSE Conference LaTeX Template V1.2 (Release Date: November 4th, 2025)
+% Copyright (c) 2025 INCOSE
+% 
+% This template is provided for use in preparing manuscripts for
+% INCOSE conferences. You may use, modify, and 
+% distribute this template for academic and professional purposes.
+% 
+% This template is provided "as is" without warranty of any kind.
+% The author(s) disclaim all warranties, express or implied,
+% including but not limited to warranties of merchantability and
+% fitness for a particular purpose.
+
+% =================================================================
+
+\documentclass[11pt,letterpaper]{article} % Remove this line if using A4 size.
+%\documentclass[11pt,a4]{article} % A4 is also accepted and is typically used for non-US submissions.
+
+% ---------- Core layout ----------
+\usepackage[
+  letterpaper,
+  left=0.6in,right=0.6in,top=0.6in,bottom=0.6in,
+  headheight=85pt,headsep=-45pt
+]{geometry}
+\raggedbottom
+\usepackage{graphicx}
+\graphicspath{{./}{figures/}}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usetikzlibrary{arrows,positioning,shapes,fit,backgrounds}
+
+% ---------- Captions & float spacing ----------
+\usepackage{caption}
+\captionsetup{
+  font={sf,bf,footnotesize},
+  labelfont={sf,bf,footnotesize},
+  justification=centering,
+  labelsep=period,
+  hypcap=false
+}
+\setlength{\textfloatsep}{8pt}
+\setlength{\floatsep}{6pt}
+\setlength{\intextsep}{8pt}
+\setlength{\abovecaptionskip}{12pt}
+\setlength{\belowcaptionskip}{1pt}
+
+% ---------- Tables / lists ----------
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\setlist{nosep}
+\usepackage[table]{xcolor}
+\definecolor{tableheader}{HTML}{D9D9D9}
+\newcolumntype{P}[1]{>{\sffamily\centering\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\sffamily\centering\arraybackslash}X}
+\newcolumntype{A}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{M}[1]{>{\raggedright\arraybackslash}m{#1}}
+
+% ---------- Fonts ----------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{PTSerif}
+\usepackage[scaled]{helvet}
+\renewcommand{\sfdefault}{phv}
+\newcommand{\headingfont}{\sffamily}
+
+% ---------- Headings ----------
+\usepackage{titlesec}
+\setcounter{secnumdepth}{0}
+
+% Heading 1
+\titleformat{\section}
+  {\headingfont\bfseries\raggedright\fontsize{18pt}{18pt}\selectfont}{}{0.75em}{}
+% Heading 2
+\titleformat{\subsection}
+  {\headingfont\bfseries\raggedright\fontsize{15pt}{16pt}\selectfont}{}{0.75em}{}
+% Heading 3
+\titleformat{\subsubsection}
+  {\headingfont\bfseries\raggedright\fontsize{12pt}{14pt}\selectfont}{}{0.75em}{}
+
+% Heading spacing
+\titlespacing*{\section}{0pt}{7pt}{6pt}
+\titlespacing*{\subsection}{0pt}{7pt}{6pt}
+\titlespacing*{\subsubsection}{0pt}{7pt}{6pt}
+
+\newcommand{\miniheading}[1]{%
+  \par\noindent{\headingfont\bfseries\fontsize{12pt}{14pt}\selectfont #1}\par\vspace{4pt}%
+}
+
+% ---------- Paragraphing ----------
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 1pt minus 1pt}
+
+% ---------- Page numbers ----------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhfoffset[R]{18pt}
+\setlength{\footskip}{18pt}
+\fancyfoot[R]{\sffamily\bfseries\footnotesize \thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% INCOSE logo
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \fancyhfoffset[R]{18pt}
+  \fancyhead[R]{%
+    \smash{\raisebox{0pt}[0pt][0pt]{
+      \begingroup\setlength{\fboxsep}{20pt}
+        \colorbox{white}{\includegraphics[height=0.6in]{template-images/incose-logo.jpg}}%
+      \endgroup
+    }}
+  }
+  \fancyfoot[R]{\sffamily\bfseries\footnotesize \thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+% ---------- Title Formatting ----------
+\makeatletter
+\@ifundefined{theauthor}{}{\let\theauthor\relax}
+\makeatother
+\usepackage{titling}
+\pretitle{\headingfont\bfseries\fontsize{24pt}{26pt}\selectfont\raggedright}
+\posttitle{\par\vspace{-.3in}}
+\preauthor{}\postauthor{}
+\author{\mbox{}}
+\date{}
+\setlength{\droptitle}{-3.2\baselineskip}
+
+% ---------- Author cards ----------
+\newcommand{\authorcard}[5]{%
+  {\headingfont\bfseries\fontsize{12pt}{14pt}\selectfont #1}\par
+  {\headingfont\bfseries\fontsize{12pt}{14pt}\selectfont #2}\par
+  {\headingfont\bfseries\fontsize{12pt}{14pt}\selectfont #3}\par
+  {\headingfont\bfseries\fontsize{12pt}{14pt}\selectfont #4}\par
+  {\headingfont\bfseries\fontsize{12pt}{14pt}\selectfont #5}\par
+}
+
+% ---------- Biography photo placeholder and entry ----------
+
+\makeatletter
+\newcommand{\authorpic}[1]{%
+    \includegraphics[width=0.6in,height=0.6in,keepaspectratio,clip]{#1}%
+}
+\makeatother
+
+\newcommand{\authorbioentry}[3]{%
+  \noindent\begin{tabular}{@{}m{0.5in} M{\dimexpr\columnwidth-0.5in\relax}@{}}
+    \authorpic{#1} & \textbf{#2}\par #3
+  \end{tabular}\par\medskip
+}
+
+% ---------- Safe figure include ----------
+\makeatletter
+\newcommand{\colfig}[2][]{%
+  \IfFileExists{#2}{\includegraphics[width=\linewidth,#1]{#2}}{%
+    \fbox{\parbox[b][1.5in][c]{\linewidth}{\centering \textit{Missing figure: }#2}}}%
+}
+\makeatother
+
+% ---------- References: APA via biblatex/biber ----------
+\let\theauthor\relax
+\usepackage{csquotes}
+\usepackage[style=apa,backend=biber]{biblatex}
+\addbibresource{refs.bib}
+
+% ---------- Highlight callouts ----------
+\usepackage{changepage}
+\newenvironment{highlight}[1][0.25in]{%
+  \begin{adjustwidth}{#1}{#1}\itshape}{\end{adjustwidth}}
+
+% ---------- Two-column setup ----------
+\usepackage{multicol}
+\setlength{\columnsep}{18pt}
+
+% ---------- Hyperlinks ----------
+\usepackage[hidelinks]{hyperref}
+
+% =========================
+% ===== Title & Authors ===
+% =========================
+\title{Assertional Verification of the Functionality Cotyledon: Replacing Structural Morphisms with Linear Temporal Logic}
+
+\begin{document}
+\maketitle
+\thispagestyle{firstpage}
+
+% ---- Authors ----
+\noindent
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} A{0.48\textwidth} A{0.48\textwidth}}
+  \authorcard{Nicholas McKibben}{University of Arizona}{Dept. of Systems \& Industrial Eng.}{Tucson, AZ, USA}{nmckibben@arizona.edu} &
+  \authorcard{Paul Wach}{University of Arizona}{Dept. of Systems \& Industrial Eng.}{Tucson, AZ, USA}{pwach@arizona.edu} \\
+  \multicolumn{2}{@{}c@{}}{\rule{0pt}{0.9\baselineskip}} \\[-0.2\baselineskip]
+  \authorcard{Larry Head}{University of Arizona}{Dept. of Systems \& Industrial Eng.}{Tucson, AZ, USA}{klhead@arizona.edu} &
+  \authorcard{Alejandro Salado}{University of Arizona}{Dept. of Systems \& Industrial Eng.}{Tucson, AZ, USA}{asalado@arizona.edu}
+\end{tabular*}
+\vspace{.25in}
+
+% ---- Two columns begin immediately after authors ----
+\begin{multicols*}{2}
+\raggedcolumns
+
+% ---- Copyright ----
+{\headingfont\bfseries\fontsize{8pt}{12pt}\selectfont
+Copyright~\textcopyright~ \the\year{} by the author(s). Permission granted to INCOSE to publish and use.}
+\\
+
+% =========================
+% ===== Abstract/Keywords =
+% =========================
+\phantomsection
+\miniheading{Abstract}
+This working draft serves as a collaborative workspace to establish the outline, draft content, and key discussion prompts for Paper 2. We focus on modernizing Wayne Wymore's Tricotyledon Theory of System Design (T3SD), specifically reinterpreting the Functionality Cotyledon as a declarative set of Linear Temporal Logic (LTL) and First-Order LTL (FO-LTL) formulas. Rather than constructing manual, rigid system morphisms between a specification $Z_{\text{spec}}$ and implementation $Z_{\text{impl}}$, we propose verifying Wymore's deterministic 5-tuple models ($Z$) directly against temporal requirements. We discuss observability boundaries (black-box vs. white-box) and address continuous trajectory decidability via SMT-backed bounded verification. Our core algebraic definitions have been validated in an interactive theorem prover to ensure mathematical soundness.
+
+\phantomsection
+\subsubsection{Keywords}
+Tricotyledon Theory of System Design, Functionality Cotyledon, Linear Temporal Logic (LTL), State and Output Trajectories, Formal Verification.
+
+% =========================
+% ===== Main Content ======
+% =========================
+\section{Introduction}
+This section introduces the foundational concepts and states the core research challenge for Paper 2.
+
+\miniheading{Section Goals and Content Structure:}
+\begin{itemize}
+    \item \textbf{Contextualize Wymore's Functionality Cotyledon:} Outline how functional requirements are traditionally represented as a constructive reference system $Z_{\text{spec}}$ \parencite{Wymore1993}. Detail recent CSER work investigating the mathematical foundations of state machines within MBSE frameworks \parencite{salado2019wymore}.
+    \item \textbf{Identify Morphism Rigidity:} Discuss why finding system homomorphisms $h: Z_{\text{impl}} \rightarrow Z_{\text{spec}}$ is manual, mathematically rigid, and breaks for complex implementations.
+    \item \textbf{Propose Direct LTL Verification:} Argue for evaluating temporal assertions (LTL/FO-LTL) directly over Wymore's state and output trajectories.
+    \item \textbf{Rigor Verification Check:} Note that the core algebraic consistency of our trajectory transformations is backed by formalization in an interactive theorem prover \parencite{demoura21lean4}, ensuring that the underlying definitions are mathematically sound.
+\end{itemize}
+
+\miniheading{Discussion Prompts for the Team:}
+\begin{itemize}
+    \item How does this direct validation align with standard MBSE validation processes in the INCOSE Handbook \parencite{INCOSE2023}?
+    \item Can we define a generic execution trace logic to evaluate LTL assertions directly on Wymorean trajectories?
+\end{itemize}
+
+\section{Methodology}
+This section details how to verify a Wymorean 5-tuple directly against LTL/FO-LTL.
+
+\subsection{Verification Paradigm Comparison}
+Figure~\ref{fig:comparison} contrasts Wymore's classical constructive verification with the proposed direct assertional verification.
+
+\end{multicols*}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[auto, >=stealth, thick,
+    block/.style={draw=blue!60, fill=blue!5, rectangle, rounded corners, minimum width=2.8cm, minimum height=1.1cm, align=center, thick},
+    model/.style={draw=orange!60, fill=orange!5, rectangle, rounded corners, minimum width=2.8cm, minimum height=1.1cm, align=center, thick},
+    arrow/.style={->, >=stealth, thick, draw=black!70},
+    biarrow/.style={<->, >=stealth, thick, draw=black!70},
+    dashedarrow/.style={<->, >=stealth, dashed, thick, draw=blue!80}
+  ]
+    
+    % Draw part A: Classical T3SD Verification
+    \begin{scope}
+      \node (req1) [block] {Stakeholder\\Requirements};
+      \node (zspec) [model, right=2.4cm of req1] {Specification\\System $Z_{\text{spec}}$};
+      \node (zimpl) [model, below=1.0cm of zspec] {Implementation\\System $Z_{\text{impl}}$};
+      
+      \path[arrow] (req1) -- node[above, font=\footnotesize] {formalize} (zspec);
+      \path[arrow] (zimpl) -- node[right=3pt, font=\footnotesize] {Morphism $h$} (zspec);
+      
+      \node[above=0.3cm of zspec, font=\headingfont\bfseries] {A. Classical Constructive T3SD};
+    \end{scope}
+    
+    % Draw part B: Proposed Direct Assertional Verification (Direct model check of Z)
+    \begin{scope}[xshift=9.8cm]
+      \node (ltl) [block] {LTL Properties\\$\Phi$};
+      \node (wym) [model, right=2.4cm of ltl] {Wymore System\\$Z_{\text{impl}}$};
+      
+      \path[dashedarrow] (ltl) -- node[above=2pt, font=\footnotesize, align=center] {$\models$ Model Checking} (wym);
+      
+      \node[above=0.3cm of wym, font=\headingfont\bfseries] {B. Proposed Direct Assertional};
+    \end{scope}
+  \end{tikzpicture}
+  \caption{Classical Constructive Morphisms vs. Proposed Direct Assertional Verification.}
+  \label{fig:comparison}
+\end{figure}
+
+\begin{multicols*}{2}
+
+\subsection{Formal Trace Definitions and Observability}
+Given a Wymorean system $Z = (S, I, O, \delta, \rho)$ and an input trajectory $f \in \text{ITZ}$, the system generates unique state and output trajectories:
+\begin{align}
+    g(0) &= s_0 \\
+    g(t+1) &= \delta(g(t), f(t)) \\
+    h(t) &= \rho(g(t))
+\end{align}
+We define the complete execution trace as the sequence $\sigma = (g(0), h(0)), (g(1), h(1)), \dots$. We partition our temporal requirements $\Phi$ based on observability constraints:
+\begin{itemize}
+    \item \textbf{External Observability (Black-Box):} Properties $\Phi_{\text{ext}}$ are defined only over output trajectories $h(t)$ and inputs $f(t)$. This represents standard system validation where internal states are hidden.
+    \item \textbf{Internal Safety (White-Box):} Invariants $\Phi_{\text{int}}$ evaluate state trajectories $g(t)$ to verify properties such as deadlock freedom or reachability of error configurations.
+\end{itemize}
+We say $Z \models \Phi$ if for all valid input trajectories $f$, the resulting trace satisfies $\sigma \models \Phi$ under standard LTL semantics \parencite{Pnueli1977}.
+
+\subsection{Continuous Dynamics and Decidability Bounds}
+Evaluating LTL over continuous states and trajectories (e.g., using FO-LTL to check properties like $G \forall x (\text{Input}(x) \rightarrow F \text{Output} = f(x))$) introduces undecidability. 
+
+To maintain decidability, we frame our methodology as evaluating trajectories at discrete time units (Wymorean ticks) and leveraging:
+\begin{enumerate}
+    \item **Bounded Model Checking (BMC):** Restricting verification to finite prefixes of the trajectories.
+    \item **SMT-Backed Invariant Checking:** Interfacing with solvers (like Z3) to evaluate continuous variables at discrete steps.
+\end{enumerate}
+This contrasts with continuous-time hybrid systems verification models, such as Differential Dynamic Logic (dL) verified in provers like KeYmaera X \parencite{platzer2018logical}, by constraining continuous reasoning to static algebraic assertions at discrete ticks.
+
+\begingroup
+\renewcommand{\arraystretch}{1.5}
+\begin{tabularx}{\columnwidth}{@{}P{0.3\columnwidth}YY@{}}
+    \rowcolor{tableheader}
+    \headingfont\bfseries Feature & \headingfont\bfseries Constructive & \headingfont\bfseries Assertional \\
+    \addlinespace[4pt]
+    Spec Form & Reference System & LTL/FO-LTL \\
+    \addlinespace[4pt]
+    Proof Type & Morphism $h$ & Trace Checking \\
+    \addlinespace[4pt]
+    Fidelity & Manual/Rigid & Automated \\
+\end{tabularx}
+\captionof{table}{Verification Paradigm Summary}
+\label{tab:comparison}
+\endgroup
+\vspace{6pt}
+
+\miniheading{Discussion Prompts for the Team:}
+\begin{itemize}
+    \item How should we formally structure the interface between the discrete time-step transitions and the continuous SMT constraints?
+    \item Does the Option-unified I/O representation for closed/autonomous systems complicate liveness properties?
+\end{itemize}
+
+\section{Results: Criteria for a Candidate Case Study}
+Rather than committing to a specific case study, this section outlines the required properties of a system model to demonstrate the utility of the direct assertional verification framework. A strong case study must exhibit the following attributes:
+
+\miniheading{1. State-Space Complexity and Concurrency:}
+The system must have enough concurrent state components (e.g. sensor subsystems, mode changes, user overrides) that composition leads to a state-space explosion. This makes drawing a manual reference specification $Z_{\text{spec}}$ or finding an explicit morphism $h: Z_{\text{impl}} \rightarrow Z_{\text{spec}}$ mathematically untenable, highlighting the need for automated trace checking.
+
+\miniheading{2. Continuous-Discrete Trajectory Interface:}
+The system must couple discrete logic with continuous inputs and outputs (e.g. tracking physical distance or velocity over time). This allows demonstrating how SMT solvers or bounded model checking can handle real-valued trajectories at discrete Wymorean clock ticks, proving the decidability limits of the proposed approach.
+
+\miniheading{3. Expressive Safety and Liveness Requirements:}
+The requirements must include both safety invariants ($G \neg \text{Hazard}$) and liveness/responsiveness properties (e.g., $G(\text{Trigger} \rightarrow F \text{Response})$). This shows how LTL and FO-LTL capture complex temporal behavior that static structural specifications cannot easily express.
+
+\miniheading{4. Morphism-Defying Edge Cases:}
+The case study should feature edge cases (e.g., transient sensor failures or unexpected environment cut-ins) where the implementation system's state space changes structurally. Under classical T3SD, this requires rebuilding the entire constructive reference system and morphism. Under our assertional framework, it only requires adding or modifying a temporal assertion.
+
+\miniheading{Discussion Prompt for the Team:}
+*What is a specific system that matches all four of these criteria? While Adaptive Cruise Control (ACC) is a standard benchmark, are there other cyber-physical systems that would better showcase the decidability bounds of continuous input trajectories?*
+
+\section{Discussion}
+This section will critically analyze the theoretical and practical implications.
+
+\miniheading{Key points to expand upon:}
+\begin{itemize}
+    \item \textbf{Decoupled Intent and Structure:} Shows how modifying state variables or output mappings doesn't require rebuilding structural morphisms, only re-running the model checker.
+    \item \textbf{Decidability of FO-LTL:} Address the complexity limits when continuous values are checked over trajectories.
+\end{itemize}
+
+\section{Conclusions \& Recommendations}
+This section summarizes the overall contribution.
+
+\miniheading{Proposed Contribution Statement:}
+The paper redefines Wymore's Functionality Cotyledon assertionally as $\mathcal{FC}(\Phi) = \{ Z \mid Z \models \Phi \}$. This replaces constructive structural morphisms with direct temporal logic verification, enabling automated model checking of systems engineering specifications.
+
+\section{Acknowledgements}
+This work is supported by our formalization project team.
+
+\newpage
+\nocite{*}
+\section{References}
+\printbibliography[heading=none]
+
+% ---------- Biography ----------
+\section*{Biography}
+\authorbioentry{template-images/author1_pic.jpg}{Nicholas McKibben}{TODO}
+\authorbioentry{template-images/author2_pic.jpg}{Paul Wach}{TODO}
+\authorbioentry{template-images/author2_pic.jpg}{Larry Head}{TODO}
+\authorbioentry{template-images/author3_pic.jpg}{Alejandro Salado}{TODO}
+
+\end{multicols*}
+
+\end{document}
