@@ -30,11 +30,13 @@ stays within the bound).
 
 **Implemented:** 7-tuple spec, snapshot trajectories, soundness/uniqueness, time invariance /
 nonanticipation, `IsDeterministic`, `Reaches` / `Language` (final-state acceptance),
-`toBoundedFSMSystem` + `bounded_output_agrees` + bounded uniqueness / `IsFinite` corollaries.
+`toBoundedFSMSystem` + `bounded_output_agrees` + bounded uniqueness / `IsFinite` corollaries,
+snapshot `DiscreteSystem` embedding, Def 2.14 `IsNontrivial` / `IsTrivial`, and partial
+`bounded_isNontrivial_of` (witness form; depth-preservation hypothesis).
 
 **Intentionally omitted** (see [formalization_roadmap.md](../formalization_roadmap.md) §3):
 Wymore reachability, state equivalence, morphisms, ports, parameterization, Ch. 3 coupling,
-worked examples, `Reaches` ↔ trajectory bridge.
+worked examples (beyond Dyck-1 in [DPDAExamples](DPDAExamples.lean)), `Reaches` ↔ trajectory bridge.
 
 ## Integration with other modules
 
@@ -52,7 +54,10 @@ worked examples, `Reaches` ↔ trajectory bridge.
   invariant is on the roadmap.
 - **`Language` acceptance mode:** By **final control state**, not by empty stack.
 - **Bounded reduction:** Beyond `max_depth`, `List.take` truncation is **lossy** unless
-  `bounded_output_agrees`'s depth hypothesis holds.
+  `bounded_output_agrees`'s depth hypothesis holds. Likewise `bounded_isNontrivial_of` is
+  one-way and requires `some`-input witnesses plus a depth-preservation hypothesis (`hPres`).
+- **Nontrivial vs CF power:** A DPDA may recognize a non-regular language while remaining
+  Wymore-trivial when `G` is constant (see Dyck-1 in [DPDAExamples](DPDAExamples.lean)).
 
 See [formalization_roadmap.md](../formalization_roadmap.md) for backlog and
 [formalization_roadmap.md §6](formalization_roadmap.md#6-rigor-verification) for the proof-honesty checklist.
@@ -952,6 +957,72 @@ theorem acceptsEmptyStack_of_trajectory (D : DPDASystem STfin IS OZ Γ) (q0 : ST
     AcceptsEmptyStack D q0 w :=
   ⟨q, wordToStream_reaches D (q0, [D.z0]) (q, [D.z0]) w htraj⟩
 
+/-! ## Snapshot `DiscreteSystem` embedding and Def 2.14 -/
+
+/--
+  [textbook/definition2.4|partial]
+  Embed a DPDA as a Wymore `DiscreteSystem` on snapshot space: `NZ = stepSnapshot`,
+  `RZ = some ∘ G ∘ peek`. Inputs are `Option IS` (ε as `none`).
+-/
+def DPDASystem.toSnapshotDiscreteSystem (D : DPDASystem STfin IS OZ Γ) :
+    DiscreteSystem (Snapshot STfin Γ) IS OZ where
+  sz_nonempty := ⟨D.st_nonempty.some, [D.z0]⟩
+  NZ := fun snap oi => stepSnapshot D snap oi
+  RZ := fun snap =>
+    let (q, s) := snap
+    some (D.G q (peek D.z0 s))
+
+theorem toSnapshotDiscreteSystem_state_trajectory (D : DPDASystem STfin IS OZ Γ) (q0 : STfin)
+    (f : ITZ_opt IS) (t : Time) :
+    generateStateTrajectory D q0 f t =
+      _root_.generateStateTrajectory D.toSnapshotDiscreteSystem (q0, [D.z0]) f t := by
+  induction t with
+  | zero => rfl
+  | succ t ih =>
+    dsimp [generateStateTrajectory, generateStateTrajectoryFrom_succ,
+      _root_.generateStateTrajectory_succ, DPDASystem.toSnapshotDiscreteSystem]
+    exact congr_arg (fun s => stepSnapshot D s (f t)) ih
+
+theorem toSnapshotDiscreteSystem_output_trajectory (D : DPDASystem STfin IS OZ Γ) (q0 : STfin)
+    (f : ITZ_opt IS) (t : Time) :
+    some (generateOutputTrajectory D q0 f t) =
+      _root_.generateOutputTrajectory D.toSnapshotDiscreteSystem (q0, [D.z0]) f t := by
+  unfold generateOutputTrajectory _root_.generateOutputTrajectory
+  rw [toSnapshotDiscreteSystem_state_trajectory]
+  rfl
+
+/--
+  [textbook/definition2.14/definition/nontrivial_system]
+  [textbook/definition2.14/requirement/state_dependent_transition]
+  [textbook/definition2.14/requirement/active_transition]
+  [textbook/definition2.14/requirement/varying_output]
+  A DPDA is nontrivial when its snapshot `DiscreteSystem` embedding is nontrivial (Def 2.14).
+-/
+def IsNontrivial (D : DPDASystem STfin IS OZ Γ) : Prop :=
+  _root_.IsNontrivial D.toSnapshotDiscreteSystem
+
+/--
+  [textbook/definition2.14/implication/trivial_system]
+  A DPDA is trivial if and only if it is not nontrivial.
+-/
+def IsTrivial (D : DPDASystem STfin IS OZ Γ) : Prop :=
+  ¬ IsNontrivial D
+
+theorem isNontrivial_iff (D : DPDASystem STfin IS OZ Γ) :
+    IsNontrivial D ↔
+      (∃ (s1 s2 : Snapshot STfin Γ) (p : IS),
+        stepSnapshot D s1 (some p) ≠ stepSnapshot D s2 (some p)) ∧
+      (∃ (s : Snapshot STfin Γ) (p : IS), stepSnapshot D s (some p) ≠ s) ∧
+      (∃ (o1 o2 : OZ) (s1 s2 : Snapshot STfin Γ),
+        o1 ≠ o2 ∧
+          D.toSnapshotDiscreteSystem.RZ s1 = some o1 ∧
+          D.toSnapshotDiscreteSystem.RZ s2 = some o2) := by
+  simp [IsNontrivial, DPDASystem.toSnapshotDiscreteSystem, _root_.IsNontrivial]
+
+theorem isTrivial_iff (D : DPDASystem STfin IS OZ Γ) :
+    IsTrivial D ↔ ¬ IsNontrivial D :=
+  Iff.rfl
+
 /-! ## Finiteness Analysis: Bounded Stack space -/
 
 /-- Helper to generate all lists of length up to `max_depth` over a finite type. -/
@@ -1132,6 +1203,134 @@ theorem bounded_output_agrees
       = D.G (generateStateTrajectory D q0 f t).1
           (peek D.z0 (generateStateTrajectory D q0 f t).2) := rfl
   rw [eL, eR, h1, h2]
+
+/--
+  When the DPDA step fits within `max_depth`, bounded `NZ` agrees with `stepSnapshot` on the
+  embedded snapshot (control state and stack list).
+-/
+theorem bounded_nz_agrees_stepSnapshot
+    (D : DPDASystem Q I O G) (max_depth : Nat)
+    (cB : Q × BoundedStack G max_depth) (input : Option I)
+    (hfit : (stepSnapshot D (cB.1, cB.2.val) input).2.length ≤ max_depth) :
+    ((toBoundedFSMSystem D max_depth).NZ cB input).1 = (stepSnapshot D (cB.1, cB.2.val) input).1 ∧
+    ((toBoundedFSMSystem D max_depth).NZ cB input).2.val =
+      (stepSnapshot D (cB.1, cB.2.val) input).2 :=
+  bounded_step_agrees D max_depth (cB.1, cB.2.val) cB rfl rfl input hfit
+
+private theorem bounded_stepSnapshot_eq_of_nz_eq
+    (D : DPDASystem Q I O G) (max_depth : Nat)
+    (c1 c2 : Q × BoundedStack G max_depth) (input : Option I)
+    (hPres1 : (stepSnapshot D (c1.1, c1.2.val) input).2.length ≤ max_depth)
+    (hPres2 : (stepSnapshot D (c2.1, c2.2.val) input).2.length ≤ max_depth)
+    (heq : (toBoundedFSMSystem D max_depth).NZ c1 input =
+        (toBoundedFSMSystem D max_depth).NZ c2 input) :
+    stepSnapshot D (c1.1, c1.2.val) input = stepSnapshot D (c2.1, c2.2.val) input := by
+  obtain ⟨h11, h12⟩ := bounded_nz_agrees_stepSnapshot D max_depth c1 input hPres1
+  obtain ⟨h21, h22⟩ := bounded_nz_agrees_stepSnapshot D max_depth c2 input hPres2
+  apply Prod.ext_iff.mpr
+  constructor
+  · rw [← h11, heq, h21]
+  · rw [← h12, congrArg Subtype.val (congrArg Prod.snd heq), h22]
+
+private theorem bounded_nz_eq_of_stepSnapshot_eq
+    (D : DPDASystem Q I O G) (max_depth : Nat)
+    (c1 c2 : Q × BoundedStack G max_depth) (input : Option I)
+    (hPres1 : (stepSnapshot D (c1.1, c1.2.val) input).2.length ≤ max_depth)
+    (hPres2 : (stepSnapshot D (c2.1, c2.2.val) input).2.length ≤ max_depth)
+    (heq : stepSnapshot D (c1.1, c1.2.val) input = stepSnapshot D (c2.1, c2.2.val) input) :
+    (toBoundedFSMSystem D max_depth).NZ c1 input = (toBoundedFSMSystem D max_depth).NZ c2 input := by
+  obtain ⟨h11, h12⟩ := bounded_nz_agrees_stepSnapshot D max_depth c1 input hPres1
+  obtain ⟨h21, h22⟩ := bounded_nz_agrees_stepSnapshot D max_depth c2 input hPres2
+  apply Prod.ext
+  · rw [h11, heq, h21]
+  · apply Subtype.ext
+    rw [h12, congrArg Prod.snd heq, h22]
+
+private theorem bounded_nz_eq_of_stepSnapshot_eq'
+    (D : DPDASystem Q I O G) (max_depth : Nat)
+    (c : Q × BoundedStack G max_depth) (input : Option I)
+    (hPres : (stepSnapshot D (c.1, c.2.val) input).2.length ≤ max_depth)
+    (heq : stepSnapshot D (c.1, c.2.val) input = (c.1, c.2.val)) :
+    (toBoundedFSMSystem D max_depth).NZ c input = c := by
+  obtain ⟨h1, h2⟩ := bounded_nz_agrees_stepSnapshot D max_depth c input hPres
+  apply Prod.ext
+  · rw [h1, congrArg Prod.fst heq]
+  · apply Subtype.ext
+    rw [h2, congrArg Prod.snd heq]
+
+private theorem bounded_stepSnapshot_eq_of_nz_eq'
+    (D : DPDASystem Q I O G) (max_depth : Nat)
+    (c : Q × BoundedStack G max_depth) (input : Option I)
+    (hPres : (stepSnapshot D (c.1, c.2.val) input).2.length ≤ max_depth)
+    (heq : (toBoundedFSMSystem D max_depth).NZ c input = c) :
+    stepSnapshot D (c.1, c.2.val) input = (c.1, c.2.val) := by
+  obtain ⟨h1, h2⟩ := bounded_nz_agrees_stepSnapshot D max_depth c input hPres
+  apply Prod.ext_iff.mpr
+  constructor
+  · rw [← h1, congrArg Prod.fst heq]
+  · rw [← h2, congrArg Prod.snd heq]
+
+private theorem bounded_nz_ne_of_stepSnapshot_ne
+    (D : DPDASystem Q I O G) (max_depth : Nat)
+    (c1 c2 : Q × BoundedStack G max_depth) (input : Option I)
+    (hPres1 : (stepSnapshot D (c1.1, c1.2.val) input).2.length ≤ max_depth)
+    (hPres2 : (stepSnapshot D (c2.1, c2.2.val) input).2.length ≤ max_depth)
+    (hne : stepSnapshot D (c1.1, c1.2.val) input ≠ stepSnapshot D (c2.1, c2.2.val) input) :
+    (toBoundedFSMSystem D max_depth).NZ c1 input ≠ (toBoundedFSMSystem D max_depth).NZ c2 input :=
+  fun heq => hne (bounded_stepSnapshot_eq_of_nz_eq D max_depth c1 c2 input hPres1 hPres2 heq)
+
+/--
+  Core partial bridge: bounded FSM nontriviality on `some`-input witnesses lifts to DPDA
+  nontriviality while stack depth is preserved (`hPres`).
+-/
+theorem bounded_isNontrivial_of_witness
+    (D : DPDASystem Q I O G) (max_depth : Nat)
+    (hPres : ∀ (c : Q × BoundedStack G max_depth) (inp : Option I),
+      (stepSnapshot D (c.1, c.2.val) inp).2.length ≤ max_depth)
+    (hSD : ∃ (x1 x2 : Q × BoundedStack G max_depth) (p : I),
+      (toBoundedFSMSystem D max_depth).NZ x1 (some p) ≠ (toBoundedFSMSystem D max_depth).NZ x2 (some p))
+    (hAct : ∃ (x : Q × BoundedStack G max_depth) (p : I),
+      (toBoundedFSMSystem D max_depth).NZ x (some p) ≠ x)
+    (hVar : ∃ (o1 o2 : O) (c1 c2 : Q × BoundedStack G max_depth),
+      o1 ≠ o2 ∧ (toBoundedFSMSystem D max_depth).RZ c1 = o1 ∧
+        (toBoundedFSMSystem D max_depth).RZ c2 = o2) :
+    IsNontrivial D := by
+  classical
+  rw [isNontrivial_iff]
+  rcases hSD with ⟨x1, x2, p, hp⟩
+  rcases hAct with ⟨x, p', hp'⟩
+  rcases hVar with ⟨o1, o2, c1, c2, ho, hc1, hc2⟩
+  refine ⟨⟨(x1.1, x1.2.val), (x2.1, x2.2.val), p, ?_⟩, ⟨(x.1, x.2.val), p', ?_⟩, ?_⟩
+  · intro heq
+    exact hp (bounded_nz_eq_of_stepSnapshot_eq D max_depth x1 x2 (some p)
+      (hPres x1 (some p)) (hPres x2 (some p)) heq)
+  · intro heq
+    exact hp' (bounded_nz_eq_of_stepSnapshot_eq' D max_depth x (some p')
+      (hPres x (some p')) heq)
+  · refine ⟨o1, o2, (c1.1, c1.2.val), (c2.1, c2.2.val), ho, ?_, ?_⟩
+    · dsimp [DPDASystem.toSnapshotDiscreteSystem]
+      simpa [hc1]
+    · dsimp [DPDASystem.toSnapshotDiscreteSystem]
+      simpa [hc2]
+
+/--
+  Partial corollary (witness form): bounded FSM nontriviality on `some`-input witnesses lifts to
+  DPDA nontriviality while stack depth is preserved (`hPres`). See `bounded_isNontrivial_of`
+  for the `FSM.IsNontrivial` hypothesis packaged with depth preservation.
+-/
+theorem bounded_isNontrivial_of
+    (D : DPDASystem Q I O G) (max_depth : Nat)
+    (hPres : ∀ (c : Q × BoundedStack G max_depth) (inp : Option I),
+      (stepSnapshot D (c.1, c.2.val) inp).2.length ≤ max_depth)
+    (hSD : ∃ (x1 x2 : Q × BoundedStack G max_depth) (p : I),
+      (toBoundedFSMSystem D max_depth).NZ x1 (some p) ≠ (toBoundedFSMSystem D max_depth).NZ x2 (some p))
+    (hAct : ∃ (x : Q × BoundedStack G max_depth) (p : I),
+      (toBoundedFSMSystem D max_depth).NZ x (some p) ≠ x)
+    (hVar : ∃ (o1 o2 : O) (c1 c2 : Q × BoundedStack G max_depth),
+      o1 ≠ o2 ∧ (toBoundedFSMSystem D max_depth).RZ c1 = o1 ∧
+        (toBoundedFSMSystem D max_depth).RZ c2 = o2) :
+    IsNontrivial D :=
+  bounded_isNontrivial_of_witness D max_depth hPres hSD hAct hVar
 
 /-- [textbook/definition2.11/definition/finite_system] The bounded reduction yields a finite Wymore system. -/
 theorem bounded_system_isFinite

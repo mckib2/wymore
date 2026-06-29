@@ -156,6 +156,47 @@ theorem dyck1_rejects_unbalanced : [lp, lp, rp] ∉ LanguageEmptyStack dyck1 0 :
   have hs : ([zA, zZ] : List (Fin 2)) = [zZ] := congrArg Prod.snd hpair
   exact absurd hs (by decide)
 
+/-! ## Def 2.14: nontrivial / trivial -/
+
+/-- Dyck-1 has constant readout `G := fun _ _ => 0`, so it is Wymore-trivial (fails clause (iii)). -/
+theorem dyck1_is_trivial : IsTrivial dyck1 := by
+  intro h
+  rcases (isNontrivial_iff dyck1).1 h with ⟨_, _, o1, o2, _, _, ho12, ho1, ho2⟩
+  simp [DPDASystem.toSnapshotDiscreteSystem, dyck1] at ho1 ho2
+  have : o1 = o2 := by rw [← Option.some.inj ho1, Option.some.inj ho2]
+  exact ho12 this
+
+/-- Varying readout on stack top: `0` at bottom marker, `1` at counter symbol. -/
+def dyck1WithOutputG (_q : Fin 1) (z : Fin 2) : Fin 2 :=
+  if z = zA then 1 else 0
+
+/-- Dyck-1 with stack-top-dependent readout (output alphabet `Fin 2`). -/
+def dyck1WithOutput : DPDASystem (Fin 1) (Fin 2) (Fin 2) (Fin 2) :=
+  { st_nonempty := dyck1.st_nonempty
+    st_finite := inferInstance
+    iz_finite := inferInstance
+    oz_finite := inferInstance
+    gamma_finite := inferInstance
+    st_decidable := inferInstance
+    gamma_decidable := inferInstance
+    z0 := zZ
+    F := dyck1F
+    G := dyck1WithOutputG }
+
+theorem dyck1WithOutput_isNontrivial : IsNontrivial dyck1WithOutput := by
+  rw [isNontrivial_iff]
+  refine ⟨⟨(0, [zZ]), (0, [zA, zZ]), lp, ?_⟩, ⟨(0, [zZ]), lp, ?_⟩, ⟨1, 0, (0, [zA, zZ]), (0, [zZ]), by decide, ?_, ?_⟩⟩
+  · intro heq
+    simp [stepSnapshot, dyck1F, dyck1WithOutput, updateStack, lp, zZ, zA, peek] at heq
+    cases heq
+  · intro heq
+    simp [stepSnapshot, dyck1F, dyck1WithOutput, updateStack, lp, zZ, peek] at heq
+    cases heq
+  · dsimp [DPDASystem.toSnapshotDiscreteSystem, dyck1WithOutputG, zA, peek]
+    rfl
+  · dsimp [DPDASystem.toSnapshotDiscreteSystem, dyck1WithOutputG, zZ, peek]
+    rfl
+
 end Dyck1
 
 end DPDA

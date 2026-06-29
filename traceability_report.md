@@ -12,8 +12,8 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.11/definition/finite_system` | `component` | The system Z is finite if and only if SZ, IZ, and OZ are finite sets. | ✅ Faithful | `bounded_system_isFinite` ([Mbse/DPDAWymore.lean:1137](Mbse/DPDAWymore.lean#L1137))<br>`IsFinite` ([Mbse/Wymore.lean:90](Mbse/Wymore.lean#L90))<br>`FSMSystem` ([Mbse/FiniteWymore.lean:21](Mbse/FiniteWymore.lean#L21))<br>`fsm_isFinite` ([Mbse/FiniteWymore.lean:50](Mbse/FiniteWymore.lean#L50))<br>`IsFinite` ([Mbse/CombinationalWymore.lean:91](Mbse/CombinationalWymore.lean#L91)) |
-| `2.11/definition/order_vector` | `component` | The system Z is finite with order vector (k, m, n) if and only if (k, m, n) ∈ IJS+^3 and #SZ = k, #IZ = m, #OZ = n. | ✅ Faithful | `HasOrderVector` ([Mbse/CombinationalWymore.lean:106](Mbse/CombinationalWymore.lean#L106)) |
+| `2.11/definition/finite_system` | `component` | The system Z is finite if and only if SZ, IZ, and OZ are finite sets. | ✅ Faithful | `bounded_system_isFinite` ([Mbse/DPDAWymore.lean:1335](Mbse/DPDAWymore.lean#L1335))<br>`IsFinite` ([Mbse/Wymore.lean:90](Mbse/Wymore.lean#L90))<br>`FSMSystem` ([Mbse/FiniteWymore.lean:21](Mbse/FiniteWymore.lean#L21))<br>`fsm_isFinite` ([Mbse/FiniteWymore.lean:50](Mbse/FiniteWymore.lean#L50))<br>`IsFinite` ([Mbse/CombinationalWymore.lean:90](Mbse/CombinationalWymore.lean#L90)) |
+| `2.11/definition/order_vector` | `component` | The system Z is finite with order vector (k, m, n) if and only if (k, m, n) ∈ IJS+^3 and #SZ = k, #IZ = m, #OZ = n. | ✅ Faithful | `HasOrderVector` ([Mbse/CombinationalWymore.lean:105](Mbse/CombinationalWymore.lean#L105)) |
 
 ### `textbook/definition2.14` — Nontrivial System
 
@@ -22,11 +22,11 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.14/definition/nontrivial_system` | `component` | The system Z is nontrivial if and only if conditions (i), (ii), and (iii) are satisfied. | ✅ Faithful | `IsNontrivial` ([Mbse/Wymore.lean:151](Mbse/Wymore.lean#L151))<br>`IsNontrivial` ([Mbse/FiniteWymore.lean:185](Mbse/FiniteWymore.lean#L185))<br>`IsNontrivial` ([Mbse/CombinationalWymore.lean:117](Mbse/CombinationalWymore.lean#L117)) _(partial)_ |
-| `2.14/requirement/state_dependent_transition` | `constraint` | (i) there exist x1 ∈ SZ, x2 ∈ SZ, and p ∈ IZ, such that NZ(x1, p) ≠ NZ(x2, p) (the transition is state-dependent). | ✅ Faithful | `IsNontrivial` ([Mbse/Wymore.lean:151](Mbse/Wymore.lean#L151))<br>`IsNontrivial` ([Mbse/FiniteWymore.lean:185](Mbse/FiniteWymore.lean#L185)) |
-| `2.14/requirement/active_transition` | `constraint` | (ii) there exist x ∈ SZ and p ∈ IZ such that NZ(x, p) ≠ x (the state is not constant under all transitions). | ✅ Faithful | `IsNontrivial` ([Mbse/Wymore.lean:151](Mbse/Wymore.lean#L151))<br>`IsNontrivial` ([Mbse/FiniteWymore.lean:185](Mbse/FiniteWymore.lean#L185)) |
-| `2.14/requirement/varying_output` | `constraint` | (iii) #RNG(RZ) > 1 (the readout function is not constant, having a range size greater than 1). | ✅ Faithful | `IsNontrivial` ([Mbse/Wymore.lean:151](Mbse/Wymore.lean#L151))<br>`IsNontrivial` ([Mbse/FiniteWymore.lean:185](Mbse/FiniteWymore.lean#L185)) |
-| `2.14/implication/trivial_system` | `implication` | Z is trivial if Z is not nontrivial. | ✅ Faithful | `IsTrivial` ([Mbse/Wymore.lean:169](Mbse/Wymore.lean#L169))<br>`IsTrivial` ([Mbse/FiniteWymore.lean:202](Mbse/FiniteWymore.lean#L202))<br>`IsTrivial` ([Mbse/CombinationalWymore.lean:127](Mbse/CombinationalWymore.lean#L127)) |
+| `2.14/definition/nontrivial_system` | `component` | The system Z is nontrivial if and only if conditions (i), (ii), and (iii) are satisfied. | ✅ Faithful | `IsNontrivial` ([Mbse/DPDAWymore.lean:994](Mbse/DPDAWymore.lean#L994))<br>`IsNontrivial` ([Mbse/Wymore.lean:151](Mbse/Wymore.lean#L151))<br>`IsNontrivial` ([Mbse/FiniteWymore.lean:185](Mbse/FiniteWymore.lean#L185))<br>`IsNontrivial` ([Mbse/CombinationalWymore.lean:116](Mbse/CombinationalWymore.lean#L116)) _(partial)_ |
+| `2.14/requirement/state_dependent_transition` | `constraint` | (i) there exist x1 ∈ SZ, x2 ∈ SZ, and p ∈ IZ, such that NZ(x1, p) ≠ NZ(x2, p) (the transition is state-dependent). | ✅ Faithful | `IsNontrivial` ([Mbse/DPDAWymore.lean:994](Mbse/DPDAWymore.lean#L994))<br>`IsNontrivial` ([Mbse/Wymore.lean:151](Mbse/Wymore.lean#L151))<br>`IsNontrivial` ([Mbse/FiniteWymore.lean:185](Mbse/FiniteWymore.lean#L185)) |
+| `2.14/requirement/active_transition` | `constraint` | (ii) there exist x ∈ SZ and p ∈ IZ such that NZ(x, p) ≠ x (the state is not constant under all transitions). | ✅ Faithful | `IsNontrivial` ([Mbse/DPDAWymore.lean:994](Mbse/DPDAWymore.lean#L994))<br>`IsNontrivial` ([Mbse/Wymore.lean:151](Mbse/Wymore.lean#L151))<br>`IsNontrivial` ([Mbse/FiniteWymore.lean:185](Mbse/FiniteWymore.lean#L185)) |
+| `2.14/requirement/varying_output` | `constraint` | (iii) #RNG(RZ) > 1 (the readout function is not constant, having a range size greater than 1). | ✅ Faithful | `IsNontrivial` ([Mbse/DPDAWymore.lean:994](Mbse/DPDAWymore.lean#L994))<br>`IsNontrivial` ([Mbse/Wymore.lean:151](Mbse/Wymore.lean#L151))<br>`IsNontrivial` ([Mbse/FiniteWymore.lean:185](Mbse/FiniteWymore.lean#L185)) |
+| `2.14/implication/trivial_system` | `implication` | Z is trivial if Z is not nontrivial. | ✅ Faithful | `IsTrivial` ([Mbse/DPDAWymore.lean:1004](Mbse/DPDAWymore.lean#L1004))<br>`IsTrivial` ([Mbse/Wymore.lean:169](Mbse/Wymore.lean#L169))<br>`IsTrivial` ([Mbse/FiniteWymore.lean:202](Mbse/FiniteWymore.lean#L202))<br>`IsTrivial` ([Mbse/CombinationalWymore.lean:126](Mbse/CombinationalWymore.lean#L126)) |
 
 ### `textbook/definition2.23` — Input Trajectory
 
@@ -45,7 +45,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.27/definition/state_trajectory_recurrence` | `component` | STZ(f, x) = {(t, y): t ∈ TZ, y ∈ SZ, y = x if t = 0; y = NZ(STZ(f, x)(t-1), f(t-1)) if t ≠ 0}. | ✅ Faithful | `generateStateTrajectory` ([Mbse/DPDAWymore.lean:150](Mbse/DPDAWymore.lean#L150)) _(partial)_<br>`IsValidStateTrajectory` ([Mbse/DPDAWymore.lean:194](Mbse/DPDAWymore.lean#L194)) _(partial)_<br>`generateStateTrajectory` ([Mbse/CombinationalWymore.lean:134](Mbse/CombinationalWymore.lean#L134)) |
+| `2.27/definition/state_trajectory_recurrence` | `component` | STZ(f, x) = {(t, y): t ∈ TZ, y ∈ SZ, y = x if t = 0; y = NZ(STZ(f, x)(t-1), f(t-1)) if t ≠ 0}. | ✅ Faithful | `generateStateTrajectory` ([Mbse/DPDAWymore.lean:154](Mbse/DPDAWymore.lean#L154)) _(partial)_<br>`IsValidStateTrajectory` ([Mbse/DPDAWymore.lean:198](Mbse/DPDAWymore.lean#L198)) _(partial)_<br>`generateStateTrajectory` ([Mbse/CombinationalWymore.lean:133](Mbse/CombinationalWymore.lean#L133)) |
 | `2.27/definition/state_at_time_t` | `component` | STZ(f, x)(t) is interpreted as the state of the system Z at time t given input f and initial state x. | ❌ Untraced | *None (Coverage Gap)* |
 
 ### `textbook/definition2.30` — Output Trajectory
@@ -55,7 +55,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.30/definition/output_trajectory_composition` | `component` | OTZ(f, x) = RZ ∘ STZ(f, x) (where composition is defined in Definition A1.268). | ✅ Faithful | `generateOutputTrajectory` ([Mbse/DPDAWymore.lean:172](Mbse/DPDAWymore.lean#L172)) _(partial)_<br>`IsValidOutputTrajectory` ([Mbse/DPDAWymore.lean:199](Mbse/DPDAWymore.lean#L199)) _(partial)_<br>`generateOutputTrajectory` ([Mbse/CombinationalWymore.lean:139](Mbse/CombinationalWymore.lean#L139)) |
+| `2.30/definition/output_trajectory_composition` | `component` | OTZ(f, x) = RZ ∘ STZ(f, x) (where composition is defined in Definition A1.268). | ✅ Faithful | `generateOutputTrajectory` ([Mbse/DPDAWymore.lean:176](Mbse/DPDAWymore.lean#L176)) _(partial)_<br>`IsValidOutputTrajectory` ([Mbse/DPDAWymore.lean:203](Mbse/DPDAWymore.lean#L203)) _(partial)_<br>`generateOutputTrajectory` ([Mbse/CombinationalWymore.lean:138](Mbse/CombinationalWymore.lean#L138)) |
 
 ### `textbook/definition2.33` — System Experiments
 
@@ -64,7 +64,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.33/definition/system_experiments` | `component` | EXZ = ITZ × SZ × TZ. | ✅ Faithful | `CombinationalEXZ` ([Mbse/CombinationalWymore.lean:326](Mbse/CombinationalWymore.lean#L326)) |
+| `2.33/definition/system_experiments` | `component` | EXZ = ITZ × SZ × TZ. | ✅ Faithful | `CombinationalEXZ` ([Mbse/CombinationalWymore.lean:325](Mbse/CombinationalWymore.lean#L325)) |
 
 ### `textbook/definition2.4` — Discrete System Specification
 
@@ -108,7 +108,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.51/definition/reachable` | `component` | The state y ∈ SZ is reachable from x ∈ SZ iff there exists f ∈ ITZ and t ∈ TZ such that y = STZ(f, x)(t). | ✅ Faithful | `Reachable` ([Mbse/CombinationalWymore.lean:190](Mbse/CombinationalWymore.lean#L190)) |
+| `2.51/definition/reachable` | `component` | The state y ∈ SZ is reachable from x ∈ SZ iff there exists f ∈ ITZ and t ∈ TZ such that y = STZ(f, x)(t). | ✅ Faithful | `Reachable` ([Mbse/CombinationalWymore.lean:189](Mbse/CombinationalWymore.lean#L189)) |
 | `2.51/terminology/by_means_of` | `component` | y is reachable from x by means of the input trajectory f at time t. | ❌ Untraced | *None (Coverage Gap)* |
 
 ### `textbook/definition2.55` — Input Ports and Port Trajectories
@@ -118,8 +118,8 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.55/definition/input_ports` | `component` | The set of input ports of the system Z is denoted IPZ: {I1Z, ..., InZ} if IZ is a product, or {IZ} otherwise. | ✅ Faithful | `IPZ` ([Mbse/Wymore.lean:521](Mbse/Wymore.lean#L521))<br>`IPZ` ([Mbse/CombinationalWymore.lean:359](Mbse/CombinationalWymore.lean#L359)) |
-| `2.55/definition/port_trajectory` | `component` | If #IPZ > 1, f ∈ ITZ, and j ∈ IJS[1, #IPZ], then PJN(IjZ) ∘ f is the IjZ input port trajectory generated by f. | ✅ Faithful | `portTrajectory` ([Mbse/Wymore.lean:528](Mbse/Wymore.lean#L528))<br>`portTrajectory` ([Mbse/CombinationalWymore.lean:371](Mbse/CombinationalWymore.lean#L371)) |
+| `2.55/definition/input_ports` | `component` | The set of input ports of the system Z is denoted IPZ: {I1Z, ..., InZ} if IZ is a product, or {IZ} otherwise. | ✅ Faithful | `IPZ` ([Mbse/Wymore.lean:521](Mbse/Wymore.lean#L521))<br>`IPZ` ([Mbse/CombinationalWymore.lean:358](Mbse/CombinationalWymore.lean#L358)) |
+| `2.55/definition/port_trajectory` | `component` | If #IPZ > 1, f ∈ ITZ, and j ∈ IJS[1, #IPZ], then PJN(IjZ) ∘ f is the IjZ input port trajectory generated by f. | ✅ Faithful | `portTrajectory` ([Mbse/Wymore.lean:528](Mbse/Wymore.lean#L528))<br>`portTrajectory` ([Mbse/CombinationalWymore.lean:370](Mbse/CombinationalWymore.lean#L370)) |
 
 ### `textbook/definition2.59` — Input Port Structure
 
@@ -128,7 +128,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.59/definition/input_port_structure` | `component` | ISZ = {(I1Z, A1), ..., (InZ, An)} if IZ is a product, or {(IZ, IZ)} otherwise. | ✅ Faithful | `ISZ` ([Mbse/CombinationalWymore.lean:365](Mbse/CombinationalWymore.lean#L365)) |
+| `2.59/definition/input_port_structure` | `component` | ISZ = {(I1Z, A1), ..., (InZ, An)} if IZ is a product, or {(IZ, IZ)} otherwise. | ✅ Faithful | `ISZ` ([Mbse/CombinationalWymore.lean:364](Mbse/CombinationalWymore.lean#L364)) |
 
 ### `textbook/definition2.62` — Output Ports and Port Output Trajectories
 
@@ -180,10 +180,10 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.82/definition/system_parameterization` | `component` | A system parameterization is a function F such that RNG(F) ⊆ DSYSTEMS. | ✅ Faithful | `DiscreteSystemParameterization` ([Mbse/Wymore.lean:762](Mbse/Wymore.lean#L762))<br>`FSMSystemParameterization` ([Mbse/FiniteWymore.lean:278](Mbse/FiniteWymore.lean#L278))<br>`CombinationalSystemParameterization` ([Mbse/CombinationalWymore.lean:407](Mbse/CombinationalWymore.lean#L407)) |
-| `2.82/definition/parameter_instance` | `component` | If F is a system parameterization, r ∈ DMN(F) and Z = F(r), then Z is an instance of F. | ✅ Faithful | `parameterInstance` ([Mbse/Wymore.lean:769](Mbse/Wymore.lean#L769))<br>`parameterInstance` ([Mbse/FiniteWymore.lean:287](Mbse/FiniteWymore.lean#L287))<br>`parameterInstance` ([Mbse/CombinationalWymore.lean:414](Mbse/CombinationalWymore.lean#L414)) |
+| `2.82/definition/system_parameterization` | `component` | A system parameterization is a function F such that RNG(F) ⊆ DSYSTEMS. | ✅ Faithful | `DiscreteSystemParameterization` ([Mbse/Wymore.lean:762](Mbse/Wymore.lean#L762))<br>`FSMSystemParameterization` ([Mbse/FiniteWymore.lean:278](Mbse/FiniteWymore.lean#L278))<br>`CombinationalSystemParameterization` ([Mbse/CombinationalWymore.lean:406](Mbse/CombinationalWymore.lean#L406)) |
+| `2.82/definition/parameter_instance` | `component` | If F is a system parameterization, r ∈ DMN(F) and Z = F(r), then Z is an instance of F. | ✅ Faithful | `parameterInstance` ([Mbse/Wymore.lean:769](Mbse/Wymore.lean#L769))<br>`parameterInstance` ([Mbse/FiniteWymore.lean:287](Mbse/FiniteWymore.lean#L287))<br>`parameterInstance` ([Mbse/CombinationalWymore.lean:413](Mbse/CombinationalWymore.lean#L413)) |
 | `2.82/definition/multiple_parameters` | `component` | F has n parameters if DMN(F) is a subset of a Cartesian product P1 × ... × Pn. | ✅ Faithful | `HasNParameters` ([Mbse/FiniteWymore.lean:296](Mbse/FiniteWymore.lean#L296)) |
-| `2.82/definition/one_parameter` | `component` | F has one parameter if DMN(F) is not a subset of a Cartesian product. | ✅ Faithful | `HasOneParameter` ([Mbse/Wymore.lean:781](Mbse/Wymore.lean#L781))<br>`fccsy_has_one_parameter` ([Mbse/CombinationalWymore.lean:440](Mbse/CombinationalWymore.lean#L440)) |
+| `2.82/definition/one_parameter` | `component` | F has one parameter if DMN(F) is not a subset of a Cartesian product. | ✅ Faithful | `HasOneParameter` ([Mbse/Wymore.lean:781](Mbse/Wymore.lean#L781))<br>`fccsy_has_one_parameter` ([Mbse/CombinationalWymore.lean:439](Mbse/CombinationalWymore.lean#L439)) |
 
 ### `textbook/definition2.93` — Function Computation Systems Parameterization
 
@@ -192,7 +192,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.93/definition/fcnsy` | `component` | FCNSY(F, n) is the system Z with SZ = RNG(F), IZ = DMN(F), OZ = RNG(F)^n, NZ(x, p) = F(p), and RZ(x) = (x, ..., x). | ✅ Faithful | `fcnsy` ([Mbse/Wymore.lean:788](Mbse/Wymore.lean#L788))<br>`fccsy` ([Mbse/CombinationalWymore.lean:424](Mbse/CombinationalWymore.lean#L424)) |
+| `2.93/definition/fcnsy` | `component` | FCNSY(F, n) is the system Z with SZ = RNG(F), IZ = DMN(F), OZ = RNG(F)^n, NZ(x, p) = F(p), and RZ(x) = (x, ..., x). | ✅ Faithful | `fcnsy` ([Mbse/Wymore.lean:788](Mbse/Wymore.lean#L788))<br>`fccsy` ([Mbse/CombinationalWymore.lean:423](Mbse/CombinationalWymore.lean#L423)) |
 
 ### `textbook/definition3.11` — System Coupling Recipe
 
@@ -201,14 +201,14 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.11/definition/system_coupling_recipe` | `component` | A system coupling recipe is a pair denoted SCR = (VSCR, CSCR) where (i) VSCR is a connectable vector of systems and (ii) CSCR is a system connectivity for VSCR. | ✅ Faithful | `SystemCouplingRecipe` ([Mbse/FiniteWymore.lean:396](Mbse/FiniteWymore.lean#L396))<br>`CombinationalCouplingRecipe` ([Mbse/CombinationalWymore.lean:592](Mbse/CombinationalWymore.lean#L592)) |
+| `3.11/definition/system_coupling_recipe` | `component` | A system coupling recipe is a pair denoted SCR = (VSCR, CSCR) where (i) VSCR is a connectable vector of systems and (ii) CSCR is a system connectivity for VSCR. | ✅ Faithful | `SystemCouplingRecipe` ([Mbse/FiniteWymore.lean:396](Mbse/FiniteWymore.lean#L396))<br>`CombinationalCouplingRecipe` ([Mbse/CombinationalWymore.lean:591](Mbse/CombinationalWymore.lean#L591)) |
 | `3.11/interpretation/vscr` | `interpretation` | VSCR is called the connectable vector of system components of SCR. | ✅ Faithful | `SystemCouplingRecipe` ([Mbse/FiniteWymore.lean:396](Mbse/FiniteWymore.lean#L396)) |
 | `3.11/interpretation/cscr` | `interpretation` | CSCR is called the system connectivity of SCR. | ✅ Faithful | `SystemCouplingRecipe` ([Mbse/FiniteWymore.lean:396](Mbse/FiniteWymore.lean#L396)) |
-| `3.11/definition/coscr` | `component` | COSCR = DMN(CSCR), if CSCR is a function or COSCR = ∅, if CSCR = ∅. | ✅ Faithful | `COSCR` ([Mbse/FiniteWymore.lean:408](Mbse/FiniteWymore.lean#L408))<br>`CCOSCR` ([Mbse/CombinationalWymore.lean:611](Mbse/CombinationalWymore.lean#L611)) |
-| `3.11/definition/ciscr` | `component` | CISCR = RNG(CSCR), if CSCR is a function or CISCR = ∅, if CSCR = ∅. | ✅ Faithful | `CISCR` ([Mbse/FiniteWymore.lean:415](Mbse/FiniteWymore.lean#L415))<br>`CCISCR` ([Mbse/CombinationalWymore.lean:618](Mbse/CombinationalWymore.lean#L618)) |
-| `3.11/definition/uoscr` | `component` | UOSCR = ∪ {OPZ' : Z' ∈ VSCR} - COSCR. | ✅ Faithful | `UOSCR` ([Mbse/FiniteWymore.lean:422](Mbse/FiniteWymore.lean#L422))<br>`CUOSCR` ([Mbse/CombinationalWymore.lean:625](Mbse/CombinationalWymore.lean#L625)) |
-| `3.11/definition/uiscr` | `component` | UISCR = ∪ {IPZ' : Z' ∈ VSCR} - CISCR. | ✅ Faithful | `UISCR` ([Mbse/FiniteWymore.lean:429](Mbse/FiniteWymore.lean#L429))<br>`CUISCR` ([Mbse/CombinationalWymore.lean:632](Mbse/CombinationalWymore.lean#L632)) |
-| `3.11/definition/interface` | `component` | The interface between Z' and Z'' specified by SCR, where Z' and Z'' are in VSCR, is the set of all pairs in CSCR involving only input ports and outputs of both Z' and Z''; that is, the interface between Z' and Z'' is (CSCR ∩ (OPZ' × IPZ'')) ∪ (CSCR ∩ (OPZ'' × IPZ')). | ✅ Faithful | `SCRInterface` ([Mbse/FiniteWymore.lean:436](Mbse/FiniteWymore.lean#L436))<br>`CCSCRInterface` ([Mbse/CombinationalWymore.lean:639](Mbse/CombinationalWymore.lean#L639)) |
+| `3.11/definition/coscr` | `component` | COSCR = DMN(CSCR), if CSCR is a function or COSCR = ∅, if CSCR = ∅. | ✅ Faithful | `COSCR` ([Mbse/FiniteWymore.lean:408](Mbse/FiniteWymore.lean#L408))<br>`CCOSCR` ([Mbse/CombinationalWymore.lean:610](Mbse/CombinationalWymore.lean#L610)) |
+| `3.11/definition/ciscr` | `component` | CISCR = RNG(CSCR), if CSCR is a function or CISCR = ∅, if CSCR = ∅. | ✅ Faithful | `CISCR` ([Mbse/FiniteWymore.lean:415](Mbse/FiniteWymore.lean#L415))<br>`CCISCR` ([Mbse/CombinationalWymore.lean:617](Mbse/CombinationalWymore.lean#L617)) |
+| `3.11/definition/uoscr` | `component` | UOSCR = ∪ {OPZ' : Z' ∈ VSCR} - COSCR. | ✅ Faithful | `UOSCR` ([Mbse/FiniteWymore.lean:422](Mbse/FiniteWymore.lean#L422))<br>`CUOSCR` ([Mbse/CombinationalWymore.lean:624](Mbse/CombinationalWymore.lean#L624)) |
+| `3.11/definition/uiscr` | `component` | UISCR = ∪ {IPZ' : Z' ∈ VSCR} - CISCR. | ✅ Faithful | `UISCR` ([Mbse/FiniteWymore.lean:429](Mbse/FiniteWymore.lean#L429))<br>`CUISCR` ([Mbse/CombinationalWymore.lean:631](Mbse/CombinationalWymore.lean#L631)) |
+| `3.11/definition/interface` | `component` | The interface between Z' and Z'' specified by SCR, where Z' and Z'' are in VSCR, is the set of all pairs in CSCR involving only input ports and outputs of both Z' and Z''; that is, the interface between Z' and Z'' is (CSCR ∩ (OPZ' × IPZ'')) ∪ (CSCR ∩ (OPZ'' × IPZ')). | ✅ Faithful | `SCRInterface` ([Mbse/FiniteWymore.lean:436](Mbse/FiniteWymore.lean#L436))<br>`CCSCRInterface` ([Mbse/CombinationalWymore.lean:638](Mbse/CombinationalWymore.lean#L638)) |
 
 ### `textbook/definition3.15` — Conjunctive Coupling Recipe
 
@@ -217,7 +217,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.15/definition/conjunctive_scr` | `component` | The system coupling recipe SCR is conjunctive if and only if CSCR = ∅. | ✅ Faithful | `IsConjunctive` ([Mbse/FiniteWymore.lean:445](Mbse/FiniteWymore.lean#L445))<br>`IsConjunctiveCombinational` ([Mbse/CombinationalWymore.lean:647](Mbse/CombinationalWymore.lean#L647)) |
+| `3.15/definition/conjunctive_scr` | `component` | The system coupling recipe SCR is conjunctive if and only if CSCR = ∅. | ✅ Faithful | `IsConjunctive` ([Mbse/FiniteWymore.lean:445](Mbse/FiniteWymore.lean#L445))<br>`IsConjunctiveCombinational` ([Mbse/CombinationalWymore.lean:646](Mbse/CombinationalWymore.lean#L646)) |
 
 ### `textbook/definition3.19` — Cascade and Essentially Cascade Coupling Recipes
 
@@ -226,8 +226,8 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.19/definition/cascade_scr` | `component` | The system coupling recipe SCR is cascade if and only if CSCR contains no feedback connections. | ✅ Faithful | `IsCascade` ([Mbse/FiniteWymore.lean:452](Mbse/FiniteWymore.lean#L452))<br>`IsCascadeCombinational` ([Mbse/CombinationalWymore.lean:654](Mbse/CombinationalWymore.lean#L654)) |
-| `3.19/definition/essentially_cascade_scr` | `component` | The system coupling recipe SCR, where VSCR = (Z1, ..., Zn) for n ∈ IJS+, is 'essentially cascade' if there exists f ∈ FNS(IJS[1, n], 1TO1, ONTO, IJS[1, n]) such that if SCRf = ((Zf(1), ..., Zf(n)), CSCR), then SCRf is cascade. | ✅ Faithful | `IsEssentiallyCascade` ([Mbse/FiniteWymore.lean:459](Mbse/FiniteWymore.lean#L459))<br>`IsEssentiallyCascadeCombinational` ([Mbse/CombinationalWymore.lean:661](Mbse/CombinationalWymore.lean#L661)) |
+| `3.19/definition/cascade_scr` | `component` | The system coupling recipe SCR is cascade if and only if CSCR contains no feedback connections. | ✅ Faithful | `IsCascade` ([Mbse/FiniteWymore.lean:452](Mbse/FiniteWymore.lean#L452))<br>`IsCascadeCombinational` ([Mbse/CombinationalWymore.lean:653](Mbse/CombinationalWymore.lean#L653)) |
+| `3.19/definition/essentially_cascade_scr` | `component` | The system coupling recipe SCR, where VSCR = (Z1, ..., Zn) for n ∈ IJS+, is 'essentially cascade' if there exists f ∈ FNS(IJS[1, n], 1TO1, ONTO, IJS[1, n]) such that if SCRf = ((Zf(1), ..., Zf(n)), CSCR), then SCRf is cascade. | ✅ Faithful | `IsEssentiallyCascade` ([Mbse/FiniteWymore.lean:459](Mbse/FiniteWymore.lean#L459))<br>`IsEssentiallyCascadeCombinational` ([Mbse/CombinationalWymore.lean:660](Mbse/CombinationalWymore.lean#L660)) |
 
 ### `textbook/definition3.26` — Singular Coupling Recipe
 
@@ -236,7 +236,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.26/definition/singular_scr` | `component` | The system coupling recipe SCR is singular if and only if: (i) VSCR = Z for some system Z and (ii) CSCR = ∅. | ✅ Faithful | `IsSingular` ([Mbse/FiniteWymore.lean:467](Mbse/FiniteWymore.lean#L467))<br>`IsSingularCombinational` ([Mbse/CombinationalWymore.lean:668](Mbse/CombinationalWymore.lean#L668)) |
+| `3.26/definition/singular_scr` | `component` | The system coupling recipe SCR is singular if and only if: (i) VSCR = Z for some system Z and (ii) CSCR = ∅. | ✅ Faithful | `IsSingular` ([Mbse/FiniteWymore.lean:467](Mbse/FiniteWymore.lean#L467))<br>`IsSingularCombinational` ([Mbse/CombinationalWymore.lean:667](Mbse/CombinationalWymore.lean#L667)) |
 
 ### `textbook/definition3.29` — Pure Feedback Coupling Recipe
 
@@ -245,7 +245,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.29/definition/pure_feedback_scr` | `component` | The system coupling recipe SCR is pure feedback if and only if: (i) VSCR = Z for some Z ∈ DSYSTEMS and (ii) CSCR ≠ ∅. | ✅ Faithful | `IsPureFeedback` ([Mbse/FiniteWymore.lean:476](Mbse/FiniteWymore.lean#L476))<br>`IsPureFeedbackCombinational` ([Mbse/CombinationalWymore.lean:675](Mbse/CombinationalWymore.lean#L675)) |
+| `3.29/definition/pure_feedback_scr` | `component` | The system coupling recipe SCR is pure feedback if and only if: (i) VSCR = Z for some Z ∈ DSYSTEMS and (ii) CSCR ≠ ∅. | ✅ Faithful | `IsPureFeedback` ([Mbse/FiniteWymore.lean:476](Mbse/FiniteWymore.lean#L476))<br>`IsPureFeedbackCombinational` ([Mbse/CombinationalWymore.lean:674](Mbse/CombinationalWymore.lean#L674)) |
 
 ### `textbook/definition3.3` — Connectable Vector of Systems
 
@@ -254,7 +254,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.3/definition/connection_vector` | `component` | VSCR is a connection vector of systems iff: (i) either VSCR ∈ DSYSTEMS or VSCR is an n-tuple for some n ∈ IJS+ of the form VSCR = (Z1, ..., Zn) for n ∈ IJS+ and Zi ∈ DSYSTEMS for every i ∈ IJS[1, n]. | ✅ Faithful | `PortSystemVector` ([Mbse/Wymore.lean:821](Mbse/Wymore.lean#L821))<br>`PortSystemVector` ([Mbse/FiniteWymore.lean:325](Mbse/FiniteWymore.lean#L325))<br>`PortCombinationalSystemVector` ([Mbse/CombinationalWymore.lean:455](Mbse/CombinationalWymore.lean#L455)) |
+| `3.3/definition/connection_vector` | `component` | VSCR is a connection vector of systems iff: (i) either VSCR ∈ DSYSTEMS or VSCR is an n-tuple for some n ∈ IJS+ of the form VSCR = (Z1, ..., Zn) for n ∈ IJS+ and Zi ∈ DSYSTEMS for every i ∈ IJS[1, n]. | ✅ Faithful | `PortSystemVector` ([Mbse/Wymore.lean:821](Mbse/Wymore.lean#L821))<br>`PortSystemVector` ([Mbse/FiniteWymore.lean:325](Mbse/FiniteWymore.lean#L325))<br>`PortCombinationalSystemVector` ([Mbse/CombinationalWymore.lean:454](Mbse/CombinationalWymore.lean#L454)) |
 | `3.3/requirement/pairwise_distinct` | `constraint` | (ii) if {i, j} ⊆ IJS[1, n] such that i ≠ j, then Zi ≠ Zj. | ✅ Faithful | `PortSystemVector` ([Mbse/Wymore.lean:821](Mbse/Wymore.lean#L821))<br>`PortSystemVector` ([Mbse/FiniteWymore.lean:325](Mbse/FiniteWymore.lean#L325)) |
 
 ### `textbook/definition3.33` — Mixed Coupling Recipe
@@ -264,7 +264,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.33/definition/mixed_scr` | `component` | A system coupling recipe is mixed if it is not singular, conjunctive, cascade, essentially cascade, or pure feedback. | ✅ Faithful | `IsMixed` ([Mbse/FiniteWymore.lean:513](Mbse/FiniteWymore.lean#L513))<br>`IsMixedCombinational` ([Mbse/CombinationalWymore.lean:709](Mbse/CombinationalWymore.lean#L709)) |
+| `3.33/definition/mixed_scr` | `component` | A system coupling recipe is mixed if it is not singular, conjunctive, cascade, essentially cascade, or pure feedback. | ✅ Faithful | `IsMixed` ([Mbse/FiniteWymore.lean:513](Mbse/FiniteWymore.lean#L513))<br>`IsMixedCombinational` ([Mbse/CombinationalWymore.lean:708](Mbse/CombinationalWymore.lean#L708)) |
 
 ### `textbook/definition3.40` — Conjunctive System (Parallel Composition)
 
@@ -273,7 +273,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.40/definition/csy` | `component` | CSY = {(V, Z): V is a connectable vector of systems; if V = Z1, then Z = Z1; if V = (Z1, ..., Zn), then Z = (SZ, IZ, OZ, NZ, RZ). | ✅ Faithful | `csyOut` ([Mbse/Wymore.lean:930](Mbse/Wymore.lean#L930))<br>`csy` ([Mbse/FiniteWymore.lean:522](Mbse/FiniteWymore.lean#L522))<br>`ccsy` ([Mbse/CombinationalWymore.lean:473](Mbse/CombinationalWymore.lean#L473)) |
+| `3.40/definition/csy` | `component` | CSY = {(V, Z): V is a connectable vector of systems; if V = Z1, then Z = Z1; if V = (Z1, ..., Zn), then Z = (SZ, IZ, OZ, NZ, RZ). | ✅ Faithful | `csyOut` ([Mbse/Wymore.lean:930](Mbse/Wymore.lean#L930))<br>`csy` ([Mbse/FiniteWymore.lean:522](Mbse/FiniteWymore.lean#L522))<br>`ccsy` ([Mbse/CombinationalWymore.lean:472](Mbse/CombinationalWymore.lean#L472)) |
 | `3.40/definition/sz` | `component` | SZ = ⅹ (SZ1, ..., SZn). | ✅ Faithful | `csyOut` ([Mbse/Wymore.lean:930](Mbse/Wymore.lean#L930))<br>`csy` ([Mbse/FiniteWymore.lean:522](Mbse/FiniteWymore.lean#L522)) |
 | `3.40/definition/iz` | `component` | IZ = ⅹ (I1Z1, ..., Ik1Z1, ..., I1Zn, ..., IknZn). | ✅ Faithful | `csyOut` ([Mbse/Wymore.lean:930](Mbse/Wymore.lean#L930))<br>`csy` ([Mbse/FiniteWymore.lean:522](Mbse/FiniteWymore.lean#L522)) |
 | `3.40/definition/oz` | `component` | OZ = ⅹ (O1Z1, ..., Om1Z1, ..., O1Zn, ..., OmnZn). | ✅ Faithful | `csyOut` ([Mbse/Wymore.lean:930](Mbse/Wymore.lean#L930))<br>`csy` ([Mbse/FiniteWymore.lean:522](Mbse/FiniteWymore.lean#L522)) |
@@ -293,12 +293,12 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.7/definition/connectivity_relation` | `component` | A set CSCR is a system connectivity for the connectable vector VSCR of systems if and only if: (i) either CSCR = ∅ or CSCR is a 1TO1 function. | ✅ Faithful | `IsOneToOneRelation` ([Mbse/FiniteWymore.lean:347](Mbse/FiniteWymore.lean#L347))<br>`IsCombinationalSystemConnectivity` ([Mbse/CombinationalWymore.lean:581](Mbse/CombinationalWymore.lean#L581)) |
+| `3.7/definition/connectivity_relation` | `component` | A set CSCR is a system connectivity for the connectable vector VSCR of systems if and only if: (i) either CSCR = ∅ or CSCR is a 1TO1 function. | ✅ Faithful | `IsOneToOneRelation` ([Mbse/FiniteWymore.lean:347](Mbse/FiniteWymore.lean#L347))<br>`IsCombinationalSystemConnectivity` ([Mbse/CombinationalWymore.lean:580](Mbse/CombinationalWymore.lean#L580)) |
 | `3.7/requirement/domain_subset` | `constraint` | (ii) DMN(CSCR) is a proper subset of ∪ {OPZ' : Z' ∈ VSCR}. | ✅ Faithful | `IsProperDomain` ([Mbse/FiniteWymore.lean:355](Mbse/FiniteWymore.lean#L355)) |
 | `3.7/requirement/range_subset` | `constraint` | (iii) RNG(CSCR) is a proper subset of ∪ {IPZ' : Z' ∈ VSCR}. | ✅ Faithful | `IsProperRange` ([Mbse/Wymore.lean:842](Mbse/Wymore.lean#L842))<br>`IsProperRange` ([Mbse/FiniteWymore.lean:362](Mbse/FiniteWymore.lean#L362)) |
-| `3.7/requirement/port_compatibility` | `constraint` | (iv) if (B, A) ∈ CSCR, where B ∈ OPZ', A ∈ IPZ'', Z' ∈ VSCR and Z'' ∈ VSCR, then OSZ'(B) = ISZ''(A) (the port compatibility condition). | ✅ Faithful | `PortCompatibilityCombinational` ([Mbse/CombinationalWymore.lean:572](Mbse/CombinationalWymore.lean#L572)) |
+| `3.7/requirement/port_compatibility` | `constraint` | (iv) if (B, A) ∈ CSCR, where B ∈ OPZ', A ∈ IPZ'', Z' ∈ VSCR and Z'' ∈ VSCR, then OSZ'(B) = ISZ''(A) (the port compatibility condition). | ✅ Faithful | `PortCompatibilityCombinational` ([Mbse/CombinationalWymore.lean:571](Mbse/CombinationalWymore.lean#L571)) |
 | `3.7/definition/feedforward_connection` | `component` | A feedforward connection is a pair (B, A) ∈ CSCR, where, if VSCR = (Z1, ..., Zn), B ∈ OPZi and A ∈ IPZj, then i < j. | ✅ Faithful | `IsFeedforward` ([Mbse/FiniteWymore.lean:378](Mbse/FiniteWymore.lean#L378)) |
-| `3.7/definition/feedback_connection` | `component` | A feedback connection is a pair (B, A) ∈ CSCR, where, if VSCR = (Z1, ..., Zn), B ∈ OPZi and A ∈ IPZj, then i ≥ j. | ✅ Faithful | `IsFeedback` ([Mbse/FiniteWymore.lean:387](Mbse/FiniteWymore.lean#L387))<br>`IsFeedbackCombinational` ([Mbse/CombinationalWymore.lean:603](Mbse/CombinationalWymore.lean#L603)) |
+| `3.7/definition/feedback_connection` | `component` | A feedback connection is a pair (B, A) ∈ CSCR, where, if VSCR = (Z1, ..., Zn), B ∈ OPZi and A ∈ IPZj, then i ≥ j. | ✅ Faithful | `IsFeedback` ([Mbse/FiniteWymore.lean:387](Mbse/FiniteWymore.lean#L387))<br>`IsFeedbackCombinational` ([Mbse/CombinationalWymore.lean:602](Mbse/CombinationalWymore.lean#L602)) |
 
 ### `textbook/definition_a1.155` — Function Specification (FNS)
 
@@ -401,7 +401,7 @@
 | `2.29/theorem/trajectory_fns` | `implication` | STZ(f, x) ∈ FNS(TZ, SZ) for any f ∈ ITZ and x ∈ SZ. | ❌ Untraced | *None (Coverage Gap)* |
 | `2.29/proof/subset` | `implication` | Deduction (i): STZ(f, x) ⊆ TZ × SZ. | ❌ Untraced | *None (Coverage Gap)* |
 | `2.29/proof/totality` | `implication` | Deduction (ii): For all t ∈ TZ, there exists y ∈ SZ such that (t, y) ∈ STZ(f, x). | ❌ Untraced | *None (Coverage Gap)* |
-| `2.29/proof/single_valuedness` | `implication` | Deduction (iii): If (t1, y1) ∈ STZ(f, x) and (t2, y2) ∈ STZ(f, x) and t1 = t2, then y1 = y2 (induction proof). | ⚠️ Stub/Partial | `stateTrajectory_unique` ([Mbse/DPDAWymore.lean:234](Mbse/DPDAWymore.lean#L234)) _(partial)_ |
+| `2.29/proof/single_valuedness` | `implication` | Deduction (iii): If (t1, y1) ∈ STZ(f, x) and (t2, y2) ∈ STZ(f, x) and t1 = t2, then y1 = y2 (induction proof). | ⚠️ Stub/Partial | `stateTrajectory_unique` ([Mbse/DPDAWymore.lean:238](Mbse/DPDAWymore.lean#L238)) _(partial)_ |
 
 ### `textbook/theorem2.32` — Output Trajectory is a Function
 
@@ -411,7 +411,7 @@
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
 | `2.32/theorem/trajectory_fns` | `implication` | OTZ(f, x) ∈ FNS(TZ, OZ). | ❌ Untraced | *None (Coverage Gap)* |
-| `2.32/theorem/trajectory_value` | `implication` | OTZ(f, x)(t) = RZ(STZ(f, x)(t)) for any t ∈ TZ. | ⚠️ Stub/Partial | `outputTrajectory_unique` ([Mbse/DPDAWymore.lean:249](Mbse/DPDAWymore.lean#L249)) _(partial)_ |
+| `2.32/theorem/trajectory_value` | `implication` | OTZ(f, x)(t) = RZ(STZ(f, x)(t)) for any t ∈ TZ. | ⚠️ Stub/Partial | `outputTrajectory_unique` ([Mbse/DPDAWymore.lean:253](Mbse/DPDAWymore.lean#L253)) _(partial)_ |
 
 ### `textbook/theorem2.46` — Time Invariance of State Trajectory
 
@@ -420,7 +420,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.46/theorem/time_invariance` | `implication` | STZ(f → s, STZ(f, x)(s))(t) = STZ(f, x)(s + t) for any f ∈ ITZ, x ∈ SZ, and s, t ∈ TZ. | ✅ Faithful | `stateTrajectory_time_invariance` ([Mbse/DPDAWymore.lean:258](Mbse/DPDAWymore.lean#L258))<br>`stateTrajectory_time_invariance` ([Mbse/Wymore.lean:424](Mbse/Wymore.lean#L424)) |
+| `2.46/theorem/time_invariance` | `implication` | STZ(f → s, STZ(f, x)(s))(t) = STZ(f, x)(s + t) for any f ∈ ITZ, x ∈ SZ, and s, t ∈ TZ. | ✅ Faithful | `stateTrajectory_time_invariance` ([Mbse/DPDAWymore.lean:262](Mbse/DPDAWymore.lean#L262))<br>`stateTrajectory_time_invariance` ([Mbse/Wymore.lean:424](Mbse/Wymore.lean#L424)) |
 
 ### `textbook/theorem2.48` — Nonanticipatory Theorem
 
@@ -429,7 +429,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `2.48/theorem/nonanticipatory` | `implication` | If Z ∈ DSYSTEMS, {(f, x, t), (g, x, t)} ⊆ EXZ and RSN(f, TZ[0, t)) = RSN(g, TZ[0, t)), then STZ(f, x)(t) = STZ(g, x)(t). | ✅ Faithful | `stateTrajectory_nonanticipatory` ([Mbse/DPDAWymore.lean:272](Mbse/DPDAWymore.lean#L272))<br>`stateTrajectory_nonanticipatory` ([Mbse/Wymore.lean:474](Mbse/Wymore.lean#L474)) |
+| `2.48/theorem/nonanticipatory` | `implication` | If Z ∈ DSYSTEMS, {(f, x, t), (g, x, t)} ⊆ EXZ and RSN(f, TZ[0, t)) = RSN(g, TZ[0, t)), then STZ(f, x)(t) = STZ(g, x)(t). | ✅ Faithful | `stateTrajectory_nonanticipatory` ([Mbse/DPDAWymore.lean:276](Mbse/DPDAWymore.lean#L276))<br>`stateTrajectory_nonanticipatory` ([Mbse/Wymore.lean:474](Mbse/Wymore.lean#L474)) |
 
 ### `textbook/theorem2.76` — Equality of Readout Functions
 
@@ -484,7 +484,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.31/theorem/class_in_themselves` | `implication` | If SCR is a pure feedback system coupling recipe, then SCR is neither singular, conjunctive, or cascade. | ✅ Faithful | `pure_feedback_not_other` ([Mbse/Wymore.lean:905](Mbse/Wymore.lean#L905))<br>`pure_feedback_not_other` ([Mbse/FiniteWymore.lean:485](Mbse/FiniteWymore.lean#L485))<br>`pure_feedback_combinational_not_other` ([Mbse/CombinationalWymore.lean:682](Mbse/CombinationalWymore.lean#L682)) |
+| `3.31/theorem/class_in_themselves` | `implication` | If SCR is a pure feedback system coupling recipe, then SCR is neither singular, conjunctive, or cascade. | ✅ Faithful | `pure_feedback_not_other` ([Mbse/Wymore.lean:905](Mbse/Wymore.lean#L905))<br>`pure_feedback_not_other` ([Mbse/FiniteWymore.lean:485](Mbse/FiniteWymore.lean#L485))<br>`pure_feedback_combinational_not_other` ([Mbse/CombinationalWymore.lean:681](Mbse/CombinationalWymore.lean#L681)) |
 | `3.31/proof/not_singular_conjunctive` | `component` | SCR is neither singular or conjunctive because CSCR ≠ ∅ by the definition at 3.29. | ✅ Faithful | `pure_feedback_not_other` ([Mbse/Wymore.lean:905](Mbse/Wymore.lean#L905))<br>`pure_feedback_not_other` ([Mbse/FiniteWymore.lean:485](Mbse/FiniteWymore.lean#L485)) |
 | `3.31/proof/not_cascade` | `component` | SCR is not cascade, since CSCR must contain a pair of the form (B, A) where B is an output port of VSCR and A is an input port of VSCR, which is a feedback connection, by the definition at 3.7. | ✅ Faithful | `pure_feedback_not_other` ([Mbse/Wymore.lean:905](Mbse/Wymore.lean#L905))<br>`pure_feedback_not_other` ([Mbse/FiniteWymore.lean:485](Mbse/FiniteWymore.lean#L485)) |
 
@@ -495,7 +495,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.42/theorem/csy_parameterization` | `implication` | CSY is a system parameterization. | ✅ Faithful | `csy_parameterization` ([Mbse/FiniteWymore.lean:620](Mbse/FiniteWymore.lean#L620))<br>`ccsy_parameterization` ([Mbse/CombinationalWymore.lean:560](Mbse/CombinationalWymore.lean#L560)) |
+| `3.42/theorem/csy_parameterization` | `implication` | CSY is a system parameterization. | ✅ Faithful | `csy_parameterization` ([Mbse/FiniteWymore.lean:620](Mbse/FiniteWymore.lean#L620))<br>`ccsy_parameterization` ([Mbse/CombinationalWymore.lean:559](Mbse/CombinationalWymore.lean#L559)) |
 | `3.42/proof/dsystems` | `component` | The conjunctive system Z belongs to DSYSTEMS, verifying the state, input, output, and transition/readout function conditions. | ✅ Faithful | `csy_parameterization` ([Mbse/FiniteWymore.lean:620](Mbse/FiniteWymore.lean#L620)) |
 | `3.42/proof/existence` | `component` | For every connectable vector of systems V, there exists Z ∈ DSYSTEMS such that (V, Z) ∈ CSY. | ✅ Faithful | `csy_parameterization` ([Mbse/FiniteWymore.lean:620](Mbse/FiniteWymore.lean#L620)) |
 | `3.42/proof/uniqueness` | `component` | If (V1, Z1) ∈ CSY and (V2, Z2) ∈ CSY and V1 = V2, then Z1 = Z2. | ✅ Faithful | `csy_parameterization` ([Mbse/FiniteWymore.lean:620](Mbse/FiniteWymore.lean#L620)) |
@@ -507,7 +507,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.45/theorem/trajectories_relation` | `implication` | The state and output trajectories of the conjunctive system Z are equal to the tuples of the component state and output trajectories under projected inputs. | ✅ Faithful | `csy_state_trajectory` ([Mbse/FiniteWymore.lean:634](Mbse/FiniteWymore.lean#L634))<br>`ccsy_output_trajectory` ([Mbse/CombinationalWymore.lean:491](Mbse/CombinationalWymore.lean#L491)) |
+| `3.45/theorem/trajectories_relation` | `implication` | The state and output trajectories of the conjunctive system Z are equal to the tuples of the component state and output trajectories under projected inputs. | ✅ Faithful | `csy_state_trajectory` ([Mbse/FiniteWymore.lean:634](Mbse/FiniteWymore.lean#L634))<br>`ccsy_output_trajectory` ([Mbse/CombinationalWymore.lean:490](Mbse/CombinationalWymore.lean#L490)) |
 | `3.45/proof/state_zero` | `component` | The state trajectory relation is verified at time t = 0. | ✅ Faithful | `csy_state_trajectory` ([Mbse/FiniteWymore.lean:634](Mbse/FiniteWymore.lean#L634)) |
 | `3.45/proof/state_induction` | `component` | The state trajectory relation is verified for all t by induction. | ✅ Faithful | `csy_state_trajectory` ([Mbse/FiniteWymore.lean:634](Mbse/FiniteWymore.lean#L634)) |
 | `3.45/proof/output_relation` | `component` | The output trajectory relation is verified using the state trajectory relation. | ❌ Untraced | *None (Coverage Gap)* |

@@ -681,6 +681,8 @@ Forward: two distinct outputs in range yield two distinct finset members via `Fi
 
 **Constructible textbook cases:** `closedSystem`, `exists_closed_discreteSystem`, `toggleSystem`, `toggle_period_two`; infinite state preserved (`counterSystem_not_finite`).
 
+**DPDA (snapshot embed):** [Mbse/DPDAWymore.lean](Mbse/DPDAWymore.lean) reuses `_root_.IsNontrivial` on `toSnapshotDiscreteSystem` (`NZ = stepSnapshot`, `RZ = some ∘ G ∘ peek`). Clauses (i)–(ii) use `some p` inputs per the base definition; ε-steps are `none` on `stepSnapshot`. `isNontrivial_iff` unfolds to existential statements on snapshots. Bounded bridge: `bounded_isNontrivial_of` (witness + `hPres`, partial).
+
 ---
 
 ## 16. Meta-Analysis and Synthesis
