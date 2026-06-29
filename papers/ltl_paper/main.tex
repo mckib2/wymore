@@ -184,7 +184,7 @@
 % =========================
 % ===== Title & Authors ===
 % =========================
-\title{Assertional Verification of the Functionality Cotyledon: Replacing Structural Morphisms with Linear Temporal Logic}
+\title{Property Checking of the Functionality Cotyledon: Replacing Structural Morphisms with Linear Temporal Logic for T3SD}
 
 \begin{document}
 \maketitle
@@ -193,11 +193,11 @@
 % ---- Authors ----
 \noindent
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} A{0.48\textwidth} A{0.48\textwidth}}
-  \authorcard{Nicholas McKibben}{University of Arizona}{Dept. of Systems \& Industrial Eng.}{Tucson, AZ, USA}{nmckibben@arizona.edu} &
-  \authorcard{Paul Wach}{University of Arizona}{Dept. of Systems \& Industrial Eng.}{Tucson, AZ, USA}{pwach@arizona.edu} \\
+  \authorcard{Nicholas McKibben}{University of Arizona}{Dept. of Systems \& Industrial Eng.}{Tucson, AZ, USA}{mckib2@arizona.edu} &
+  \authorcard{Paul Wach}{University of Arizona}{Dept. of Systems \& Industrial Eng.}{Tucson, AZ, USA}{paulwach@arizona.edu} \\
   \multicolumn{2}{@{}c@{}}{\rule{0pt}{0.9\baselineskip}} \\[-0.2\baselineskip]
   \authorcard{Larry Head}{University of Arizona}{Dept. of Systems \& Industrial Eng.}{Tucson, AZ, USA}{klhead@arizona.edu} &
-  \authorcard{Alejandro Salado}{University of Arizona}{Dept. of Systems \& Industrial Eng.}{Tucson, AZ, USA}{asalado@arizona.edu}
+  \authorcard{Alejandro Salado}{University of Arizona}{Dept. of Systems \& Industrial Eng.}{Tucson, AZ, USA}{alejandrosalado@arizona.edu}
 \end{tabular*}
 \vspace{.25in}
 
@@ -215,34 +215,29 @@ Copyright~\textcopyright~ \the\year{} by the author(s). Permission granted to IN
 % =========================
 \phantomsection
 \miniheading{Abstract}
-This working draft serves as a collaborative workspace to establish the outline, draft content, and key discussion prompts for Paper 2. We focus on modernizing Wayne Wymore's Tricotyledon Theory of System Design (T3SD), specifically reinterpreting the Functionality Cotyledon as a declarative set of Linear Temporal Logic (LTL) and First-Order LTL (FO-LTL) formulas. Rather than constructing manual, rigid system morphisms between a specification $Z_{\text{spec}}$ and implementation $Z_{\text{impl}}$, we propose verifying Wymore's deterministic 5-tuple models ($Z$) directly against temporal requirements. We discuss observability boundaries (black-box vs. white-box) and address continuous trajectory decidability via SMT-backed bounded verification. Our core algebraic definitions have been validated in an interactive theorem prover to ensure mathematical soundness.
+We focus on modernizing Wayne Wymore's Tricotyledon Theory of System Design (T3SD), specifically reinterpreting the Functionality Cotyledon as a declarative set of Linear Temporal Logic (LTL) and First-Order LTL (FO-LTL) formulas. Rather than constructing manual, rigid system morphisms between a specification and implementation, we propose verifying Wymore's deterministic 5-tuple models directly against desired temporal requirements, captured as LTL expressions.
 
 \phantomsection
 \subsubsection{Keywords}
-Tricotyledon Theory of System Design, Functionality Cotyledon, Linear Temporal Logic (LTL), State and Output Trajectories, Formal Verification.
+Tricotyledon Theory of System Design (T3SD), Linear Temporal Logic (LTL), Formal Verification.
 
 % =========================
 % ===== Main Content ======
 % =========================
 \section{Introduction}
-This section introduces the foundational concepts and states the core research challenge for Paper 2.
 
-\miniheading{Section Goals and Content Structure:}
 \begin{itemize}
     \item \textbf{Contextualize Wymore's Functionality Cotyledon:} Outline how functional requirements are traditionally represented as a constructive reference system $Z_{\text{spec}}$ \parencite{Wymore1993}. Detail recent CSER work investigating the mathematical foundations of state machines within MBSE frameworks \parencite{salado2019wymore}.
-    \item \textbf{Identify Morphism Rigidity:} Discuss why finding system homomorphisms $h: Z_{\text{impl}} \rightarrow Z_{\text{spec}}$ is manual, mathematically rigid, and breaks for complex implementations.
+    \item \textbf{Identify Morphism Rigidity:} Discuss why finding system homomorphisms $h: Z_{\text{impl}} \rightarrow Z_{\text{spec}}$ is manual and breaks for even simple revisions to complex implementations.
     \item \textbf{Propose Direct LTL Verification:} Argue for evaluating temporal assertions (LTL/FO-LTL) directly over Wymore's state and output trajectories.
-    \item \textbf{Rigor Verification Check:} Note that the core algebraic consistency of our trajectory transformations is backed by formalization in an interactive theorem prover \parencite{demoura21lean4}, ensuring that the underlying definitions are mathematically sound.
 \end{itemize}
 
-\miniheading{Discussion Prompts for the Team:}
 \begin{itemize}
     \item How does this direct validation align with standard MBSE validation processes in the INCOSE Handbook \parencite{INCOSE2023}?
     \item Can we define a generic execution trace logic to evaluate LTL assertions directly on Wymorean trajectories?
 \end{itemize}
 
 \section{Methodology}
-This section details how to verify a Wymorean 5-tuple directly against LTL/FO-LTL.
 
 \subsection{Verification Paradigm Comparison}
 Figure~\ref{fig:comparison} contrasts Wymore's classical constructive verification with the proposed direct assertional verification.
@@ -294,22 +289,22 @@ Given a Wymorean system $Z = (S, I, O, \delta, \rho)$ and an input trajectory $f
     g(t+1) &= \delta(g(t), f(t)) \\
     h(t) &= \rho(g(t))
 \end{align}
-We define the complete execution trace as the sequence $\sigma = (g(0), h(0)), (g(1), h(1)), \dots$. We partition our temporal requirements $\Phi$ based on observability constraints:
+We define the complete execution trace as the sequence $\sigma = (g(0), h(0)), (g(1), h(1)), \dots$. We consider our temporal requirements $\Phi$ based on observability constraints:
 \begin{itemize}
     \item \textbf{External Observability (Black-Box):} Properties $\Phi_{\text{ext}}$ are defined only over output trajectories $h(t)$ and inputs $f(t)$. This represents standard system validation where internal states are hidden.
-    \item \textbf{Internal Safety (White-Box):} Invariants $\Phi_{\text{int}}$ evaluate state trajectories $g(t)$ to verify properties such as deadlock freedom or reachability of error configurations.
+    % TODO: cite Salado work on system theoretic definitions of closed and open system -- we are in the problem space of solutions, so we need only open systems
 \end{itemize}
 We say $Z \models \Phi$ if for all valid input trajectories $f$, the resulting trace satisfies $\sigma \models \Phi$ under standard LTL semantics \parencite{Pnueli1977}.
 
 \subsection{Continuous Dynamics and Decidability Bounds}
-Evaluating LTL over continuous states and trajectories (e.g., using FO-LTL to check properties like $G \forall x (\text{Input}(x) \rightarrow F \text{Output} = f(x))$) introduces undecidability. 
+Evaluating LTL over continuous states and trajectories (e.g., using FO-LTL to check properties like $G \forall x (\text{Input}(x) \rightarrow F \text{Output} = f(x))$) introduces undecidability. % NBPM: why must we consider continuous states?  Wymorean systems are explicitly in DSYSTEMS, not continuous.  Can be extended to DEVS if we need this (see T3SD DEVS paper)
 
-To maintain decidability, we frame our methodology as evaluating trajectories at discrete time units (Wymorean ticks) and leveraging:
+To maintain decidability, we frame our methodology as evaluating trajectories at discrete time units and leveraging:
 \begin{enumerate}
     \item **Bounded Model Checking (BMC):** Restricting verification to finite prefixes of the trajectories.
     \item **SMT-Backed Invariant Checking:** Interfacing with solvers (like Z3) to evaluate continuous variables at discrete steps.
 \end{enumerate}
-This contrasts with continuous-time hybrid systems verification models, such as Differential Dynamic Logic (dL) verified in provers like KeYmaera X \parencite{platzer2018logical}, by constraining continuous reasoning to static algebraic assertions at discrete ticks.
+This contrasts with continuous-time hybrid systems verification models, such as Differential Dynamic Logic (dL) verified in provers like KeYmaera X \parencite{platzer2018logical}, by constraining continuous reasoning to static algebraic assertions at discrete ticks.  % NBPM: Need to also relate to DEVS -- that's probably the most important comparison in the existing literature
 
 \begingroup
 \renewcommand{\arraystretch}{1.5}
@@ -321,26 +316,25 @@ This contrasts with continuous-time hybrid systems verification models, such as 
     \addlinespace[4pt]
     Proof Type & Morphism $h$ & Trace Checking \\
     \addlinespace[4pt]
-    Fidelity & Manual/Rigid & Automated \\
+    Fidelity & Manual/Rigid & Automated \\  % NBPM: is fidelity the right word here?  What about correctness, completeness, soundness, etc.?
 \end{tabularx}
 \captionof{table}{Verification Paradigm Summary}
 \label{tab:comparison}
 \endgroup
 \vspace{6pt}
 
-\miniheading{Discussion Prompts for the Team:}
 \begin{itemize}
     \item How should we formally structure the interface between the discrete time-step transitions and the continuous SMT constraints?
-    \item Does the Option-unified I/O representation for closed/autonomous systems complicate liveness properties?
+    \item Does the Option-unified I/O representation for closed/autonomous systems complicate liveness properties?  % NBPM: I don't know what this means
 \end{itemize}
 
-\section{Results: Criteria for a Candidate Case Study}
-Rather than committing to a specific case study, this section outlines the required properties of a system model to demonstrate the utility of the direct assertional verification framework. A strong case study must exhibit the following attributes:
+\section{Results}
+A strong case study must exhibit the following attributes:
 
 \miniheading{1. State-Space Complexity and Concurrency:}
 The system must have enough concurrent state components (e.g. sensor subsystems, mode changes, user overrides) that composition leads to a state-space explosion. This makes drawing a manual reference specification $Z_{\text{spec}}$ or finding an explicit morphism $h: Z_{\text{impl}} \rightarrow Z_{\text{spec}}$ mathematically untenable, highlighting the need for automated trace checking.
 
-\miniheading{2. Continuous-Discrete Trajectory Interface:}
+\miniheading{2. Continuous-Discrete Trajectory Interface:}  % NBPM: why continuous?  Can we get away with discrete?
 The system must couple discrete logic with continuous inputs and outputs (e.g. tracking physical distance or velocity over time). This allows demonstrating how SMT solvers or bounded model checking can handle real-valued trajectories at discrete Wymorean clock ticks, proving the decidability limits of the proposed approach.
 
 \miniheading{3. Expressive Safety and Liveness Requirements:}
@@ -349,26 +343,18 @@ The requirements must include both safety invariants ($G \neg \text{Hazard}$) an
 \miniheading{4. Morphism-Defying Edge Cases:}
 The case study should feature edge cases (e.g., transient sensor failures or unexpected environment cut-ins) where the implementation system's state space changes structurally. Under classical T3SD, this requires rebuilding the entire constructive reference system and morphism. Under our assertional framework, it only requires adding or modifying a temporal assertion.
 
-\miniheading{Discussion Prompt for the Team:}
-*What is a specific system that matches all four of these criteria? While Adaptive Cruise Control (ACC) is a standard benchmark, are there other cyber-physical systems that would better showcase the decidability bounds of continuous input trajectories?*
-
 \section{Discussion}
-This section will critically analyze the theoretical and practical implications.
 
-\miniheading{Key points to expand upon:}
 \begin{itemize}
     \item \textbf{Decoupled Intent and Structure:} Shows how modifying state variables or output mappings doesn't require rebuilding structural morphisms, only re-running the model checker.
     \item \textbf{Decidability of FO-LTL:} Address the complexity limits when continuous values are checked over trajectories.
 \end{itemize}
 
-\section{Conclusions \& Recommendations}
-This section summarizes the overall contribution.
+% NBPM: should mention somewhere that a benefit of enocoding requirements using LTL is that they are now in a formal language, not free-form/natural language -- this is a win for formal verification in SE
 
-\miniheading{Proposed Contribution Statement:}
+\section{Conclusionss}
+
 The paper redefines Wymore's Functionality Cotyledon assertionally as $\mathcal{FC}(\Phi) = \{ Z \mid Z \models \Phi \}$. This replaces constructive structural morphisms with direct temporal logic verification, enabling automated model checking of systems engineering specifications.
-
-\section{Acknowledgements}
-This work is supported by our formalization project team.
 
 \newpage
 \nocite{*}
