@@ -1,5 +1,5 @@
 import Mbse.Notation
-import Mbse.Wymore
+import Mbse.FiniteWymore
 
 /-!
   ## Zx4: Toggle System (Alternating States)
@@ -29,15 +29,15 @@ theorem zx4_double_toggle (s : SZx4) (i1 i2 : IZx4) :
 
 /-- At even times the system is in the initial state; at odd times, the opposite. -/
 theorem zx4_even_returns (s0 : SZx4) (f : ITZ IZx4) (n : Nat) :
-    generateStateTrajectory Zx4 s0 f (2 * n) = s0 := by
+    FSM.generateStateTrajectory Zx4 s0 f (2 * n) = s0 := by
   induction n with
-  | zero => simp [generateStateTrajectory_zero]
+  | zero => simp [FSM.generateStateTrajectory_zero]
   | succ k ih =>
     have h1 : 2 * (k + 1) = 2 * k + 1 + 1 := by omega
-    rw [h1, generateStateTrajectory_succ, generateStateTrajectory_succ, ih, zx4_double_toggle]
+    rw [h1, FSM.generateStateTrajectory_succ, FSM.generateStateTrajectory_succ, ih, zx4_double_toggle]
 
 /-- Both states are reachable from either starting state. -/
-theorem zx4_fully_reachable (s0 s : SZx4) : Reachable Zx4 s0 s := by
+theorem zx4_fully_reachable (s0 s : SZx4) : FSM.Reachable Zx4 s0 s := by
   cases s0 <;> cases s
   · exact ⟨fun _ => IZx4.v3, 0, rfl⟩
   · exact ⟨fun _ => IZx4.v3, 1, rfl⟩

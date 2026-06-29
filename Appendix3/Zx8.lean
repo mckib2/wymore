@@ -1,5 +1,5 @@
 import Mbse.Notation
-import Mbse.Wymore
+import Mbse.FiniteWymore
 
 /-!
   ## Zx8: Asymmetric Transition System (Variant)
@@ -24,13 +24,15 @@ theorem zx8_v1_absorbing (i : IZx8) : Zx8.NZ SZx8.v1 i = SZx8.v1 := by
 
 /-- Starting from v1, the state trajectory is constant. -/
 theorem zx8_v1_constant (f : ITZ IZx8) (t : Time) :
-    generateStateTrajectory Zx8 SZx8.v1 f t = SZx8.v1 := by
+    FSM.generateStateTrajectory Zx8 SZx8.v1 f t = SZx8.v1 := by
   induction t with
   | zero => rfl
-  | succ n ih => simp [generateStateTrajectory_succ, ih, zx8_v1_absorbing]
+  | succ n ih => simp [FSM.generateStateTrajectory_succ, ih, zx8_v1_absorbing]
 
 /-- State v2 is NOT reachable from v1 — the two-state system has
     a one-way escape from v2 to v1 but not the reverse. -/
-theorem zx8_v2_unreachable_from_v1 : ¬ Reachable Zx8 SZx8.v1 SZx8.v2 := by
-  intro ⟨f, t, h⟩
-  simp [zx8_v1_constant] at h
+theorem zx8_v2_unreachable_from_v1 : ¬ FSM.Reachable Zx8 SZx8.v1 SZx8.v2 := by
+  intro h
+  obtain ⟨f, t, ht⟩ := (FSM.reachable_iff Zx8 SZx8.v1 SZx8.v2).mp h
+  rw [zx8_v1_constant f t] at ht
+  cases ht

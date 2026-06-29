@@ -614,7 +614,57 @@ In Lean 4, the proofs translate coordinate projections ($\text{PJN}$) into depen
 
 ---
 
-## 12. Meta-Analysis and Synthesis
+## 12. Morphism Output Trajectory Preservation (Corollary)
+
+### Theorem Statement
+
+#### Textbook Strategy (composed)
+> If $\phi$ is a system morphism, then output trajectories commute with $\phi_O$ because $OTZ(f,x)(t) = RZ(STZ(f,x)(t))$ and morphisms preserve state trajectories and readout at every state.
+
+#### Lean 4 Representation
+* `morphism_preserves_output_trajectory` in [Mbse/Wymore.lean](Mbse/Wymore.lean)
+
+```lean
+theorem morphism_preserves_output_trajectory
+    (m : SystemMorphism Z1 Z2) (s0 : SZ1) (f : ITZ IZ1) :
+    ∀ t, m.φO (generateOutputTrajectory Z1 s0 f t) =
+         generateOutputTrajectory Z2 (m.φS s0) (m.φI ∘ f) t
+```
+
+### Proof Analysis
+
+#### DTT Strategy (§4/§5 collapse)
+Unfold `generateOutputTrajectory`, rewrite with `m.preserves_readout` then `morphism_preserves_state_trajectory`. No separate induction — readout is post-composition on state.
+
+---
+
+## 13. Output Trajectory Time Invariance and Nonanticipation (Corollaries of 2.46 / 2.48)
+
+#### Lean 4 Representation
+* `outputTrajectory_time_invariance` — [Mbse/Wymore.lean](Mbse/Wymore.lean)
+* `outputTrajectory_nonanticipatory` — [Mbse/Wymore.lean](Mbse/Wymore.lean)
+
+#### DTT Strategy
+Both are one-step rewrites after unfolding `generateOutputTrajectory`: apply `stateTrajectory_time_invariance` or `stateTrajectory_nonanticipatory` respectively. Textbook double induction on time invariance (§4) is bypassed entirely for outputs.
+
+---
+
+## 14. IsNontrivial Clause (iii): Existential vs `#RNG > 1`
+
+#### Textbook Statement
+> Varying output: `#RNG(RZ) > 1`.
+
+#### Lean 4 Representation
+* General: `IsNontrivial` clause (iii) uses existential distinct outputs — [Mbse/Wymore.lean](Mbse/Wymore.lean)
+* Finite: `FSM.IsNontrivial` uses `Finset.card (RNG Z.RZ) > 1` — [Mbse/FiniteWymore.lean](Mbse/FiniteWymore.lean)
+* Bridge: `varyingOutput_iff_card_rng`, `isNontrivial_varyingOutput_iff` — [Mbse/Wymore.lean](Mbse/Wymore.lean)
+
+#### DTT Strategy
+Forward: two distinct outputs in range yield two distinct finset members via `Finset.mem_image`. Backward: `Finset.one_lt_card_iff` gives two distinct range values with witnessing states. Requires `[Fintype SZ]` and `[DecidableEq OZ]` on the finite branch only.
+
+---
+
+## 15. Meta-Analysis and Synthesis
 
 
 Formalizing Wayne Wymore's textbook theorems in Lean 4 reveals key differences in how set theory and dependent type theory model and verify mathematical objects.

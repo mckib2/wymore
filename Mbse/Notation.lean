@@ -1,5 +1,5 @@
 import Lean
-import Mbse.Wymore
+import Mbse.FiniteWymore
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Tactic.DeriveFintype
 
@@ -70,7 +70,7 @@ def elabWymoreSystem : CommandElab := fun stx => do
     let firstSz := szElems.getElems[0]!
     let firstSzCtor := mkIdent (szName.getId ++ toCtorName firstSz)
 
-    elabCommand (← `(command| def $sysName:ident : DiscreteSystem $szName:ident $izName:ident $ozName:ident := {
+    elabCommand (← `(command| def $sysName:ident : FSM.FSMSystem $szName:ident $izName:ident $ozName:ident := {
       sz_nonempty := ⟨$firstSzCtor:ident⟩,
       sz_finite := inferInstance,
       iz_finite := inferInstance,

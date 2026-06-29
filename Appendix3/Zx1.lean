@@ -1,5 +1,5 @@
 import Mbse.Notation
-import Mbse.Wymore
+import Mbse.FiniteWymore
 
 /-!
   ## Zx1: Trivial Single-State System
@@ -32,17 +32,17 @@ theorem zx1_nz_fixed (s : SZx1) (i : IZx1) : Zx1.NZ s i = SZx1.v1 := by
 
 /-- The state trajectory is constant: state is always v1 at every time step. -/
 theorem zx1_trajectory_constant (s0 : SZx1) (f : ITZ IZx1) (t : Time) :
-    generateStateTrajectory Zx1 s0 f t = SZx1.v1 := by
+    FSM.generateStateTrajectory Zx1 s0 f t = SZx1.v1 := by
   induction t with
   | zero => exact zx1_constant_state s0
-  | succ n ih => simp [generateStateTrajectory_succ, ih, zx1_nz_fixed]
+  | succ n ih => simp [FSM.generateStateTrajectory_succ, ih, zx1_nz_fixed]
 
 /-- The output trajectory is constant: output is always v3. -/
 theorem zx1_output_constant (s0 : SZx1) (f : ITZ IZx1) (t : Time) :
-    generateOutputTrajectory Zx1 s0 f t = OZx1.v3 := by
-  simp [generateOutputTrajectory, zx1_trajectory_constant]
+    FSM.generateOutputTrajectory Zx1 s0 f t = OZx1.v3 := by
+  simp [FSM.generateOutputTrajectory, zx1_trajectory_constant]
 
 /-- All states in Zx1 are equivalent (trivially, there's only one). -/
 theorem zx1_all_states_equiv (s1 s2 : SZx1) : StateEquiv Zx1 s1 s2 := by
   intro f t
-  simp [generateOutputTrajectory, zx1_trajectory_constant]
+  simp [FSM.generateOutputTrajectory, zx1_trajectory_constant]

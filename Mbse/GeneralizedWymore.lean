@@ -111,7 +111,7 @@ theorem outputTrajectory_unique (Z : WymoreSystem SZ IZ OZ) (g : STZ SZ) (h : Ti
 
 /-! ## Time invariance and nonanticipation (ported from the base engine) -/
 
-/-- [textbook/theorem2.46/theorem/time_invariant] The state trajectory engine is time invariant. -/
+/-- [textbook/theorem2.46/theorem/time_invariance] The state trajectory engine is time invariant. -/
 theorem stateTrajectory_time_invariance
     (Z : WymoreSystem SZ IZ OZ) (x : SZ) (f : ITZW IZ) (s t : Time) :
     generateStateTrajectory Z (generateStateTrajectory Z x f s) (translate f s) t =
@@ -236,12 +236,12 @@ end GWymore
   `some ∘ Z.RZ`. This shows `WymoreSystem` conservatively generalizes the base development: the
   FSM theory is the always-`some`, always-output fragment.
 -/
-def DiscreteSystem.toWymore {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
-    GWymore.WymoreSystem SZ IZ OZ where
+noncomputable def DiscreteSystem.toWymore {SZ IZ OZ : Type} [Finite SZ] [Finite IZ] [Finite OZ]
+    (Z : DiscreteSystem SZ IZ OZ) : GWymore.WymoreSystem SZ IZ OZ where
   sz_nonempty := Z.sz_nonempty
-  sz_finite := Z.sz_finite
-  iz_finite := Z.iz_finite
-  oz_finite := Z.oz_finite
+  sz_finite := Fintype.ofFinite SZ
+  iz_finite := Fintype.ofFinite IZ
+  oz_finite := Fintype.ofFinite OZ
   NZ := fun s oi => match oi with
     | some i => Z.NZ s i
     | none => s
@@ -253,7 +253,8 @@ namespace GWymore
 abbrev liftInput {IZ : Type} (f : ITZ IZ) : ITZW IZ := fun t => some (f t)
 
 /-- The embedding preserves state trajectories exactly (under the lifted input). -/
-theorem toWymore_state_trajectory {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ)
+theorem toWymore_state_trajectory {SZ IZ OZ : Type} [Finite SZ] [Finite IZ] [Finite OZ]
+    (Z : DiscreteSystem SZ IZ OZ)
     (s0 : SZ) (f : ITZ IZ) (t : Time) :
     generateStateTrajectory Z.toWymore s0 (liftInput f) t =
       _root_.generateStateTrajectory Z s0 f t := by
@@ -265,7 +266,8 @@ theorem toWymore_state_trajectory {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ
 
 /-- The embedding is behaviorally faithful: its (partial) output trajectory is exactly the base
     system's output trajectory wrapped in `Option.some` (under the lifted input). -/
-theorem toWymore_output_trajectory {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ)
+theorem toWymore_output_trajectory {SZ IZ OZ : Type} [Finite SZ] [Finite IZ] [Finite OZ]
+    (Z : DiscreteSystem SZ IZ OZ)
     (s0 : SZ) (f : ITZ IZ) (t : Time) :
     generateOutputTrajectory Z.toWymore s0 (liftInput f) t =
       some (_root_.generateOutputTrajectory Z s0 f t) := by
@@ -276,7 +278,8 @@ theorem toWymore_output_trajectory {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ O
 
 /-- The embedding of any `DiscreteSystem` always produces output, reflecting that it lands in the
     open/Moore fragment. -/
-theorem toWymore_output_isSome {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ)
+theorem toWymore_output_isSome {SZ IZ OZ : Type} [Finite SZ] [Finite IZ] [Finite OZ]
+    (Z : DiscreteSystem SZ IZ OZ)
     (s0 : SZ) (f : ITZ IZ) (t : Time) :
     (generateOutputTrajectory Z.toWymore s0 (liftInput f) t).isSome = true := by
   rw [toWymore_output_trajectory]; rfl
@@ -314,8 +317,9 @@ theorem morphism_preserves_state_trajectory
 
 /-- Main-line integration: every `DiscreteSystem` morphism lifts to a `WymoreSystem` morphism
     between the embedded systems, so the generalized morphism theory subsumes the base one. -/
-def _root_.SystemMorphism.toWymore
-    {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+noncomputable def _root_.SystemMorphism.toWymore
+    {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type} [Finite SZ1] [Finite IZ1] [Finite OZ1]
+    [Finite SZ2] [Finite IZ2] [Finite OZ2]
     {Z1 : DiscreteSystem SZ1 IZ1 OZ1} {Z2 : DiscreteSystem SZ2 IZ2 OZ2}
     (m : _root_.SystemMorphism Z1 Z2) : GWymore.SystemMorphism Z1.toWymore Z2.toWymore where
   φS := m.φS
@@ -332,7 +336,8 @@ def _root_.SystemMorphism.toWymore
     rw [m.preserves_readout]
 
 /-- Main-line integration: reachability in a `DiscreteSystem` transfers to its embedding. -/
-theorem toWymore_reachable {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (s0 s : SZ)
+theorem toWymore_reachable {SZ IZ OZ : Type} [Finite SZ] [Finite IZ] [Finite OZ]
+    (Z : DiscreteSystem SZ IZ OZ) (s0 s : SZ)
     (h : _root_.Reachable Z s0 s) : Reachable Z.toWymore s0 s := by
   obtain ⟨f, t, ht⟩ := h
   exact ⟨liftInput f, t, by rw [toWymore_state_trajectory]; exact ht⟩
@@ -340,7 +345,8 @@ theorem toWymore_reachable {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (s0 s
 /-- Main-line integration: generalized state equivalence of the embedding refines base state
     equivalence. (The converse fails in general because the generalized notion also quantifies
     over autonomous `none`-driven trajectories.) -/
-theorem stateEquiv_toWymore_imp {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (s1 s2 : SZ)
+theorem stateEquiv_toWymore_imp {SZ IZ OZ : Type} [Finite SZ] [Finite IZ] [Finite OZ]
+    (Z : DiscreteSystem SZ IZ OZ) (s1 s2 : SZ)
     (h : StateEquiv Z.toWymore s1 s2) : _root_.StateEquiv Z s1 s2 := by
   intro f t
   have hh := h (liftInput f) t

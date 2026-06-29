@@ -1,5 +1,5 @@
 import Mbse.Notation
-import Mbse.Wymore
+import Mbse.FiniteWymore
 
 /-!
   ## Zx2: Absorbing-State System
@@ -51,38 +51,37 @@ theorem zx2_absorbing (s : SZx2) (i : IZx2) : Zx2.NZ s i = SZx2.v1 := by
 /-- After exactly one time step, the system is in state v1 regardless of
     the initial state or input. -/
 theorem zx2_reaches_v1_at_1 (s0 : SZx2) (f : ITZ IZx2) :
-    generateStateTrajectory Zx2 s0 f 1 = SZx2.v1 := by
-  simp [generateStateTrajectory_succ, zx2_absorbing]
+    FSM.generateStateTrajectory Zx2 s0 f 1 = SZx2.v1 := by
+  simp [FSM.generateStateTrajectory_succ, zx2_absorbing]
 
 /-- The system remains in v1 permanently after the first step.
     This is the key stability result: convergence in one step. -/
 theorem zx2_stable_after_1 (s0 : SZx2) (f : ITZ IZx2) (t : Time) (ht : t ≥ 1) :
-    generateStateTrajectory Zx2 s0 f t = SZx2.v1 := by
+    FSM.generateStateTrajectory Zx2 s0 f t = SZx2.v1 := by
   match t, ht with
-  | n + 1, _ => simp [generateStateTrajectory_succ, zx2_absorbing]
+  | n + 1, _ => simp [FSM.generateStateTrajectory_succ, zx2_absorbing]
 
 /-- After one step, the output is always v5 (the readout of the absorbing state). -/
 theorem zx2_output_after_1 (s0 : SZx2) (f : ITZ IZx2) (t : Time) (ht : t ≥ 1) :
-    generateOutputTrajectory Zx2 s0 f t = OZx2.v5 := by
-  unfold generateOutputTrajectory
-  rw [zx2_stable_after_1 s0 f t ht]
+    FSM.generateOutputTrajectory Zx2 s0 f t = OZx2.v5 := by
+  rw [FSM.generateOutputTrajectory_eq, zx2_stable_after_1 s0 f t ht]
   rfl
 
 /-- State v1 is reachable from any initial state. -/
-theorem zx2_v1_reachable (s0 : SZx2) : Reachable Zx2 s0 SZx2.v1 := by
+theorem zx2_v1_reachable (s0 : SZx2) : FSM.Reachable Zx2 s0 SZx2.v1 := by
   exact ⟨fun _ => IZx2.v3, 1, zx2_reaches_v1_at_1 s0 _⟩
 
 /-- Zx2 is finite (its state/input/output spaces are all finite). -/
-theorem zx2_is_finite : IsFinite Zx2 :=
-  discreteSystem_isFinite Zx2
+theorem zx2_is_finite : IsFinite Zx2.toDiscreteSystem :=
+  FSM.fsm_isFinite Zx2
 
 /-- Zx2 has order vector (2, 2, 2). -/
-theorem zx2_order_vector : HasOrderVector Zx2 2 2 2 := by
-  unfold HasOrderVector
+theorem zx2_order_vector : FSM.HasOrderVector Zx2 2 2 2 := by
+  unfold FSM.HasOrderVector
   decide
 
 /-- Zx2 is trivial because it fails the nontrivial requirements (no state-dependent transition). -/
-theorem zx2_is_trivial : IsTrivial Zx2 := by
+theorem zx2_is_trivial : FSM.IsTrivial Zx2 := by
   rintro ⟨⟨x1, x2, p, hne⟩, _, _⟩
   exact hne (by rw [zx2_absorbing, zx2_absorbing])
 

@@ -1,5 +1,5 @@
 import Mbse.Notation
-import Mbse.Wymore
+import Mbse.FiniteWymore
 
 /-!
   ## Zx7: Asymmetric Transition System
@@ -24,7 +24,7 @@ theorem zx7_v2_returns (i : IZx7) : Zx7.NZ SZx7.v2 i = SZx7.v1 := by
   cases i <;> rfl
 
 /-- Both states are reachable from v1. -/
-theorem zx7_reachable_from_v1 (s : SZx7) : Reachable Zx7 SZx7.v1 s := by
+theorem zx7_reachable_from_v1 (s : SZx7) : FSM.Reachable Zx7 SZx7.v1 s := by
   cases s
   · exact ⟨fun _ => IZx7.v3, 0, rfl⟩
   · exact ⟨fun _ => IZx7.v4, 1, rfl⟩

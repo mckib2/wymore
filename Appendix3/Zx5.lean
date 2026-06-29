@@ -1,5 +1,5 @@
 import Mbse.Notation
-import Mbse.Wymore
+import Mbse.FiniteWymore
 
 /-!
   ## Zx5: Input-Determined System
@@ -35,24 +35,28 @@ theorem zx5_input_v4 (s : SZx5) : Zx5.NZ s IZx5.v4 = SZx5.v2 := by
 /-- After one step, the state is completely determined by the most recent input.
     The system "forgets" its history after a single step. -/
 theorem zx5_forgets_initial (s0 s0' : SZx5) (f : ITZ IZx5) :
-    generateStateTrajectory Zx5 s0 f 1 = generateStateTrajectory Zx5 s0' f 1 := by
-  simp only [generateStateTrajectory_succ, generateStateTrajectory_zero]
+    FSM.generateStateTrajectory Zx5 s0 f 1 = FSM.generateStateTrajectory Zx5 s0' f 1 := by
+  simp only [FSM.generateStateTrajectory_succ, FSM.generateStateTrajectory_zero]
   exact zx5_input_determined s0 s0' (f 0)
 
 /-- More generally: for any t ≥ 1, the state depends only on f, not s0. -/
 theorem zx5_forgets_initial_general (s0 s0' : SZx5) (f : ITZ IZx5) (n : Nat) :
-    generateStateTrajectory Zx5 s0 f (n + 1) =
-    generateStateTrajectory Zx5 s0' f (n + 1) := by
+    FSM.generateStateTrajectory Zx5 s0 f (n + 1) =
+    FSM.generateStateTrajectory Zx5 s0' f (n + 1) := by
   induction n with
   | zero =>
-    simp only [generateStateTrajectory_succ, generateStateTrajectory_zero]
+    simp only [FSM.generateStateTrajectory_succ, FSM.generateStateTrajectory_zero]
     exact zx5_input_determined s0 s0' (f 0)
   | succ m ih =>
-    simp only [generateStateTrajectory_succ]
+    simp only [FSM.generateStateTrajectory_succ]
     congr 1
 
 /-- Both states are reachable from any initial state (by choosing the right input). -/
-theorem zx5_fully_reachable (s0 s : SZx5) : Reachable Zx5 s0 s := by
+theorem zx5_fully_reachable (s0 s : SZx5) : FSM.Reachable Zx5 s0 s := by
   cases s
-  · exact ⟨fun _ => IZx5.v3, 1, by simp [generateStateTrajectory_succ, zx5_input_v3]⟩
-  · exact ⟨fun _ => IZx5.v4, 1, by simp [generateStateTrajectory_succ, zx5_input_v4]⟩
+  · exact ⟨fun _ => IZx5.v3, 1, by
+      show FSM.generateStateTrajectory Zx5 s0 (fun _ => IZx5.v3) 1 = SZx5.v1
+      simp [FSM.generateStateTrajectory_succ, FSM.generateStateTrajectory_zero, zx5_input_v3]⟩
+  · exact ⟨fun _ => IZx5.v4, 1, by
+      show FSM.generateStateTrajectory Zx5 s0 (fun _ => IZx5.v4) 1 = SZx5.v2
+      simp [FSM.generateStateTrajectory_succ, FSM.generateStateTrajectory_zero, zx5_input_v4]⟩

@@ -1,13 +1,18 @@
 import Mathlib.Data.Fintype.Basic
-import Mathlib.Data.Fintype.Card
-import Mathlib.Data.Fintype.Pi
-import Mathlib.Data.Fintype.Sigma
+import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Data.Finset.Basic
 
 
 
 /-!
-  Formalization of Wayne Wymore's Tricotyledon Theory of System Design (T3SD)
+# General Wymore Discrete Systems (Definition 2.4)
+
+Faithful encoding of Wayne Wymore's discrete system quintuple `Z = (SZ, IZ, OZ, NZ, RZ)` from
+Definition 2.4: `SZ` is any nonempty type (infinite state spaces allowed). Definition 2.11
+finiteness is a derived predicate (`IsFinite`), not a construction rule.
+
+For finite Moore machines (Def 2.11, `Fintype` state/input/output, Ch. 3 coupling, `Z2`, `csy`),
+see [`FiniteWymore`](FiniteWymore.lean).
 -/
 
 /--
@@ -21,15 +26,6 @@ import Mathlib.Data.Finset.Basic
 structure DiscreteSystem (SZ : Type) (IZ : Type) (OZ : Type) where
     /-- [textbook/definition2.4/constraint/sz_nonempty] Proof that the state space SZ is not empty -/
     sz_nonempty : Nonempty SZ
-
-    /-- Proof that the state space is finite (discrete system assumption) -/
-    sz_finite : Fintype SZ
-
-    /-- Proof that the input space is finite (discrete system assumption) -/
-    iz_finite : Fintype IZ
-
-    /-- Proof that the output space is finite (discrete system assumption) -/
-    oz_finite : Fintype OZ
 
     /-- [textbook/definition2.4/component/NZ] [textbook/definition2.4/constraint/nz_signature|partial] Next State Function: NZ ∈ FNS(SZ × IZ, SZ).
         Partial: the textbook's empty-input case (NZ ∈ FNS(SZ, SZ) if IZ empty) is not separately modeled;
@@ -104,44 +100,55 @@ theorem not_isClosed {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) : ¬ IsClos
 /--
   [textbook/definition2.11/definition/finite_system]
   A Wymorian discrete system Z is finite if and only if SZ, IZ, and OZ are finite sets.
-  In our formalization, all systems are finite by construction (enforced by the Fintype fields);
-  `discreteSystem_isFinite` proves this predicate holds for every system.
+  On the general base this is a nontrivial classification predicate; every `FSMSystem`
+  (see `FiniteWymore`) satisfies it via `fsm_isFinite`.
 -/
 def IsFinite {SZ IZ OZ : Type} (_Z : DiscreteSystem SZ IZ OZ) : Prop :=
   Finite SZ ∧ Finite IZ ∧ Finite OZ
 
-/-- Every `DiscreteSystem` is finite, since its state/input/output spaces carry `Fintype`. -/
-theorem discreteSystem_isFinite {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) : IsFinite Z :=
-  have := Z.sz_finite
-  have := Z.iz_finite
-  have := Z.oz_finite
-  ⟨Finite.of_fintype SZ, Finite.of_fintype IZ, Finite.of_fintype OZ⟩
+/--
+  [textbook/definition_a1.218/definition/range]
+  The range (RNG) of a function with finite domain and decidable equality on the codomain.
+  Used for the finite `#RNG(RZ) > 1` formulation of nontriviality (see `IsNontrivial` in `FSM`).
+-/
+def RNG {A B : Type} [Fintype A] [DecidableEq B] (f : A → B) : Finset B :=
+  Finset.image f Finset.univ
 
 /--
-  [textbook/definition2.11/definition/order_vector]
-  The system Z is finite with order vector (k, m, n) if and only if
-  k = #SZ, m = #IZ, n = #OZ, and k, m, n ∈ IJS+ (positive integers).
+  On finite systems, clause (iii) of nontriviality (`∃` two distinct outputs) is equivalent to
+  `#RNG(RZ) > 1`. DTT strategy (proof comparison §13): forward via `Finset.insert`;
+  backward via `Finset.card_le_two` / two-element witness from `card > 1`.
 -/
-def HasOrderVector {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (k m n : Nat) : Prop :=
-  have : Fintype SZ := Z.sz_finite
-  have : Fintype IZ := Z.iz_finite
-  have : Fintype OZ := Z.oz_finite
-  Fintype.card SZ = k ∧ Fintype.card IZ = m ∧ Fintype.card OZ = n ∧
-  k ≥ 1 ∧ m ≥ 1 ∧ n ≥ 1
+theorem varyingOutput_iff_card_rng {SZ OZ : Type} [Fintype SZ] [Fintype OZ] [DecidableEq OZ]
+    (RZ : SZ → OZ) :
+    (∃ (o1 o2 : OZ) (s1 s2 : SZ), o1 ≠ o2 ∧ RZ s1 = o1 ∧ RZ s2 = o2) ↔
+    Finset.card (RNG RZ) > 1 := by
+  constructor
+  · rintro ⟨o1, o2, s1, s2, ho, h1, h2⟩
+    refine (Finset.one_lt_card_iff).2 ⟨o1, o2, ?_, ?_, ho⟩
+    · exact Finset.mem_image.mpr ⟨s1, Finset.mem_univ _, h1⟩
+    · exact Finset.mem_image.mpr ⟨s2, Finset.mem_univ _, h2⟩
+  · intro h
+    obtain ⟨o1, o2, hm1, hm2, ho⟩ := (Finset.one_lt_card_iff).1 h
+    obtain ⟨s1, _, hs1⟩ := Finset.mem_image.mp hm1
+    obtain ⟨s2, _, hs2⟩ := Finset.mem_image.mp hm2
+    exact ⟨o1, o2, s1, s2, ho, hs1, hs2⟩
+
+/--
+  On a finite discrete system, general `IsNontrivial` clause (iii) matches the textbook
+  `#RNG(RZ) > 1` formulation.
+-/
+theorem isNontrivial_varyingOutput_iff {SZ IZ OZ : Type} [Fintype SZ] [Fintype OZ] [DecidableEq OZ]
+    (Z : DiscreteSystem SZ IZ OZ) :
+    (∃ (o1 o2 : OZ) (s1 s2 : SZ), o1 ≠ o2 ∧ Z.RZ s1 = o1 ∧ Z.RZ s2 = o2) ↔
+    Finset.card (RNG Z.RZ) > 1 :=
+  varyingOutput_iff_card_rng Z.RZ
 
 /--
   [textbook/definition_a1.218/definition/domain]
   The domain (DMN) of a function `f : A → B` is the type `A`.
 -/
 abbrev DMN {A B : Type} (_f : A → B) : Type := A
-
-/--
-  [textbook/definition_a1.218/definition/range]
-  The range (RNG) of a function `f : A → B` (with finite domain A and decidable equality on B)
-  is the image of the domain under `f` as a Finset.
--/
-def RNG {A B : Type} [Fintype A] [DecidableEq B] (f : A → B) : Finset B :=
-  Finset.image f Finset.univ
 
 /--
   [textbook/definition2.14/definition/nontrivial_system]
@@ -151,14 +158,15 @@ def RNG {A B : Type} [Fintype A] [DecidableEq B] (f : A → B) : Finset B :=
   A Wymorian discrete system Z is nontrivial if and only if:
   1. State-dependent transition: there exist x1, x2 : SZ and p : IZ such that Z.NZ x1 p ≠ Z.NZ x2 p
   2. Active transition: there exist x : SZ and p : IZ such that Z.NZ x p ≠ x
-  3. Varying output: the size of the range of the readout function Z.RZ is greater than 1.
+  3. Varying output: the readout takes at least two distinct values.
+
+  Clause (iii) is stated without `Fintype` so it applies on infinite state spaces. The finite
+  `#RNG(RZ) > 1` formulation lives in `FiniteWymore.FSM.IsNontrivial`.
 -/
 def IsNontrivial {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) : Prop :=
-  have : Fintype SZ := Z.sz_finite
-  have : DecidableEq OZ := Classical.decEq OZ
   (∃ (x1 x2 : SZ) (p : IZ), Z.NZ x1 p ≠ Z.NZ x2 p) ∧
   (∃ (x : SZ) (p : IZ), Z.NZ x p ≠ x) ∧
-  (Finset.card (RNG Z.RZ) > 1)
+  (∃ (o1 o2 : OZ) (s1 s2 : SZ), o1 ≠ o2 ∧ Z.RZ s1 = o1 ∧ Z.RZ s2 = o2)
 
 /--
   [textbook/definition2.14/implication/trivial_system]
@@ -363,6 +371,21 @@ theorem morphism_preserves_state_trajectory
     simp only [generateStateTrajectory_succ, Function.comp]
     rw [m.preserves_transition, ih]
 
+/-- A morphism preserves output trajectories: mapped readout at each time equals the
+    output trajectory in the target system from the mapped initial state and inputs.
+    DTT strategy (proof comparison §4/§5 collapse): induction on `t`; base and step use
+    `preserves_readout` after rewriting state via `morphism_preserves_state_trajectory`. -/
+theorem morphism_preserves_output_trajectory
+    {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z1 : DiscreteSystem SZ1 IZ1 OZ1}
+    {Z2 : DiscreteSystem SZ2 IZ2 OZ2}
+    (m : SystemMorphism Z1 Z2) (s0 : SZ1) (f : ITZ IZ1) :
+    ∀ t, m.φO (generateOutputTrajectory Z1 s0 f t) =
+         generateOutputTrajectory Z2 (m.φS s0) (m.φI ∘ f) t := by
+  intro t
+  unfold generateOutputTrajectory
+  rw [m.preserves_readout, morphism_preserves_state_trajectory m s0 f t]
+
 /-! ## Translation and Concatenation of Trajectories -/
 
 /--
@@ -483,6 +506,16 @@ theorem stateTrajectory_time_invariance
     congr 2
     exact Nat.add_comm t s
 
+/-- Output trajectory time invariance: corollary of Theorem 2.46 via readout post-composition.
+    DTT strategy (proof comparison §4): no second induction — rewrite with
+    `stateTrajectory_time_invariance` after unfolding `generateOutputTrajectory`. -/
+theorem outputTrajectory_time_invariance
+    (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f : ITZ IZ) (s t : Time) :
+    generateOutputTrajectory Z (generateStateTrajectory Z x f s) (translate f s) t =
+    generateOutputTrajectory Z x f (s + t) := by
+  unfold generateOutputTrajectory
+  rw [stateTrajectory_time_invariance Z x f s t]
+
 /-! ## System Experiments and Nonanticipation -/
 
 /--
@@ -537,6 +570,15 @@ theorem stateTrajectory_nonanticipatory
       rw [rsn_eq_iff]
       exact h_lt
     rw [ih h_rsn_t, h_eq]
+
+/-- Output trajectory nonanticipation: corollary of Theorem 2.48 via readout post-composition.
+    DTT strategy (proof comparison §5): `stateTrajectory_nonanticipatory` then `rfl` on readout. -/
+theorem outputTrajectory_nonanticipatory
+    (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f g : ITZ IZ) (t : Time)
+    (h_agree : RSN f {i | i < t} = RSN g {i | i < t}) :
+    generateOutputTrajectory Z x f t = generateOutputTrajectory Z x g t := by
+  unfold generateOutputTrajectory
+  rw [stateTrajectory_nonanticipatory Z x f g t h_agree]
 
 /-! ## Projection Functions and Input Ports -/
 
@@ -726,52 +768,36 @@ theorem pjn_is_fun {I : Type} {A : I → Type} (i : I) :
     SatisfiesFNS (PJN i : ((j : I) → A j) → A i) :=
   satisfiesFNS_of_function _
 
-/--
-  State space of the constructed system Z2.
-  Pair of output value and original state, restricted such that the output value
-  is the readout of the state.
--/
+/-! ## Z2 Construction (Theorem 2.78) -/
+
 structure Z2State (SZ OZ : Type) (RZ : SZ → OZ) where
   out : OZ
   state : SZ
   eq : out = RZ state
 
-/--
-  Equivalence between the new state space Z2State and the original state space SZ.
--/
+/-- Equivalence between `Z2State` and the original state space `SZ`. -/
 def Z2State.equivSZ {SZ OZ : Type} (RZ : SZ → OZ) : Z2State SZ OZ RZ ≃ SZ where
   toFun s2 := s2.state
   invFun s := ⟨RZ s, s, rfl⟩
-  left_inv := fun ⟨o, s, h⟩ => by
-    subst h
-    rfl
-  right_inv s := rfl
+  left_inv := fun ⟨o, s, h⟩ => by subst h; rfl
+  right_inv _ := rfl
 
 /--
   [textbook/theorem2.78/theorem/system_construction]
   [textbook/theorem2.78/proof/dsystems]
   [textbook/theorem2.78/proof/properly_aligned]
   Construction of a system Z2 with properly aligned projective readout to replace Z1.
+  DTT strategy (proof comparison §7): `Z2State.equivSZ` gives non-emptiness without cardinality.
 -/
 def Z2 {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) : DiscreteSystem (Z2State SZ OZ Z.RZ) IZ OZ where
   sz_nonempty := Z.sz_nonempty.map (Z2State.equivSZ Z.RZ).symm
-  sz_finite :=
-    have := Z.sz_finite
-    Fintype.ofEquiv SZ (Z2State.equivSZ Z.RZ).symm
-  iz_finite := Z.iz_finite
-  oz_finite := Z.oz_finite
   NZ := fun s2 p => ⟨Z.RZ (Z.NZ s2.state p), Z.NZ s2.state p, rfl⟩
   RZ := fun s2 => s2.out
 
-/--
-  The properly aligned property of the constructed readout function Z2.RZ.
-  The readout to output port `op` is the coordinate projection of the state.
--/
 theorem z2_readout_projective {SZ IZ OutPort : Type} {OutPortVal : OutPort → Type}
     (Z : DiscreteSystem SZ IZ ((op : OutPort) → OutPortVal op)) (op : OutPort)
     (s2 : Z2State SZ ((op : OutPort) → OutPortVal op) Z.RZ) :
-    portReadout (Z2 Z) op s2 = s2.out op := by
-  rfl
+    portReadout (Z2 Z) op s2 = s2.out op := rfl
 
 /--
   [textbook/theorem2.78/proof/exz_mapping]
@@ -784,13 +810,12 @@ def Z2.exz_map {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
 /--
   [textbook/theorem2.78/proof/state_trajectory_projection]
   State trajectory equivalence: the state part of Z2's trajectory is Z1's state trajectory.
-  Proven by induction on time t.
 -/
-theorem z2_state_trajectory_equivalence {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f : ITZ IZ) (t : Time) :
+theorem z2_state_trajectory_equivalence {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (x : SZ)
+    (f : ITZ IZ) (t : Time) :
     (generateStateTrajectory (Z2 Z) ⟨Z.RZ x, x, rfl⟩ f t).state = generateStateTrajectory Z x f t := by
   induction t with
-  | zero =>
-    rfl
+  | zero => rfl
   | succ t ih =>
     simp only [generateStateTrajectory_succ]
     unfold Z2
@@ -802,67 +827,51 @@ theorem z2_state_trajectory_equivalence {SZ IZ OZ : Type} (Z : DiscreteSystem SZ
   [textbook/theorem2.78/proof/output_trajectory_equality]
   Output trajectory equivalence: Z2 produces the same output trajectory as Z1.
 -/
-theorem z2_output_trajectory_equivalence {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f : ITZ IZ) (t : Time) :
+theorem z2_output_trajectory_equivalence {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (x : SZ)
+    (f : ITZ IZ) (t : Time) :
     generateOutputTrajectory (Z2 Z) ⟨Z.RZ x, x, rfl⟩ f t = generateOutputTrajectory Z x f t := by
-  unfold generateOutputTrajectory
-  unfold Z2
-  dsimp
-  have eq_th := (generateStateTrajectory (Z2 Z) ⟨Z.RZ x, x, rfl⟩ f t).eq
-  unfold Z2 at eq_th
-  rw [eq_th]
-  have st_eq := z2_state_trajectory_equivalence Z x f t
-  unfold Z2 at st_eq
-  rw [st_eq]
+  let s0 : Z2State SZ OZ Z.RZ := ⟨Z.RZ x, x, rfl⟩
+  have h_out :
+      generateOutputTrajectory (Z2 Z) s0 f t = (generateStateTrajectory (Z2 Z) s0 f t).out := rfl
+  have h_z :
+      generateOutputTrajectory Z x f t = Z.RZ (generateStateTrajectory Z x f t) := rfl
+  rw [h_out, h_z, (generateStateTrajectory (Z2 Z) s0 f t).eq, z2_state_trajectory_equivalence Z x f t]
 
 /-! ## System Parameterization -/
 
 /--
   [textbook/definition2.82/definition/system_parameterization]
-  A system parameterization F maps a parameter type `P` to a `DiscreteSystem`.
-  To allow system spaces to depend on parameters, we define it as a structure
-  where the state, input, and output spaces are functions of `P`.
+  A system parameterization maps a parameter type `P` to a `DiscreteSystem`.
 -/
-def SystemParameterization (P : Type u) (SZ IZ OZ : P → Type) : Type u :=
+def DiscreteSystemParameterization (P : Type) (SZ IZ OZ : P → Type) : Type :=
   (p : P) → DiscreteSystem (SZ p) (IZ p) (OZ p)
 
 /--
   [textbook/definition2.82/definition/parameter_instance]
-  An instance of a system parameterization `F` for a parameter value `r : P`
-  is simply the system `F r`.
+  An instance of a system parameterization `F` for a parameter value `r : P` is the system `F r`.
 -/
-def parameterInstance {P : Type u} {SZ IZ OZ : P → Type}
-    (F : SystemParameterization P SZ IZ OZ) (r : P) : DiscreteSystem (SZ r) (IZ r) (OZ r) :=
+def parameterInstance {P : Type} {SZ IZ OZ : P → Type}
+    (F : DiscreteSystemParameterization P SZ IZ OZ) (r : P) :
+    DiscreteSystem (SZ r) (IZ r) (OZ r) :=
   F r
 
-/--
-  [textbook/definition2.82/definition/multiple_parameters]
-  A parameterization has `n` parameters if its parameter domain type is (equivalent to) a
-  product type indexed by `Fin n`. Stated via an explicit type equivalence so the predicate
-  carries real content rather than restating its own hypothesis.
--/
 def HasNParameters (P : Type) (n : Nat) (ParamType : Fin n → Type) : Prop :=
   Nonempty (P ≃ ((i : Fin n) → ParamType i))
 
 /--
   [textbook/definition2.82/definition/one_parameter]
-  A parameterization has one parameter if its parameter domain is (equivalent to) a single-factor
-  product, i.e. it has exactly one parameter factor.
+  A parameterization has one parameter if its parameter domain is equivalent to a single-factor product.
 -/
 def HasOneParameter (P : Type) : Prop :=
   ∃ ParamType : Fin 1 → Type, HasNParameters P 1 ParamType
 
 /--
   [textbook/definition2.93/definition/fcnsy]
-  The parameterization of function computation systems is denoted FCNSY.
-  For a function F : IZ → SZ and a positive number of output ports n,
-  it returns a system Z with state space SZ, input space IZ, and output space Fin n → SZ.
+  The parameterization of function computation systems FCNSY.
 -/
-def fcnsy {IZ SZ : Type} (F : IZ → SZ) (n : Nat) [Fintype SZ] [Fintype IZ] [Inhabited SZ] :
+def fcnsy {IZ SZ : Type} (F : IZ → SZ) (n : Nat) [Inhabited SZ] :
     DiscreteSystem SZ IZ (Fin n → SZ) where
   sz_nonempty := ⟨default⟩
-  sz_finite := inferInstance
-  iz_finite := inferInstance
-  oz_finite := by infer_instance
   NZ := fun _x p => F p
   RZ := fun x _j => x
 
@@ -870,35 +879,28 @@ def fcnsy {IZ SZ : Type} (F : IZ → SZ) (n : Nat) [Fintype SZ] [Fintype IZ] [In
   [textbook/theorem2.96/theorem/parameter_count]
   FCNSY is a system parameterization with two parameters.
 -/
-theorem fcnsy_has_two_parameters {IZ SZ : Type} [Fintype SZ] [Fintype IZ] [Inhabited SZ] :
+theorem fcnsy_has_two_parameters {IZ SZ : Type} [Inhabited SZ] :
     ∃ (P : Type) (ParamType : Fin 2 → Type), HasNParameters P 2 ParamType := by
   let ParamType : Fin 2 → Type := fun i => if i.val == 0 then (IZ → SZ) else Nat
   exact ⟨(i : Fin 2) → ParamType i, ParamType, ⟨Equiv.refl _⟩⟩
-
 
 /--
   [textbook/theorem2.97/theorem/output_value]
   [textbook/theorem2.97/proof/t_zero]
   [textbook/theorem2.97/proof/arbitrary_t]
   For Z = FCNSY(F, 1), the output at t + 1 is F(f(t)).
-  Due to the simplicity of the function computation system where the next state is independent
-  of the previous state, this holds definitionally by `rfl` for all `t`. Thus, the textbook's
-  induction proof (using t = 0 as base case and applying the Time Invariance Theorem)
-  collapses to a single definitional proof in Lean 4.
+  DTT strategy (proof comparison §9): state-independent NZ collapses to `rfl`.
 -/
-theorem fcnsy_output_one_time_unit {IZ SZ : Type} (F : IZ → SZ) [Fintype SZ] [Fintype IZ] [Inhabited SZ]
+theorem fcnsy_output_one_time_unit {IZ SZ : Type} (F : IZ → SZ) [Inhabited SZ]
     (x : SZ) (f : ITZ IZ) (t : Time) :
-    generateOutputTrajectory (fcnsy F 1) x f (t + 1) 0 = F (f t) := by
-  rfl
+    generateOutputTrajectory (fcnsy F 1) x f (t + 1) 0 = F (f t) := rfl
 
 /-! ## Chapter 3: System Coupling Recipes and Connectivity -/
 
 /--
   [textbook/definition3.3/definition/connection_vector]
   [textbook/definition3.3/requirement/pairwise_distinct]
-  A connectable vector of systems of length `n`.
-  Each component `i` is a discrete system with structured input and output ports.
-  All component systems are pairwise distinct under heterogeneous equality (HEq).
+  A connectable vector of systems of length `n` (components may have infinite state spaces).
 -/
 structure PortSystemVector (n : Nat) where
   SZ : Fin n → Type
@@ -907,53 +909,27 @@ structure PortSystemVector (n : Nat) where
   OutPort : Fin n → Type
   OutPortVal : (i : Fin n) → OutPort i → Type
   Z : (i : Fin n) → DiscreteSystem (SZ i) ((p : Port i) → PortVal i p) ((op : OutPort i) → OutPortVal i op)
-  Port_finite : (i : Fin n) → Fintype (Port i)
-  PortVal_finite : (i : Fin n) → (p : Port i) → Fintype (PortVal i p)
-  OutPort_finite : (i : Fin n) → Fintype (OutPort i)
-  OutPortVal_finite : (i : Fin n) → (op : OutPort i) → Fintype (OutPortVal i op)
-  Port_decidable : (i : Fin n) → DecidableEq (Port i)
-  OutPort_decidable : (i : Fin n) → DecidableEq (OutPort i)
   distinct : ∀ (i j : Fin n), i ≠ j → ¬ HEq (Z i) (Z j)
 
-/--
-  [textbook/definition3.7/definition/connectivity_relation]
-  A relation R is a 1-to-1 function if it is single-valued and injective.
--/
 def IsOneToOneRelation {α β : Type} (R : Set (α × β)) : Prop :=
   (∀ (x : α) (y1 y2 : β), (x, y1) ∈ R → (x, y2) ∈ R → y1 = y2) ∧
   (∀ (x1 x2 : α) (y : β), (x1, y) ∈ R → (x2, y) ∈ R → x1 = x2)
 
-/--
-  [textbook/definition3.7/requirement/domain_subset]
-  The domain of CSCR is a proper subset of all output ports (modeled as not equal to Set.univ).
--/
 def IsProperDomain {α β : Type} (R : Set (α × β)) : Prop :=
   { x : α | ∃ y, (x, y) ∈ R } ≠ Set.univ
 
 /--
   [textbook/definition3.7/requirement/range_subset]
-  The range of CSCR is a proper subset of all input ports (modeled as not equal to Set.univ).
+  The range of CSCR is a proper subset of all input ports.
 -/
 def IsProperRange {α β : Type} (R : Set (α × β)) : Prop :=
   { y : β | ∃ x, (x, y) ∈ R } ≠ Set.univ
 
-/--
-  [textbook/definition3.7/requirement/port_compatibility]
-  Port compatibility condition: if output port `op` is connected to input port `ip`,
-  their corresponding value types must be equal.
--/
 def PortCompatibility {n : Nat} (VSCR : PortSystemVector n)
     (CSCR : Set ((Σ (i : Fin n), VSCR.OutPort i) × (Σ (i : Fin n), VSCR.Port i))) : Prop :=
   ∀ (op : Σ (i : Fin n), VSCR.OutPort i) (ip : Σ (i : Fin n), VSCR.Port i),
     (op, ip) ∈ CSCR → VSCR.OutPortVal op.1 op.2 = VSCR.PortVal ip.1 ip.2
 
-/--
-  [textbook/definition3.7/definition/connectivity_relation]
-  [textbook/definition3.7/requirement/domain_subset]
-  [textbook/definition3.7/requirement/range_subset]
-  [textbook/definition3.7/requirement/port_compatibility]
-  Checks if CSCR is a valid system connectivity for VSCR.
--/
 def IsSystemConnectivity {n : Nat} (VSCR : PortSystemVector n)
     (CSCR : Set ((Σ (i : Fin n), VSCR.OutPort i) × (Σ (i : Fin n), VSCR.Port i))) : Prop :=
   IsOneToOneRelation CSCR ∧
@@ -961,110 +937,47 @@ def IsSystemConnectivity {n : Nat} (VSCR : PortSystemVector n)
   IsProperRange CSCR ∧
   PortCompatibility VSCR CSCR
 
-/--
-  [textbook/definition3.7/definition/feedforward_connection]
-  A connection is feedforward if the output port belongs to system `i`
-  and the input port belongs to system `j` such that `i < j`.
--/
 def IsFeedforward {n : Nat} {VSCR : PortSystemVector n}
     (p : (Σ (i : Fin n), VSCR.OutPort i) × (Σ (i : Fin n), VSCR.Port i)) : Prop :=
   p.1.1 < p.2.1
 
-/--
-  [textbook/definition3.7/definition/feedback_connection]
-  A connection is feedback if the output port belongs to system `i`
-  and the input port belongs to system `j` such that `i ≥ j`.
--/
 def IsFeedback {n : Nat} {VSCR : PortSystemVector n}
     (p : (Σ (i : Fin n), VSCR.OutPort i) × (Σ (i : Fin n), VSCR.Port i)) : Prop :=
   p.1.1 ≥ p.2.1
 
-/--
-  [textbook/definition3.11/definition/system_coupling_recipe]
-  [textbook/definition3.11/interpretation/vscr]
-  [textbook/definition3.11/interpretation/cscr]
-  A system coupling recipe is a pair SCR = (VSCR, CSCR) where VSCR is a connectable
-  vector of systems and CSCR is a system connectivity for VSCR.
--/
 structure SystemCouplingRecipe (n : Nat) where
   VSCR : PortSystemVector n
   CSCR : Set ((Σ (i : Fin n), VSCR.OutPort i) × (Σ (i : Fin n), VSCR.Port i))
   connectivity : IsSystemConnectivity VSCR CSCR
 
-/--
-  [textbook/definition3.11/definition/coscr]
-  The set of output ports connected by the coupling recipe SCR.
--/
 def COSCR {n : Nat} (SCR : SystemCouplingRecipe n) : Set (Σ (i : Fin n), SCR.VSCR.OutPort i) :=
   { op | ∃ ip, (op, ip) ∈ SCR.CSCR }
 
-/--
-  [textbook/definition3.11/definition/ciscr]
-  The set of input ports connected by the coupling recipe SCR.
--/
 def CISCR {n : Nat} (SCR : SystemCouplingRecipe n) : Set (Σ (i : Fin n), SCR.VSCR.Port i) :=
   { ip | ∃ op, (op, ip) ∈ SCR.CSCR }
 
-/--
-  [textbook/definition3.11/definition/uoscr]
-  The set of output ports unconnected by the coupling recipe SCR.
--/
 def UOSCR {n : Nat} (SCR : SystemCouplingRecipe n) : Set (Σ (i : Fin n), SCR.VSCR.OutPort i) :=
   (COSCR SCR)ᶜ
 
-/--
-  [textbook/definition3.11/definition/uiscr]
-  The set of input ports unconnected by the coupling recipe SCR.
--/
 def UISCR {n : Nat} (SCR : SystemCouplingRecipe n) : Set (Σ (i : Fin n), SCR.VSCR.Port i) :=
   (CISCR SCR)ᶜ
 
-/--
-  [textbook/definition3.11/definition/interface]
-  The interface between system `i` and system `j` specified by SCR
-  is the set of connections in CSCR involving only ports of system `i` and system `j`.
--/
 def SCRInterface {n : Nat} (SCR : SystemCouplingRecipe n) (i j : Fin n) :
     Set ((Σ (k : Fin n), SCR.VSCR.OutPort k) × (Σ (k : Fin n), SCR.VSCR.Port k)) :=
   { p ∈ SCR.CSCR | (p.1.1 = i ∧ p.2.1 = j) ∨ (p.1.1 = j ∧ p.2.1 = i) }
 
-/--
-  [textbook/definition3.15/definition/conjunctive_scr]
-  A system coupling recipe is conjunctive if and only if CSCR is empty.
--/
 def IsConjunctive {n : Nat} (SCR : SystemCouplingRecipe n) : Prop :=
   SCR.CSCR = ∅
 
-/--
-  [textbook/definition3.19/definition/cascade_scr]
-  A system coupling recipe is cascade if and only if CSCR contains no feedback connections.
--/
 def IsCascade {n : Nat} (SCR : SystemCouplingRecipe n) : Prop :=
   ∀ p ∈ SCR.CSCR, ¬ IsFeedback p
 
-/--
-  [textbook/definition3.19/definition/essentially_cascade_scr]
-  A system coupling recipe is essentially cascade if there exists a permutation of the
-  component systems such that the reordered recipe is cascade.
--/
 def IsEssentiallyCascade {n : Nat} (SCR : SystemCouplingRecipe n) : Prop :=
   ∃ (g : Fin n ≃ Fin n), ∀ p ∈ SCR.CSCR, g p.1.1 < g p.2.1
 
-/--
-  [textbook/definition3.26/definition/singular_scr]
-  A system coupling recipe is singular if and only if:
-  1. VSCR contains only a single system component (length n = 1)
-  2. CSCR is empty
--/
 def IsSingular {n : Nat} (SCR : SystemCouplingRecipe n) : Prop :=
   n = 1 ∧ SCR.CSCR = ∅
 
-/--
-  [textbook/definition3.29/definition/pure_feedback_scr]
-  A system coupling recipe is pure feedback if and only if:
-  1. VSCR contains only a single system component (length n = 1)
-  2. CSCR is not empty
--/
 def IsPureFeedback {n : Nat} (SCR : SystemCouplingRecipe n) : Prop :=
   n = 1 ∧ SCR.CSCR ≠ ∅
 
@@ -1072,35 +985,23 @@ def IsPureFeedback {n : Nat} (SCR : SystemCouplingRecipe n) : Prop :=
   [textbook/theorem3.31/theorem/class_in_themselves]
   [textbook/theorem3.31/proof/not_singular_conjunctive]
   [textbook/theorem3.31/proof/not_cascade]
-  Pure feedback coupling recipes are neither singular, conjunctive, nor cascade.
+  DTT strategy (proof comparison §10): `obtain` + `Subsingleton.elim` on `Fin 1`.
 -/
 theorem pure_feedback_not_other {n : Nat} (SCR : SystemCouplingRecipe n) (h : IsPureFeedback SCR) :
     ¬ IsSingular SCR ∧ ¬ IsConjunctive SCR ∧ ¬ IsCascade SCR := by
   have hn : n = 1 := h.1
   have hne : SCR.CSCR ≠ ∅ := h.2
   constructor
-  · intro hs
-    exact hne hs.2
+  · intro hs; exact hne hs.2
   · constructor
-    · intro hc
-      exact hne hc
+    · intro hc; exact hne hc
     · intro h_cas
       obtain ⟨p, hp⟩ := Set.nonempty_iff_ne_empty.mpr hne
-      have : Subsingleton (Fin n) := by
-        rw [hn]
-        infer_instance
+      have : Subsingleton (Fin n) := by rw [hn]; infer_instance
       have heq : p.1.1 = p.2.1 := Subsingleton.elim p.1.1 p.2.1
-      have h_feed : IsFeedback p := by
-        unfold IsFeedback
-        rw [heq]
-      have h_not_feed := h_cas p hp
-      exact h_not_feed h_feed
+      have h_feed : IsFeedback p := by unfold IsFeedback; rw [heq]
+      exact h_cas p hp h_feed
 
-/--
-  [textbook/definition3.33/definition/mixed_scr]
-  A system coupling recipe is mixed if it is not singular, conjunctive, cascade,
-  essentially cascade, or pure feedback.
--/
 def IsMixed {n : Nat} (SCR : SystemCouplingRecipe n) : Prop :=
   ¬ IsSingular SCR ∧ ¬ IsConjunctive SCR ∧ ¬ IsCascade SCR ∧
   ¬ IsEssentiallyCascade SCR ∧ ¬ IsPureFeedback SCR
@@ -1112,13 +1013,7 @@ def IsMixed {n : Nat} (SCR : SystemCouplingRecipe n) : Prop :=
   [textbook/definition3.40/definition/oz]
   [textbook/definition3.40/definition/nz]
   [textbook/definition3.40/definition/rz]
-  The parallel (conjunctive) composition of a connectable vector of systems.
-  Returns a new DiscreteSystem where:
-  - State space is the product of the component state spaces.
-  - Input space is the product of the input sets of all component input ports.
-  - Output space is the product of the output sets of all component output ports.
-  - NZ transitions each component system independently.
-  - RZ reads out each component port independently.
+  Parallel (conjunctive) composition of a connectable vector of systems.
 -/
 def csy {n : Nat} (VSCR : PortSystemVector n) :
     DiscreteSystem
@@ -1128,129 +1023,83 @@ def csy {n : Nat} (VSCR : PortSystemVector n) :
   sz_nonempty := by
     have h_non : ∀ i, Nonempty (VSCR.SZ i) := fun i => (VSCR.Z i).sz_nonempty
     exact ⟨fun i => Classical.choice (h_non i)⟩
-  sz_finite := by
-    haveI : ∀ i, Fintype (VSCR.SZ i) := fun i => (VSCR.Z i).sz_finite
-    infer_instance
-  iz_finite := by
-    haveI : ∀ i, Fintype (VSCR.Port i) := VSCR.Port_finite
-    haveI : ∀ i, DecidableEq (VSCR.Port i) := VSCR.Port_decidable
-    haveI : ∀ (ip : Σ i, VSCR.Port i), Fintype (VSCR.PortVal ip.fst ip.snd) := fun ip => VSCR.PortVal_finite ip.fst ip.snd
-    infer_instance
-  oz_finite := by
-    haveI : ∀ i, Fintype (VSCR.OutPort i) := VSCR.OutPort_finite
-    haveI : ∀ i, DecidableEq (VSCR.OutPort i) := VSCR.OutPort_decidable
-    haveI : ∀ (op : Σ i, VSCR.OutPort i), Fintype (VSCR.OutPortVal op.fst op.snd) := fun op => VSCR.OutPortVal_finite op.fst op.snd
-    infer_instance
   NZ := fun x p i => (VSCR.Z i).NZ (x i) (fun port => p ⟨i, port⟩)
   RZ := fun x op => (VSCR.Z op.1).RZ (x op.1) op.2
 
-/--
-  [textbook/definition3.40/definition/ip_map]
-  Function mapping the input ports of the conjunctive system to the input ports
-  of the component systems (modeled as the identity function since they share the same type).
--/
-def csy_IP_map {n : Nat} (VSCR : PortSystemVector n) :
-    (Σ (i : Fin n), VSCR.Port i) → (Σ (i : Fin n), VSCR.Port i) :=
-  ID _
+def csy_IP_map {n : Nat} (_VSCR : PortSystemVector n) :
+    (Σ (i : Fin n), _VSCR.Port i) → (Σ (i : Fin n), _VSCR.Port i) := ID _
 
-/--
-  [textbook/definition3.40/definition/inip_map]
-  The inverse mapping of the conjunctive system input ports to component input ports.
--/
-def csy_INIP_map {n : Nat} (VSCR : PortSystemVector n) :
-    (Σ (i : Fin n), VSCR.Port i) → (Σ (i : Fin n), VSCR.Port i) :=
-  ID _
+def csy_INIP_map {n : Nat} (_VSCR : PortSystemVector n) :
+    (Σ (i : Fin n), _VSCR.Port i) → (Σ (i : Fin n), _VSCR.Port i) := ID _
 
-/--
-  [textbook/definition3.40/definition/is_map]
-  The input port structure function of the conjunctive system (returns the value type of each port).
--/
 def csy_IS_map {n : Nat} (VSCR : PortSystemVector n) (ip : Σ (i : Fin n), VSCR.Port i) : Type :=
   VSCR.PortVal ip.1 ip.2
 
-/--
-  [textbook/definition3.40/definition/op_map]
-  Function mapping the output ports of the conjunctive system to the output ports
-  of the component systems (modeled as the identity function since they share the same type).
--/
-def csy_OP_map {n : Nat} (VSCR : PortSystemVector n) :
-    (Σ (i : Fin n), VSCR.OutPort i) → (Σ (i : Fin n), VSCR.OutPort i) :=
-  ID _
+def csy_OP_map {n : Nat} (_VSCR : PortSystemVector n) :
+    (Σ (i : Fin n), _VSCR.OutPort i) → (Σ (i : Fin n), _VSCR.OutPort i) := ID _
 
-/--
-  [textbook/definition3.40/definition/inop_map]
-  The inverse mapping of the conjunctive system output ports to component output ports.
--/
-def csy_INOP_map {n : Nat} (VSCR : PortSystemVector n) :
-    (Σ (i : Fin n), VSCR.OutPort i) → (Σ (i : Fin n), VSCR.OutPort i) :=
-  ID _
+def csy_INOP_map {n : Nat} (_VSCR : PortSystemVector n) :
+    (Σ (i : Fin n), _VSCR.OutPort i) → (Σ (i : Fin n), _VSCR.OutPort i) := ID _
 
-/--
-  [textbook/definition3.40/definition/os_map]
-  The output port structure function of the conjunctive system (returns the value type of each port).
--/
 def csy_OS_map {n : Nat} (VSCR : PortSystemVector n) (op : Σ (i : Fin n), VSCR.OutPort i) : Type :=
   VSCR.OutPortVal op.1 op.2
 
-/--
-  [textbook/theorem_a1.219/theorem/vector_value_fns]
-  The product function of a family of functions, mapping the product domain
-  to the product codomain.
--/
 def product_fun {I : Type} {A B : I → Type} (f : (i : I) → A i → B i) :
     ((i : I) → A i) → ((i : I) → B i) :=
   fun x i => f i (x i)
 
-/--
-  [textbook/theorem3.42/theorem/csy_parameterization]
-  [textbook/theorem3.42/proof/dsystems]
-  [textbook/theorem3.42/proof/existence]
-  [textbook/theorem3.42/proof/uniqueness]
-  The parallel composition `csy` defines a valid system parameterization.
--/
-def csy_parameterization (n : Nat) :
-    SystemParameterization (PortSystemVector n)
-      (fun VSCR => (i : Fin n) → VSCR.SZ i)
-      (fun VSCR => (ip : Σ i, VSCR.Port i) → VSCR.PortVal ip.1 ip.2)
-      (fun VSCR => (op : Σ i, VSCR.OutPort i) → VSCR.OutPortVal op.1 op.2) :=
-  fun VSCR => csy VSCR
+def csy_parameterization (n : Nat) (VSCR : PortSystemVector n) :
+    DiscreteSystem
+      ((i : Fin n) → VSCR.SZ i)
+      ((ip : Σ i, VSCR.Port i) → VSCR.PortVal ip.1 ip.2)
+      ((op : Σ i, VSCR.OutPort i) → VSCR.OutPortVal op.1 op.2) :=
+  csy VSCR
 
 /--
   [textbook/theorem3.45/theorem/trajectories_relation]
   [textbook/theorem3.45/proof/state_zero]
   [textbook/theorem3.45/proof/state_induction]
-  The state trajectory of a conjunctive (parallel) system evaluated at component `i`
-  is equal to the state trajectory of the `i`-th component system running under projected inputs.
+  DTT strategy (proof comparison §11): `induction t generalizing i`.
 -/
 theorem csy_state_trajectory {n : Nat} (VSCR : PortSystemVector n) (x : (i : Fin n) → VSCR.SZ i)
     (f : ITZ ((ip : Σ i, VSCR.Port i) → VSCR.PortVal ip.1 ip.2)) (t : Time) (i : Fin n) :
     generateStateTrajectory (csy VSCR) x f t i =
     generateStateTrajectory (VSCR.Z i) (x i) (fun t port => f t ⟨i, port⟩) t := by
   induction t generalizing i with
-  | zero => rfl
+  | zero => simp [generateStateTrajectory_zero]
   | succ t ih =>
-    simp only [generateStateTrajectory_succ]
-    have ih_fun : generateStateTrajectory (csy VSCR) x f t =
-        fun i => generateStateTrajectory (VSCR.Z i) (x i) (fun t port => f t ⟨i, port⟩) t := by
-      ext i
-      apply ih
-    rw [ih_fun]
-    rfl
+    rw [generateStateTrajectory_succ]
+    simp only [csy]
+    exact congr_arg (fun s => (VSCR.Z i).NZ s (fun port => f t ⟨i, port⟩)) (ih i)
 
 /--
   [textbook/theorem3.45/theorem/trajectories_relation]
   [textbook/theorem3.45/proof/output_relation]
-  The output trajectory of a conjunctive (parallel) system evaluated at component port `B'`
-  of system `i` is equal to the output trajectory of component `i` at port `B'` under projected inputs.
+  DTT strategy (proof comparison §11): unfold readout; rewrite with `csy_state_trajectory`.
 -/
 theorem csy_output_trajectory {n : Nat} (VSCR : PortSystemVector n) (x : (i : Fin n) → VSCR.SZ i)
-    (f : ITZ ((ip : Σ i, VSCR.Port i) → VSCR.PortVal ip.1 ip.2)) (t : Time) (i : Fin n) (B' : VSCR.OutPort i) :
+    (f : ITZ ((ip : Σ i, VSCR.Port i) → VSCR.PortVal ip.1 ip.2)) (t : Time) (i : Fin n)
+    (B' : VSCR.OutPort i) :
     generateOutputTrajectory (csy VSCR) x f t ⟨i, B'⟩ =
     generateOutputTrajectory (VSCR.Z i) (x i) (fun t port => f t ⟨i, port⟩) t B' := by
   unfold generateOutputTrajectory
-  have h_st : generateStateTrajectory (csy VSCR) x f t =
-      fun i => generateStateTrajectory (VSCR.Z i) (x i) (fun t port => f t ⟨i, port⟩) t := by
-    ext i
-    apply csy_state_trajectory
-  rw [h_st]
-  rfl
+  simp only [csy]
+  exact congr_arg (fun s => (VSCR.Z i).RZ s B') (csy_state_trajectory VSCR x f t i)
+
+/-! ## Infinite-state examples (Def 2.4, not Def 2.11) -/
+
+/-- A discrete system with countably infinite state space `ℕ`. -/
+def counterSystem : DiscreteSystem Nat Bool Nat where
+  sz_nonempty := ⟨0⟩
+  NZ := fun n _ => n + 1
+  RZ := id
+
+theorem counterSystem_not_finite : ¬ IsFinite counterSystem := by
+  intro h
+  exact Infinite.not_finite (α := Nat) h.1
+
+/-- Z2 of the counter system remains infinite-state (state space is `Z2State Nat Nat id`). -/
+theorem counterSystem_z2_not_finite : ¬ IsFinite (Z2 counterSystem) := by
+  intro ⟨hSZ, _, _⟩
+  have hNat : Finite Nat := (Z2State.equivSZ counterSystem.RZ).symm.finite_iff.mpr hSZ
+  exact Infinite.not_finite (α := Nat) hNat

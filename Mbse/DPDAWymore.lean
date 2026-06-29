@@ -1,4 +1,5 @@
 import Mbse.Wymore
+import Mbse.FiniteWymore
 import Mathlib.Data.Fintype.Option
 import Mathlib.Data.Fintype.Prod
 
@@ -29,7 +30,7 @@ stays within the bound).
 
 **Implemented:** 7-tuple spec, snapshot trajectories, soundness/uniqueness, time invariance /
 nonanticipation, `IsDeterministic`, `Reaches` / `Language` (final-state acceptance),
-`toBoundedDiscreteSystem` + `bounded_output_agrees` + bounded uniqueness / `IsFinite` corollaries.
+`toBoundedFSMSystem` + `bounded_output_agrees` + bounded uniqueness / `IsFinite` corollaries.
 
 **Intentionally omitted** (see [formalization_roadmap.md](../formalization_roadmap.md) §3):
 Wymore reachability, state equivalence, morphisms, ports, parameterization, Ch. 3 coupling,
@@ -37,7 +38,7 @@ worked examples, `Reaches` ↔ trajectory bridge.
 
 ## Integration with other modules
 
-- **Base [Wymore](Wymore.lean):** `toBoundedDiscreteSystem` maps a depth-bounded DPDA into
+- **Base [Wymore](Wymore.lean):** `toBoundedFSMSystem` maps a depth-bounded DPDA into
   `DiscreteSystem (Q × BoundedStack Γ max_depth) (Option I) O`. Unbounded stacks cannot live in
   `DiscreteSystem` directly because it requires `Fintype SZ`.
 - **[GeneralizedWymore](GeneralizedWymore.lean):** Both use the shared base type `ITZW IS =
@@ -1018,11 +1019,11 @@ def boundedInit {Q I O G : Type}
   exceed `max_depth` the new stack is truncated (`List.take`); this is a *lossy* approximation,
   faithful only while the genuine DPDA stack stays within the bound (see `bounded_output_agrees`).
 -/
-def toBoundedDiscreteSystem
+def toBoundedFSMSystem
     {Q I O G : Type}
     [Fintype G] [DecidableEq G] [Fintype Q] [DecidableEq Q] [Fintype I] [Fintype O]
     (D : DPDASystem Q I O G) (max_depth : Nat) [Inhabited Q] :
-    DiscreteSystem (Q × BoundedStack G max_depth) (Option I) O where
+    FSM.FSMSystem (Q × BoundedStack G max_depth) (Option I) O where
   sz_nonempty := ⟨(default, ⟨[D.z0].take max_depth, by
     rw [mem_allListsUpTo]
     exact List.length_take_le _ _⟩)⟩
@@ -1055,8 +1056,8 @@ theorem bounded_step_agrees
     (cD : Snapshot Q G) (cB : Q × BoundedStack G max_depth)
     (h1 : cB.1 = cD.1) (h2 : cB.2.val = cD.2) (input : Option I)
     (hfit : (stepSnapshot D cD input).2.length ≤ max_depth) :
-    ((toBoundedDiscreteSystem D max_depth).NZ cB input).1 = (stepSnapshot D cD input).1 ∧
-    (((toBoundedDiscreteSystem D max_depth).NZ cB input).2).val = (stepSnapshot D cD input).2 := by
+    ((toBoundedFSMSystem D max_depth).NZ cB input).1 = (stepSnapshot D cD input).1 ∧
+    (((toBoundedFSMSystem D max_depth).NZ cB input).2).val = (stepSnapshot D cD input).2 := by
   obtain ⟨qB, sB⟩ := cB
   obtain ⟨sBval, sBmem⟩ := sB
   obtain ⟨qD, sDval⟩ := cD
@@ -1065,13 +1066,13 @@ theorem bounded_step_agrees
   subst h2
   cases hF : D.F qB input (peek D.z0 sBval) with
   | none =>
-    refine ⟨?_, ?_⟩ <;> simp [toBoundedDiscreteSystem, stepSnapshot, hF]
+    refine ⟨?_, ?_⟩ <;> simp [toBoundedFSMSystem, stepSnapshot, hF]
   | some v =>
     obtain ⟨q', new⟩ := v
     simp only [stepSnapshot, hF] at hfit
     refine ⟨?_, ?_⟩
-    · simp [toBoundedDiscreteSystem, stepSnapshot, hF]
-    · simp only [toBoundedDiscreteSystem, stepSnapshot, hF]
+    · simp [toBoundedFSMSystem, stepSnapshot, hF]
+    · simp only [toBoundedFSMSystem, stepSnapshot, hF]
       exact List.take_of_length_le hfit
 
 /--
@@ -1083,16 +1084,16 @@ theorem bounded_state_agrees
     (D : DPDASystem Q I O G) (max_depth : Nat) (q0 : Q) (f : ITZ_opt I)
     (hmd : 1 ≤ max_depth) :
     ∀ t, (∀ τ, τ ≤ t → ((generateStateTrajectory D q0 f τ).2).length ≤ max_depth) →
-      (_root_.generateStateTrajectory (toBoundedDiscreteSystem D max_depth)
+      (FSM.generateStateTrajectory (toBoundedFSMSystem D max_depth)
           (boundedInit D max_depth q0) f t).1 = (generateStateTrajectory D q0 f t).1 ∧
-      ((_root_.generateStateTrajectory (toBoundedDiscreteSystem D max_depth)
+      ((FSM.generateStateTrajectory (toBoundedFSMSystem D max_depth)
           (boundedInit D max_depth q0) f t).2).val = (generateStateTrajectory D q0 f t).2 := by
   intro t
   induction t with
   | zero =>
     intro _hbound
     refine ⟨rfl, ?_⟩
-    simp only [_root_.generateStateTrajectory_zero, dpda_generateStateTrajectory_zero, boundedInit]
+    simp only [FSM.generateStateTrajectory_zero, dpda_generateStateTrajectory_zero, boundedInit]
     exact List.take_of_length_le (by simpa using hmd)
   | succ t ih =>
     intro hbound
@@ -1104,10 +1105,10 @@ theorem bounded_state_agrees
       rwa [dpda_generateStateTrajectory_succ] at h
     have hstep := bounded_step_agrees D max_depth
       (generateStateTrajectory D q0 f t)
-      (_root_.generateStateTrajectory (toBoundedDiscreteSystem D max_depth)
+      (FSM.generateStateTrajectory (toBoundedFSMSystem D max_depth)
         (boundedInit D max_depth q0) f t)
       ih1 ih2 (f t) hfit
-    simpa only [_root_.generateStateTrajectory_succ, dpda_generateStateTrajectory_succ] using hstep
+    simpa only [FSM.generateStateTrajectory_succ, dpda_generateStateTrajectory_succ] using hstep
 
 /--
   Behavioral equivalence: while the DPDA's stack stays within `max_depth` up to time `t`, the
@@ -1119,14 +1120,14 @@ theorem bounded_output_agrees
     (D : DPDASystem Q I O G) (max_depth : Nat) (q0 : Q) (f : ITZ_opt I)
     (hmd : 1 ≤ max_depth) (t : Time)
     (hbound : ∀ τ, τ ≤ t → ((generateStateTrajectory D q0 f τ).2).length ≤ max_depth) :
-    _root_.generateOutputTrajectory (toBoundedDiscreteSystem D max_depth)
+    FSM.generateOutputTrajectory (toBoundedFSMSystem D max_depth)
         (boundedInit D max_depth q0) f t = generateOutputTrajectory D q0 f t := by
   obtain ⟨h1, h2⟩ := bounded_state_agrees D max_depth q0 f hmd t hbound
-  have eL : _root_.generateOutputTrajectory (toBoundedDiscreteSystem D max_depth)
+  have eL : FSM.generateOutputTrajectory (toBoundedFSMSystem D max_depth)
         (boundedInit D max_depth q0) f t
-      = D.G (_root_.generateStateTrajectory (toBoundedDiscreteSystem D max_depth)
+      = D.G (FSM.generateStateTrajectory (toBoundedFSMSystem D max_depth)
               (boundedInit D max_depth q0) f t).1
-          (peek D.z0 (_root_.generateStateTrajectory (toBoundedDiscreteSystem D max_depth)
+          (peek D.z0 (FSM.generateStateTrajectory (toBoundedFSMSystem D max_depth)
               (boundedInit D max_depth q0) f t).2.val) := rfl
   have eR : generateOutputTrajectory D q0 f t
       = D.G (generateStateTrajectory D q0 f t).1
@@ -1136,8 +1137,8 @@ theorem bounded_output_agrees
 /-- [textbook/definition2.11/definition/finite_system] The bounded reduction yields a finite Wymore system. -/
 theorem bounded_system_isFinite
     (D : DPDASystem Q I O G) (max_depth : Nat) :
-    IsFinite (toBoundedDiscreteSystem D max_depth) :=
-  discreteSystem_isFinite (toBoundedDiscreteSystem D max_depth)
+    IsFinite (toBoundedFSMSystem D max_depth).toDiscreteSystem :=
+  FSM.fsm_isFinite (toBoundedFSMSystem D max_depth)
 
 /--
   State trajectory uniqueness for the bounded `DiscreteSystem`, derived from base Wymore
@@ -1147,10 +1148,10 @@ theorem bounded_stateTrajectory_unique
     (D : DPDASystem Q I O G) (max_depth : Nat) (q0 : Q) (f : ITZ_opt I)
     (g : Time → Q × BoundedStack G max_depth)
     (h_init : g 0 = boundedInit D max_depth q0)
-    (h_valid : _root_.IsValidStateTrajectory (toBoundedDiscreteSystem D max_depth) f g) :
-    ∀ t, g t = _root_.generateStateTrajectory (toBoundedDiscreteSystem D max_depth)
+    (h_valid : FSM.IsValidStateTrajectory (toBoundedFSMSystem D max_depth) f g) :
+    ∀ t, g t = FSM.generateStateTrajectory (toBoundedFSMSystem D max_depth)
         (boundedInit D max_depth q0) f t :=
-  _root_.stateTrajectory_unique (toBoundedDiscreteSystem D max_depth) f g (boundedInit D max_depth q0)
+  FSM.stateTrajectory_unique (toBoundedFSMSystem D max_depth) f g (boundedInit D max_depth q0)
     h_init h_valid
 
 /--
@@ -1160,13 +1161,13 @@ theorem bounded_stateTrajectory_unique
 theorem bounded_outputTrajectory_unique
     (D : DPDASystem Q I O G) (max_depth : Nat) (q0 : Q) (f : ITZ_opt I)
     (h : Time → O)
-    (h_valid : _root_.IsValidOutputTrajectory (toBoundedDiscreteSystem D max_depth)
-      (_root_.generateStateTrajectory (toBoundedDiscreteSystem D max_depth)
+    (h_valid : FSM.IsValidOutputTrajectory (toBoundedFSMSystem D max_depth)
+      (FSM.generateStateTrajectory (toBoundedFSMSystem D max_depth)
         (boundedInit D max_depth q0) f) h) (t : Time) :
-    h t = _root_.generateOutputTrajectory (toBoundedDiscreteSystem D max_depth)
+    h t = FSM.generateOutputTrajectory (toBoundedFSMSystem D max_depth)
         (boundedInit D max_depth q0) f t := by
-  rw [_root_.outputTrajectory_unique (toBoundedDiscreteSystem D max_depth)
-    (_root_.generateStateTrajectory (toBoundedDiscreteSystem D max_depth)
+  rw [_root_.outputTrajectory_unique (toBoundedFSMSystem D max_depth).toDiscreteSystem
+    (FSM.generateStateTrajectory (toBoundedFSMSystem D max_depth)
         (boundedInit D max_depth q0) f) h h_valid t]
   rfl
 

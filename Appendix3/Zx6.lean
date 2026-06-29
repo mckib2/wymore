@@ -1,5 +1,5 @@
 import Mbse.Notation
-import Mbse.Wymore
+import Mbse.FiniteWymore
 
 /-!
   ## Zx6: Input-Controlled Toggle (XOR-like)
@@ -28,13 +28,13 @@ theorem zx6_toggle (s : SZx6) :
 
 /-- If the input is always v3 (hold), the state never changes. -/
 theorem zx6_constant_hold (s0 : SZx6) (t : Time) :
-    generateStateTrajectory Zx6 s0 (fun _ => IZx6.v3) t = s0 := by
+    FSM.generateStateTrajectory Zx6 s0 (fun _ => IZx6.v3) t = s0 := by
   induction t with
   | zero => rfl
-  | succ n ih => simp [generateStateTrajectory_succ, ih, zx6_hold]
+  | succ n ih => simp [FSM.generateStateTrajectory_succ, ih, zx6_hold]
 
 /-- Both states are reachable from either state (using toggle). -/
-theorem zx6_fully_reachable (s0 s : SZx6) : Reachable Zx6 s0 s := by
+theorem zx6_fully_reachable (s0 s : SZx6) : FSM.Reachable Zx6 s0 s := by
   cases s0 <;> cases s
   · exact ⟨fun _ => IZx6.v3, 0, rfl⟩
   · exact ⟨fun _ => IZx6.v4, 1, rfl⟩
