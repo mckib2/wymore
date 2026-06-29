@@ -348,7 +348,7 @@ Classical T3SD verification asserts \textbf{language inclusion}: every input/out
 
 \textbf{Theoretical definition.} To preserve unconstrained specification potential, $\mathcal{FC}_{\mathcal{L}}(\Phi)$ admits a spectrum of temporal logics; FO-LTL suffices for trajectory-level specs over infinite domains at ticks, and MSO-extended FO-LTL provides a theoretical ceiling for expressing structural existence claims (morphism existence) \parencite{Thomas1990}. More expressive logics are equally admissible.
 
-\textbf{Pragmatic restriction.} While theory admits arbitrary temporal logics, model authors and tooling may restrict $\mathcal{L}$ to propositional LTL, bounded FO-LTL, or STL fragments for decidable automated checking (e.g., Lean, finite-state model checking, tick-local SMT). This is a practical modeling and analysis choice, not a restriction on the expressive power of the Functionality cotyledon.
+\textbf{Pragmatic restriction.} While theory admits arbitrary temporal logics, model authors and tooling may restrict $\mathcal{L}$ to propositional LTL, bounded FO-LTL, or STL fragments for decidable automated checking (e.g., finite-state model checking, tick-local SMT). This is a practical modeling and analysis choice, not a restriction on the expressive power of the Functionality cotyledon.
 
 \subsection{Discrete Trajectories and Verification Bounds}
 This paper scopes verification to Wymore DSYSTEMS: trajectories evolve at discrete time steps according to $\delta$ and $\rho$, and $S$, $I$, and $O$ may be infinite \parencite{Wymore1993}. The satisfaction relation $Z \models_{\mathcal{L}} \Phi$ is defined over these trajectories regardless of cardinality.
@@ -414,11 +414,23 @@ where $d_{ij} = \sqrt{(x_i - x_j)^2 + (y_i - y_j)^2}$ and $\Phi = \{\varphi_{\te
     \item[FO-LTL:] $\varphi_{\text{safe}}$ above (instantiated for swarm index set $N$).
 \end{description}
 
+\miniheading{Behavioral Specification $Z_{\text{spec}}$}
+Functional intent is expressed as a \emph{behavioral} reference system, not a kinematic clone of each UAV. States record aggregate search progress $(C, t, a)$ where $C \subseteq R$ is the set of grid cells covered by active agents, $t$ is mission clock, and $a$ indicates whether search is active. Inputs are mission commands; outputs report percent coverage and deadline satisfaction. The specification transition advances mission time and coverage when progress is signaled; liveness intent is that search eventually covers $R$ before $t > T_{\max}$ while search remains active. This abstraction is chosen so that an implementation homomorphism can project detailed swarm state onto coverage and mission status without encoding every coordinate in $Z_{\text{spec}}$.
+
+\miniheading{Implementation $Z_{\text{impl}}$}
+The implementation is a parameterized $N$-UAV swarm built by conjunctive composition (CSY) over per-agent subsystems $Z_i$. Each agent carries grid coordinates, battery, and an active flag; RTB sets the flag inactive when $b_i$ falls below threshold. Global swarm state is the product $\prod_{i=1}^{N} S_i$ restricted by the active mask $M$. Transitions apply local RTB rules at each tick. Parameterization over $N$ avoids a separate system definition for every fleet size while keeping quantifiers in $\Phi$ indexed by agent set $N$.
+
+\miniheading{Constructive Verification}
+We exhibit a system homomorphism $h : Z_{\text{impl}} \rightarrow Z_{\text{spec}}$ (Wymore Def.~4.3) with surjective state, input, and output maps projecting aggregate coverage, mission clock, and readouts. Under the hypothesis that no RTB transition fires (batteries remain above threshold), $h$ preserves next-state and readout functions, so trajectories of $Z_{\text{impl}}$ map into valid trajectories of $Z_{\text{spec}}$---classical constructive FC. When RTB occurs, $h$ may fail to preserve transitions unless the specification abstracted participation change; this motivates assertional checking on the same instance.
+
+\miniheading{Assertional Verification}
+The same property set $\Phi = \{\varphi_{\text{safe}}, \varphi_{\text{live}}\}$ is evaluated on trajectories $(f,g,y)$ without rebuilding $h$. Safety $\varphi_{\text{safe}}$ quantifies over active agents in $M$; after RTB removes an agent, re-checking $\Phi$ on the reduced trajectory addresses participation change directly. Liveness $\varphi_{\text{live}}$ is evaluated on projected spec trajectories derived from swarm execution. Constructive trace inclusion (via $h$) and assertional $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$ address the same mission from complementary verification workflows: the former certifies abstraction soundness; the latter reuses $\Phi$ across mask transitions.
+
 \miniheading{Illustrative Instance: RTB ($N=10 \rightarrow 9$)}
 Suppose UAV$_3$ enters RTB after a battery fault; agent~3 becomes inactive in $M$ while nine agents continue. \textbf{Constructive:} unless a universal invariant over mask transitions was proved upfront, RTB triggers a new proof obligation for the mask change. \textbf{Assertional:} the same $\Phi$ is re-checked on trajectories of the reduced active set; if $\varphi_{\text{safe}}$ and $\varphi_{\text{live}}$ hold (quantifying only over active agents), then $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$.
 
-\miniheading{Formal Exploration}
-For $N=1$, a single \texttt{DiscreteSystem} yields trajectory uniqueness. For $N=2$ and $N=3$, product-state steps with \texttt{ActiveAgents} and \texttt{SwarmSeparation} demonstrate RTB as a mask transition and indexed separation invariants without $2^N$ case analysis. Universal constructive proof over all masks and all real trajectories at scale remains open.
+\miniheading{Comparison on the Swarm Instance}
+Constructive verification via $h$ yields trace inclusion and documents which behavioral aspects of $Z_{\text{spec}}$ are guaranteed by the implementation structure. Assertional verification avoids updating $h$ after RTB but requires a checker for FO-LTL over trajectories. On this instance, both approaches share the same $\Phi$; the tradeoff is proof maintenance of $h$ versus property re-use and tooling dependence.
 
 \miniheading{Evaluation Rubric (Instantiated)}
 The swarm exhibits: (1) concurrent subsystems with infinite product state; (2) continuous-valued state at discrete ticks; (3) FO-LTL safety and liveness in $\Phi$; and (4) participation change under RTB as proof-maintenance, not impossibility of classical T3SD. We do not report empirical benchmarks, instead arguing complexity qualitatively from coupling structure and mask-based proof patterns.
@@ -441,9 +453,9 @@ Constructive verification can still be preferable when $|S|$ is small, $Z_{\text
     \item \textbf{Equivalence:} Assertional and classical FC are not proven equivalent; Table~\ref{tab:comparison} compares workflows, not logical strength. Exact temporal logic $\leftrightarrow$ morphism equivalence is open.
     \item \textbf{Theory vs.\ tooling:} Theory admits FO-LTL/MSO; propositional LTL is insufficient for the swarm without FO quantifiers. Tooling may restrict $\mathcal{L}$; FO-LTL over reals is undecidable in general.
     \item \textbf{Infinite state:} Tick-local SMT checks are an under-approximation for inter-tick motion; continuous-time between ticks is out of scope.
-    \item \textbf{Constructive tractability:} Unified mask state avoids $2^N$ system definitions; universal proofs over all masks/reals remain open (Lean $N \leq 3$ exploration).
+    \item \textbf{Constructive tractability:} Unified mask state avoids $2^N$ system definitions; universal proofs over all masks and real trajectories remain open.
     \item \textbf{Scope:} General contribution is trace semantics plus parameterized temporal logics; SMT-at-ticks is swarm-specific.
-    \item \textbf{Autonomous steps:} Lean encoding uses \texttt{Option} for empty inputs \parencite{demoura21lean4}; liveness over autonomous (\texttt{none}) steps---formal treatment deferred.
+    \item \textbf{Autonomous steps:} Liveness over autonomous (no external input) steps at discrete ticks---formal treatment deferred.
     \item \textbf{Empirical evidence:} No benchmark comparing morphism-construction effort to property checking; swarm evidence is qualitative.
 \end{itemize}
 
@@ -459,7 +471,7 @@ The objective of this work is to reinterpret Wymore's Functionality Cotyledon as
 \drafttodo{Review --- Wach: Is DEVS framed as brief related work only (not core claim)?}
 \drafttodo{Review --- Wach: Is FO-LTL admitted in theoretical FC with tooling restriction explicit (not demoted to future work)?}
 \drafttodo{Review --- Wach: Is the comparison table terminology correct (verification effort / scalability vs.\ ``fidelity'')?}
-\drafttodo{Review --- Wach: Resolve Option-unified I/O question --- does Lean \texttt{Option} encoding affect liveness over autonomous (\texttt{none}) steps?}
+\drafttodo{Review --- Wach: Resolve autonomous-step liveness semantics --- how should $Z \models_{\mathcal{L}} \Phi$ treat ticks with no external input?}
 \drafttodo{Review --- Wach: Does assertional $\mathcal{FC}_{\mathcal{L}}(\Phi)$ preserve Wymore's notion of solution space at the FO-LTL/MSO ceiling?}
 
 \miniheading{Review: Alejandro Salado}

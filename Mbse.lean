@@ -5,7 +5,9 @@ import Mbse.Notation
 import Mbse.CombinationalWymore
 import Mbse.DPDAWymore
 import Mbse.DPDAExamples
+import Mbse.Homomorphism
 import Mbse.FiniteWymore
 import Mbse.SwarmExamples
+import Mbse.SwarmCaseStudy
 
 

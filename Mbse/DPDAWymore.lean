@@ -152,7 +152,7 @@ def generateStateTrajectoryFrom (D : DPDASystem STfin IS OZ Γ) (snap0 : Snapsho
   | t + 1 => stepSnapshot D (generateStateTrajectoryFrom D snap0 f t) (f t)
 
 /--
-  [textbook/definition2.27/definition/state_trajectory_recurrence|partial]
+  [textbook/definition2.27/definition/state_trajectory_recurrence]
   Generates the snapshot trajectory (state trajectory) of the DPDA from control state `q0`.
 -/
 def generateStateTrajectory (D : DPDASystem STfin IS OZ Γ) (q0 : STfin) (f : ITZ_opt IS) :
@@ -195,7 +195,7 @@ theorem generateOutputTrajectory_eq_from (D : DPDASystem STfin IS OZ Γ) (q0 : S
       generateOutputTrajectoryFrom D (q0, [D.z0]) f t := by
   simp only [generateOutputTrajectory, generateOutputTrajectoryFrom, generateStateTrajectory_eq_from]
 
-/-- [textbook/definition2.27/definition/state_trajectory_recurrence|partial] Predicate for a valid state trajectory. -/
+/-- Predicate for a valid state trajectory. -/
 def IsValidStateTrajectory (D : DPDASystem STfin IS OZ Γ) (f : ITZ_opt IS)
     (g : Time → Snapshot STfin Γ) : Prop :=
   ∀ t : Time, g (t + 1) = stepSnapshot D (g t) (f t)
@@ -236,7 +236,7 @@ theorem generateOutputTrajectory_valid (D : DPDASystem STfin IS OZ Γ) (q0 : STf
   rfl
 
 /--
-  [textbook/theorem2.29/proof/single_valuedness|partial]
+  [textbook/theorem2.29/proof/single_valuedness]
   Given an initial control state and input trajectory, the snapshot trajectory is unique.
 -/
 theorem stateTrajectory_unique (D : DPDASystem STfin IS OZ Γ) (f : ITZ_opt IS)
@@ -250,7 +250,10 @@ theorem stateTrajectory_unique (D : DPDASystem STfin IS OZ Γ) (f : ITZ_opt IS)
   | succ t ih =>
     rw [h_valid t, dpda_generateStateTrajectory_succ, ih]
 
-/-- [textbook/theorem2.32/theorem/trajectory_value|partial] Output trajectory is uniquely determined by the snapshot trajectory. -/
+/--
+  [textbook/theorem2.32/theorem/trajectory_value]
+  Output trajectory is uniquely determined by the snapshot trajectory.
+-/
 theorem outputTrajectory_unique (D : DPDASystem STfin IS OZ Γ) (g : Time → Snapshot STfin Γ)
     (h : Time → OZ) (h_valid : IsValidOutputTrajectory D g h) :
     ∀ t, h t = D.G (g t).1 (peek D.z0 (g t).2) := by

@@ -1,0 +1,37 @@
+{
+  "id": "4.8",
+  "name": "CSY Component Homomorphic Image",
+  "description": "Every component of a conjunctive system coupling is a homomorphic image of the resultant conjunctive system CSY(VSCR).",
+  "elements": [
+    {
+      "id": "4.8/theorem/csy_component_homomorphic",
+      "type": "theorem",
+      "text": "If SCR is a conjunctive system coupling recipe, Z& = CSY(VSCR), and Z$ ∈ VSCR, then Z$ is a homomorphic image of Z& with respect to PJN(SZ$), PJN(IPZ$), and PJN(OPZ$)."
+    },
+    {
+      "id": "4.8/proof/state_homomorphism",
+      "type": "component",
+      "text": "HS = PJN(SZ$) ∈ FNS(SZ&, ONTO, SZ$) by theorem A1.176."
+    },
+    {
+      "id": "4.8/proof/input_homomorphism",
+      "type": "component",
+      "text": "HI = PJN(IPZ$) ∈ FNS(IZ&, ONTO, IZ$) by theorem A1.176."
+    },
+    {
+      "id": "4.8/proof/output_homomorphism",
+      "type": "component",
+      "text": "HO = PJN(OPZ$) ∈ FNS(OZ&, ONTO, OZ$) by theorem A1.176."
+    },
+    {
+      "id": "4.8/proof/next_state_consistency",
+      "type": "component",
+      "text": "Next-state consistency follows from the CSY definition at 3.40."
+    },
+    {
+      "id": "4.8/proof/readout_consistency",
+      "type": "component",
+      "text": "Readout consistency follows from the CSY definition at 3.40."
+    }
+  ]
+}

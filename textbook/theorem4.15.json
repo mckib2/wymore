@@ -1,0 +1,22 @@
+{
+  "id": "4.15",
+  "name": "Fundamental Theorem of System Homomorphisms",
+  "description": "Characterization of homomorphic images via the HIMSY construction.",
+  "elements": [
+    {
+      "id": "4.15/theorem/fundamental_iff",
+      "type": "theorem",
+      "text": "Z1 = HIMSY(Z2, HS, HI, HO) if and only if {Z1, Z2} ⊆ DSYSTEMS and Z1 is a homomorphic image of Z2 with respect to HS, HI, and HO."
+    },
+    {
+      "id": "4.15/proof/forward",
+      "type": "component",
+      "text": "If Z1 = HIMSY(Z2, HS, HI, HO), then Z1 is a homomorphic image of Z2."
+    },
+    {
+      "id": "4.15/proof/reverse",
+      "type": "component",
+      "text": "If Z1 is a homomorphic image of Z2 with respect to HS, HI, HO, then Z1 = HIMSY(Z2, HS, HI, HO)."
+    }
+  ]
+}

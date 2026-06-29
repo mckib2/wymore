@@ -16,7 +16,16 @@ This report compiles the analyses of the proofs of core theorems in Wayne Wymore
 9. [Theorem 2.97: FCNSY Output Trajectory at One Time Unit](#9-theorem-297-fcnsy-output-trajectory-at-one-time-unit)
 10. [Theorem 3.31: Pure Feedback Coupling Recipes are in a Class by Themselves](#10-theorem-331-pure-feedback-coupling-recipes)
 11. [Theorem 3.45: State and Output Trajectories of Conjunctive Systems](#11-theorem-345-state-and-output-trajectories-of-conjunctive-systems)
-12. [Meta-Analysis and Synthesis](#12-meta-analysis-and-synthesis)
+12. [Morphism Output Trajectory Preservation (Corollary)](#12-morphism-output-trajectory-preservation-corollary)
+13. [Output Trajectory Time Invariance and Nonanticipation (Corollaries of 2.46 / 2.48)](#13-output-trajectory-time-invariance-and-nonanticipation-corollaries-of-246--248)
+14. [IsNontrivial Clause (iii): Existential vs `#RNG > 1`](#14-isnontrivial-clause-iii-existential-vs-rng--1)
+15. [Option-Unified Definition 2.4 Encoding](#15-option-unified-definition-24-encoding)
+16. [Definition 4.3: System Homomorphisms and Surjectivity](#16-definition-43-system-homomorphisms-and-surjectivity)
+17. [Definition 4.10: HIMSY as Relational vs Constructive Parameterization](#17-definition-410-himsy-as-relational-vs-constructive-parameterization)
+18. [Theorem 4.8: CSY Component Homomorphic Image](#18-theorem-48-csy-component-homomorphic-image)
+19. [Theorem 4.15: Fundamental Theorem (Forward / Reverse Split)](#19-theorem-415-fundamental-theorem-forward--reverse-split)
+20. [Textbook ↔ Lean Naming Convention Table](#20-textbook--lean-naming-convention-table)
+21. [Meta-Analysis and Synthesis](#21-meta-analysis-and-synthesis)
 
 
 ---
@@ -685,7 +694,83 @@ Forward: two distinct outputs in range yield two distinct finset members via `Fi
 
 ---
 
-## 16. Meta-Analysis and Synthesis
+## 16. Definition 4.3: System Homomorphisms and Surjectivity
+
+| Textbook | Lean ([Mbse/Homomorphism.lean](Mbse/Homomorphism.lean)) |
+|---|---|
+| Z₁ homomorphic **image** of Z₂ | `IsHomomorphicImage Z_img Z_elab` on `DiscreteSystem` |
+| HS : SZ₂ → ONTO(SZ₁) | `HomomorphicImageWitness.HS` + `Function.Surjective HS` |
+| Next-state: HS(NZ₂(x), p) = NZ₁(HS(x), HI(p)) | `preserves_transition` with `oi.map HI` |
+| Readout: HO(RZ₂(x)) = RZ₁(HS(x)) | `preserves_readout` as `(Z_elab.RZ x).map HO = Z_img.RZ (HS x)` |
+
+**Layering:** Chapter 4 definitions and theorems live on general `DiscreteSystem` (no finiteness). [Mbse/FiniteWymore.lean](Mbse/FiniteWymore.lean) provides an FSM bridge: `FSM.HomomorphicImageWitness` with `toGeneral` embedding into the general witness via `FSMSystem.toDiscreteSystem`.
+
+**Set theory vs DTT:** Textbook ONTO is encoded by fixing codomain type `SZ₁` and requiring `Surjective HS` (RNG = codomain). The witness is a **structure**; the textbook predicate is `Prop` via `Nonempty`.
+
+**Direction vs `SystemMorphism`:** Lean `SystemMorphism Z₁ Z₂` maps φS : SZ₁ → SZ₂. Textbook HS maps elaboration → image. Bridge: `homomorphicImage_of_morphism` from a surjective `SystemMorphism Z_elab Z_img`.
+
+**Swarm case study:** [Mbse/SwarmCaseStudy.lean](Mbse/SwarmCaseStudy.lean) uses `FSM.IsHomomorphicImage` / `FSM.HomomorphicImageWitness` (total Moore maps); proofs delegate to the general layer through `toGeneral`.
+
+---
+
+## 17. Definition 4.10: HIMSY as Relational vs Constructive Parameterization
+
+| Textbook | Lean |
+|---|---|
+| HIMSY = {Z₁ \| Z₁ homomorphic image of Z₂} | `Homomorphism.himsy Z₂ HS HI HO : DiscreteSystem …` |
+| SZ₁ = RNG(HS), etc. | Codomain types of HS, HI, HO (surjective onto) |
+| NZ₁, RZ₁ well-defined on equivalence classes | `HimsyWellDefined` + `Classical.choose` on preimages |
+
+**Relational vs constructive:** The textbook defines HIMSY as a **set comprehension**. Lean builds a **single canonical representative** `himsy` when `HimsyWellDefined` holds, using classical choice (no `Fintype` required). Finite specialization: `FSM.himsy` on `FSMSystem` with the same formulas on total maps.
+
+**Parameterization:** `Homomorphism.himsy_parameterization` registers HIMSY as `DiscreteSystemParameterization`; `FSM.himsy_parameterization` mirrors this for finite systems.
+
+---
+
+## 18. Theorem 4.8: CSY Component Homomorphic Image
+
+**Textbook claim:** Component `VSCR.Z i` of a conjunctive system is a homomorphic image of `csy VSCR` with HS = projection on product state, HI/HO = port projections (Thm A1.176).
+
+**General Lean proof:** `Homomorphism.csy_component_homomorphic_image` on Wymore `PortSystemVector` and `csy` with `AlwaysOutputs` on each component. Readout uses `Classical.choose` from `AlwaysOutputs`; next-state uses `Option.map` on bundled inputs.
+
+**Finite bridge:** `FSM.csy_component_homomorphic_image` on `FSM.PortSystemVector` / `FSM.csy` (direct witness; same projection maps as before).
+
+**Status:** **Proved** on both general and finite layers (no stubs).
+
+---
+
+## 19. Theorem 4.15: Fundamental Theorem (Forward / Reverse Split)
+
+| Direction | Textbook | Lean | Status |
+|---|---|---|---|
+| Forward | Homomorphic image ⇒ Z₁ = HIMSY(Z₂, …) | `homomorphic_image_eq_himsy` | **Proved** on `DiscreteSystem` NZ/RZ |
+| Reverse | Z₁ = HIMSY(…) ⇒ homomorphic image | `himsy_is_homomorphic_image` | **Proved** |
+| Iff packaging | `4.15/theorem/fundamental_iff` | `fundamental_theorem_homomorphism_iff` | **Proved** |
+
+**Finite corollary:** `FSM.homomorphic_image_eq_himsy` and `FSM.himsy_is_homomorphic_image` via `toGeneral`.
+
+**Trajectory corollary:** `homomorphicImage_preserves_state_trajectory` / `homomorphicImage_preserves_output_trajectory` on `ITZW`; FSM layer uses `liftInput`.
+
+---
+
+## 20. Textbook ↔ Lean Naming Convention Table
+
+| Concept | Textbook notation | Lean name | Argument order |
+|---|---|---|---|
+| Image (simpler) system | Z₁ | `Z_img` / first arg of `IsHomomorphicImage` | — |
+| Elaboration system | Z₂ | `Z_elab` / second arg | — |
+| State map (onto) | HS : S₂ → S₁ | `HomomorphicImageWitness.HS` | elaboration → image |
+| Input map (onto) | HI | `.HI` | elaboration → image |
+| Output map (onto) | HO | `.HO` | elaboration → image |
+| Ch. 3 morphism | h : Z_impl → Z_spec | `SystemMorphism Z_spec Z_impl` | φS : S_spec → S_impl |
+| Induced image system | HIMSY(Z₂, HS, HI, HO) | `himsy Z₂ HS HI HO` | general; `FSM.himsy` for finite |
+| Conjunctive composition | csy(VSCR) | `csy VSCR hOut` (general); `FSM.csy VSCR` | — |
+
+**Swarm instantiation:** `searchSpec` = Z_spec (behavioral coverage/deadline intent); `swarmSystem n` = Z_impl (parameterized Fin n product); witness maps aggregate swarm state to spec state via `swarmToSpecHS`.
+
+---
+
+## 21. Meta-Analysis and Synthesis
 
 
 Formalizing Wayne Wymore's textbook theorems in Lean 4 reveals key differences in how set theory and dependent type theory model and verify mathematical objects.

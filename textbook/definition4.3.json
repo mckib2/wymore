@@ -1,0 +1,47 @@
+{
+  "id": "4.3",
+  "name": "System Homomorphisms",
+  "description": "Definition of system homomorphisms: Z1 is a homomorphic image of Z2 with respect to state, input, and output homomorphisms satisfying next-state and readout consistency.",
+  "elements": [
+    {
+      "id": "4.3/definition/homomorphic_image",
+      "type": "definition",
+      "text": "Z1 is a homomorphic image of Z2 with respect to HS, HI, HO if and only if (i) HS ∈ FNS(SZ2, ONTO, SZ1), (ii) HI ∈ FNS(IZ2, ONTO, IZ1), (iii) HO ∈ FNS(OZ2, ONTO, OZ1), (iv) HS(NZ2(x,p)) = NZ1(HS(x), HI(p)) for all x ∈ SZ2 and p ∈ IZ2, and (v) HO(RZ2(x)) = RZ1(HS(x)) for all x ∈ SZ2."
+    },
+    {
+      "id": "4.3/requirement/next_state_consistency",
+      "type": "constraint",
+      "text": "Condition (iv) is the next-state consistency requirement."
+    },
+    {
+      "id": "4.3/requirement/readout_consistency",
+      "type": "constraint",
+      "text": "Condition (v) is the readout consistency requirement."
+    },
+    {
+      "id": "4.3/component/state_homomorphism",
+      "type": "component",
+      "text": "HS is the state homomorphism."
+    },
+    {
+      "id": "4.3/component/input_homomorphism",
+      "type": "component",
+      "text": "HI is the input homomorphism."
+    },
+    {
+      "id": "4.3/component/output_homomorphism",
+      "type": "component",
+      "text": "HO is the output homomorphism."
+    },
+    {
+      "id": "4.3/implication/consistent_simplification",
+      "type": "implication",
+      "text": "If Z1 is a homomorphic image of Z2, then Z1 is a consistent simplification of Z2 and Z2 is a consistent elaboration of Z1."
+    },
+    {
+      "id": "4.3/implication/functional_capability",
+      "type": "implication",
+      "text": "If Z1 is a homomorphic image of Z2, then Z2 has the functional capability of Z1."
+    }
+  ]
+}

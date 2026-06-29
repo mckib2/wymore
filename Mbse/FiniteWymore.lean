@@ -1,4 +1,5 @@
 import Mbse.Wymore
+import Mbse.Homomorphism
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Fintype.Pi
@@ -227,6 +228,7 @@ def HasStateReadout {SZ IZ : Type} (F : FSMSystem SZ IZ SZ) : Prop :=
 open Z2State in
 /--
   [textbook/theorem2.78/theorem/system_construction]
+  [textbook/theorem2.78/proof/dsystems]
   Finite wrapper: NZ/RZ agree with [`_root_.Z2`](Wymore.lean) on `toDiscreteSystem`.
 -/
 noncomputable def Z2RZ (Z : FSMSystem SZ IZ OZ) : SZ → Option OZ := fun s => some (Z.RZ s)
@@ -241,16 +243,28 @@ noncomputable def Z2 (Z : FSMSystem SZ IZ OZ) : FSMSystem (Z2State SZ OZ (Z2RZ Z
   NZ := fun s2 p => ⟨Z.RZ (Z.NZ s2.state p), Z.NZ s2.state p, rfl⟩
   RZ := fun s2 => s2.out
 
+/--
+  [textbook/theorem2.78/proof/properly_aligned]
+  The Z2 readout is projective on each output port coordinate.
+-/
 theorem z2_readout_projective {SZ IZ OutPort : Type} {OutPortVal : OutPort → Type}
     (Z : FSMSystem SZ IZ ((op : OutPort) → OutPortVal op)) (op : OutPort)
     (s2 : Z2State SZ ((op : OutPort) → OutPortVal op) (Z2RZ Z)) :
     portReadout (Z2 Z) op s2 = some (s2.out op) :=
   _root_.z2_readout_projective Z.toDiscreteSystem (fsm_alwaysOutputs Z) op s2
 
+/--
+  [textbook/theorem2.78/proof/exz_mapping]
+  Experiments of Z lift to experiments of Z2 under the extended-state embedding.
+-/
 def Z2.exz_map {SZ IZ OZ : Type} (Z : FSMSystem SZ IZ OZ) :
     EXZ SZ IZ → EXZ (Z2State SZ OZ (Z2RZ Z)) IZ :=
   _root_.Z2.exz_map Z.toDiscreteSystem (fsm_alwaysOutputs Z)
 
+/--
+  [textbook/theorem2.78/proof/state_trajectory_projection]
+  The underlying state component of the Z2 trajectory agrees with the Z trajectory.
+-/
 theorem z2_state_trajectory_equivalence {SZ IZ OZ : Type} (Z : FSMSystem SZ IZ OZ) (x : SZ)
     (f : ITZ IZ) (t : Time) :
     (generateStateTrajectory (Z2 Z) ⟨Z.RZ x, x, rfl⟩ f t).state = generateStateTrajectory Z x f t := by
@@ -260,6 +274,10 @@ theorem z2_state_trajectory_equivalence {SZ IZ OZ : Type} (Z : FSMSystem SZ IZ O
     simp only [generateStateTrajectory_succ, Z2, Z2State.state]
     exact congr_arg (fun s => Z.NZ s (f t)) ih
 
+/--
+  [textbook/theorem2.78/proof/output_trajectory_equality]
+  Output trajectories of Z and Z2 agree from corresponding initial conditions.
+-/
 theorem z2_output_trajectory_equivalence {SZ IZ OZ : Type} (Z : FSMSystem SZ IZ OZ) (x : SZ)
     (f : ITZ IZ) (t : Time) :
     generateOutputTrajectory (Z2 Z) ⟨Z.RZ x, x, rfl⟩ f t =
@@ -649,6 +667,10 @@ theorem csy_state_trajectory {n : Nat} (VSCR : PortSystemVector n) (x : (i : Fin
     congr 1
     exact ih i
 
+/--
+  [textbook/theorem3.45/proof/output_relation]
+  The output trajectory of a conjunctive system projects to component output trajectories.
+-/
 theorem csy_output_trajectory {n : Nat} (VSCR : PortSystemVector n) (x : (i : Fin n) → VSCR.SZ i)
     (f : ITZ ((ip : Σ i, VSCR.Port i) → VSCR.PortVal ip.1 ip.2)) (t : Time) (i : Fin n)
     (B' : VSCR.OutPort i) :
@@ -659,9 +681,237 @@ theorem csy_output_trajectory {n : Nat} (VSCR : PortSystemVector n) (x : (i : Fi
   dsimp [csy] at hst ⊢
   rw [hst]
 
+/-! ## Chapter 4: Homomorphism bridge (FSMSystem) -/
+
+/--
+  FSM-level homomorphic image witness (total Moore maps). Maps to
+  [`Homomorphism.HomomorphicImageWitness`] on `toDiscreteSystem`.
+-/
+structure HomomorphicImageWitness
+    {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    (F_img : FSMSystem SZ1 IZ1 OZ1)
+    (F_elab : FSMSystem SZ2 IZ2 OZ2) where
+  HS : SZ2 → SZ1
+  HI : IZ2 → IZ1
+  HO : OZ2 → OZ1
+  HS_surjective : Function.Surjective HS
+  HI_surjective : Function.Surjective HI
+  HO_surjective : Function.Surjective HO
+  preserves_transition : ∀ x p, HS (F_elab.NZ x p) = F_img.NZ (HS x) (HI p)
+  preserves_readout : ∀ x, HO (F_elab.RZ x) = F_img.RZ (HS x)
+
+def HomomorphicImageWitness.toGeneral
+    {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {F_img : FSMSystem SZ1 IZ1 OZ1} {F_elab : FSMSystem SZ2 IZ2 OZ2}
+    (w : HomomorphicImageWitness F_img F_elab) :
+    Homomorphism.HomomorphicImageWitness F_img.toDiscreteSystem F_elab.toDiscreteSystem where
+  HS := w.HS
+  HI := w.HI
+  HO := w.HO
+  HS_surjective := w.HS_surjective
+  HI_surjective := w.HI_surjective
+  HO_surjective := w.HO_surjective
+  preserves_transition := fun x oi => by
+    cases oi with
+    | none => simp [FSMSystem.toDiscreteSystem, DiscreteSystem.ofTotal, w.preserves_transition]
+    | some p => simp [FSMSystem.toDiscreteSystem, DiscreteSystem.ofTotal, w.preserves_transition]
+  preserves_readout := fun x => by
+    simp [FSMSystem.toDiscreteSystem, DiscreteSystem.ofTotal, w.preserves_readout, Option.map_some]
+
+def IsHomomorphicImage {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    (F_img : FSMSystem SZ1 IZ1 OZ1) (F_elab : FSMSystem SZ2 IZ2 OZ2) : Prop :=
+  Nonempty (HomomorphicImageWitness F_img F_elab)
+
+theorem homomorphicImage_preserves_state_trajectory
+    {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {F_img : FSMSystem SZ1 IZ1 OZ1} {F_elab : FSMSystem SZ2 IZ2 OZ2}
+    (w : HomomorphicImageWitness F_img F_elab) (s0 : SZ2) (f : ITZ IZ2) :
+    ∀ t, w.HS (generateStateTrajectory F_elab s0 f t) =
+         generateStateTrajectory F_img (w.HS s0) (w.HI ∘ f) t :=
+  Homomorphism.homomorphicImage_preserves_state_trajectory w.toGeneral s0 (liftInput f)
+
+theorem homomorphicImage_preserves_output_trajectory
+    {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {F_img : FSMSystem SZ1 IZ1 OZ1} {F_elab : FSMSystem SZ2 IZ2 OZ2}
+    (w : HomomorphicImageWitness F_img F_elab) (s0 : SZ2) (f : ITZ IZ2) :
+    ∀ t, (generateOutputTrajectory F_elab s0 f t).map w.HO =
+         generateOutputTrajectory F_img (w.HS s0) (w.HI ∘ f) t :=
+  Homomorphism.homomorphicImage_preserves_output_trajectory w.toGeneral s0 (liftInput f)
+
+def HimsyWellDefined {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    (F2 : FSMSystem SZ2 IZ2 OZ2) (HS : SZ2 → SZ1) (HI : IZ2 → IZ1) (HO : OZ2 → OZ1) : Prop :=
+  Homomorphism.HimsyWellDefined F2.toDiscreteSystem HS HI HO
+
+noncomputable def himsy {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    [Fintype SZ1] [Fintype IZ1] [Fintype OZ1] [Nonempty SZ1]
+    (F2 : FSMSystem SZ2 IZ2 OZ2) (HS : SZ2 → SZ1) (HI : IZ2 → IZ1) (HO : OZ2 → OZ1)
+    (hwd : HimsyWellDefined F2 HS HI HO)
+    (hS : Function.Surjective HS) (hI : Function.Surjective HI) (_hO : Function.Surjective HO) :
+    FSMSystem SZ1 IZ1 OZ1 where
+  sz_nonempty := inferInstance
+  sz_finite := inferInstance
+  iz_finite := inferInstance
+  oz_finite := inferInstance
+  NZ := fun s i =>
+    HS (F2.NZ (Classical.choose (hS s)) (Classical.choose (hI i)))
+  RZ := fun s => HO (F2.RZ (Classical.choose (hS s)))
+
+theorem homomorphic_image_eq_himsy {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    [Fintype SZ1] [Fintype IZ1] [Fintype OZ1] [Nonempty SZ1] [Inhabited IZ2]
+    {F_img : FSMSystem SZ1 IZ1 OZ1} {F_elab : FSMSystem SZ2 IZ2 OZ2}
+    (h : HomomorphicImageWitness F_img F_elab) :
+    (∀ s i, F_img.NZ s i = (himsy F_elab h.HS h.HI h.HO
+      (Homomorphism.himsyWellDefined_of_homomorphicImage h.toGeneral) h.HS_surjective h.HI_surjective h.HO_surjective).NZ s i) ∧
+    (∀ s, F_img.RZ s = (himsy F_elab h.HS h.HI h.HO
+      (Homomorphism.himsyWellDefined_of_homomorphicImage h.toGeneral) h.HS_surjective h.HI_surjective h.HO_surjective).RZ s) := by
+  have hgen := Homomorphism.homomorphic_image_eq_himsy h.toGeneral
+  constructor
+  · intro s i
+    have := hgen.1 s (some i)
+    simp [FSMSystem.toDiscreteSystem, DiscreteSystem.ofTotal, himsy, Homomorphism.himsy] at this ⊢
+    exact this
+  · intro s
+    have := hgen.2 s
+    simp [FSMSystem.toDiscreteSystem, DiscreteSystem.ofTotal, himsy, Homomorphism.himsy] at this ⊢
+    exact this
+
+theorem himsy_is_homomorphic_image {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    [Fintype SZ1] [Fintype IZ1] [Fintype OZ1] [Nonempty SZ1] [Inhabited IZ2]
+    (F2 : FSMSystem SZ2 IZ2 OZ2) (HS : SZ2 → SZ1) (HI : IZ2 → IZ1) (HO : OZ2 → OZ1)
+    (hwd : HimsyWellDefined F2 HS HI HO)
+    (hS : Function.Surjective HS) (hI : Function.Surjective HI) (hO : Function.Surjective HO) :
+    IsHomomorphicImage (himsy F2 HS HI HO hwd hS hI hO) F2 := by
+  obtain ⟨w⟩ := Homomorphism.himsy_is_homomorphic_image F2.toDiscreteSystem HS HI HO hwd hS hI hO
+  exact ⟨{
+    HS := w.HS
+    HI := w.HI
+    HO := w.HO
+    HS_surjective := w.HS_surjective
+    HI_surjective := w.HI_surjective
+    HO_surjective := w.HO_surjective
+    preserves_transition := fun x p => by
+      have ht := w.preserves_transition x (some p)
+      simpa [FSMSystem.toDiscreteSystem, DiscreteSystem.ofTotal, himsy, Homomorphism.himsy] using ht
+    preserves_readout := fun x => by
+      have hr := w.preserves_readout x
+      simpa [FSMSystem.toDiscreteSystem, DiscreteSystem.ofTotal, himsy, Homomorphism.himsy, Option.map_some] using hr
+  }⟩
+
+def csy_input_proj {n : Nat} (VSCR : PortSystemVector n) (i : Fin n) :
+    ((ip : Σ j, VSCR.Port j) → VSCR.PortVal ip.1 ip.2) →
+    ((p : VSCR.Port i) → VSCR.PortVal i p) :=
+  fun po p => po ⟨i, p⟩
+
+def csy_output_proj {n : Nat} (VSCR : PortSystemVector n) (i : Fin n) :
+    ((op : Σ j, VSCR.OutPort j) → VSCR.OutPortVal op.1 op.2) →
+    ((p : VSCR.OutPort i) → VSCR.OutPortVal i p) :=
+  fun ro op => ro ⟨i, op⟩
+
+noncomputable def csy_fill_state {n : Nat} (VSCR : PortSystemVector n) (i : Fin n)
+    (s : VSCR.SZ i) : (j : Fin n) → VSCR.SZ j :=
+  fun j => if h : j = i then h ▸ s else Classical.choice (VSCR.Z j).sz_nonempty
+
+theorem csy_fill_state_proj {n : Nat} (VSCR : PortSystemVector n) (i : Fin n)
+    (s : VSCR.SZ i) : _root_.PJN i (csy_fill_state VSCR i s) = s := by
+  simp [csy_fill_state, _root_.PJN]
+
+noncomputable def csy_fill_input {n : Nat} (VSCR : PortSystemVector n) (i : Fin n)
+    (hPort : ∀ j (p : VSCR.Port j), Nonempty (VSCR.PortVal j p))
+    (ci : (p : VSCR.Port i) → VSCR.PortVal i p) :
+    ((ip : Σ j, VSCR.Port j) → VSCR.PortVal ip.1 ip.2) :=
+  fun ⟨j, p⟩ =>
+    if h : j = i then by subst h; exact ci p
+    else Classical.choice (hPort j p)
+
+theorem csy_fill_input_proj {n : Nat} (VSCR : PortSystemVector n) (i : Fin n)
+    (hPort : ∀ j (p : VSCR.Port j), Nonempty (VSCR.PortVal j p))
+    (ci : (p : VSCR.Port i) → VSCR.PortVal i p) :
+    csy_input_proj VSCR i (csy_fill_input VSCR i hPort ci) = ci := by
+  funext p
+  simp [csy_input_proj, csy_fill_input]
+
+noncomputable def csy_fill_output {n : Nat} (VSCR : PortSystemVector n) (i : Fin n)
+    (hOut : ∀ j (p : VSCR.OutPort j), Nonempty (VSCR.OutPortVal j p))
+    (co : (p : VSCR.OutPort i) → VSCR.OutPortVal i p) :
+    ((op : Σ j, VSCR.OutPort j) → VSCR.OutPortVal op.1 op.2) :=
+  fun ⟨j, p⟩ =>
+    if h : j = i then by subst h; exact co p
+    else Classical.choice (hOut j p)
+
+theorem csy_fill_output_proj {n : Nat} (VSCR : PortSystemVector n) (i : Fin n)
+    (hOut : ∀ j (p : VSCR.OutPort j), Nonempty (VSCR.OutPortVal j p))
+    (co : (p : VSCR.OutPort i) → VSCR.OutPortVal i p) :
+    csy_output_proj VSCR i (csy_fill_output VSCR i hOut co) = co := by
+  funext p
+  simp [csy_output_proj, csy_fill_output]
+
+theorem csy_component_homomorphic_image {n : Nat} (VSCR : PortSystemVector n) (i : Fin n)
+    (hPort : ∀ j (p : VSCR.Port j), Nonempty (VSCR.PortVal j p))
+    (hOut : ∀ j (p : VSCR.OutPort j), Nonempty (VSCR.OutPortVal j p)) :
+    IsHomomorphicImage (VSCR.Z i) (csy VSCR) :=
+  ⟨{
+    HS := _root_.PJN i
+    HI := csy_input_proj VSCR i
+    HO := csy_output_proj VSCR i
+    HS_surjective := fun s => ⟨csy_fill_state VSCR i s, csy_fill_state_proj VSCR i s⟩
+    HI_surjective := fun ci => ⟨csy_fill_input VSCR i hPort ci, csy_fill_input_proj VSCR i hPort ci⟩
+    HO_surjective := fun co => ⟨csy_fill_output VSCR i hOut co, csy_fill_output_proj VSCR i hOut co⟩
+    preserves_transition := fun x po => rfl
+    preserves_readout := fun x => by
+      simp only [_root_.PJN, csy_output_proj, csy]
+      funext op
+      rfl
+  }⟩
+
+structure HimsyParam (SZ1 IZ1 OZ1 : Type) [Fintype SZ1] [Fintype IZ1] [Fintype OZ1]
+    [Nonempty SZ1] where
+  SZ2 : Type
+  IZ2 : Type
+  OZ2 : Type
+  [sz2_finite : Fintype SZ2]
+  [iz2_finite : Fintype IZ2]
+  [oz2_finite : Fintype OZ2]
+  F2 : FSMSystem SZ2 IZ2 OZ2
+  HS : SZ2 → SZ1
+  HI : IZ2 → IZ1
+  HO : OZ2 → OZ1
+  well_defined : HimsyWellDefined F2 HS HI HO
+  HS_surj : Function.Surjective HS
+  HI_surj : Function.Surjective HI
+  HO_surj : Function.Surjective HO
+
+attribute [local instance] HimsyParam.sz2_finite HimsyParam.iz2_finite HimsyParam.oz2_finite
+
+noncomputable def himsy_parameterization (SZ1 : Type) (IZ1 : Type) (OZ1 : Type)
+    [Fintype SZ1] [Fintype IZ1] [Fintype OZ1] [Nonempty SZ1] :
+    FSMSystemParameterization (HimsyParam SZ1 IZ1 OZ1)
+      (fun _ => SZ1) (fun _ => IZ1) (fun _ => OZ1) :=
+  fun p => himsy p.F2 p.HS p.HI p.HO p.well_defined p.HS_surj p.HI_surj p.HO_surj
+
+theorem homomorphicImage_of_morphism
+    {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {F_img : FSMSystem SZ1 IZ1 OZ1} {F_elab : FSMSystem SZ2 IZ2 OZ2}
+    (m : SystemMorphism F_elab F_img) (hS : Function.Surjective m.φS)
+    (hI : Function.Surjective m.φI) (hO : Function.Surjective m.φO) :
+    IsHomomorphicImage F_img F_elab :=
+  ⟨{
+    HS := m.φS
+    HI := m.φI
+    HO := m.φO
+    HS_surjective := hS
+    HI_surjective := hI
+    HO_surjective := hO
+    preserves_transition := fun x p => m.preserves_transition x p
+    preserves_readout := fun x => m.preserves_readout x
+  }⟩
+
 end FSM
 
 export FSM (FSMSystem generateStateTrajectory generateOutputTrajectory StateEquiv Reachable
   IsValidStateTrajectory IsValidOutputTrajectory SystemMorphism outputTrajectory_unique
-  generateStateTrajectory_zero generateStateTrajectory_succ generateOutputTrajectory_eq reachable_iff stateEquiv_iff)
+  generateStateTrajectory_zero generateStateTrajectory_succ generateOutputTrajectory_eq reachable_iff stateEquiv_iff
+  HomomorphicImageWitness IsHomomorphicImage himsy HimsyWellDefined homomorphic_image_eq_himsy
+  himsy_is_homomorphic_image csy_component_homomorphic_image himsy_parameterization
+  homomorphicImage_preserves_state_trajectory homomorphicImage_preserves_output_trajectory
+  homomorphicImage_of_morphism)
 

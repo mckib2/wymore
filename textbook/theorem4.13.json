@@ -1,0 +1,12 @@
+{
+  "id": "4.13",
+  "name": "HIMSY is a System Parameterization",
+  "description": "Theorem establishing that the homomorphic image system parameterization HIMSY satisfies the system parameterization axioms.",
+  "elements": [
+    {
+      "id": "4.13/theorem/himsy_parameterization",
+      "type": "theorem",
+      "text": "HIMSY is a system parameterization."
+    }
+  ]
+}

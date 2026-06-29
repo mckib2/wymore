@@ -1,0 +1,37 @@
+{
+  "id": "4.10",
+  "name": "Parameterization of Homomorphic Image Systems",
+  "description": "HIMSY: the parameterization of homomorphic image systems, constructing Z1 from Z2 and homomorphisms HS, HI, HO.",
+  "elements": [
+    {
+      "id": "4.10/definition/himsy",
+      "type": "definition",
+      "text": "HIMSY = {((Z2, HS, HI, HO), Z1): Z2 ∈ DSYSTEMS; HS, HI, HO are functions with DMN(HS)=SZ2, DMN(HI)=IZ2, DMN(HO)=OZ2; consistency side-conditions on HS, HI, HO; Z1 = (SZ1, IZ1, OZ1, NZ1, RZ1) with SZ1=RNG(HS), IZ1=RNG(HI), OZ1=RNG(HO), NZ1 and RZ1 induced from Z2 via HS, HI, HO}."
+    },
+    {
+      "id": "4.10/component/sz1",
+      "type": "component",
+      "text": "SZ1 = RNG(HS)."
+    },
+    {
+      "id": "4.10/component/iz1",
+      "type": "component",
+      "text": "IZ1 = RNG(HI)."
+    },
+    {
+      "id": "4.10/component/oz1",
+      "type": "component",
+      "text": "OZ1 = RNG(HO)."
+    },
+    {
+      "id": "4.10/component/nz1",
+      "type": "component",
+      "text": "NZ1 induced from Z2 via HS, HI, HO and next-state consistency."
+    },
+    {
+      "id": "4.10/component/rz1",
+      "type": "component",
+      "text": "RZ1 induced from Z2 via HS, HO and readout consistency."
+    }
+  ]
+}
