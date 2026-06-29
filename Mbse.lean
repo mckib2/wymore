@@ -6,5 +6,6 @@ import Mbse.CombinationalWymore
 import Mbse.DPDAWymore
 import Mbse.DPDAExamples
 import Mbse.FiniteWymore
+import Mbse.SwarmExamples
 
 
