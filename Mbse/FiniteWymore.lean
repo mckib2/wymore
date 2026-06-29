@@ -39,10 +39,13 @@ structure FSMSystem (SZ : Type) (IZ : Type) (OZ : Type) where
   RZ : SZ → OZ
 
 /-- Embed a finite Moore machine into a general `DiscreteSystem` (Definition 2.4). -/
-def FSMSystem.toDiscreteSystem (F : FSMSystem SZ IZ OZ) : DiscreteSystem SZ IZ OZ where
-  sz_nonempty := F.sz_nonempty
-  NZ := F.NZ
-  RZ := F.RZ
+def FSMSystem.toDiscreteSystem (F : FSMSystem SZ IZ OZ) : DiscreteSystem SZ IZ OZ :=
+  DiscreteSystem.ofTotal F.NZ F.RZ F.sz_nonempty
+
+theorem fsm_alwaysOutputs (F : FSMSystem SZ IZ OZ) : AlwaysOutputs F.toDiscreteSystem :=
+  ofTotal_alwaysOutputs F.NZ F.RZ F.sz_nonempty
+
+abbrev liftInput (f : ITZ IZ) : ITZW IZ := _root_.liftInput f
 
 /-- [textbook/definition2.11/definition/finite_system] Every `FSMSystem` is finite. -/
 theorem fsm_isFinite (F : FSMSystem SZ IZ OZ) : IsFinite F.toDiscreteSystem := by
@@ -55,22 +58,23 @@ theorem fsm_isFinite (F : FSMSystem SZ IZ OZ) : IsFinite F.toDiscreteSystem := b
 /-! ## Trajectory engine (finite systems) -/
 
 def generateStateTrajectory (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) : STZ SZ :=
-  _root_.generateStateTrajectory F.toDiscreteSystem s0 f
+  _root_.generateStateTrajectory F.toDiscreteSystem s0 (liftInput f)
 
 def generateOutputTrajectory (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) : OTZ OZ :=
-  _root_.generateOutputTrajectory F.toDiscreteSystem s0 f
+  _root_.generateOutputTrajectory F.toDiscreteSystem s0 (liftInput f)
 
 def IsValidStateTrajectory (F : FSMSystem SZ IZ OZ) (f : ITZ IZ) (g : STZ SZ) : Prop :=
-  _root_.IsValidStateTrajectory F.toDiscreteSystem f g
+  _root_.IsValidStateTrajectory F.toDiscreteSystem (liftInput f) g
 
 def IsValidOutputTrajectory (F : FSMSystem SZ IZ OZ) (g : STZ SZ) (h : OTZ OZ) : Prop :=
   _root_.IsValidOutputTrajectory F.toDiscreteSystem g h
 
 def Reachable (F : FSMSystem SZ IZ OZ) (s0 s : SZ) : Prop :=
-  _root_.Reachable F.toDiscreteSystem s0 s
+  ∃ (f : ITZ IZ) (t : Time), generateStateTrajectory F s0 f t = s
 
 def StateEquiv (F : FSMSystem SZ IZ OZ) (s1 s2 : SZ) : Prop :=
-  _root_.StateEquiv F.toDiscreteSystem s1 s2
+  ∀ (f : ITZ IZ) (t : Time),
+    generateOutputTrajectory F s1 f t = generateOutputTrajectory F s2 f t
 
 structure SystemMorphism
     {SZ1 IZ1 OZ1 : Type} {SZ2 IZ2 OZ2 : Type}
@@ -82,79 +86,86 @@ structure SystemMorphism
   preserves_transition : ∀ s i, φS (F1.NZ s i) = F2.NZ (φS s) (φI i)
   preserves_readout : ∀ s, φO (F1.RZ s) = F2.RZ (φS s)
 
+def SystemMorphism.toDiscreteSystem
+    {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {F1 : FSMSystem SZ1 IZ1 OZ1} {F2 : FSMSystem SZ2 IZ2 OZ2}
+    (m : SystemMorphism F1 F2) : _root_.SystemMorphism F1.toDiscreteSystem F2.toDiscreteSystem where
+  φS := m.φS
+  φI := m.φI
+  φO := m.φO
+  preserves_transition := fun s oi => by
+    cases oi with
+    | none => simp [FSMSystem.toDiscreteSystem, DiscreteSystem.ofTotal]
+    | some i => simp [FSMSystem.toDiscreteSystem, DiscreteSystem.ofTotal, m.preserves_transition]
+  preserves_readout := fun s => by
+    simp [FSMSystem.toDiscreteSystem, DiscreteSystem.ofTotal, m.preserves_readout, Option.map_some]
+
 theorem morphism_preserves_state_trajectory
     {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     {F1 : FSMSystem SZ1 IZ1 OZ1} {F2 : FSMSystem SZ2 IZ2 OZ2}
     (m : SystemMorphism F1 F2) (s0 : SZ1) (f : ITZ IZ1) :
     ∀ t, m.φS (generateStateTrajectory F1 s0 f t) =
-         generateStateTrajectory F2 (m.φS s0) (m.φI ∘ f) t := by
-  intro t
-  induction t with
-  | zero => rfl
-  | succ n ih =>
-    unfold generateStateTrajectory
-    simp only [_root_.generateStateTrajectory_succ, FSMSystem.toDiscreteSystem, m.preserves_transition]
-    have ih' : m.φS (_root_.generateStateTrajectory F1.toDiscreteSystem s0 f n) =
-        _root_.generateStateTrajectory F2.toDiscreteSystem (m.φS s0) (m.φI ∘ f) n := by
-      simpa [generateStateTrajectory, FSMSystem.toDiscreteSystem] using ih
-    dsimp [FSMSystem.toDiscreteSystem] at ih' ⊢
-    rw [ih']
+         generateStateTrajectory F2 (m.φS s0) (m.φI ∘ f) t :=
+  _root_.morphism_preserves_state_trajectory m.toDiscreteSystem s0 (liftInput f)
+
+theorem morphism_preserves_output_trajectory
+    {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {F1 : FSMSystem SZ1 IZ1 OZ1} {F2 : FSMSystem SZ2 IZ2 OZ2}
+    (m : SystemMorphism F1 F2) (s0 : SZ1) (f : ITZ IZ1) :
+    ∀ t, (generateOutputTrajectory F1 s0 f t).map m.φO =
+         generateOutputTrajectory F2 (m.φS s0) (m.φI ∘ f) t :=
+  _root_.morphism_preserves_output_trajectory m.toDiscreteSystem s0 (liftInput f)
 
 theorem stateTrajectory_unique (F : FSMSystem SZ IZ OZ) (f : ITZ IZ) (g : STZ SZ) (s0 : SZ)
     (h_init : g 0 = s0) (h_valid : IsValidStateTrajectory F f g) :
     ∀ t, g t = generateStateTrajectory F s0 f t :=
-  _root_.stateTrajectory_unique F.toDiscreteSystem f g s0 h_init h_valid
+  _root_.stateTrajectory_unique F.toDiscreteSystem (liftInput f) g s0 h_init h_valid
 
 theorem generateStateTrajectory_valid (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) :
     IsValidStateTrajectory F f (generateStateTrajectory F s0 f) :=
-  _root_.generateStateTrajectory_valid F.toDiscreteSystem s0 f
+  _root_.generateStateTrajectory_valid F.toDiscreteSystem s0 (liftInput f)
 
 theorem generateOutputTrajectory_valid (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) :
     IsValidOutputTrajectory F (generateStateTrajectory F s0 f) (generateOutputTrajectory F s0 f) :=
-  _root_.generateOutputTrajectory_valid F.toDiscreteSystem s0 f
+  _root_.generateOutputTrajectory_valid F.toDiscreteSystem s0 (liftInput f)
 
 theorem outputTrajectory_unique (F : FSMSystem SZ IZ OZ) (g : STZ SZ) (h : OTZ OZ)
     (h_valid : IsValidOutputTrajectory F g h) (t : Time) :
-    h t = F.RZ (g t) :=
+    h t = some (F.RZ (g t)) :=
   h_valid t
 
 /-! ## Bridge corollaries -/
 
 theorem toDiscreteSystem_state_trajectory (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) (t : Time) :
-    generateStateTrajectory F s0 f t = _root_.generateStateTrajectory F.toDiscreteSystem s0 f t := rfl
+    generateStateTrajectory F s0 f t =
+      _root_.generateStateTrajectory F.toDiscreteSystem s0 (liftInput f) t := rfl
 
 theorem toDiscreteSystem_output_trajectory (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) (t : Time) :
-    generateOutputTrajectory F s0 f t = _root_.generateOutputTrajectory F.toDiscreteSystem s0 f t := rfl
+    generateOutputTrajectory F s0 f t =
+      _root_.generateOutputTrajectory F.toDiscreteSystem s0 (liftInput f) t := rfl
 
 theorem generateOutputTrajectory_eq (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) (t : Time) :
-    generateOutputTrajectory F s0 f t = F.RZ (generateStateTrajectory F s0 f t) := by
-  unfold generateOutputTrajectory
-  simp only [_root_.generateOutputTrajectory, toDiscreteSystem_state_trajectory, FSMSystem.toDiscreteSystem]
+    generateOutputTrajectory F s0 f t = some (F.RZ (generateStateTrajectory F s0 f t)) := by
+  unfold generateOutputTrajectory generateStateTrajectory liftInput
+  simp only [_root_.generateOutputTrajectory, _root_.generateStateTrajectory,
+    FSMSystem.toDiscreteSystem, DiscreteSystem.ofTotal]
 
 theorem reachable_iff (F : FSMSystem SZ IZ OZ) (s0 s : SZ) :
-    Reachable F s0 s ↔ ∃ (f : ITZ IZ) (t : Time), generateStateTrajectory F s0 f t = s := by
-  constructor
-  · intro h
-    obtain ⟨f, t, ht⟩ := h
-    exact ⟨f, t, by simpa [toDiscreteSystem_state_trajectory] using ht⟩
-  · intro ⟨f, t, ht⟩
-    exact ⟨f, t, by simpa [toDiscreteSystem_state_trajectory] using ht⟩
+    Reachable F s0 s ↔ ∃ (f : ITZ IZ) (t : Time), generateStateTrajectory F s0 f t = s :=
+  Iff.rfl
 
 theorem stateEquiv_iff (F : FSMSystem SZ IZ OZ) (s1 s2 : SZ) :
     StateEquiv F s1 s2 ↔ ∀ (f : ITZ IZ) (t : Time),
-      generateOutputTrajectory F s1 f t = generateOutputTrajectory F s2 f t := by
-  constructor
-  · intro h f t
-    simpa [toDiscreteSystem_output_trajectory, generateOutputTrajectory_eq] using h f t
-  · intro h f t
-    simpa [toDiscreteSystem_output_trajectory, generateOutputTrajectory_eq] using h f t
+      generateOutputTrajectory F s1 f t = generateOutputTrajectory F s2 f t :=
+  Iff.rfl
 
 @[simp] theorem generateStateTrajectory_zero (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) :
     generateStateTrajectory F s0 f 0 = s0 := rfl
 
 @[simp] theorem generateStateTrajectory_succ (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) (t : Time) :
     generateStateTrajectory F s0 f (t + 1) = F.NZ (generateStateTrajectory F s0 f t) (f t) := by
-  simp only [generateStateTrajectory, _root_.generateStateTrajectory_succ, FSMSystem.toDiscreteSystem]
+  simp [generateStateTrajectory, _root_.generateStateTrajectory_succ,
+    FSMSystem.toDiscreteSystem, DiscreteSystem.ofTotal, liftInput]
 
 def HasOrderVector {SZ IZ OZ : Type} (Z : FSMSystem SZ IZ OZ) (k m n : Nat) : Prop :=
   have : Fintype SZ := Z.sz_finite
@@ -198,7 +209,7 @@ def IsTrivial {SZ IZ OZ : Type} (Z : FSMSystem SZ IZ OZ) : Prop :=
 /-! ## FSM port readout (via general layer) -/
 
 def portReadout {SZ IZ OutPort : Type} {OutPortVal : OutPort → Type}
-    (F : FSMSystem SZ IZ ((op : OutPort) → OutPortVal op)) (op : OutPort) : SZ → OutPortVal op :=
+    (F : FSMSystem SZ IZ ((op : OutPort) → OutPortVal op)) (op : OutPort) : SZ → Option (OutPortVal op) :=
   _root_.portReadout F.toDiscreteSystem op
 
 def IsProperlyAlignedReadout {IZ I : Type} {Val : I → Type}
@@ -218,11 +229,13 @@ open Z2State in
   [textbook/theorem2.78/theorem/system_construction]
   Finite wrapper: NZ/RZ agree with [`_root_.Z2`](Wymore.lean) on `toDiscreteSystem`.
 -/
-def Z2 {SZ IZ OZ : Type} (Z : FSMSystem SZ IZ OZ) : FSMSystem (Z2State SZ OZ Z.RZ) IZ OZ where
-  sz_nonempty := Z.sz_nonempty.map (Z2State.equivSZ Z.RZ).symm
+noncomputable def Z2RZ (Z : FSMSystem SZ IZ OZ) : SZ → Option OZ := fun s => some (Z.RZ s)
+
+noncomputable def Z2 (Z : FSMSystem SZ IZ OZ) : FSMSystem (Z2State SZ OZ (Z2RZ Z)) IZ OZ where
+  sz_nonempty := Z.sz_nonempty.map (Z2State.equivSZ (Z2RZ Z) (fun s => ⟨Z.RZ s, rfl⟩)).symm
   sz_finite := by
     haveI : Fintype SZ := Z.sz_finite
-    exact Fintype.ofEquiv SZ (Z2State.equivSZ Z.RZ).symm
+    exact Fintype.ofEquiv SZ (Z2State.equivSZ (Z2RZ Z) (fun s => ⟨Z.RZ s, rfl⟩)).symm
   iz_finite := Z.iz_finite
   oz_finite := Z.oz_finite
   NZ := fun s2 p => ⟨Z.RZ (Z.NZ s2.state p), Z.NZ s2.state p, rfl⟩
@@ -230,13 +243,13 @@ def Z2 {SZ IZ OZ : Type} (Z : FSMSystem SZ IZ OZ) : FSMSystem (Z2State SZ OZ Z.R
 
 theorem z2_readout_projective {SZ IZ OutPort : Type} {OutPortVal : OutPort → Type}
     (Z : FSMSystem SZ IZ ((op : OutPort) → OutPortVal op)) (op : OutPort)
-    (s2 : Z2State SZ ((op : OutPort) → OutPortVal op) Z.RZ) :
-    portReadout (Z2 Z) op s2 = s2.out op :=
-  _root_.z2_readout_projective Z.toDiscreteSystem op s2
+    (s2 : Z2State SZ ((op : OutPort) → OutPortVal op) (Z2RZ Z)) :
+    portReadout (Z2 Z) op s2 = some (s2.out op) :=
+  _root_.z2_readout_projective Z.toDiscreteSystem (fsm_alwaysOutputs Z) op s2
 
 def Z2.exz_map {SZ IZ OZ : Type} (Z : FSMSystem SZ IZ OZ) :
-    EXZ SZ IZ → EXZ (Z2State SZ OZ Z.RZ) IZ :=
-  _root_.Z2.exz_map Z.toDiscreteSystem
+    EXZ SZ IZ → EXZ (Z2State SZ OZ (Z2RZ Z)) IZ :=
+  _root_.Z2.exz_map Z.toDiscreteSystem (fsm_alwaysOutputs Z)
 
 theorem z2_state_trajectory_equivalence {SZ IZ OZ : Type} (Z : FSMSystem SZ IZ OZ) (x : SZ)
     (f : ITZ IZ) (t : Time) :
@@ -244,21 +257,21 @@ theorem z2_state_trajectory_equivalence {SZ IZ OZ : Type} (Z : FSMSystem SZ IZ O
   induction t with
   | zero => rfl
   | succ t ih =>
-    simp only [generateStateTrajectory_succ]
-    unfold Z2
-    dsimp
-    unfold Z2 at ih
-    rw [ih]
+    simp only [generateStateTrajectory_succ, Z2, Z2State.state]
+    exact congr_arg (fun s => Z.NZ s (f t)) ih
 
 theorem z2_output_trajectory_equivalence {SZ IZ OZ : Type} (Z : FSMSystem SZ IZ OZ) (x : SZ)
     (f : ITZ IZ) (t : Time) :
-    generateOutputTrajectory (Z2 Z) ⟨Z.RZ x, x, rfl⟩ f t = generateOutputTrajectory Z x f t := by
-  let s0 : Z2State SZ OZ Z.RZ := ⟨Z.RZ x, x, rfl⟩
-  have h_out :
-      generateOutputTrajectory (Z2 Z) s0 f t = (generateStateTrajectory (Z2 Z) s0 f t).out := rfl
-  have h_z :
-      generateOutputTrajectory Z x f t = Z.RZ (generateStateTrajectory Z x f t) := rfl
-  rw [h_out, h_z, (generateStateTrajectory (Z2 Z) s0 f t).eq, z2_state_trajectory_equivalence Z x f t]
+    generateOutputTrajectory (Z2 Z) ⟨Z.RZ x, x, rfl⟩ f t =
+    generateOutputTrajectory Z x f t := by
+  rw [generateOutputTrajectory_eq, generateOutputTrajectory_eq]
+  set s2 := generateStateTrajectory (Z2 Z) ⟨Z.RZ x, x, rfl⟩ f t
+  have hst := z2_state_trajectory_equivalence Z x f t
+  have ho : s2.out = Z.RZ (generateStateTrajectory Z x f t) := by
+    have heq : some (Z.RZ s2.state) = some s2.out := by simpa [Z2RZ] using s2.eq
+    rw [hst] at heq
+    exact Option.some_injective _ heq.symm
+  exact congrArg some ho
 
 /-! ## System Parameterization -/
 
@@ -294,23 +307,18 @@ def HasOneParameter (P : Type) : Prop :=
 
 def fcnsy {IZ SZ : Type} (F : IZ → SZ) (n : Nat) [Fintype SZ] [Fintype IZ] [Inhabited SZ] :
     FSMSystem SZ IZ (Fin n → SZ) :=
-  let G := _root_.fcnsy F n
-  { sz_nonempty := G.sz_nonempty
+  { sz_nonempty := ⟨default⟩
     sz_finite := inferInstance
     iz_finite := inferInstance
     oz_finite := inferInstance
-    NZ := G.NZ
-    RZ := G.RZ }
-
-theorem fcnsy_has_two_parameters {IZ SZ : Type} [Fintype SZ] [Fintype IZ] [Inhabited SZ] :
-    ∃ (P : Type) (ParamType : Fin 2 → Type), HasNParameters P 2 ParamType :=
-  _root_.fcnsy_has_two_parameters (IZ := IZ) (SZ := SZ)
+    NZ := fun _ i => F i
+    RZ := fun x _j => x }
 
 theorem fcnsy_output_one_time_unit {IZ SZ : Type} (F : IZ → SZ) [Fintype SZ] [Fintype IZ]
     [Inhabited SZ] (x : SZ) (f : ITZ IZ) (t : Time) :
-    generateOutputTrajectory (fcnsy F 1) x f (t + 1) 0 = F (f t) := by
-  simpa [generateOutputTrajectory, fcnsy] using
-    _root_.fcnsy_output_one_time_unit F x f t
+    (generateOutputTrajectory (fcnsy F 1) x f (t + 1)).map (fun r => r 0) = some (F (f t)) := by
+  simpa [generateOutputTrajectory, fcnsy, liftInput] using
+    _root_.fcnsy_output_one_time_unit F x (liftInput f) t (f t) rfl
 
 /-! ## Chapter 3: System Coupling Recipes and Connectivity -/
 
@@ -540,14 +548,16 @@ def csy {n : Nat} (VSCR : PortSystemVector n) :
   iz_finite := by
     haveI : ∀ i, Fintype (VSCR.Port i) := VSCR.Port_finite
     haveI : ∀ i, DecidableEq (VSCR.Port i) := VSCR.Port_decidable
-    haveI : ∀ (ip : Σ i, VSCR.Port i), Fintype (VSCR.PortVal ip.fst ip.snd) := fun ip => VSCR.PortVal_finite ip.fst ip.snd
+    haveI : ∀ (ip : Σ i, VSCR.Port i), Fintype (VSCR.PortVal ip.fst ip.snd) :=
+      fun ip => VSCR.PortVal_finite ip.fst ip.snd
     infer_instance
   oz_finite := by
     haveI : ∀ i, Fintype (VSCR.OutPort i) := VSCR.OutPort_finite
     haveI : ∀ i, DecidableEq (VSCR.OutPort i) := VSCR.OutPort_decidable
-    haveI : ∀ (op : Σ i, VSCR.OutPort i), Fintype (VSCR.OutPortVal op.fst op.snd) := fun op => VSCR.OutPortVal_finite op.fst op.snd
+    haveI : ∀ (op : Σ i, VSCR.OutPort i), Fintype (VSCR.OutPortVal op.fst op.snd) :=
+      fun op => VSCR.OutPortVal_finite op.fst op.snd
     infer_instance
-  NZ := fun x p i => (VSCR.Z i).NZ (x i) (fun port => p ⟨i, port⟩)
+  NZ := fun x po i => (VSCR.Z i).NZ (x i) (fun port => po ⟨i, port⟩)
   RZ := fun x op => (VSCR.Z op.1).RZ (x op.1) op.2
 
 /--
@@ -635,24 +645,19 @@ theorem csy_state_trajectory {n : Nat} (VSCR : PortSystemVector n) (x : (i : Fin
   induction t generalizing i with
   | zero => simp [generateStateTrajectory_zero]
   | succ t ih =>
-    unfold generateStateTrajectory
-    simp only [_root_.generateStateTrajectory_succ, FSMSystem.toDiscreteSystem, csy]
-    change (VSCR.Z i).NZ (generateStateTrajectory (csy VSCR) x f t i) (fun port => f t ⟨i, port⟩) =
-        (VSCR.Z i).NZ (generateStateTrajectory (VSCR.Z i) (x i) (fun t port => f t ⟨i, port⟩) t)
-          (fun port => f t ⟨i, port⟩)
-    rw [ih i]
+    simp only [generateStateTrajectory_succ, csy]
+    congr 1
+    exact ih i
 
 theorem csy_output_trajectory {n : Nat} (VSCR : PortSystemVector n) (x : (i : Fin n) → VSCR.SZ i)
     (f : ITZ ((ip : Σ i, VSCR.Port i) → VSCR.PortVal ip.1 ip.2)) (t : Time) (i : Fin n)
     (B' : VSCR.OutPort i) :
-    generateOutputTrajectory (csy VSCR) x f t ⟨i, B'⟩ =
-    generateOutputTrajectory (VSCR.Z i) (x i) (fun t port => f t ⟨i, port⟩) t B' := by
-  have h := csy_state_trajectory VSCR x f t i
-  unfold generateOutputTrajectory
-  dsimp [FSMSystem.toDiscreteSystem, csy]
-  show (VSCR.Z i).RZ (generateStateTrajectory (csy VSCR) x f t i) B' =
-      (VSCR.Z i).RZ (generateStateTrajectory (VSCR.Z i) (x i) (fun t port => f t ⟨i, port⟩) t) B'
-  rw [h]
+    (generateOutputTrajectory (csy VSCR) x f t).map (fun r => r ⟨i, B'⟩) =
+    (generateOutputTrajectory (VSCR.Z i) (x i) (fun t port => f t ⟨i, port⟩) t).map (fun r => r B') := by
+  have hst := csy_state_trajectory VSCR x f t i
+  rw [generateOutputTrajectory_eq, generateOutputTrajectory_eq]
+  dsimp [csy] at hst ⊢
+  rw [hst]
 
 end FSM
 

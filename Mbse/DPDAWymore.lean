@@ -39,10 +39,9 @@ worked examples, `Reaches` ↔ trajectory bridge.
 ## Integration with other modules
 
 - **Base [Wymore](Wymore.lean):** `toBoundedFSMSystem` maps a depth-bounded DPDA into
-  `DiscreteSystem (Q × BoundedStack Γ max_depth) (Option I) O`. Unbounded stacks cannot live in
-  `DiscreteSystem` directly because it requires `Fintype SZ`.
-- **[GeneralizedWymore](GeneralizedWymore.lean):** Both use the shared base type `ITZW IS =
-  Time → Option IS` (`ITZ_opt` is a DPDA-local alias).
+  `DiscreteSystem (Q × BoundedStack Γ max_depth) (Option I) O` via `FSMSystem.toDiscreteSystem`.
+  Unbounded stacks cannot live in `DiscreteSystem` directly when a finite bridge is required.
+  Base `ITZW IS = Time → Option IS` (`ITZ_opt` is a DPDA-local alias).
 
 ## Semantic caveats
 
@@ -1160,16 +1159,15 @@ theorem bounded_stateTrajectory_unique
 -/
 theorem bounded_outputTrajectory_unique
     (D : DPDASystem Q I O G) (max_depth : Nat) (q0 : Q) (f : ITZ_opt I)
-    (h : Time → O)
+    (h : _root_.OTZ O)
     (h_valid : FSM.IsValidOutputTrajectory (toBoundedFSMSystem D max_depth)
       (FSM.generateStateTrajectory (toBoundedFSMSystem D max_depth)
         (boundedInit D max_depth q0) f) h) (t : Time) :
     h t = FSM.generateOutputTrajectory (toBoundedFSMSystem D max_depth)
-        (boundedInit D max_depth q0) f t := by
-  rw [_root_.outputTrajectory_unique (toBoundedFSMSystem D max_depth).toDiscreteSystem
+        (boundedInit D max_depth q0) f t :=
+  FSM.outputTrajectory_unique (toBoundedFSMSystem D max_depth)
     (FSM.generateStateTrajectory (toBoundedFSMSystem D max_depth)
-        (boundedInit D max_depth q0) f) h h_valid t]
-  rfl
+      (boundedInit D max_depth q0) f) h h_valid t
 
 end Bounded
 

@@ -45,6 +45,9 @@ instance : Fintype SingletonState where
 
 namespace Combinational
 
+/-- Combinational output trajectories are total (zero-delay Mealy readout). -/
+abbrev OTZ (OZ : Type) := Time → OZ
+
 /--
   A combinational system is a system with no memory where the output is a direct
   mapping of the input.
@@ -70,8 +73,7 @@ def IsOpen (_C : CombinationalSystem IZ OZ) : Prop :=
   Nonempty IZ ∧ Nonempty OZ
 
 /-- A concrete closed combinational system: empty input and output.
-    Unlike base `DiscreteSystem` (`not_isClosed`), closed systems are representable here
-    because readout is `IZ → OZ` with no forced nonempty output space. -/
+    Unlike the combinational layer (empty `IZ`/`OZ` with total readout), base `DiscreteSystem` now also supports closed systems via `closedSystem` / `exists_closed_discreteSystem`. -/
 def closedSystem : CombinationalSystem Empty Empty where
   iz_finite := inferInstance
   oz_finite := inferInstance
@@ -81,7 +83,7 @@ theorem closedSystem_isClosed : IsClosed closedSystem :=
   ⟨inferInstance, inferInstance⟩
 
 /-- Closed (empty-input, empty-output) combinational systems are constructible.
-    Contrast `not_isClosed`, which proves no base `DiscreteSystem` can be closed. -/
+    Base `DiscreteSystem` also supports closed systems after the Option-unified merge. -/
 theorem exists_closed_combinationalSystem : ∃ (C : CombinationalSystem Empty Empty), IsClosed C :=
   ⟨closedSystem, closedSystem_isClosed⟩
 
@@ -325,7 +327,7 @@ theorem outputTrajectory_nonanticipatory
   System experiments for combinational systems: input trajectory, initial (singleton) state, and time.
   On the singleton state space, experiments reduce to `(f, s0, t)` with output `C.RZ (f t)`.
 -/
-abbrev CombinationalEXZ (IZ : Type) := EXZ SingletonState IZ
+abbrev CombinationalEXZ (IZ : Type) := ITZ IZ × SingletonState × Time
 
 /--
   Run a combinational system experiment: output is the instantaneous readout at the experiment time.
@@ -363,7 +365,7 @@ abbrev IPZ (Port : Type) := _root_.IPZ Port
   [textbook/definition2.59/definition/input_port_structure]
   Input port structure for combinational systems (thin wrapper over base `ISZ`).
 -/
-abbrev ISZ (Port : Type) (PortVal : Port → Type) := _root_.ISZ Port PortVal
+abbrev ISZ (Port : Type) (PortVal : Port → Type) := (p : Port) → PortVal p
 
 /--
   [textbook/definition2.55/definition/port_trajectory]
@@ -371,7 +373,7 @@ abbrev ISZ (Port : Type) (PortVal : Port → Type) := _root_.ISZ Port PortVal
 -/
 def portTrajectory {Port : Type} {PortVal : Port → Type}
     (f : ITZ ((p : Port) → PortVal p)) (p : Port) : Time → PortVal p :=
-  _root_.portTrajectory f p
+  fun t => f t p
 
 @[simp]
 theorem portTrajectory_at_time {Port : Type} {PortVal : Port → Type}
@@ -733,10 +735,7 @@ end Combinational
 theorem singleton_state_discrete_system_is_constant {IZ OZ : Type}
     (Z : FSM.FSMSystem SingletonState IZ OZ) (s_init : SingletonState) (f g : ITZ IZ) (t : Time) :
     FSM.generateOutputTrajectory Z s_init f t = FSM.generateOutputTrajectory Z s_init g t := by
-  unfold FSM.generateOutputTrajectory
-  cases (FSM.generateStateTrajectory Z s_init f t)
-  cases (FSM.generateStateTrajectory Z s_init g t)
-  rfl
+  rw [FSM.generateOutputTrajectory_eq, FSM.generateOutputTrajectory_eq]
 
 /--
   Corollary in I/O language: zero-delay Moore encoding on `SingletonState` cannot distinguish
@@ -765,33 +764,27 @@ def combinationalToDelaySystem {IZ OZ : Type} (C : Combinational.CombinationalSy
 -/
 theorem delay_system_output {IZ OZ : Type} [Inhabited IZ] (C : Combinational.CombinationalSystem IZ OZ)
     (x : IZ) (f : ITZ IZ) (t : Time) :
-    FSM.generateOutputTrajectory (combinationalToDelaySystem C) x f (t + 1) = C.RZ (f t) := by
-  rfl
+    FSM.generateOutputTrajectory (combinationalToDelaySystem C) x f (t + 1) = some (C.RZ (f t)) := by
+  simp [FSM.generateOutputTrajectory_eq, FSM.generateStateTrajectory_succ,
+    FSM.generateStateTrajectory_zero, combinationalToDelaySystem]
 
-/-- At `t = 0` the delayed Moore system outputs `C.RZ x` (the initial state as readout),
-    not the combinational response to `f 0`. The 1-step offset begins at `t + 1`. -/
 theorem delay_system_initial_output {IZ OZ : Type} [Inhabited IZ]
     (C : Combinational.CombinationalSystem IZ OZ) (x : IZ) (f : ITZ IZ) :
-    FSM.generateOutputTrajectory (combinationalToDelaySystem C) x f 0 = C.RZ x := by
-  rfl
+    FSM.generateOutputTrajectory (combinationalToDelaySystem C) x f 0 = some (C.RZ x) := by
+  simp [FSM.generateOutputTrajectory_eq, FSM.generateStateTrajectory_zero, combinationalToDelaySystem]
 
-/-- Full trajectory correspondence: delayed Moore output at `t + 1` equals instantaneous
-    combinational output at `t`. -/
 theorem delay_system_matches_combinational_trajectory {IZ OZ : Type} [Inhabited IZ]
     (C : Combinational.CombinationalSystem IZ OZ) (x : IZ) (f : ITZ IZ) (t : Time) :
     FSM.generateOutputTrajectory (combinationalToDelaySystem C) x f (t + 1) =
-      Combinational.generateOutputTrajectory C f t := by
-  rfl
+      some (Combinational.generateOutputTrajectory C f t) := by
+  simp [FSM.generateOutputTrajectory_eq, FSM.generateStateTrajectory_succ,
+    FSM.generateStateTrajectory_zero, combinationalToDelaySystem, Combinational.generateOutputTrajectory_val]
 
-/--
-  Summary: input-dependent zero-delay output requires either combinational readout or a delayed
-  Moore system with nontrivial state. Moore on a singleton cannot express non-constant I/O.
--/
 theorem zeroDelayRequiresCombinationalOrDelay {IZ OZ : Type} [Inhabited IZ]
     (C : Combinational.CombinationalSystem IZ OZ) (f : ITZ IZ) (t : Time) :
     Combinational.generateOutputTrajectory C f t = C.RZ (f t) ∧
     FSM.generateOutputTrajectory (combinationalToDelaySystem C) default f (t + 1) =
-      Combinational.generateOutputTrajectory C f t :=
+      some (Combinational.generateOutputTrajectory C f t) :=
   ⟨Combinational.generateOutputTrajectory_val C f t, delay_system_matches_combinational_trajectory C default f t⟩
 
 /-- State of the delayed Moore embedding at `t + 1` holds the input at time `t`. -/
@@ -803,33 +796,24 @@ theorem delaySystem_state_at_time {IZ OZ : Type} [Inhabited IZ]
   | succ t _ =>
     simp [FSM.generateStateTrajectory_succ, combinationalToDelaySystem]
 
-/-- Delay-system output at `t + 1` derives combinational output at `t` via the embedding bridge. -/
 theorem delaySystem_derives_combinational_output {IZ OZ : Type} [Inhabited IZ]
     (C : Combinational.CombinationalSystem IZ OZ) (x : IZ) (f : ITZ IZ) (t : Time) :
     FSM.generateOutputTrajectory (combinationalToDelaySystem C) x f (t + 1) =
-      C.RZ (f t) := by
+      some (C.RZ (f t)) := by
   rw [delay_system_matches_combinational_trajectory, Combinational.generateOutputTrajectory_val]
 
-/--
-  Output trajectory uniqueness for the delay embedding at each time step, derived from base Wymore
-  `FSM.outputTrajectory_unique` and the combinational bridge.
--/
 theorem delaySystem_outputTrajectory_unique {IZ OZ : Type} [Inhabited IZ]
     (C : Combinational.CombinationalSystem IZ OZ) (x : IZ) (f : ITZ IZ)
-    (h : OTZ OZ) (h_valid : FSM.IsValidOutputTrajectory (combinationalToDelaySystem C)
+    (h : _root_.OTZ OZ) (h_valid : FSM.IsValidOutputTrajectory (combinationalToDelaySystem C)
       (FSM.generateStateTrajectory (combinationalToDelaySystem C) x f) h) (t : Time) :
-    h t = FSM.generateOutputTrajectory (combinationalToDelaySystem C) x f t := by
-  rw [FSM.outputTrajectory_unique (combinationalToDelaySystem C)
-    (FSM.generateStateTrajectory (combinationalToDelaySystem C) x f) h h_valid t]
-  rfl
+    h t = FSM.generateOutputTrajectory (combinationalToDelaySystem C) x f t :=
+  FSM.outputTrajectory_unique (combinationalToDelaySystem C)
+    (FSM.generateStateTrajectory (combinationalToDelaySystem C) x f) h h_valid t
 
-/--
-  Valid delay-system output at `t + 1` equals combinational output at `t`.
--/
 theorem delaySystem_valid_implies_combinational_valid {IZ OZ : Type} [Inhabited IZ]
-    (C : Combinational.CombinationalSystem IZ OZ) (x : IZ) (f : ITZ IZ) (h : OTZ OZ)
+    (C : Combinational.CombinationalSystem IZ OZ) (x : IZ) (f : ITZ IZ) (h : _root_.OTZ OZ)
     (h_valid : FSM.IsValidOutputTrajectory (combinationalToDelaySystem C)
       (FSM.generateStateTrajectory (combinationalToDelaySystem C) x f) h) (t : Time) :
-    h (t + 1) = Combinational.generateOutputTrajectory C f t := by
+    h (t + 1) = some (Combinational.generateOutputTrajectory C f t) := by
   rw [h_valid (t + 1), Combinational.generateOutputTrajectory_val, delaySystem_state_at_time]
   rfl

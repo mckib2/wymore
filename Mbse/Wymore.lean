@@ -11,8 +11,12 @@ Faithful encoding of Wayne Wymore's discrete system quintuple `Z = (SZ, IZ, OZ, 
 Definition 2.4: `SZ` is any nonempty type (infinite state spaces allowed). Definition 2.11
 finiteness is a derived predicate (`IsFinite`), not a construction rule.
 
-For finite Moore machines (Def 2.11, `Fintype` state/input/output, Ch. 3 coupling, `Z2`, `csy`),
-see [`FiniteWymore`](FiniteWymore.lean).
+* `NZ : SZ → Option IZ → SZ` — `some i` is an input-driven step; `none` is autonomous (empty-input
+  systems evolve via `fun _ => none`).
+* `RZ : SZ → Option OZ` — `none` models no output (closed systems).
+
+Open Moore machines use `DiscreteSystem.ofTotal`. For finite Moore development (Def 2.11, Ch. 3,
+`Z2`, `csy`), see [`FiniteWymore`](FiniteWymore.lean).
 -/
 
 /--
@@ -27,15 +31,21 @@ structure DiscreteSystem (SZ : Type) (IZ : Type) (OZ : Type) where
     /-- [textbook/definition2.4/constraint/sz_nonempty] Proof that the state space SZ is not empty -/
     sz_nonempty : Nonempty SZ
 
-    /-- [textbook/definition2.4/component/NZ] [textbook/definition2.4/constraint/nz_signature|partial] Next State Function: NZ ∈ FNS(SZ × IZ, SZ).
-        Partial: the textbook's empty-input case (NZ ∈ FNS(SZ, SZ) if IZ empty) is not separately modeled;
-        with empty IZ this `SZ → IZ → SZ` is vacuous in its second argument. -/
-    NZ : SZ → IZ → SZ
+    /-- [textbook/definition2.4/component/NZ] [textbook/definition2.4/constraint/nz_signature]
+        Next State Function: NZ ∈ FNS(SZ × IZ, SZ) when inputs are present (`some i`), and
+        NZ ∈ FNS(SZ, SZ) for autonomous steps (`none`) when IZ is empty. -/
+    NZ : SZ → Option IZ → SZ
 
-    /-- [textbook/definition2.4/component/RZ] [textbook/definition2.4/constraint/rz_signature|partial] Readout Function: RZ ∈ FNS(SZ, OZ).
-        Partial: the textbook's empty-output case (RZ = ∅ if OZ empty) is unrepresentable here, since a total
-        `RZ : SZ → OZ` with nonempty SZ forces OZ nonempty (see `discreteSystem_output_nonempty`). -/
-    RZ : SZ → OZ
+    /-- [textbook/definition2.4/component/RZ] [textbook/definition2.4/constraint/rz_signature]
+        Readout Function: RZ ∈ FNS(SZ, OZ) on states that produce output (`some o`); `none` when OZ is empty. -/
+    RZ : SZ → Option OZ
+
+/-- Open Moore fragment: total NZ/RZ wrapped in `some`; autonomous steps stutter. -/
+def DiscreteSystem.ofTotal {SZ IZ OZ : Type} (NZ : SZ → IZ → SZ) (RZ : SZ → OZ) (hNE : Nonempty SZ) :
+    DiscreteSystem SZ IZ OZ where
+  sz_nonempty := hNE
+  NZ := fun s oi => match oi with | some i => NZ s i | none => s
+  RZ := fun s => some (RZ s)
 
 /-- [textbook/definition2.4/component/TZ] The time scale TZ of the discrete system defined as IJS++ (natural numbers). -/
 abbrev Time := Nat
@@ -78,26 +88,6 @@ def IsOpen {SZ IZ OZ : Type} (_Z : DiscreteSystem SZ IZ OZ) : Prop :=
   Nonempty IZ ∧ Nonempty OZ
 
 /--
-  In this encoding the readout `RZ : SZ → OZ` is total and `SZ` is nonempty, so the output
-  space is always inhabited. This makes explicit that the `DiscreteSystem` structure models
-  output-producing (open / Moore) systems; the closed/empty-output case of Definition 2.4
-  (`RZ = ∅ if OZ empty`) is out of scope by construction (see `not_isClosed`).
--/
-theorem discreteSystem_output_nonempty {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
-    Nonempty OZ :=
-  ⟨Z.RZ (Classical.choice Z.sz_nonempty)⟩
-
-/--
-  No `DiscreteSystem` (as encoded) is closed: a closed system would require an empty output
-  space, which contradicts `discreteSystem_output_nonempty`. This turns the encoding's
-  limitation (Definition 2.4 closed systems are unrepresentable) into an explicit proved fact
-  rather than a silent gap.
--/
-theorem not_isClosed {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) : ¬ IsClosed Z := by
-  intro h
-  exact h.2.false (Z.RZ (Classical.choice Z.sz_nonempty))
-
-/--
   [textbook/definition2.11/definition/finite_system]
   A Wymorian discrete system Z is finite if and only if SZ, IZ, and OZ are finite sets.
   On the general base this is a nontrivial classification predicate; every `FSMSystem`
@@ -138,11 +128,19 @@ theorem varyingOutput_iff_card_rng {SZ OZ : Type} [Fintype SZ] [Fintype OZ] [Dec
   On a finite discrete system, general `IsNontrivial` clause (iii) matches the textbook
   `#RNG(RZ) > 1` formulation.
 -/
-theorem isNontrivial_varyingOutput_iff {SZ IZ OZ : Type} [Fintype SZ] [Fintype OZ] [DecidableEq OZ]
-    (Z : DiscreteSystem SZ IZ OZ) :
-    (∃ (o1 o2 : OZ) (s1 s2 : SZ), o1 ≠ o2 ∧ Z.RZ s1 = o1 ∧ Z.RZ s2 = o2) ↔
-    Finset.card (RNG Z.RZ) > 1 :=
-  varyingOutput_iff_card_rng Z.RZ
+theorem isNontrivial_varyingOutput_iff_ofTotal {SZ IZ OZ : Type} [Fintype SZ] [Fintype OZ] [DecidableEq OZ]
+    (NZ : SZ → IZ → SZ) (RZ : SZ → OZ) (hNE : Nonempty SZ) :
+    let Z := DiscreteSystem.ofTotal NZ RZ hNE
+    (∃ (o1 o2 : OZ) (s1 s2 : SZ), o1 ≠ o2 ∧ Z.RZ s1 = some o1 ∧ Z.RZ s2 = some o2) ↔
+    Finset.card (RNG RZ) > 1 := by
+  constructor
+  · intro h
+    rcases h with ⟨o1, o2, s1, s2, ho, h1, h2⟩
+    simp [DiscreteSystem.ofTotal] at h1 h2
+    exact (varyingOutput_iff_card_rng RZ).mp ⟨o1, o2, s1, s2, ho, h1, h2⟩
+  · intro h
+    rcases (varyingOutput_iff_card_rng RZ).mpr h with ⟨o1, o2, s1, s2, ho, h1, h2⟩
+    exact ⟨o1, o2, s1, s2, ho, by simp [DiscreteSystem.ofTotal, h1], by simp [DiscreteSystem.ofTotal, h2]⟩
 
 /--
   [textbook/definition_a1.218/definition/domain]
@@ -164,9 +162,9 @@ abbrev DMN {A B : Type} (_f : A → B) : Type := A
   `#RNG(RZ) > 1` formulation lives in `FiniteWymore.FSM.IsNontrivial`.
 -/
 def IsNontrivial {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) : Prop :=
-  (∃ (x1 x2 : SZ) (p : IZ), Z.NZ x1 p ≠ Z.NZ x2 p) ∧
-  (∃ (x : SZ) (p : IZ), Z.NZ x p ≠ x) ∧
-  (∃ (o1 o2 : OZ) (s1 s2 : SZ), o1 ≠ o2 ∧ Z.RZ s1 = o1 ∧ Z.RZ s2 = o2)
+  (∃ (x1 x2 : SZ) (p : IZ), Z.NZ x1 (some p) ≠ Z.NZ x2 (some p)) ∧
+  (∃ (x : SZ) (p : IZ), Z.NZ x (some p) ≠ x) ∧
+  (∃ (o1 o2 : OZ) (s1 s2 : SZ), o1 ≠ o2 ∧ Z.RZ s1 = some o1 ∧ Z.RZ s2 = some o2)
 
 /--
   [textbook/definition2.14/implication/trivial_system]
@@ -197,124 +195,73 @@ def InputTrajectory (IZ : Type) := { s : STRINGS IZ // s ≠ [] }
 -- We use variables here so we don't have to rewrite {SZ IZ OZ} for every definition
 variable {SZ IZ OZ : Type}
 
-/-- [textbook/definition2.23/definition/complete_input_trajectory] The set of all possible complete Input Trajectories ITZ = FNS(TZ, IZ) -/
+/-- [textbook/definition2.23/definition/complete_input_trajectory] Complete input trajectories ITZ = FNS(TZ, IZ). -/
 abbrev ITZ (IZ : Type) := Time → IZ
 
-/--
-  [textbook/definition2.23/definition/complete_input_trajectory|partial]
-  Generalized complete input trajectory: at each time the system either receives an input
-  (`some i`) or takes an autonomous step (`none`). Shared by `GeneralizedWymore` and `DPDA`.
--/
+/-- [textbook/definition2.23/definition/complete_input_trajectory]
+    Complete input trajectory with autonomous (`none`) steps: ITZW = FNS(TZ, Option IZ). -/
 abbrev ITZW (IZ : Type) := Time → Option IZ
 
--- The set of all possible State Trajectories
+/-- Lift a total input trajectory to the generalized form (always `some`). -/
+abbrev liftInput {IZ : Type} (f : ITZ IZ) : ITZW IZ := fun t => some (f t)
+
 abbrev STZ (SZ : Type) := Time → SZ
 
--- The set of all possible Output Trajectories
-abbrev OTZ (OZ : Type) := Time → OZ
+/-- Output trajectories: partial readout along time. -/
+abbrev OTZ (OZ : Type) := Time → Option OZ
 
-/--
-  [textbook/definition2.27/definition/state_trajectory_recurrence]
-  [textbook/definition2.27/definition/state_at_time_t]
-  [textbook/theorem2.29/theorem/trajectory_fns]
-  [textbook/theorem2.29/proof/subset]
-  [textbook/theorem2.29/proof/totality]
-  Generates the state trajectory given a system, an initial state, and an input trajectory.
--/
-def generateStateTrajectory (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) : STZ SZ
-  | 0 => s0                                      -- At time 0, state is s0
-  | t + 1 => Z.NZ (generateStateTrajectory Z s0 f t) (f t)  -- At time t+1, apply NZ to the state at time t and input at time t
+def generateStateTrajectory (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) (f : ITZW IZ) : STZ SZ
+  | 0 => s0
+  | t + 1 => Z.NZ (generateStateTrajectory Z s0 f t) (f t)
 
-/--
-  [textbook/definition2.30/definition/output_trajectory_composition]
-  [textbook/theorem2.32/theorem/trajectory_fns]
-  [textbook/theorem2.32/theorem/trajectory_value]
-  Generates the output trajectory based on the state trajectory.
--/
-def generateOutputTrajectory (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) : OTZ OZ :=
-  -- For any time t, apply RZ to whatever the state is at time t
+def generateOutputTrajectory (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) (f : ITZW IZ) : OTZ OZ :=
   fun t => Z.RZ (generateStateTrajectory Z s0 f t)
 
-/--
-  A logical predicate defining what it means for an arbitrary function 'g'
-  to be a valid state trajectory for input trajectory 'f'.
--/
-def IsValidStateTrajectory (Z : DiscreteSystem SZ IZ OZ) (f : ITZ IZ) (g : STZ SZ) : Prop :=
+def IsValidStateTrajectory (Z : DiscreteSystem SZ IZ OZ) (f : ITZW IZ) (g : STZ SZ) : Prop :=
   ∀ t : Time, g (t + 1) = Z.NZ (g t) (f t)
 
-/--
-  A logical predicate defining what it means for an arbitrary function 'h'
-  to be a valid output trajectory for state trajectory 'g'.
--/
 def IsValidOutputTrajectory (Z : DiscreteSystem SZ IZ OZ) (g : STZ SZ) (h : OTZ OZ) : Prop :=
   ∀ t : Time, h t = Z.RZ (g t)
 
 /-! ## Simp lemmas for trajectory unfolding -/
 
 @[simp]
-theorem generateStateTrajectory_zero (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) :
+theorem generateStateTrajectory_zero (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) (f : ITZW IZ) :
     generateStateTrajectory Z s0 f 0 = s0 := rfl
 
 @[simp]
-theorem generateStateTrajectory_succ (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) (t : Time) :
+theorem generateStateTrajectory_succ (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) (f : ITZW IZ) (t : Time) :
     generateStateTrajectory Z s0 f (t + 1) = Z.NZ (generateStateTrajectory Z s0 f t) (f t) := rfl
 
-/-! ## Core Soundness Theorems -/
-
-/-- The generated state trajectory satisfies the validity predicate. -/
-theorem generateStateTrajectory_valid (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) :
+theorem generateStateTrajectory_valid (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) (f : ITZW IZ) :
     IsValidStateTrajectory Z f (generateStateTrajectory Z s0 f) := by
-  intro t
-  rfl
+  intro t; rfl
 
-/-- The generated output trajectory satisfies the validity predicate. -/
-theorem generateOutputTrajectory_valid (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) :
+theorem generateOutputTrajectory_valid (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) (f : ITZW IZ) :
     IsValidOutputTrajectory Z (generateStateTrajectory Z s0 f) (generateOutputTrajectory Z s0 f) := by
-  intro t
-  rfl
+  intro t; rfl
 
-/--
-  [textbook/theorem2.29/proof/single_valuedness]
-  Given an initial state and input trajectory, the state trajectory is unique.
-  Any function satisfying the recurrence with the same initial condition
-  must equal the generated trajectory at every time step.
--/
-theorem stateTrajectory_unique (Z : DiscreteSystem SZ IZ OZ) (f : ITZ IZ) (g : STZ SZ) (s0 : SZ)
-    (h_init : g 0 = s0)
-    (h_valid : IsValidStateTrajectory Z f g) :
+theorem stateTrajectory_unique (Z : DiscreteSystem SZ IZ OZ) (f : ITZW IZ) (g : STZ SZ) (s0 : SZ)
+    (h_init : g 0 = s0) (h_valid : IsValidStateTrajectory Z f g) :
     ∀ t, g t = generateStateTrajectory Z s0 f t := by
   intro t
   induction t with
   | zero => exact h_init
-  | succ n ih =>
-    rw [generateStateTrajectory_succ, h_valid n, ih]
+  | succ n ih => rw [generateStateTrajectory_succ, h_valid n, ih]
 
-/-- Output trajectory is uniquely determined by the state trajectory. -/
 theorem outputTrajectory_unique (Z : DiscreteSystem SZ IZ OZ) (g : STZ SZ) (h : OTZ OZ)
     (h_valid : IsValidOutputTrajectory Z g h) :
-    ∀ t, h t = Z.RZ (g t) := by
-  exact h_valid
+    ∀ t, h t = Z.RZ (g t) :=
+  h_valid
 
-/-! ## System-Theoretic Concepts -/
-
-/--
-  [textbook/definition2.51/definition/reachable]
-  [textbook/definition2.51/terminology/by_means_of]
-  A state `s` is reachable from initial state `s0` if there exists
-  some input trajectory and time at which the system reaches `s`.
--/
 def Reachable (Z : DiscreteSystem SZ IZ OZ) (s0 s : SZ) : Prop :=
-  ∃ (f : ITZ IZ) (t : Time), generateStateTrajectory Z s0 f t = s
+  ∃ (f : ITZW IZ) (t : Time), generateStateTrajectory Z s0 f t = s
 
-/-- The initial state is always reachable from itself (at time 0). -/
-theorem reachable_self (Z : DiscreteSystem SZ IZ OZ) [Inhabited IZ] (s0 : SZ) :
-    Reachable Z s0 s0 :=
-  ⟨fun _ => default, 0, rfl⟩
+theorem reachable_self (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) : Reachable Z s0 s0 :=
+  ⟨fun _ => none, 0, rfl⟩
 
-/-- Two states are equivalent if, starting from either one, the system produces
-    identical output trajectories for every possible input trajectory. -/
 def StateEquiv (Z : DiscreteSystem SZ IZ OZ) (s1 s2 : SZ) : Prop :=
-  ∀ (f : ITZ IZ) (t : Time),
+  ∀ (f : ITZW IZ) (t : Time),
     generateOutputTrajectory Z s1 f t = generateOutputTrajectory Z s2 f t
 
 /-- State equivalence is reflexive. -/
@@ -343,45 +290,33 @@ structure SystemMorphism
     {SZ1 IZ1 OZ1 : Type} {SZ2 IZ2 OZ2 : Type}
     (Z1 : DiscreteSystem SZ1 IZ1 OZ1)
     (Z2 : DiscreteSystem SZ2 IZ2 OZ2) where
-  /-- State mapping -/
   φS : SZ1 → SZ2
-  /-- Input mapping -/
   φI : IZ1 → IZ2
-  /-- Output mapping -/
   φO : OZ1 → OZ2
-  /-- The state map commutes with transitions -/
-  preserves_transition : ∀ s i, φS (Z1.NZ s i) = Z2.NZ (φS s) (φI i)
-  /-- The output map commutes with readout -/
-  preserves_readout : ∀ s, φO (Z1.RZ s) = Z2.RZ (φS s)
+  preserves_transition : ∀ s oi, φS (Z1.NZ s oi) = Z2.NZ (φS s) (oi.map φI)
+  preserves_readout : ∀ s, (Z1.RZ s).map φO = Z2.RZ (φS s)
 
-/-- A morphism preserves state trajectories: mapping state-by-state is the same
-    as generating the trajectory in the target system from the mapped initial state
-    and mapped inputs. -/
 theorem morphism_preserves_state_trajectory
     {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     {Z1 : DiscreteSystem SZ1 IZ1 OZ1}
     {Z2 : DiscreteSystem SZ2 IZ2 OZ2}
-    (m : SystemMorphism Z1 Z2) (s0 : SZ1) (f : ITZ IZ1) :
+    (m : SystemMorphism Z1 Z2) (s0 : SZ1) (f : ITZW IZ1) :
     ∀ t, m.φS (generateStateTrajectory Z1 s0 f t) =
-         generateStateTrajectory Z2 (m.φS s0) (m.φI ∘ f) t := by
+         generateStateTrajectory Z2 (m.φS s0) (fun τ => (f τ).map m.φI) t := by
   intro t
   induction t with
   | zero => rfl
   | succ n ih =>
-    simp only [generateStateTrajectory_succ, Function.comp]
+    simp only [generateStateTrajectory_succ]
     rw [m.preserves_transition, ih]
 
-/-- A morphism preserves output trajectories: mapped readout at each time equals the
-    output trajectory in the target system from the mapped initial state and inputs.
-    DTT strategy (proof comparison §4/§5 collapse): induction on `t`; base and step use
-    `preserves_readout` after rewriting state via `morphism_preserves_state_trajectory`. -/
 theorem morphism_preserves_output_trajectory
     {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     {Z1 : DiscreteSystem SZ1 IZ1 OZ1}
     {Z2 : DiscreteSystem SZ2 IZ2 OZ2}
-    (m : SystemMorphism Z1 Z2) (s0 : SZ1) (f : ITZ IZ1) :
-    ∀ t, m.φO (generateOutputTrajectory Z1 s0 f t) =
-         generateOutputTrajectory Z2 (m.φS s0) (m.φI ∘ f) t := by
+    (m : SystemMorphism Z1 Z2) (s0 : SZ1) (f : ITZW IZ1) :
+    ∀ t, (generateOutputTrajectory Z1 s0 f t).map m.φO =
+         generateOutputTrajectory Z2 (m.φS s0) (fun τ => (f τ).map m.φI) t := by
   intro t
   unfold generateOutputTrajectory
   rw [m.preserves_readout, morphism_preserves_state_trajectory m s0 f t]
@@ -493,12 +428,11 @@ theorem translate_additivity {A : Type} (f : Time → A) (r s : Time) :
   from initial state `s0` with input `f` for time `s + t`.
 -/
 theorem stateTrajectory_time_invariance
-    (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f : ITZ IZ) (s t : Time) :
+    (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f : ITZW IZ) (s t : Time) :
     generateStateTrajectory Z (generateStateTrajectory Z x f s) (translate f s) t =
     generateStateTrajectory Z x f (s + t) := by
   induction t with
-  | zero =>
-    simp only [generateStateTrajectory_zero, Nat.add_zero]
+  | zero => simp only [generateStateTrajectory_zero, Nat.add_zero]
   | succ t ih =>
     simp only [generateStateTrajectory_succ]
     rw [ih]
@@ -506,23 +440,14 @@ theorem stateTrajectory_time_invariance
     congr 2
     exact Nat.add_comm t s
 
-/-- Output trajectory time invariance: corollary of Theorem 2.46 via readout post-composition.
-    DTT strategy (proof comparison §4): no second induction — rewrite with
-    `stateTrajectory_time_invariance` after unfolding `generateOutputTrajectory`. -/
 theorem outputTrajectory_time_invariance
-    (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f : ITZ IZ) (s t : Time) :
+    (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f : ITZW IZ) (s t : Time) :
     generateOutputTrajectory Z (generateStateTrajectory Z x f s) (translate f s) t =
     generateOutputTrajectory Z x f (s + t) := by
   unfold generateOutputTrajectory
   rw [stateTrajectory_time_invariance Z x f s t]
 
-/-! ## System Experiments and Nonanticipation -/
-
-/--
-  [textbook/definition2.33/definition/system_experiments]
-  The set of system experiments EXZ is formalized as the product type `ITZ IZ × SZ × Time`.
--/
-def EXZ (SZ IZ : Type) := ITZ IZ × SZ × Time
+def EXZ (SZ IZ : Type) := ITZW IZ × SZ × Time
 
 /--
   [textbook/definition_a1.257/definition/restriction]
@@ -552,29 +477,23 @@ theorem rsn_eq_iff {A B : Type} (f g : A → B) (S : Set A) :
   the input trajectory restricted to the interval [0, t).
 -/
 theorem stateTrajectory_nonanticipatory
-    (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f g : ITZ IZ) (t : Time)
+    (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f g : ITZW IZ) (t : Time)
     (h_agree : RSN f {i | i < t} = RSN g {i | i < t}) :
     generateStateTrajectory Z x f t = generateStateTrajectory Z x g t := by
   induction t with
-  | zero =>
-    simp only [generateStateTrajectory_zero]
+  | zero => simp only [generateStateTrajectory_zero]
   | succ t ih =>
     simp only [generateStateTrajectory_succ]
     rw [rsn_eq_iff] at h_agree
-    have h_lt : ∀ i < t, f i = g i := by
-      intro i hi
-      exact h_agree i (Nat.lt_trans hi (Nat.lt_succ_self t))
-    have h_eq : f t = g t := by
-      exact h_agree t (Nat.lt_succ_self t)
+    have h_lt : ∀ i < t, f i = g i := fun i hi =>
+      h_agree i (Nat.lt_trans hi (Nat.lt_succ_self t))
+    have h_eq : f t = g t := h_agree t (Nat.lt_succ_self t)
     have h_rsn_t : RSN f {i | i < t} = RSN g {i | i < t} := by
-      rw [rsn_eq_iff]
-      exact h_lt
+      rw [rsn_eq_iff]; exact h_lt
     rw [ih h_rsn_t, h_eq]
 
-/-- Output trajectory nonanticipation: corollary of Theorem 2.48 via readout post-composition.
-    DTT strategy (proof comparison §5): `stateTrajectory_nonanticipatory` then `rfl` on readout. -/
 theorem outputTrajectory_nonanticipatory
-    (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f g : ITZ IZ) (t : Time)
+    (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f g : ITZW IZ) (t : Time)
     (h_agree : RSN f {i | i < t} = RSN g {i | i < t}) :
     generateOutputTrajectory Z x f t = generateOutputTrajectory Z x g t := by
   unfold generateOutputTrajectory
@@ -611,38 +530,18 @@ def IPZ (Port : Type) : Type := Port
   The `p`-th input port trajectory generated by `f ∈ ITZ` is defined as the composition
   of the projection `PJN p` and `f`.
 -/
-def portTrajectory {Port : Type} {PortVal : Port → Type} (f : ITZ ((p : Port) → PortVal p)) (p : Port) : Time → PortVal p :=
-  fun t => PJN p (f t)
+def portTrajectory {Port : Type} {PortVal : Port → Type} (f : ITZW ((p : Port) → PortVal p)) (p : Port) :
+    Time → Option (PortVal p) :=
+  fun t => (f t).map (PJN p)
 
-/--
-  [textbook/definition2.59/definition/input_port_structure]
-  The input port structure ISZ is represented as a function mapping each input port
-  to its value type.
--/
-def ISZ (Port : Type) (PortVal : Port → Type) : Port → Type := PortVal
-
-/--
-  [textbook/definition2.62/definition/output_ports]
-  The set of output ports OPZ is modeled as the type index set `OutPort`.
-  If the output space is a product, OZ is `(op : OutPort) → OutPortVal op`.
--/
-def OPZ (OutPort : Type) : Type := OutPort
-
-/--
-  [textbook/definition2.62/definition/port_readout]
-  The readout to the `op`-th output port, RjZ, is the composition of the projection PJN and Z.RZ.
--/
 def portReadout {SZ IZ OutPort : Type} {OutPortVal : OutPort → Type}
-    (Z : DiscreteSystem SZ IZ ((op : OutPort) → OutPortVal op)) (op : OutPort) : SZ → OutPortVal op :=
-  fun s => PJN op (Z.RZ s)
+    (Z : DiscreteSystem SZ IZ ((op : OutPort) → OutPortVal op)) (op : OutPort) :
+    SZ → Option (OutPortVal op) :=
+  fun s => (Z.RZ s).map (PJN op)
 
-/--
-  [textbook/definition2.62/definition/port_output_trajectory]
-  The `op`-th output port trajectory, OTjZ(f, x), is the composition of the projection PJN and the output trajectory.
--/
 def portOutputTrajectory {OutPort : Type} {OutPortVal : OutPort → Type}
-    (ot : OTZ ((op : OutPort) → OutPortVal op)) (op : OutPort) : Time → OutPortVal op :=
-  fun t => PJN op (ot t)
+    (ot : OTZ ((op : OutPort) → OutPortVal op)) (op : OutPort) : Time → Option (OutPortVal op) :=
+  fun t => (ot t).map (PJN op)
 
 /--
   [textbook/definition2.65/definition/output_port_structure]
@@ -671,8 +570,8 @@ def FSZ (StateFactor : Type) (StateFactorVal : StateFactor → Type) : StateFact
 -/
 def factorNZ {IZ OZ StateFactor : Type} {StateFactorVal : StateFactor → Type}
     (Z : DiscreteSystem ((sf : StateFactor) → StateFactorVal sf) IZ OZ) (sf : StateFactor) :
-    ((sf : StateFactor) → StateFactorVal sf) → IZ → StateFactorVal sf :=
-  fun s i => PJN sf (Z.NZ s i)
+    ((sf : StateFactor) → StateFactorVal sf) → Option IZ → StateFactorVal sf :=
+  fun s oi => PJN sf (Z.NZ s oi)
 
 /--
   [textbook/definition2.70/definition/factor_state_trajectory]
@@ -693,7 +592,7 @@ def ID (A : Type) : A → A := fun x => x
   The system Z has state readout if the output is simply the state (RZ = ID(SZ)).
 -/
 def HasStateReadout {SZ IZ : Type} (Z : DiscreteSystem SZ IZ SZ) : Prop :=
-  Z.RZ = ID SZ
+  Z.RZ = fun s => some s
 
 /--
   [textbook/definition2.73/definition/projective_readout]
@@ -714,7 +613,7 @@ def IsProjectiveReadout {IZ OutPort StateFactor : Type} {OutPortVal : OutPort �
 def IsProperlyAlignedReadout {IZ I : Type} {Val : I → Type}
     (Z : DiscreteSystem ((i : I) → Val i) IZ ((i : I) → Val i)) : Prop :=
   ∀ (i : I), ∀ (s : (j : I) → Val j),
-    portReadout Z i s = PJN i s
+    portReadout Z i s = some (PJN i s)
 
 /--
   [textbook/theorem_a1.178/theorem/vector_projection_equality]
@@ -748,17 +647,24 @@ theorem fun_eq_iff {A B : Type} (f g : A → B) :
   Shows that if two systems have properly aligned projective readouts, identical state space
   and output space, their readout functions are equal.
 -/
-theorem readout_eq_of_properly_aligned {IZ IZ2 I : Type} {Val : I → Type}
+theorem readout_eq_of_properly_aligned {IZ IZ2 I : Type} {Val : I → Type} [Inhabited I]
     (Z1 : DiscreteSystem ((i : I) → Val i) IZ ((i : I) → Val i))
     (Z2 : DiscreteSystem ((i : I) → Val i) IZ2 ((i : I) → Val i))
     (h1 : IsProperlyAlignedReadout Z1)
     (h2 : IsProperlyAlignedReadout Z2) :
     Z1.RZ = Z2.RZ := by
   funext s
-  funext i
-  have r1 : portReadout Z1 i s = PJN i s := h1 i s
-  have r2 : portReadout Z2 i s = PJN i s := h2 i s
-  exact r1.trans r2.symm
+  have hproj1 : ∀ i, (Z1.RZ s).map (PJN i) = some (PJN i s) := fun i => h1 i s
+  have hproj2 : ∀ i, (Z2.RZ s).map (PJN i) = some (PJN i s) := fun i => h2 i s
+  match hz1 : Z1.RZ s, hz2 : Z2.RZ s with
+  | some o1, some o2 =>
+    apply Option.some_inj.mpr
+    funext i
+    have h1i := hproj1 i; rw [hz1, Option.map_some] at h1i
+    have h2i := hproj2 i; rw [hz2, Option.map_some] at h2i
+    exact Option.some_injective _ (h1i.trans h2i.symm)
+  | none, _ => exact absurd (hproj1 default) (by rw [hz1]; simp)
+  | some _, none => exact absurd (hproj2 default) (by rw [hz2]; simp)
 
 /--
   [textbook/theorem_a1.176/theorem/projection_functions]
@@ -770,72 +676,86 @@ theorem pjn_is_fun {I : Type} {A : I → Type} (i : I) :
 
 /-! ## Z2 Construction (Theorem 2.78) -/
 
-structure Z2State (SZ OZ : Type) (RZ : SZ → OZ) where
+structure Z2State (SZ OZ : Type) (RZ : SZ → Option OZ) where
   out : OZ
   state : SZ
-  eq : out = RZ state
+  eq : RZ state = some out
 
-/-- Equivalence between `Z2State` and the original state space `SZ`. -/
-def Z2State.equivSZ {SZ OZ : Type} (RZ : SZ → OZ) : Z2State SZ OZ RZ ≃ SZ where
+noncomputable def Z2State.mkFrom {SZ OZ : Type} (RZ : SZ → Option OZ)
+    (h : ∀ s, ∃ o, RZ s = some o) (s : SZ) : Z2State SZ OZ RZ :=
+  ⟨Classical.choose (h s), s, Classical.choose_spec (h s)⟩
+
+noncomputable def Z2State.equivSZ {SZ OZ : Type} (RZ : SZ → Option OZ) (h : ∀ s, ∃ o, RZ s = some o) :
+    Z2State SZ OZ RZ ≃ SZ where
   toFun s2 := s2.state
-  invFun s := ⟨RZ s, s, rfl⟩
-  left_inv := fun ⟨o, s, h⟩ => by subst h; rfl
+  invFun s := Z2State.mkFrom RZ h s
+  left_inv := fun ⟨o, s, ho⟩ => by
+    simp [Z2State.mkFrom, Classical.choose_spec, ho]
   right_inv _ := rfl
 
-/--
-  [textbook/theorem2.78/theorem/system_construction]
-  [textbook/theorem2.78/proof/dsystems]
-  [textbook/theorem2.78/proof/properly_aligned]
-  Construction of a system Z2 with properly aligned projective readout to replace Z1.
-  DTT strategy (proof comparison §7): `Z2State.equivSZ` gives non-emptiness without cardinality.
--/
-def Z2 {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) : DiscreteSystem (Z2State SZ OZ Z.RZ) IZ OZ where
-  sz_nonempty := Z.sz_nonempty.map (Z2State.equivSZ Z.RZ).symm
-  NZ := fun s2 p => ⟨Z.RZ (Z.NZ s2.state p), Z.NZ s2.state p, rfl⟩
-  RZ := fun s2 => s2.out
+def AlwaysOutputs {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) : Prop :=
+  ∀ s, ∃ o, Z.RZ s = some o
+
+theorem alwaysOutputs_not_none {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z)
+    (s : SZ) (h : Z.RZ s = none) : False := by
+  obtain ⟨o, ho⟩ := hOut s
+  rw [h] at ho
+  exact nomatch ho
+
+theorem ofTotal_alwaysOutputs {SZ IZ OZ : Type} (NZ : SZ → IZ → SZ) (RZ : SZ → OZ) (hNE : Nonempty SZ) :
+    AlwaysOutputs (DiscreteSystem.ofTotal NZ RZ hNE) := by
+  intro s; exact ⟨RZ s, rfl⟩
+
+def Z2 {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
+    DiscreteSystem (Z2State SZ OZ Z.RZ) IZ OZ where
+  sz_nonempty := Z.sz_nonempty.map (Z2State.equivSZ Z.RZ hOut).symm
+  NZ := fun s2 oi =>
+    let ns := Z.NZ s2.state oi
+    match hrz : Z.RZ ns with
+    | some o => ⟨o, ns, hrz⟩
+    | none => (alwaysOutputs_not_none Z hOut ns hrz).elim
+  RZ := fun s2 => some s2.out
 
 theorem z2_readout_projective {SZ IZ OutPort : Type} {OutPortVal : OutPort → Type}
-    (Z : DiscreteSystem SZ IZ ((op : OutPort) → OutPortVal op)) (op : OutPort)
+    (Z : DiscreteSystem SZ IZ ((op : OutPort) → OutPortVal op)) (hOut : AlwaysOutputs Z) (op : OutPort)
     (s2 : Z2State SZ ((op : OutPort) → OutPortVal op) Z.RZ) :
-    portReadout (Z2 Z) op s2 = s2.out op := rfl
+    portReadout (Z2 Z hOut) op s2 = some (s2.out op) := rfl
 
-/--
-  [textbook/theorem2.78/proof/exz_mapping]
-  Mapping of system experiments from Z1 to Z2.
--/
-def Z2.exz_map {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
+def Z2.exz_map {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
     EXZ SZ IZ → EXZ (Z2State SZ OZ Z.RZ) IZ :=
-  fun ⟨f, x, t⟩ => ⟨f, ⟨Z.RZ x, x, rfl⟩, t⟩
+  fun ⟨f, x, t⟩ =>
+    match hrz : Z.RZ x with
+    | some o => ⟨f, ⟨o, x, hrz⟩, t⟩
+    | none => (alwaysOutputs_not_none Z hOut x hrz).elim
 
-/--
-  [textbook/theorem2.78/proof/state_trajectory_projection]
-  State trajectory equivalence: the state part of Z2's trajectory is Z1's state trajectory.
--/
-theorem z2_state_trajectory_equivalence {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (x : SZ)
-    (f : ITZ IZ) (t : Time) :
-    (generateStateTrajectory (Z2 Z) ⟨Z.RZ x, x, rfl⟩ f t).state = generateStateTrajectory Z x f t := by
+theorem z2_nz_state {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z)
+    (s2 : Z2State SZ OZ Z.RZ) (oi : Option IZ) :
+    ((Z2 Z hOut).NZ s2 oi).state = Z.NZ s2.state oi := by
+  dsimp [Z2, Z2State.state]
+  split
+  · rfl
+  · exact (alwaysOutputs_not_none Z hOut (Z.NZ s2.state oi) ‹_›).elim
+
+theorem z2_state_trajectory_equivalence {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ)
+    (hOut : AlwaysOutputs Z) (x : SZ) (o : OZ) (f : ITZW IZ) (t : Time) (hrz : Z.RZ x = some o) :
+    (generateStateTrajectory (Z2 Z hOut) ⟨o, x, hrz⟩ f t).state =
+    generateStateTrajectory Z x f t := by
   induction t with
   | zero => rfl
   | succ t ih =>
     simp only [generateStateTrajectory_succ]
-    unfold Z2
-    dsimp
-    unfold Z2 at ih
-    rw [ih]
+    rw [z2_nz_state Z hOut, ih]
 
-/--
-  [textbook/theorem2.78/proof/output_trajectory_equality]
-  Output trajectory equivalence: Z2 produces the same output trajectory as Z1.
--/
-theorem z2_output_trajectory_equivalence {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (x : SZ)
-    (f : ITZ IZ) (t : Time) :
-    generateOutputTrajectory (Z2 Z) ⟨Z.RZ x, x, rfl⟩ f t = generateOutputTrajectory Z x f t := by
-  let s0 : Z2State SZ OZ Z.RZ := ⟨Z.RZ x, x, rfl⟩
-  have h_out :
-      generateOutputTrajectory (Z2 Z) s0 f t = (generateStateTrajectory (Z2 Z) s0 f t).out := rfl
-  have h_z :
-      generateOutputTrajectory Z x f t = Z.RZ (generateStateTrajectory Z x f t) := rfl
-  rw [h_out, h_z, (generateStateTrajectory (Z2 Z) s0 f t).eq, z2_state_trajectory_equivalence Z x f t]
+theorem z2_output_trajectory_equivalence {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ)
+    (hOut : AlwaysOutputs Z) (x : SZ) (o : OZ) (f : ITZW IZ) (t : Time) (hrz : Z.RZ x = some o) :
+    generateOutputTrajectory (Z2 Z hOut) ⟨o, x, hrz⟩ f t =
+    generateOutputTrajectory Z x f t := by
+  set s2t := generateStateTrajectory (Z2 Z hOut) ⟨o, x, hrz⟩ f t
+  unfold generateOutputTrajectory
+  rw [← z2_state_trajectory_equivalence Z hOut x o f t hrz]
+  show (Z2 Z hOut).RZ s2t = Z.RZ s2t.state
+  simp [Z2]
+  exact s2t.eq.symm
 
 /-! ## System Parameterization -/
 
@@ -872,8 +792,8 @@ def HasOneParameter (P : Type) : Prop :=
 def fcnsy {IZ SZ : Type} (F : IZ → SZ) (n : Nat) [Inhabited SZ] :
     DiscreteSystem SZ IZ (Fin n → SZ) where
   sz_nonempty := ⟨default⟩
-  NZ := fun _x p => F p
-  RZ := fun x _j => x
+  NZ := fun _x oi => match oi with | some p => F p | none => default
+  RZ := fun x => some (fun _j => x)
 
 /--
   [textbook/theorem2.96/theorem/parameter_count]
@@ -892,8 +812,9 @@ theorem fcnsy_has_two_parameters {IZ SZ : Type} [Inhabited SZ] :
   DTT strategy (proof comparison §9): state-independent NZ collapses to `rfl`.
 -/
 theorem fcnsy_output_one_time_unit {IZ SZ : Type} (F : IZ → SZ) [Inhabited SZ]
-    (x : SZ) (f : ITZ IZ) (t : Time) :
-    generateOutputTrajectory (fcnsy F 1) x f (t + 1) 0 = F (f t) := rfl
+    (x : SZ) (f : ITZW IZ) (t : Time) (i : IZ) (hi : f t = some i) :
+    (generateOutputTrajectory (fcnsy F 1) x f (t + 1)).map (fun a => a 0) = some (F i) := by
+  simp [generateOutputTrajectory, generateStateTrajectory_succ, fcnsy, hi, Option.map_some]
 
 /-! ## Chapter 3: System Coupling Recipes and Connectivity -/
 
@@ -1015,7 +936,12 @@ def IsMixed {n : Nat} (SCR : SystemCouplingRecipe n) : Prop :=
   [textbook/definition3.40/definition/rz]
   Parallel (conjunctive) composition of a connectable vector of systems.
 -/
-def csy {n : Nat} (VSCR : PortSystemVector n) :
+noncomputable def csyOut {n : Nat} (VSCR : PortSystemVector n) (hOut : ∀ i, AlwaysOutputs (VSCR.Z i))
+    (x : (i : Fin n) → VSCR.SZ i) (op : Σ i, VSCR.OutPort i) : VSCR.OutPortVal op.1 op.2 :=
+  Classical.choose (hOut op.1 (x op.1)) op.2
+
+noncomputable def csy {n : Nat} (VSCR : PortSystemVector n)
+    (hOut : ∀ i, AlwaysOutputs (VSCR.Z i)) :
     DiscreteSystem
       ((i : Fin n) → VSCR.SZ i)
       ((ip : Σ (i : Fin n), VSCR.Port i) → VSCR.PortVal ip.1 ip.2)
@@ -1023,8 +949,8 @@ def csy {n : Nat} (VSCR : PortSystemVector n) :
   sz_nonempty := by
     have h_non : ∀ i, Nonempty (VSCR.SZ i) := fun i => (VSCR.Z i).sz_nonempty
     exact ⟨fun i => Classical.choice (h_non i)⟩
-  NZ := fun x p i => (VSCR.Z i).NZ (x i) (fun port => p ⟨i, port⟩)
-  RZ := fun x op => (VSCR.Z op.1).RZ (x op.1) op.2
+  NZ := fun x po i => (VSCR.Z i).NZ (x i) (po.map (fun full port => full ⟨i, port⟩))
+  RZ := fun x => some (fun op => csyOut VSCR hOut x op)
 
 def csy_IP_map {n : Nat} (_VSCR : PortSystemVector n) :
     (Σ (i : Fin n), _VSCR.Port i) → (Σ (i : Fin n), _VSCR.Port i) := ID _
@@ -1048,58 +974,86 @@ def product_fun {I : Type} {A B : I → Type} (f : (i : I) → A i → B i) :
     ((i : I) → A i) → ((i : I) → B i) :=
   fun x i => f i (x i)
 
-def csy_parameterization (n : Nat) (VSCR : PortSystemVector n) :
+noncomputable def csy_parameterization (n : Nat) (VSCR : PortSystemVector n)
+    (hOut : ∀ i, AlwaysOutputs (VSCR.Z i)) :
     DiscreteSystem
       ((i : Fin n) → VSCR.SZ i)
       ((ip : Σ i, VSCR.Port i) → VSCR.PortVal ip.1 ip.2)
       ((op : Σ i, VSCR.OutPort i) → VSCR.OutPortVal op.1 op.2) :=
-  csy VSCR
+  csy VSCR hOut
 
-/--
-  [textbook/theorem3.45/theorem/trajectories_relation]
-  [textbook/theorem3.45/proof/state_zero]
-  [textbook/theorem3.45/proof/state_induction]
-  DTT strategy (proof comparison §11): `induction t generalizing i`.
--/
-theorem csy_state_trajectory {n : Nat} (VSCR : PortSystemVector n) (x : (i : Fin n) → VSCR.SZ i)
-    (f : ITZ ((ip : Σ i, VSCR.Port i) → VSCR.PortVal ip.1 ip.2)) (t : Time) (i : Fin n) :
-    generateStateTrajectory (csy VSCR) x f t i =
-    generateStateTrajectory (VSCR.Z i) (x i) (fun t port => f t ⟨i, port⟩) t := by
+theorem csy_state_trajectory {n : Nat} (VSCR : PortSystemVector n)
+    (hOut : ∀ i, AlwaysOutputs (VSCR.Z i)) (x : (i : Fin n) → VSCR.SZ i)
+    (f : ITZW ((ip : Σ i, VSCR.Port i) → VSCR.PortVal ip.1 ip.2)) (t : Time) (i : Fin n) :
+    (generateStateTrajectory (csy VSCR hOut) x f t i) =
+    generateStateTrajectory (VSCR.Z i) (x i) (fun τ => (f τ).map (fun full port => full ⟨i, port⟩)) t := by
   induction t generalizing i with
   | zero => simp [generateStateTrajectory_zero]
   | succ t ih =>
     rw [generateStateTrajectory_succ]
     simp only [csy]
-    exact congr_arg (fun s => (VSCR.Z i).NZ s (fun port => f t ⟨i, port⟩)) (ih i)
+    exact congr_arg (fun s => (VSCR.Z i).NZ s ((f t).map (fun full port => full ⟨i, port⟩))) (ih i)
 
-/--
-  [textbook/theorem3.45/theorem/trajectories_relation]
-  [textbook/theorem3.45/proof/output_relation]
-  DTT strategy (proof comparison §11): unfold readout; rewrite with `csy_state_trajectory`.
--/
-theorem csy_output_trajectory {n : Nat} (VSCR : PortSystemVector n) (x : (i : Fin n) → VSCR.SZ i)
-    (f : ITZ ((ip : Σ i, VSCR.Port i) → VSCR.PortVal ip.1 ip.2)) (t : Time) (i : Fin n)
+theorem csy_output_trajectory {n : Nat} (VSCR : PortSystemVector n)
+    (hOut : ∀ i, AlwaysOutputs (VSCR.Z i)) (x : (i : Fin n) → VSCR.SZ i)
+    (f : ITZW ((ip : Σ i, VSCR.Port i) → VSCR.PortVal ip.1 ip.2)) (t : Time) (i : Fin n)
     (B' : VSCR.OutPort i) :
-    generateOutputTrajectory (csy VSCR) x f t ⟨i, B'⟩ =
-    generateOutputTrajectory (VSCR.Z i) (x i) (fun t port => f t ⟨i, port⟩) t B' := by
-  unfold generateOutputTrajectory
-  simp only [csy]
-  exact congr_arg (fun s => (VSCR.Z i).RZ s B') (csy_state_trajectory VSCR x f t i)
+    (generateOutputTrajectory (csy VSCR hOut) x f t).map (fun r => r ⟨i, B'⟩) =
+    (generateOutputTrajectory (VSCR.Z i) (x i)
+      (fun τ => (f τ).map (fun full port => full ⟨i, port⟩)) t).map (fun r => r B') := by
+  have hst := csy_state_trajectory VSCR hOut x f t i
+  let s := generateStateTrajectory (VSCR.Z i) (x i)
+    (fun τ => (f τ).map (fun full port => full ⟨i, port⟩)) t
+  obtain ⟨o, ho⟩ := hOut i s
+  have hchoose : Classical.choose (hOut i s) B' = o B' := by
+    have heq : Classical.choose (hOut i s) = o :=
+      Option.some_injective _ ((Classical.choose_spec (hOut i s)).symm.trans ho)
+    exact congrArg (fun g => g B') heq
+  have hmain : Classical.choose (hOut i (generateStateTrajectory (csy VSCR hOut) x f t i)) B' = o B' := by
+    rw [hst, hchoose]
+  simp only [generateOutputTrajectory, csy, csyOut, Option.map_some]
+  rw [ho]
+  exact congrArg some hmain
 
-/-! ## Infinite-state examples (Def 2.4, not Def 2.11) -/
+/-! ## Closed, autonomous, and infinite-state examples -/
 
-/-- A discrete system with countably infinite state space `ℕ`. -/
-def counterSystem : DiscreteSystem Nat Bool Nat where
-  sz_nonempty := ⟨0⟩
-  NZ := fun n _ => n + 1
-  RZ := id
+def closedSystem : DiscreteSystem Unit Empty Empty where
+  sz_nonempty := ⟨()⟩
+  NZ := fun s _ => s
+  RZ := fun _ => none
+
+theorem closedSystem_isClosed : IsClosed closedSystem :=
+  ⟨inferInstance, inferInstance⟩
+
+theorem exists_closed_discreteSystem :
+    ∃ (Z : DiscreteSystem Unit Empty Empty), IsClosed Z :=
+  ⟨closedSystem, closedSystem_isClosed⟩
+
+def toggleSystem : DiscreteSystem Bool Empty Bool where
+  sz_nonempty := ⟨true⟩
+  NZ := fun s _ => !s
+  RZ := fun s => some s
+
+theorem toggle_step (s0 : Bool) (f : ITZW Empty) :
+    generateStateTrajectory toggleSystem s0 f 1 = !s0 := rfl
+
+theorem toggle_period_two (s0 : Bool) (f : ITZW Empty) :
+    generateStateTrajectory toggleSystem s0 f 2 = s0 := by
+  cases s0 <;> rfl
+
+def counterSystem : DiscreteSystem Nat Bool Nat :=
+  DiscreteSystem.ofTotal (fun n (_ : Bool) => n + 1) id ⟨0⟩
 
 theorem counterSystem_not_finite : ¬ IsFinite counterSystem := by
   intro h
   exact Infinite.not_finite (α := Nat) h.1
 
-/-- Z2 of the counter system remains infinite-state (state space is `Z2State Nat Nat id`). -/
-theorem counterSystem_z2_not_finite : ¬ IsFinite (Z2 counterSystem) := by
+theorem counterSystem_alwaysOutputs : AlwaysOutputs counterSystem :=
+  ofTotal_alwaysOutputs (fun n (_ : Bool) => n + 1) id ⟨0⟩
+
+theorem counterSystem_z2_not_finite :
+    ¬ IsFinite (Z2 counterSystem counterSystem_alwaysOutputs) := by
   intro ⟨hSZ, _, _⟩
-  have hNat : Finite Nat := (Z2State.equivSZ counterSystem.RZ).symm.finite_iff.mpr hSZ
+  have hNat : Finite Nat :=
+    (Z2State.equivSZ counterSystem.RZ counterSystem_alwaysOutputs).symm.finite_iff.mpr hSZ
   exact Infinite.not_finite (α := Nat) hNat

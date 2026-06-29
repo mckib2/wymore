@@ -664,7 +664,26 @@ Forward: two distinct outputs in range yield two distinct finset members via `Fi
 
 ---
 
-## 15. Meta-Analysis and Synthesis
+## 15. Option-Unified Definition 2.4 Encoding
+
+`GeneralizedWymore` was merged into [Mbse/Wymore.lean](Mbse/Wymore.lean). One structure, one trajectory engine:
+
+| Concept | Encoding |
+|---|---|
+| Next-state | `NZ : SZ → Option IZ → SZ` (`some i` driven; `none` autonomous stutter) |
+| Readout | `RZ : SZ → Option OZ` (`none` = no output / closed) |
+| Input trajectories | `ITZW IZ = Time → Option IZ` |
+| Output trajectories | `OTZ OZ = Time → Option OZ` (not total `Time → OZ`) |
+| Open Moore fragment | `DiscreteSystem.ofTotal` wraps total `NZ`/`RZ` in `some` |
+| FSM bridge | `FSMSystem.toDiscreteSystem` + `liftInput : ITZ → ITZW` |
+
+**Migration notes for proofs:** morphism readout uses `(Z1.RZ s).map φO`; state/output trajectory proofs are unchanged in induction shape; FSM layer keeps total `ITZ` API and lifts via `liftInput`; Z2/csy require `AlwaysOutputs` for `Classical.choose` on readouts.
+
+**Constructible textbook cases:** `closedSystem`, `exists_closed_discreteSystem`, `toggleSystem`, `toggle_period_two`; infinite state preserved (`counterSystem_not_finite`).
+
+---
+
+## 16. Meta-Analysis and Synthesis
 
 
 Formalizing Wayne Wymore's textbook theorems in Lean 4 reveals key differences in how set theory and dependent type theory model and verify mathematical objects.

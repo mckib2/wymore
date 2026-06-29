@@ -39,10 +39,10 @@ theorem zx1_trajectory_constant (s0 : SZx1) (f : ITZ IZx1) (t : Time) :
 
 /-- The output trajectory is constant: output is always v3. -/
 theorem zx1_output_constant (s0 : SZx1) (f : ITZ IZx1) (t : Time) :
-    FSM.generateOutputTrajectory Zx1 s0 f t = OZx1.v3 := by
-  simp [FSM.generateOutputTrajectory, zx1_trajectory_constant]
+    FSM.generateOutputTrajectory Zx1 s0 f t = some OZx1.v3 := by
+  rw [FSM.generateOutputTrajectory_eq, zx1_trajectory_constant]
 
 /-- All states in Zx1 are equivalent (trivially, there's only one). -/
 theorem zx1_all_states_equiv (s1 s2 : SZx1) : StateEquiv Zx1 s1 s2 := by
   intro f t
-  simp [FSM.generateOutputTrajectory, zx1_trajectory_constant]
+  rw [FSM.generateOutputTrajectory_eq, zx1_trajectory_constant]
