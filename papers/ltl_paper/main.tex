@@ -30,7 +30,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{tikz}
-\usetikzlibrary{arrows,positioning,shapes,fit,backgrounds}
+\usetikzlibrary{arrows,arrows.meta,positioning,shapes,shapes.geometric,fit,backgrounds,calc}
 
 % ---------- Captions & float spacing ----------
 \usepackage{caption}
@@ -207,7 +207,7 @@ Copyright~\textcopyright~ \the\year{} by the author(s). Permission granted to IN
 % =========================
 \phantomsection
 \miniheading{Abstract}
-We propose an assertional reinterpretation of the Functionality Cotyledon in A.\ Wayne Wymore's Tricotyledon Theory of System Design (T3SD). In classical T3SD, functional intent is verified constructively between a reference system $Z_{\text{spec}}$ and implementation $Z_{\text{impl}}$ via homomorphism $h: Z_{\text{impl}} \rightarrow Z_{\text{spec}}$. We define the Functionality Cotyledon as $\mathcal{FC}_{\mathcal{L}}(\Phi) = \{ Z \mid Z \models_{\mathcal{L}} \Phi \}$, where $\Phi$ is a set of temporal logic properties over Wymore discrete-system trajectories and $\mathcal{L}$ is a chosen temporal logic dialect. The contribution is a reinterpretation of the elements of the Functionality Cotyledon, trace semantics, and workflow comparison. We illustrate the comparison on a decentralized UAV swarm with infinite product state and dynamic system configuration.
+We propose an assertional reinterpretation of the Functionality Cotyledon in A.\ Wayne Wymore's Tricotyledon Theory of System Design (T3SD). In classical T3SD, functional intent is verified constructively between a reference system $Z_{\text{spec}}$ and implementation $Z_{\text{impl}}$ via homomorphism $h: Z_{\text{impl}} \rightarrow Z_{\text{spec}}$. We offer an assertional reading of the FC as $\mathcal{FC}_{\mathcal{L}}(\Phi) = \{ Z \mid Z \models_{\mathcal{L}} \Phi \}$, where $\Phi$ is a set of temporal logic properties over Wymore discrete-system trajectories and $\mathcal{L}$ is a chosen temporal logic dialect. The contribution is a reinterpretation of the elements of the Functionality Cotyledon, trace semantics, and workflow comparison. We illustrate the comparison on a decentralized UAV swarm with infinite product state and dynamic system configuration.
 
 \phantomsection
 \subsubsection{Keywords}
@@ -220,11 +220,9 @@ Tricotyledon Theory of System Design (T3SD), Linear Temporal Logic (LTL), Formal
 
 Model-Based Systems Engineering (MBSE) promises improved traceability and earlier verification, yet many requirements remain in natural language or diagrammatic forms without checkable temporal semantics \parencite{salado2019mbse}. Validation then depends on manual reconstruction of intent: engineers cannot mechanically determine whether an implementation satisfies any given requirement without informal argument. Encoding requirements as temporal properties over explicit system trajectories is one path toward model-based requirements that are executable rather than purely documentation \parencite{salado2019mbse}.
 
-A.\ Wayne Wymore's Tricotyledon Theory of System Design (T3SD) offers a rigorous foundation: cotyledon-structured design spaces, trajectory theorems, and constructive verification via reference systems and homomorphisms \parencite{Wymore1993,salado2019wymore}. While, generic model checking literature lacks this design-space interpretation, our work stays reinterprets Functionality Cotyledon (FC) assertionaly, keeping the design-space semantics intact.
+A.\ Wayne Wymore's Tricotyledon Theory of System Design (T3SD) offers a rigorous foundation for this gap: cotyledon-structured design spaces, trajectory theorems, and constructive verification via reference systems and homomorphisms \parencite{Wymore1993,salado2019wymore}. Generic model checking lacks T3SD's design-space semantics; we reinterpret the Functionality Cotyledon (FC) assertionally while preserving cotyledon structure. Constructing and maintaining homomorphisms is largely manual and poorly matched to evolving implementations, especially when concurrent subsystems induce large proof obligations \parencite{Wymore1993}.
 
-In classical T3SD, functional requirements are formalized as a specification system $Z_{\text{spec}}$, and proof that an implementation $Z_{\text{impl}}$ satisfies those requirements is established by finding a homomorphism $h: Z_{\text{impl}} \rightarrow Z_{\text{spec}}$. Constructing and maintaining such morphisms as described in Wymore's work is largely manual and poorly matched to evolving implementations, especially when concurrent subsystems induce large proof obligations \parencite{Wymore1993}.  Maintaining universal constructive proofs across complex specifications and implementations can require substantial re-verification effort even though overall system function intent may be largely unchanged.
-
-We propose a higher-level functional verification strategy: encode functional requirements as a property set $\Phi$ in a temporal logic dialect $\mathcal{L}$ and verify implementations by checking $Z \models_{\mathcal{L}} \Phi$ (i.e., $Z$ satisfies $\Phi$) over all possible Wymore input/output trajectories. In contrast to structural morphisms, the assertional FC does not require a concrete instance of any $Z_{\text{spec}}$.
+We propose encoding functional requirements as a property set $\Phi$ in temporal logic dialect $\mathcal{L}$ and verifying implementations by checking $Z \models_{\mathcal{L}} \Phi$ over admissible Wymore trajectories. In contrast to structural morphisms, assertional FC does not require a concrete $Z_{\text{spec}}$ for checking.
 
 \miniheading{Contributions}
 \begin{itemize}
@@ -239,6 +237,48 @@ The paper proceeds as follows: Section \ref{sec:background} summarizes T3SD, not
 
 \subsection{Tricotyledon Theory of System Design}
 Wymore's T3SD organizes system design into three cotyledons (design spaces): Functionality (FC), Buildability, and Implementability \parencite{Wymore1993}. The FC contains system designs that satisfy required input/output behavior and preferred performance ordering. Buildability captures technology constraints and cost orderings while Implementability is the space of designs that homomorphically map buildable artifacts to functional ones. In classical verification, functional intent is realized constructively: system requirements are formalized into a reference system $Z_{\text{spec}}$, and implementations are checked via morphisms. This paper focuses specifically on the FC.
+
+Figure~\ref{fig:t3sd-cotyledons} situates both verification readings within the cotyledon layout: $Z_{\text{spec}}$ and property set $\Phi$ formalize functional intent in the FC, while $Z_{\text{impl}}$ resides in the buildability space; constructive and assertional checks cross the implementability intersection via homomorphism $h$ or trace satisfaction $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$.
+
+\begin{figure}[t]
+  \centering
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[
+    cotyledon/.style={draw, thick, circle, minimum size=6.2cm, fill opacity=0.05},
+    box/.style={draw, thick, rounded corners=4pt, align=center, fill=white, fill opacity=1, text opacity=1, minimum width=2.6cm, minimum height=0.95cm, font=\small},
+    cotarrow/.style={-{Stealth[scale=1.2]}, thick},
+    classic/.style={dashed, draw=black!55, text=black!75},
+    modern/.style={draw=blue!80!black, thick, fill=blue!5},
+    labelStyle/.style={font=\normalsize\bfseries, align=center},
+    labelLine/.style={dashed, thick, draw=black!45}
+  ]
+    \coordinate (ICoverlap) at (2.5, {sqrt(9.61-6.25)});
+    \node[cotyledon, fill=blue, draw=blue!70!black] (FC) at (0,0) {};
+    \node[cotyledon, fill=orange, draw=orange!70!black] (BC) at (5,0) {};
+
+    \node[labelStyle, text=blue!80!black, anchor=north] (FClabel) at (-1.25, -3.35) {Functionality\\Cotyledon (FC)};
+    \node[labelStyle, text=orange!80!black, anchor=north] (BClabel) at (6.25, -3.35) {Buildability\\Cotyledon};
+    \node[labelStyle, text=black!70, anchor=south] (IClabel) at (2.5, 3.35) {Implementability\\Cotyledon};
+    \draw[labelLine] (IClabel.south) -- (ICoverlap);
+
+    \node[box, classic, font=\scriptsize] (Zspec) at (-1.35, 0.85) {Specification\\System $Z_{\text{spec}}$};
+    \node[box, modern, font=\scriptsize] (Phi) at (-1.35, -1.35) {Property Set $\Phi$\\[-1pt] {\tiny FO-LTL, STL, \ldots}};
+
+    \node[box, draw=orange!80!black, fill=orange!5] (Zimpl) at (6.15, -0.15) {Implementation\\System $Z_{\text{impl}}$};
+
+    \draw[cotarrow, classic] (Zimpl.west) .. controls (3.9, 0.85) and (0.9, 0.85) .. (Zspec.east)
+        node[midway, above, sloped, font=\footnotesize, text=black!75] {Classical: morphism $h$};
+
+    \draw[cotarrow, modern] (Zimpl.west) .. controls (3.9, -1.35) and (0.9, -1.35) .. (Phi.east)
+        node[midway, below, sloped, font=\footnotesize, text=blue!90!black] {Proposed: $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$};
+
+    \node[font=\tiny, text=black!75, align=center] at (-1.35, 1.55) {Classical FC:\\[-1pt] $\exists h: Z_{\text{impl}} \to Z_{\text{spec}}$};
+    \node[font=\tiny, text=blue!90!black, align=center] at (-1.35, -2.05) {Assertional FC:\\[-1pt] $\mathcal{FC}_{\mathcal{L}}(\Phi)$};
+  \end{tikzpicture}%
+  }
+  \caption{T3SD cotyledon layout (design-space placement). Functional intent is encoded in the FC as reference system $Z_{\text{spec}}$ (classical) or property set $\Phi$ (proposed); $Z_{\text{impl}}$ lies in the buildability space. Verification paths cross the implementability intersection.}
+  \label{fig:t3sd-cotyledons}
+\end{figure}
 
 We restrict attention to the subset of system designs that can be expressed within Wymore's discrete systems (DSYSTEMS): a deterministic 5-tuple $Z = (S, I, O, \delta, \rho)$ with state set $S$, input set $I$, output set $O$, transition function $\delta$, and readout $\rho$ \parencite{Wymore1993}. Time index $t \in T$ advances in discrete, atomic ticks while state components may be continuous-valued at each tick (e.g., $x,y \in \mathbb{R}$).  ``Discrete system'' here refers to the clock, not to finite or integer-valued states. Verification in this paper evaluates properties at tick boundaries. Wymore explicitly allows $S$, $I$, and $O$ to be \emph{not-necessarily-finite}, i.e., possibly infinite, compared to finite state machines only. Given an input trajectory $f: T \to I$ and initial state $s_0 \in S$, Wymore's trajectory theorems yield unique state and output trajectories $g: T \to S$ and $y: T \to O$. Systems of interest here are open: verification is performed at the system boundary through observable inputs and outputs, consistent with Systems Theory \parencite{salado2019mbse}.
 
@@ -263,20 +303,34 @@ Table~\ref{tab:notation} maps classical Wymore naming conventions (e.g., ITZ, ST
 \vspace{4pt}
 
 \subsection{Temporal Logics}
-% TODO: say generally what temporal logics are and what they are used for.  Present a table showing common operators and example expressions with interpretations
-Linear Temporal Logic (LTL) expresses requirements over execution traces with $G$ (always), $F$ (eventually), and related operators \parencite{Pnueli1977,BaierKatoen2008}. First-Order LTL (FO-LTL) adds quantifiers over state, input, or output variables at each tick which are needed when requirements relate continuous variables or indexed elements. Other dialects (e.g., Signal Temporal Logic (STL) for continuous signals) remain admissible as $\mathcal{L}$. Because functional intent varies in complexity from discrete event sequencing to continuous signal bounds, our framework parameterizes the chosen logic as $\mathcal{L}$ which allows arbitrarily complex property specification.% Functional intent in T3SD is inherently trajectory-based \parencite{salado2019mbse}.
+Temporal logics are formal languages for stating requirements over time-indexed execution traces \parencite{Pnueli1977,BaierKatoen2008}. They are used to specify safety (forbidden conditions never occur), liveness (desired conditions eventually occur), and ordering constraints on behavior.
+
+\begingroup
+\renewcommand{\arraystretch}{1.35}
+\footnotesize
+\begin{tabularx}{\textwidth}{@{}P{0.10\textwidth} P{0.14\textwidth} A{0.30\textwidth} A{0.40\textwidth}@{}}
+    \rowcolor{tableheader}
+    \headingfont\bfseries Op. & \headingfont\bfseries Name & \headingfont\bfseries Example & \headingfont\bfseries Reading (over trace $\sigma$) \\
+    \addlinespace[2pt]
+    $G\,\varphi$ & always & $G\,\text{safe}$ & $\varphi$ holds at every tick \\
+    $F\,\varphi$ & eventually & $F\,\text{done}$ & $\varphi$ holds at some future tick \\
+    $X\,\varphi$ & next & $X\,\texttt{ack}$ & $\varphi$ holds at the next tick \\
+    $\varphi \rightarrow \psi$ & implication & $\text{start} \rightarrow F\,\text{complete}$ & if $\varphi$ holds, then $\psi$ eventually holds \\
+\end{tabularx}
+\captionof{table}{Common LTL operators and illustrative readings.}
+\label{tab:ltl-operators}
+\endgroup
+\vspace{4pt}
+
+Table~\ref{tab:ltl-operators} summarizes the operators used below. First-Order LTL (FO-LTL) adds quantifiers over state, input, or output variables at each tick which are needed when requirements relate continuous variables or indexed elements. Other dialects (e.g., Signal Temporal Logic (STL) for continuous signals) remain admissible as $\mathcal{L}$. Because functional intent varies in complexity from discrete event sequencing to continuous signal bounds, our framework parameterizes the chosen logic as $\mathcal{L}$ which allows arbitrarily complex property specification.
 
 \subsection{Related Formalisms}
 Generic state model checking does not, by itself, supply Wymore trajectory semantics or a constructive-versus-assertional account of T3SD verification. Hybrid and event-scheduled formalisms address dynamics outside Wymore's discrete systems with uniform, atomic clock \parencite{platzer2018logical,wach2021devs}.
 
-Assertional FC matters to MBSE practitioners as it connects checkable temporal requirements to Wymore's foundations and to model-based requirements practice without requiring engineers to maintain reference systems and homomorphisms as implementations evolve~\parencite{salado2019mbse}.
-
 \section{Methodology} \label{sec:methodology}
 
 \subsection{Verification Paradigm Comparison}
-Figure~\ref{fig:comparison} contrasts Wymore's classical constructive verification with the proposed direct assertional verification. In both panels, \emph{system requirements} are formalized as a checkable artifact ($Z_{\text{spec}}$ or $\Phi$).  The implementation $Z_{\text{impl}}$ is then verified against that artifact at the system boundary (morphism $h$ or property checking).
-
-Functional requirements in T3SD are naturally expressed as input/output trajectory behavior over time \parencite{salado2019mbse, Wymore1993}. Under the assertional paradigm, $\Phi$ is encoded in dialect $\mathcal{L}$ and checked by evaluating whether execution traces of $Z_{\text{impl}}$ satisfy each property in $\Phi$ \parencite{BaierKatoen2008}. When implementations change structure, maintaining universal constructive proofs over $Z_{\text{spec}}$ and $h$ can require substantial re-verification. Assertional checking instead evaluates whether the post-change system satisfies $\Phi$ on its trajectories, without necessitating the construction of a new reference system.
+Figure~\ref{fig:comparison} instantiates the verification workflow sketched in Figure~\ref{fig:t3sd-cotyledons}: in both panels, system requirements are formalized as a checkable artifact ($Z_{\text{spec}}$ or $\Phi$), and $Z_{\text{impl}}$ is verified at the system boundary via morphism $h$ or property checking. Table~\ref{tab:comparison} summarizes the generic comparison.  When implementations change structure, maintaining universal constructive proofs over $Z_{\text{spec}}$ and $h$ can require substantial re-verification. Assertional checking instead evaluates whether the post-change system satisfies $\Phi$ on its trajectories, without necessitating the construction of a new reference system.
 
 \begin{figure}[t]
   \centering
@@ -307,13 +361,13 @@ Functional requirements in T3SD are naturally expressed as input/output trajecto
     \end{scope}
   \end{tikzpicture}%
   }
-  \caption{Classical constructive verification (A) versus assertional property checking (B). Both panels formalize system requirements; panel~B verifies $Z_{\text{impl}}$ against $\Phi$ without constructing $Z_{\text{spec}}$. The swarm case study (Figure~\ref{fig:swarm-verification}) applies both readings to the same $Z_{\text{impl}}$.}
+  \caption{Classical constructive verification (A) versus assertional property checking (B). Both panels formalize system requirements; panel~B verifies $Z_{\text{impl}}$ against $\Phi$ without constructing $Z_{\text{spec}}$. See Figure~\ref{fig:t3sd-cotyledons} for cotyledon placement.}
   \label{fig:comparison}
 \end{figure}
 
 \subsection{Formal Trace Definitions and Observability}
 \label{sec:trace-observability}
-Given a Wymorean system $Z = (S, I, O, \delta, \rho)$, an initial state $s_0 \in S$, and a complete input trajectory $f: T \to I$, Wymore defines unique state and output trajectories $g: T \to S$ and $y: T \to O$ \parencite{Wymore1993}. We write $g(t)$ for the state and $y(t)$ for the output at discrete time $t \in T$. The recursive form below is Wymore's standard trajectory construction:
+For $Z = (S, I, O, \delta, \rho)$ and trajectories $(f, g, y)$ as in Section~\ref{sec:background}, we write $g(t)$ for state and $y(t)$ for output at tick $t \in T$. Wymore's standard trajectory construction is:
 \begin{align}
     g(0) &= s_0 \\
     g(t+1) &= \delta(g(t), f(t)) \\
@@ -324,7 +378,10 @@ We define the complete execution trace as $\sigma = (g(t), y(t))_{t \in T}$. Tem
     \item External (black-box): $\Phi_{\text{ext}}$ over outputs $y(t)$ and inputs $f(t)$ only.
     \item Internal (white-box): properties over state components in $g(t)$.
 \end{itemize}
-We say $Z \models_{\mathcal{L}} \Phi$ if, for all admissible input trajectories $f$, the resulting trace satisfies $\sigma \models_{\mathcal{L}} \Phi$ under dialect $\mathcal{L}$ \parencite{Pnueli1977,BaierKatoen2008}. We write $\mathcal{FC}_{\mathcal{L}}(\Phi) = \{ Z \mid Z \models_{\mathcal{L}} \Phi \}$, where dialect $\mathcal{L}$ is chosen to match requirement complexity. When $\mathcal{L}$ is clear we write simply $Z \models \Phi$. Verification is scoped to Wymore DSYSTEMS at discrete ticks; $S$, $I$, and $O$ may be infinite, and checking strategy is tool-dependent \parencite{Wymore1993,BaierKatoen2008}. Subsystems may advance via internal $\delta$ when no external command arrives (i.e., automous state transition).  We treat such steps as ticks with hold-last-input or environment-defined $f(t)$. Assertional and classical FC need not coincide: a morphism $h$ guarantees structural simulation; temporal properties on traces may under-specify internal structure or over-specify behavior via liveness clauses.  % TODO: please explain more what this last sentence is talking about
+
+Under the assertional workflow, systems engineers (1)~elicit boundary requirements, (2)~encode $\Phi$ in dialect $\mathcal{L}$ (optionally splitting $\Phi_{\text{ext}}$ and internal properties), (3)~obtain $Z_{\text{impl}}$ (possibly via some know system coupling recipe), and (4)~check $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$ under a stated admissible input class. Admissible input trajectories $f$ are those consistent with mission protocol and environment assumptions at the system boundary, not arbitrary elements of $I^T$ unless explicitly required \parencite{salado2019mbse}. Port-level liveness and coordination belong in $\Phi_{\text{ext}}$; physical invariants not exported at ports are checked over $g$. When both $Z_{\text{spec}}$ and $\Phi$ are present, $\Phi$ may abstract the same mission intent at ports while $Z_{\text{spec}}$ supports constructive $h$; assertional checking does not require $Z_{\text{spec}}$. Properties over multiple agents are evaluated on the resultant system trajectory, not per-agent in isolation.
+
+We say $Z \models_{\mathcal{L}} \Phi$ if, for all admissible input trajectories $f$, the resulting trace satisfies $\sigma \models_{\mathcal{L}} \Phi$ under dialect $\mathcal{L}$ \parencite{Pnueli1977,BaierKatoen2008}. We write $\mathcal{FC}_{\mathcal{L}}(\Phi) = \{ Z \mid Z \models_{\mathcal{L}} \Phi \}$, where dialect $\mathcal{L}$ is chosen to match requirement complexity. When $\mathcal{L}$ is clear we write simply $Z \models \Phi$. Verification is scoped to Wymore DSYSTEMS at discrete ticks; $S$, $I$, and $O$ may be infinite, and checking strategy is tool-dependent \parencite{Wymore1993,BaierKatoen2008}. Subsystems may advance via internal $\delta$ when no external command arrives (i.e., autonomous state transition).  We treat such steps as ticks with hold-last-input or environment-defined $f(t)$. Assertional and classical FC need not coincide: existence of a homomorphism $h$ guarantees that every implementation trajectory maps to a valid specification trajectory (structural simulation), whereas $Z \models_{\mathcal{L}} \Phi$ judges only the trace variables referenced in $\Phi$. Two implementations may therefore satisfy the same black-box properties while differing in unobserved state (under-specification relative to $h$), and a liveness clause may demand progress not encoded in a given $Z_{\text{spec}}$ transition structure (over-specification relative to $h$).
 
 \subsection{Constructive Verification Criteria}
 \label{sec:constructive-criteria}
@@ -357,13 +414,14 @@ Classical FC seeks a system homomorphism $h : Z_{\text{impl}} \rightarrow Z_{\te
 We apply the proposed methodology to an example system in order to compare constructive and assertional workflows on the same $Z_{\text{impl}}$.  This is done as a conceptual demonstration, not an empirical benchmark.
 
 \subsection{Specification System Definition}
+\label{sec:swarm-spec}
 
-% TODO: introduce the specification system first
+Under classical T3SD, swarm functional intent is first expressed as a behavioral reference system $Z_{\text{spec}}$ (Table~\ref{tab:swarm-quintuples}, left column; Figure~\ref{fig:swarm-verification}). States record aggregate search progress $(K,t,a)$: covered cells $K \subseteq \text{Cells}$ over region $R$, mission clock $t$, and phase $a$. Boundary ports are broadcast \texttt{MissionCmd} and aggregate \texttt{MissionOut}; $\rho$ maps $(K,t,a)$ to \texttt{coveragePct}, \texttt{missionActive}, \texttt{deadlineMet}, and \texttt{ack}. On \texttt{tick}, $t$ advances and $K$ grows when active agents enter new cells; liveness requires $K = \text{Cells}$ before $t > T_{\max}$ while $a = \text{searching}$.
 
 \subsection{Implementation System Definition}
 A decentralized swarm of $N$ UAVs executes cooperative search over a bounded region $R \subset \mathbb{R}^2$ while maintaining minimum separation $d_{\text{safe}}$. A Return to Base (RTB) event removes a vehicle from the current \emph{active set} $M \subseteq \{1,\ldots,N\}$ when its battery falls below threshold. Participation change is the deliberate confounder: for constructive proofs, dynamic system configuration may require revisiting a homomorphism $h$ between the specification and current system configuration, whereas assertional checking re-evaluates the same $\Phi$ on the suffix trace.
 
-Three artifacts share mission vocabulary at the boundary ports (Figure~\ref{fig:swarm-verification}): assertional specification $\Phi = \{\varphi_{\text{safe}}, \varphi_{\text{live}}\}$ in FO-LTL; implementation $Z_{\text{impl}}$ as a CSY composition of $N$ agent subsystems; and a constructive reference $Z_{\text{spec}}$, the desired behavioral over search progress.
+The implementation $Z_{\text{impl}}$ is a conjunctive composition (CSY) of $N$ agent subsystems sharing \texttt{MissionCmd} at the mission bus (Table~\ref{tab:swarm-quintuples}, right column). Assertional specification $\Phi = \{\varphi_{\text{safe}}, \varphi_{\text{live}}\}$ in FO-LTL provides the alternative functional artifact; port and property detail appear in Section~\ref{sec:artifact-definitions}.
 
 \begin{table}[t]
 \centering
@@ -407,6 +465,7 @@ Three artifacts share mission vocabulary at the boundary ports (Figure~\ref{fig:
 \end{figure}
 
 \subsection{Artifact Definitions}
+\label{sec:artifact-definitions}
 
 \miniheading{Mission Port Vocabulary}
 Boundary types are shared by $Z_{\text{impl}}$, $Z_{\text{spec}}$, and black-box checking of $\Phi$ (Figure~\ref{fig:swarm-verification}).
@@ -427,18 +486,8 @@ We instantiate dialect $\mathcal{L}$ as FO-LTL. $\varphi_{\text{safe}}$ uses int
 \end{align*}
 where $d_{ij}$ is Euclidean distance between agents $i$ and $j$, and $M$ is the active-agent set.
 
-\miniheading{Implementation $Z_{\text{impl}}$}
-Each UAV is a Wymore subsystem $Z_i$; per-agent state carries continuous pose, velocity, battery, and an \texttt{active} flag, sampled at discrete flight-controller ticks (e.g., 1~Hz). Because coordinates are real-valued, $|S_{\text{swarm}}|$ is infinite. The swarm is built by conjunctive composition (CSY): broadcast \texttt{MissionCmd} on the mission bus, per-agent $\delta$ (kinematics and RTB clearing \texttt{active}), per-agent \texttt{AgentStatus} on status ports, and swarm-level $\rho$ aggregating \texttt{MissionOut} from projected cell coverage. RTB is encoded in $\delta$ when $b_i$ crosses threshold.
-
 \miniheading{Constructive Reference $Z_{\text{spec}}$}
-Stakeholder intent is also formalized as a \emph{behavioral} reference system (Table~\ref{tab:swarm-quintuples}). States record aggregate search progress $(K, t, a)$ where $K \subseteq \text{Cells}$ is the set of covered cell indices over $R$ (from active agents), $t$ is mission clock, and $a$ is phase. Shared mission ports are \texttt{MissionCmd} and \texttt{MissionOut}; $\rho$ maps $(K,t,a)$ to the four \texttt{MissionOut} fields defined above. Liveness in $Z_{\text{spec}}$ requires $K = \text{Cells}$ before $t > T_{\max}$ while $a = \text{searching}$.
-
-\miniheading{Functionality Cotyledon Interpretations}
-Figure~\ref{fig:comparison} and Figure~\ref{fig:swarm-verification} apply both readings to this $Z_{\text{impl}}$:
-\begin{itemize}
-    \item Classical FC (constructive): homomorphism $h : Z_{\text{impl}} \rightarrow Z_{\text{spec}}$.
-    \item Proposed Assertional FC: $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$ on trajectories ($Z_{\text{spec}}$ not required).
-\end{itemize}
+As defined in Section~\ref{sec:swarm-spec}, $Z_{\text{spec}}$ abstracts continuous swarm motion to aggregate cell coverage $(K,t,a)$ at shared mission ports; $\varphi_{\text{live}}$ checks the same \texttt{MissionOut} fields that $\rho$ exposes on $Z_{\text{spec}}$.
 
 \subsection{Verification Comparison}
 
@@ -462,10 +511,8 @@ One illustrative tick sequence on mission ports (outputs used by $\varphi_{\text
 \endgroup
 \end{minipage}
 
-\miniheading{Verification Comparison}
-\textbf{Constructive:} homomorphism $h$ projects continuous swarm state to spec state: cell occupancy from active agents via position-to-cell map yields $K \subseteq \text{Cells}$, together with shared clock, phase, and $\rho$-consistent \texttt{MissionOut}. When no RTB fires, $h$ preserves $\delta$ and $\rho$; RTB may break $\delta$-preservation unless $Z_{\text{spec}}$ abstracts participation change.
-
-\textbf{Assertional:} $\varphi_{\text{safe}}$ is checked on state trajectory $g$ (or tick-local constraints over active pairs in $M$); $\varphi_{\text{live}}$ on output trajectory $y$. After RTB, re-check the suffix trace with updated $M$ without rebuilding $h$.
+\miniheading{Swarm-boundary comparison}
+Table~\ref{tab:swarm-verification} instantiates Table~\ref{tab:comparison} on the swarm; the RTB vignette below details the constructive failure mode.
 
 \begingroup
 \renewcommand{\arraystretch}{1.35}
@@ -501,7 +548,7 @@ T3SD pedagogy traditionally introduces constructive FC first: students formalize
 \subsection{Relationship to Classical Functionality Cotyledon}
 \label{sec:classical-fc}
 
-Classical T3SD defines functional designs constructively while assertional FC defines them by temporal properties in dialect $\mathcal{L}$. A system homomorphism $h$ asserts language inclusion: trajectories of $Z_{\text{impl}}$ map into valid trajectories of $Z_{\text{spec}}$. Morphism existence implies trace inclusion under the homomorphic map---one direction of relationship; conversely, $Z \models_{\mathcal{L}} \Phi$ does not imply existence of $h$ to a given $Z_{\text{spec}}$. Logical equivalence between these two methods is left to future work.
+Classical T3SD defines functional designs constructively while assertional FC defines them by temporal properties in dialect $\mathcal{L}$. Morphism existence implies trace inclusion under the homomorphic map; conversely, $Z \models_{\mathcal{L}} \Phi$ does not imply existence of $h$ to a given $Z_{\text{spec}}$ (Section~\ref{sec:trace-observability}). Logical equivalence between these methods is left to future work.
 
 We also note that constructive verification may still be preferable when $|S|$ is small, $Z_{\text{spec}}$ already exists, and changes are internal refinements with fixed observable behavior.
 
@@ -524,7 +571,7 @@ Assertional FC is intended to capture functional intent through $\mathcal{FC}_{\
 
 \section{Conclusions}
 
-In this paper we demonstrated how to reinterpret Wymore's Functionality Cotyledon assertionaly: $\mathcal{FC}_{\mathcal{L}}(\Phi) = \{ Z \mid Z \models_{\mathcal{L}} \Phi \}$, grounded in trajectories $(f,g,y)$ and compared against classical T3SD on a UAV swarm. FO-LTL instantiates $\mathcal{L}$ in the case study, while richer dialects remain admissible. The swarm illustrates mixed observability, infinite product state, and verification across RTB participation change without rebuilding $Z_{\text{spec}}$ and $h$. Future work includes formal FC relationships, autonomous-step semantics, SysML trace integration, and tool-chain support.
+In this paper, we offer an assertional reinterpretation of Wymore's Functionality Cotyledon: functional verification as temporal property checking over trajectories, with trace semantics aligned to T3SD. The UAV swarm case study illustrates mixed observability, infinite product state, and RTB participation change, where assertional re-checking of $\Phi$ avoids rebuilding $Z_{\text{spec}}$ and $h$. Logical equivalence between paradigms, autonomous-step semantics, and MBSE tool integration remain open.
 
 \newpage
 \nocite{*}
