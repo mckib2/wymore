@@ -242,7 +242,7 @@ Figure~\ref{fig:t3sd-cotyledons} situates both verification readings within the 
 
 \begin{figure}[t]
   \centering
-  \resizebox{\textwidth}{!}{%
+  \resizebox{0.6\textwidth}{!}{%
   \begin{tikzpicture}[
     cotyledon/.style={draw, thick, circle, minimum size=6.2cm, fill opacity=0.05},
     box/.style={draw, thick, rounded corners=4pt, align=center, fill=white, fill opacity=1, text opacity=1, minimum width=2.6cm, minimum height=0.95cm, font=\small},
@@ -421,7 +421,14 @@ Under classical T3SD, swarm functional intent is first expressed as a behavioral
 \subsection{Implementation System Definition}
 A decentralized swarm of $N$ UAVs executes cooperative search over a bounded region $R \subset \mathbb{R}^2$ while maintaining minimum separation $d_{\text{safe}}$. A Return to Base (RTB) event removes a vehicle from the current \emph{active set} $M \subseteq \{1,\ldots,N\}$ when its battery falls below threshold. Participation change is the deliberate confounder: for constructive proofs, dynamic system configuration may require revisiting a homomorphism $h$ between the specification and current system configuration, whereas assertional checking re-evaluates the same $\Phi$ on the suffix trace.
 
-The implementation $Z_{\text{impl}}$ is a conjunctive composition (CSY) of $N$ agent subsystems sharing \texttt{MissionCmd} at the mission bus (Table~\ref{tab:swarm-quintuples}, right column). Assertional specification $\Phi = \{\varphi_{\text{safe}}, \varphi_{\text{live}}\}$ in FO-LTL provides the alternative functional artifact; port and property detail appear in Section~\ref{sec:artifact-definitions}.
+The implementation $Z_{\text{impl}}$ is a conjunctive composition (CSY) of $N$ agent subsystems sharing \texttt{MissionCmd} at the mission bus (Table~\ref{tab:swarm-quintuples}, right column; Figure~\ref{fig:swarm-ov1}). Assertional specification $\Phi = \{\varphi_{\text{safe}}, \varphi_{\text{live}}\}$ in FO-LTL provides the alternative functional artifact; port and property detail appear in Section~\ref{sec:artifact-definitions}.
+
+\begin{figure}[t]
+  \centering
+  \resizebox{0.7\textwidth}{!}{\input{figures/swarm_ov1.tex}}
+  \caption{Operational view of the UAV swarm case study. Active agents in $M$ search region $R$ while maintaining $\varphi_{\text{safe}}$; \texttt{MissionCmd} and \texttt{MissionOut} form the mission bus boundary; agent~3 initiates RTB and leaves $M$. Verification architecture in Figure~\ref{fig:swarm-verification}.}
+  \label{fig:swarm-ov1}
+\end{figure}
 
 \begin{table}[t]
 \centering
@@ -457,18 +464,11 @@ The implementation $Z_{\text{impl}}$ is a conjunctive composition (CSY) of $N$ a
 \endgroup
 \end{table}
 
-\begin{figure}[t]
-  \centering
-  \resizebox{\textwidth}{!}{\input{build/swarm_verification.tex}}
-  \caption{Swarm case study: verification architecture. Assertional checking of $\Phi$ (dashed) and constructive homomorphism $h$ (double arrow) to behavioral $Z_{\text{spec}}$ on the same $Z_{\text{impl}}$; \texttt{MissionCmd} and \texttt{MissionOut} are the vertical I/O ports. Representative agent $Z_i$ is a conjunctive factor inside the CSY composition. Quintuple detail in Table~\ref{tab:swarm-quintuples}.}
-  \label{fig:swarm-verification}
-\end{figure}
-
 \subsection{Artifact Definitions}
 \label{sec:artifact-definitions}
 
 \miniheading{Mission Port Vocabulary}
-Boundary types are shared by $Z_{\text{impl}}$, $Z_{\text{spec}}$, and black-box checking of $\Phi$ (Figure~\ref{fig:swarm-verification}).
+Boundary types are shared by $Z_{\text{impl}}$, $Z_{\text{spec}}$, and black-box checking of $\Phi$ (Figure~\ref{fig:swarm-verification} summarizes the wiring).
 
 \textbf{Input} \texttt{MissionCmd} (broadcast on one mission bus): \texttt{startSearch} sets phase $a \leftarrow \text{searching}$; \texttt{pause} holds the mission clock and sets $a \leftarrow \text{idle}$; \texttt{abort} terminates with $a \leftarrow \text{aborted}$; \texttt{tick} advances clock $t$ by one flight-controller cycle (default when no operator command is present).
 
@@ -489,27 +489,34 @@ where $d_{ij}$ is Euclidean distance between agents $i$ and $j$, and $M$ is the 
 \miniheading{Constructive Reference $Z_{\text{spec}}$}
 As defined in Section~\ref{sec:swarm-spec}, $Z_{\text{spec}}$ abstracts continuous swarm motion to aggregate cell coverage $(K,t,a)$ at shared mission ports; $\varphi_{\text{live}}$ checks the same \texttt{MissionOut} fields that $\rho$ exposes on $Z_{\text{spec}}$.
 
+\begin{figure}[t]
+  \centering
+  \resizebox{\textwidth}{!}{\input{build/swarm_verification.tex}}
+  \caption{Swarm case study: verification architecture. Assertional checking of $\Phi$ (dashed) and constructive homomorphism $h$ (double arrow) to behavioral $Z_{\text{spec}}$ on the same $Z_{\text{impl}}$; \texttt{MissionCmd} and \texttt{MissionOut} are the vertical I/O ports. Representative agent $Z_i$ is a conjunctive factor inside the CSY composition. Quintuple detail in Table~\ref{tab:swarm-quintuples}.}
+  \label{fig:swarm-verification}
+\end{figure}
+
 \subsection{Verification Comparison}
 
-\miniheading{Mission I/O Trace (Black-Box Observability)}
-\noindent\begin{minipage}{\linewidth}
-One illustrative tick sequence on mission ports (outputs used by $\varphi_{\text{live}}$):
-\begingroup
-\renewcommand{\arraystretch}{1.25}
-\footnotesize
-\setlength{\tabcolsep}{2pt}
-\begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash}p{0.07\linewidth} >{\raggedright\arraybackslash}p{0.18\linewidth} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}p{0.11\linewidth}@{}}
-    \toprule
-    Tick & Input & Output & Phase \\
-    \midrule
-    $0$ & \texttt{startSearch} & $\texttt{ack}=\top$, $\texttt{missionActive}=\top$, $\texttt{deadlineMet}=\top$, $\texttt{coveragePct}=0$ & searching \\
-    $1$ & \texttt{tick} & $\texttt{coveragePct}$ rises as agents enter new cells & searching \\
-    $\vdots$ & \texttt{tick} & $\texttt{coveragePct} \nearrow 100$ & searching \\
-    $k$ & \texttt{abort} & $\texttt{ack}=\bot$, $\texttt{missionActive}=\bot$ & aborted \\
-    \bottomrule
-\end{tabularx}
-\endgroup
-\end{minipage}
+% \miniheading{Mission I/O Trace (Black-Box Observability)}
+% \noindent\begin{minipage}{\linewidth}
+% One illustrative tick sequence on mission ports (outputs used by $\varphi_{\text{live}}$):
+% \begingroup
+% \renewcommand{\arraystretch}{1.25}
+% \footnotesize
+% \setlength{\tabcolsep}{2pt}
+% \begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash}p{0.07\linewidth} >{\raggedright\arraybackslash}p{0.18\linewidth} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}p{0.11\linewidth}@{}}
+%     \toprule
+%     Tick & Input & Output & Phase \\
+%     \midrule
+%     $0$ & \texttt{startSearch} & $\texttt{ack}=\top$, $\texttt{missionActive}=\top$, $\texttt{deadlineMet}=\top$, $\texttt{coveragePct}=0$ & searching \\
+%     $1$ & \texttt{tick} & $\texttt{coveragePct}$ rises as agents enter new cells & searching \\
+%     $\vdots$ & \texttt{tick} & $\texttt{coveragePct} \nearrow 100$ & searching \\
+%     $k$ & \texttt{abort} & $\texttt{ack}=\bot$, $\texttt{missionActive}=\bot$ & aborted \\
+%     \bottomrule
+% \end{tabularx}
+% \endgroup
+% \end{minipage}
 
 \miniheading{Swarm-boundary comparison}
 Table~\ref{tab:swarm-verification} instantiates Table~\ref{tab:comparison} on the swarm; the RTB vignette below details the constructive failure mode.
