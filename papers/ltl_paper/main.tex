@@ -291,21 +291,31 @@ Figure~\ref{fig:t3sd-cotyledons} situates both verification readings within the 
 We restrict attention to the subset of system designs that can be expressed within Wymore's discrete systems (DSYSTEMS): a deterministic 5-tuple $Z = (S, I, O, \delta, \rho)$ with state set $S$, input set $I$, output set $O$, transition function $\delta$, and readout $\rho$ \parencite{Wymore1993}. Time index $t \in T$ advances in discrete, atomic ticks while state components may be continuous-valued at each tick (e.g., $x,y \in \mathbb{R}$).  ``Discrete system'' here refers to the clock, not to finite or integer-valued states. Verification in this paper evaluates properties at tick boundaries. Wymore explicitly allows $S$, $I$, and $O$ to be \emph{not-necessarily-finite}, i.e., possibly infinite, compared to finite state machines only. Given an input trajectory $f: T \to I$ and initial state $s_0 \in S$, Wymore's trajectory theorems yield unique state and output trajectories $g: T \to S$ and $y: T \to O$. Systems of interest here are open: verification is performed at the system boundary through observable inputs and outputs, consistent with Systems Theory \parencite{salado2019mbse}.
 
 \miniheading{Notation}
-Table~\ref{tab:notation} maps classical Wymore naming conventions (e.g., ITZ, STZ, OTZ, Z, Z\&, Z\$) to a standard function notation that will be used throughout this paper.
+Table~\ref{tab:notation} maps Wymore textbook notation \parencite{Wymore1993} to the functional notation used in this paper.
 
 \begingroup
 \renewcommand{\arraystretch}{1.4}
 \footnotesize
-\begin{tabularx}{\textwidth}{@{}A{0.38\textwidth} A{0.56\textwidth}@{}}
+\begin{tabularx}{\textwidth}{@{}A{0.20\textwidth} A{0.32\textwidth} >{\raggedright\arraybackslash}X@{}}
     \rowcolor{tableheader}
-    \headingfont\bfseries Wymore & \headingfont\bfseries Mathematical notation \\
+    \headingfont\bfseries Name & \headingfont\bfseries Wymore & \headingfont\bfseries Mathematical notation \\
     \addlinespace[3pt]
-    TZ & $T$ (discrete time; $t \in T$, typically $T = \mathbb{N}$) \\
-    ITZ & input trajectory $f: T \to I$ \\
-    STZ$(f, s_0)$ & state trajectory $g: T \to S$ \\
-    OTZ$(f, s_0)$ & output trajectory $y: T \to O$ \\
+    Discrete system quintuple & $(S_Z, I_Z, O_Z, \text{NZ}, \text{RZ})$ & $(S, I, O, \delta, \rho)$ \\
+    Next state function & $\text{NZ}(x, p)$ & $\delta(s, i)$ \\
+    Readout function & $\text{RZ}(x)$ & $\rho(s)$ \\
+    Time scale & $\text{TZ}$ & $T$ \\
+    Input trajectories & $\text{ITZ}$ & $f : T \to I$ \\
+    Initial state & $x$ in $\text{STZ}(f, x)$ & $s_0$ \\
+    State trajectory & $\text{STZ}(f, x)$ & $g : T \to S$ \\
+    State at time $t$ & $\text{STZ}(f, x)(t)$ & $g(t)$ \\
+    Output trajectory & $\text{OTZ}(f, x)$ & $y : T \to O$ \\
+    Output at time $t$ & $\text{OTZ}(f, x)(t)$ & $y(t)$ \\
+    System experiments & $\text{EXZ}$ & $(f, s_0, t)$ \\
+    Homomorphism maps & $\text{HS}, \text{HI}, \text{HO}$ & $h_S, h_I, h_O$ \\
+    Next-state consistency & $\text{HS}(\text{NZ}_2(x,p)) = \text{NZ}_1(\text{HS}(x), \text{HI}(p))$ & $h_S(\delta_2(s,i)) = \delta_1(h_S(s), h_I(i))$ \\
+    Readout consistency & $\text{HO}(\text{RZ}_2(x)) = \text{RZ}_1(\text{HS}(x))$ & $h_O(\rho_2(s)) = \rho_1(h_S(s))$ \\
 \end{tabularx}
-\captionof{table}{Wymore trajectory notation and mathematical equivalents.}
+\captionof{table}{Wymore-to-functional notation map.}
 \label{tab:notation}
 \endgroup
 \vspace{4pt}
