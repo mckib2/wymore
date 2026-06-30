@@ -1,0 +1,48 @@
+% OV1-style operational view: UAV swarm case study (included from main.tex)
+\begin{tikzpicture}[
+    font=\sffamily,
+    uav/.style={draw=blue!80!black, fill=blue!10, regular polygon, regular polygon sides=3, inner sep=1pt, minimum size=0.85cm, thick},
+    base/.style={draw=black!70, fill=gray!20, rectangle, rounded corners, minimum width=2.2cm, minimum height=1.2cm, align=center, thick, font=\small},
+    operator/.style={draw=orange!80!black, fill=orange!10, ellipse, align=center, minimum width=2.2cm, minimum height=1.3cm, thick, font=\small},
+    arrow/.style={-{Stealth[scale=1.1]}, thick},
+    dashedarrow/.style={-{Stealth[scale=1.1]}, dashed, thick}
+]
+    \begin{scope}[shift={(4, 1.2)}]
+        \fill[green!5] (0,0) rectangle (7,5);
+        \draw[step=1cm, gray!40, thin] (0,0) grid (7,5);
+        \fill[green!30, opacity=0.7] (0,4) rectangle (1,5);
+        \fill[green!30, opacity=0.7] (1,4) rectangle (2,5);
+        \fill[green!30, opacity=0.7] (0,3) rectangle (1,4);
+        \node[text=black!50, font=\large\bfseries, align=center] at (3.5, 2.5) {Bounded Region $R$\\(Cells)};
+        \node[text=black!80, fill=green!10, draw=green!60!black, rounded corners, inner sep=2pt, font=\scriptsize] at (1, 4.5) {Covered ($K$)};
+    \end{scope}
+
+    \node[base] (base) at (9.5, -0.5) {\textbf{Base Station}\\(Return Point)};
+
+    \node[operator] (cmd) at (0, 3.2) {\textbf{Mission Bus}\\\texttt{MissionCmd}\\\texttt{MissionOut}};
+
+    \node[uav, rotate=-20] (uav1) at (5.5, 5.3) {1};
+    \node[uav, rotate=40] (uav2) at (9.5, 5.8) {2};
+    \node[uav, fill=red!15, draw=red!80!black, rotate=-110] (uav3) at (6.5, 2.3) {3};
+
+    \draw[<->, thick, blue!80!black] (uav1) -- (uav2)
+        node[midway, above, sloped, font=\scriptsize] {$d_{\text{safe}}$ ($\varphi_{\text{safe}}$)};
+
+    \draw[dashedarrow, red!80!black] (uav3.south) -- (base.north west)
+        node[midway, left, align=right, font=\scriptsize, text=red!80!black] {Battery low\\RTB (leaves $M$)};
+
+    \draw[arrow, orange!90!black, dashed] (cmd.north) .. controls (1, 5.8) .. (uav1.west)
+        node[midway, above, sloped, text=black, font=\tiny] {\texttt{startSearch}/\texttt{tick}};
+    \draw[arrow, orange!90!black, dashed] (cmd.north) .. controls (2, 6.2) .. (uav2.west);
+
+    \draw[arrow, blue!80!black, dashed] (uav1.south west) .. controls (3, 3.8) .. (cmd.east)
+        node[midway, below, sloped, text=black, font=\tiny] {\texttt{coveragePct}};
+
+    \node[draw=blue!80!black, fill=blue!2, rounded corners, align=left, thick, inner sep=6pt, font=\scriptsize] at (5.5, 8.2) {%
+        \textbf{Assertional $\Phi$ (FO-LTL)}\\[2pt]
+        \textbf{Safety} (white-box $g$, active set $M$):\\
+        $\varphi_{\text{safe}} = G(\forall i,j \in M,\, i \neq j \rightarrow d_{ij} \geq d_{\text{safe}})$\\[3pt]
+        \textbf{Liveness} (black-box $y$):\\
+        $\varphi_{\text{live}} = G(\text{Command}_{\text{search}} \rightarrow F(\texttt{coveragePct}=100))$%
+    };
+\end{tikzpicture}
