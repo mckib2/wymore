@@ -709,7 +709,9 @@ Forward: two distinct outputs in range yield two distinct finset members via `Fi
 
 **Direction vs `SystemMorphism`:** Lean `SystemMorphism Z₁ Z₂` maps φS : SZ₁ → SZ₂. Textbook HS maps elaboration → image. Bridge: `homomorphicImage_of_morphism` from a surjective `SystemMorphism Z_elab Z_img`.
 
-**Swarm case study:** [Mbse/SwarmCaseStudy.lean](Mbse/SwarmCaseStudy.lean) uses `FSM.IsHomomorphicImage` / `FSM.HomomorphicImageWitness` (total Moore maps); proofs delegate to the general layer through `toGeneral`.
+**Swarm case study:** [Mbse/SwarmCaseStudy.lean](Mbse/SwarmCaseStudy.lean) uses general `IsHomomorphicImage` on `DiscreteSystem`: finite `searchSpec` (Z_spec) bridges via `FSMSystem.toDiscreteSystem`; infinite-product `swarmSystem` / `swarmSystemMorph` (Z_impl) use `DiscreteSystem.ofTotal` directly. Witness `swarm_homomorphic_image` maps continuous agent positions to discrete coverage via `locateCell` and `swarmToSpecHS`.
+
+**CSY ports:** `swarmVector` uses Wymore `PortSystemVector` with `MissionCmd` input bus and per-agent `AgentStatus` outputs; `csySwarm_component_homomorphic` invokes `Homomorphism.csy_component_homomorphic_image` (no finite `AgentState` `Fintype`).
 
 ---
 
@@ -766,7 +768,7 @@ Forward: two distinct outputs in range yield two distinct finset members via `Fi
 | Induced image system | HIMSY(Z₂, HS, HI, HO) | `himsy Z₂ HS HI HO` | general; `FSM.himsy` for finite |
 | Conjunctive composition | csy(VSCR) | `csy VSCR hOut` (general); `FSM.csy VSCR` | — |
 
-**Swarm instantiation:** `searchSpec` = Z_spec (behavioral coverage/deadline intent); `swarmSystem n` = Z_impl (parameterized Fin n product); witness maps aggregate swarm state to spec state via `swarmToSpecHS`.
+**Swarm instantiation:** `searchSpec` = Z_spec (`SpecState`: covered cells, clock, phase; I/O = `MissionCmd` / `MissionOut`); `swarmSystem n` / `swarmSystemMorph n` = Z_impl (`SwarmState n` with continuous `UavState` positions on `DiscreteSystem`); witness maps aggregate swarm state to spec state via `swarmToSpecHS` (coverage from `locateCell`, plus clock/phase). Continuous coordinates are mechanized in [Mbse/SwarmExamples.lean](Mbse/SwarmExamples.lean); cell discretization is spec-side only.
 
 ---
 

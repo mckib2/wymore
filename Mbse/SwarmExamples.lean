@@ -1,4 +1,7 @@
 import Mbse.FiniteWymore
+import Mathlib.Data.Real.Basic
+import Mathlib.Data.Real.Archimedean
+import Mathlib.Algebra.Order.Floor.Ring
 
 /-!
 # UAV swarm case study: mask-based participation
@@ -6,40 +9,72 @@ import Mbse.FiniteWymore
 Formal exploration for the INCOSE paper. **Return to Base (RTB):** when battery falls below
 threshold, agent becomes inactive in the swarm mask.
 
-- **N=1:** `DiscreteSystem` + trajectory uniqueness.
-- **N=2, N=3:** product-state steps with `ActiveAgents` / `SwarmSeparation` (Finset quantifiers).
-
-Finite grid coordinates for tractable proofs; paper uses $\mathbb{R}$.
+Continuous-valued positions in $\mathbb{R}^2$; coverage is projected to a finite cell grid.
 -/
 
 namespace Swarm
 
 open FSM
 
-abbrev UavState := Fin 10 × Fin 10 × Fin 11 × Bool
+abbrev Cell := Fin 10 × Fin 10
 
-namespace UavState
+def gridSize : Nat := 10
 
-def mk (x y : Fin 10) (b : Fin 11) (active : Bool) : UavState := (x, y, b, active)
-def x (s : UavState) : Fin 10 := s.1
-def y (s : UavState) : Fin 10 := s.2.1
-def b (s : UavState) : Fin 11 := s.2.2.1
-def active (s : UavState) : Bool := s.2.2.2
-def init : UavState := mk 0 0 ⟨5, by decide⟩ true
+def regionSize : ℝ := 10
 
-end UavState
+/-- Clamp a natural index into the grid. -/
+def clampCellIdx (k : Nat) : Fin gridSize :=
+  ⟨min 9 k, Nat.lt_succ_of_le (Nat.min_le_left 9 k)⟩
 
-def rtbThreshold : Nat := 5
+/-- Project continuous coordinates to a coverage cell (paper: discretization of $R$). -/
+noncomputable def locateCell (x y : ℝ) : Cell :=
+  let ix := (⌊x⌋).toNat
+  let iy := (⌊y⌋).toNat
+  (clampCellIdx ix, clampCellIdx iy)
 
-def rtbTransition (s : UavState) (threshold : Nat) : UavState :=
-  if (UavState.b s).val < threshold then
-    UavState.mk (UavState.x s) (UavState.y s) (UavState.b s) false
-  else s
+noncomputable def cellCenterX (c : Cell) : ℝ := (c.1.val : ℝ) + (0.5 : ℝ)
+noncomputable def cellCenterY (c : Cell) : ℝ := (c.2.val : ℝ) + (0.5 : ℝ)
 
-def stepUav (s : UavState) : UavState := rtbTransition s rtbThreshold
+private theorem nat_floor_center (n : Fin gridSize) :
+    ⌊((n.val : ℝ) + (0.5 : ℝ))⌋ = (n.val : ℤ) := by
+  rw [Int.floor_natCast_add, show ⌊(0.5 : ℝ)⌋ = (0 : ℤ) by norm_num, add_zero]
 
-def uav1 : DiscreteSystem UavState Unit Unit :=
-  DiscreteSystem.ofTotal (fun s _ => stepUav s) (fun _ => ()) ⟨UavState.init⟩
+private theorem nat_toNat_floor_center (n : Fin gridSize) :
+    (⌊((n.val : ℝ) + (0.5 : ℝ))⌋).toNat = n.val := by
+  rw [nat_floor_center, Int.toNat_natCast]
+
+theorem locateCell_cellCenter (c : Cell) :
+    locateCell (cellCenterX c) (cellCenterY c) = c := by
+  apply Prod.ext
+  · apply Fin.ext
+    simp only [locateCell, clampCellIdx, cellCenterX]
+    rw [nat_toNat_floor_center c.1, Nat.min_comm]
+    exact Nat.min_eq_left (Nat.le_of_lt_succ c.1.isLt)
+  · apply Fin.ext
+    simp only [locateCell, clampCellIdx, cellCenterY]
+    rw [nat_toNat_floor_center c.2, Nat.min_comm]
+    exact Nat.min_eq_left (Nat.le_of_lt_succ c.2.isLt)
+
+structure UavState where
+  x : ℝ
+  y : ℝ
+  psi : ℝ
+  v : ℝ
+  b : ℝ
+  active : Bool
+
+def uavInit : UavState :=
+  { x := 0, y := 0, psi := 0, v := 0, b := 10, active := true }
+
+def rtbThreshold : ℝ := 5
+
+noncomputable def rtbTransition (s : UavState) (threshold : ℝ) : UavState :=
+  if h : s.b < threshold then { s with active := false } else s
+
+noncomputable def stepUav (s : UavState) : UavState := rtbTransition s rtbThreshold
+
+noncomputable def uav1 : DiscreteSystem UavState Unit Unit :=
+  DiscreteSystem.ofTotal (fun s _ => stepUav s) (fun _ => ()) ⟨uavInit⟩
 
 theorem uav1_stateTrajectory_unique (f : ITZW Unit) (g : STZ UavState) (s0 : UavState)
     (h_init : g 0 = s0) (h_valid : IsValidStateTrajectory uav1 f g) :
@@ -47,16 +82,16 @@ theorem uav1_stateTrajectory_unique (f : ITZW Unit) (g : STZ UavState) (s0 : Uav
   stateTrajectory_unique uav1 f g s0 h_init h_valid
 
 def ActiveAgents {n : Nat} (s : Fin n → UavState) : Finset (Fin n) :=
-  Finset.univ.filter fun i => UavState.active (s i)
+  Finset.univ.filter fun i => (s i).active
 
-def gridDist (x1 y1 x2 y2 : Fin 10) : Nat :=
-  Int.natAbs ((x1.val : Int) - x2.val) + Int.natAbs ((y1.val : Int) - y2.val)
+noncomputable def distSq (x1 y1 x2 y2 : ℝ) : ℝ :=
+  (x1 - x2) ^ 2 + (y1 - y2) ^ 2
 
-def SwarmSeparation {n : Nat} (s : Fin n → UavState) (d : Nat) : Prop :=
+def SwarmSeparation {n : Nat} (s : Fin n → UavState) (d : ℝ) : Prop :=
   ∀ i ∈ ActiveAgents s, ∀ j ∈ ActiveAgents s, i ≠ j →
-    gridDist (UavState.x (s i)) (UavState.y (s i)) (UavState.x (s j)) (UavState.y (s j)) ≥ d
+    distSq (s i).x (s i).y (s j).x (s j).y ≥ d ^ 2
 
-theorem swarmSeparation_trivial_self {n : Nat} (s : Fin n → UavState) (d : Nat) (i : Fin n)
+theorem swarmSeparation_trivial_self {n : Nat} (s : Fin n → UavState) (d : ℝ) (i : Fin n)
     (honly : ActiveAgents s = {i}) :
     SwarmSeparation s d := by
   intro i' hi' j' hj' hij
@@ -65,40 +100,33 @@ theorem swarmSeparation_trivial_self {n : Nat} (s : Fin n → UavState) (d : Nat
   rw [hi'eq, hj'eq] at hij
   exact absurd rfl hij
 
-def swarm2Step (s : Fin 2 → UavState) : Fin 2 → UavState :=
+noncomputable def swarm2Step (s : Fin 2 → UavState) : Fin 2 → UavState :=
   fun i => stepUav (s i)
 
 theorem rtb2_drops_agent0 (s : Fin 2 → UavState)
-    (h : (UavState.b (s 0)).val < rtbThreshold) :
-    ¬ UavState.active (swarm2Step s 0) := by
-  have hdef : swarm2Step s 0 =
-      UavState.mk (UavState.x (s 0)) (UavState.y (s 0)) (UavState.b (s 0)) false := by
-    simp [swarm2Step, stepUav, rtbTransition, h]
-  rw [hdef, UavState.active]
-  intro h
-  cases h
+    (h : (s 0).b < rtbThreshold) :
+    ¬ (swarm2Step s 0).active := by
+  simp [swarm2Step, stepUav, rtbTransition, h]
 
-theorem swarm2_safety_single_active (s : Fin 2 → UavState) (d : Nat)
+theorem swarm2_safety_single_active (s : Fin 2 → UavState) (d : ℝ)
     (honly : ActiveAgents (swarm2Step s) = {1}) :
     SwarmSeparation (swarm2Step s) d :=
   swarmSeparation_trivial_self _ d 1 honly
 
-def swarm3Step (s : Fin 3 → UavState) : Fin 3 → UavState :=
+noncomputable def swarm3Step (s : Fin 3 → UavState) : Fin 3 → UavState :=
   fun i => stepUav (s i)
 
 theorem rtb3_drops_agent (s : Fin 3 → UavState) (k : Fin 3)
-    (h : (UavState.b (s k)).val < rtbThreshold) :
-    ¬ UavState.active (swarm3Step s k) := by
-  have hdef : swarm3Step s k =
-      UavState.mk (UavState.x (s k)) (UavState.y (s k)) (UavState.b (s k)) false := by
-    simp [swarm3Step, stepUav, rtbTransition, h]
-  rw [hdef, UavState.active]
-  intro h
-  cases h
+    (h : (s k).b < rtbThreshold) :
+    ¬ (swarm3Step s k).active := by
+  simp [swarm3Step, stepUav, rtbTransition, h]
 
-theorem swarm3_safety_single_active (s : Fin 3 → UavState) (d : Nat)
+theorem swarm3_safety_single_active (s : Fin 3 → UavState) (d : ℝ)
     (honly : ActiveAgents (swarm3Step s) = {1}) :
     SwarmSeparation (swarm3Step s) d :=
   swarmSeparation_trivial_self _ d 1 honly
+
+/-- Default initial UAV state (paper: above RTB threshold). -/
+abbrev UavState.init := uavInit
 
 end Swarm
