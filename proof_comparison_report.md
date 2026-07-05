@@ -790,3 +790,22 @@ Wymore's textbook features explicit theorems for function extensionality (Theore
 
 ### 4. Erratum Isolation
 Textbooks written in informal set theory are susceptible to cross-referencing and numbering errata, as observed in Theorem 2.32 (where set preimage lemmas A1.249 and A1.250 are erroneously cited for function composition). In Lean, the compiler enforces strict type checking. If a proof contains an invalid cross-reference, compilation fails, ensuring that only logically consistent proofs are admitted.
+
+---
+
+## 22. Proof Automation (Lemma Library and Tactics)
+
+Recurring proof families in `Wymore.lean` and `Homomorphism.lean` are captured in a shared lemma layer (`Mbse/Trajectory.lean`) with optional macro tactics (`Mbse/WymoreTactics.lean`) and a dedicated simp set (`@[wymore]` in `Mbse/WymoreSimp.lean`, registered in `Mbse/WymoreAttr.lean`). Core definitions live in `Mbse/WymoreCore.lean`; `Mbse/Wymore.lean` re-exports them with thin theorem wrappers.
+
+| DTT / proof pattern | Lemma(s) | Optional tactic |
+|---|---|---|
+| Trajectory induction on `Nat` | `trajectory_induction`, `map_preserves_state_trajectory`, `morphism_preserves_state_trajectory` | `wymore_trajectory_induction` |
+| Output from state + readout | `outputTrajectory_of_state_eq`, `outputTrajectory_time_invariance`, `outputTrajectory_nonanticipatory`, `morphism_preserves_output_trajectory` | `wymore_output_of_state` |
+| FNS / `FunctionGraph` | `FunctionGraph_mem` (`@[wymore]`) | `wymore_simp` |
+| Finset card ↔ distinct witnesses | `exists_two_distinct_of_card_gt_one`, `card_gt_one_of_exists_two_distinct`, `varyingOutput_iff_card_rng` | `wymore_card_rng` |
+| `AlwaysOutputs` / `none` elimination | `alwaysOutputs_elim`, `alwaysOutputs_not_none` | — |
+| Surjective `Classical.choose` | `choose_preimage`, `choose_some_map`, `choose_alwaysOutputs` | — (use lemmas directly) |
+| RSN input agreement (nonanticipatory) | `rsn_agree_on`, `rsn_agree_lt`, `stateTrajectory_nonanticipatory` | — |
+| Pure-feedback index collapse | `fin_one_eq`, `fin_one_indices_eq` | — |
+
+**Pilot refactors:** The eight target theorems (`morphism_preserves_*`, time invariance, nonanticipatory, `csy_*`, `varyingOutput_iff_card_rng`, `pure_feedback_not_other`, `homomorphic_image_eq_himsy`) now delegate to `Trajectory` lemmas or one-line `exact` calls. `Homomorphism.lean` uses `map_preserves_state_trajectory` and `choose_preimage`/`choose_some_map` in Theorem 4.15; `FiniteWymore.lean` continues to delegate via `_root_.` / `Homomorphism.*` wrappers without duplicating tactics.

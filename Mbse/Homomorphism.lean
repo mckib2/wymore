@@ -1,4 +1,7 @@
 import Mbse.Wymore
+import Mbse.Trajectory
+
+open Trajectory
 
 /-!
 # Chapter 4: System Homomorphisms
@@ -65,13 +68,8 @@ theorem homomorphicImage_preserves_state_trajectory
     {Z_img : DiscreteSystem SZ1 IZ1 OZ1} {Z_elab : DiscreteSystem SZ2 IZ2 OZ2}
     (h : HomomorphicImageWitness Z_img Z_elab) (s0 : SZ2) (f : ITZW IZ2) :
     ∀ t, h.HS (generateStateTrajectory Z_elab s0 f t) =
-         generateStateTrajectory Z_img (h.HS s0) (fun τ => (f τ).map h.HI) t := by
-  intro t
-  induction t with
-  | zero => rfl
-  | succ n ih =>
-    simp only [generateStateTrajectory_succ]
-    rw [h.preserves_transition, ih]
+         generateStateTrajectory Z_img (h.HS s0) (fun τ => (f τ).map h.HI) t :=
+  map_preserves_state_trajectory Z_elab Z_img h.HS (fun oi => oi.map h.HI) h.preserves_transition s0 f
 
 theorem homomorphicImage_preserves_output_trajectory
     {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
@@ -80,9 +78,8 @@ theorem homomorphicImage_preserves_output_trajectory
     ∀ t, (generateOutputTrajectory Z_elab s0 f t).map h.HO =
          generateOutputTrajectory Z_img (h.HS s0) (fun τ => (f τ).map h.HI) t := by
   intro t
-  have hst := homomorphicImage_preserves_state_trajectory h s0 f t
   unfold generateOutputTrajectory
-  rw [h.preserves_readout, hst]
+  rw [h.preserves_readout, homomorphicImage_preserves_state_trajectory h s0 f t]
 
 /--
   [textbook/definition4.3/implication/functional_capability]
@@ -161,7 +158,7 @@ private theorem himsy_rz_well_defined {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
 -/
 noncomputable def himsy {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     (Z2 : DiscreteSystem SZ2 IZ2 OZ2) (HS : SZ2 → SZ1) (HI : IZ2 → IZ1) (HO : OZ2 → OZ1)
-    (hwd : HimsyWellDefined Z2 HS HI HO)
+    (_ : HimsyWellDefined Z2 HS HI HO)
     (hS : Function.Surjective HS) (hI : Function.Surjective HI) (_hO : Function.Surjective HO) :
     DiscreteSystem SZ1 IZ1 OZ1 where
   sz_nonempty := ⟨HS (Classical.choice Z2.sz_nonempty)⟩
@@ -214,8 +211,7 @@ theorem homomorphic_image_eq_himsy {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
   constructor
   · intro s oi
     dsimp [himsy]
-    have hx : h.HS (Classical.choose (h.HS_surjective s)) = s :=
-      Classical.choose_spec (h.HS_surjective s)
+    have hx := choose_preimage h.HS h.HS_surjective s
     match oi with
     | none =>
       calc
@@ -225,9 +221,7 @@ theorem homomorphic_image_eq_himsy {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
         _ = (himsy Z_elab h.HS h.HI h.HO (himsyWellDefined_of_homomorphicImage h)
             h.HS_surjective h.HI_surjective h.HO_surjective).NZ s none := rfl
     | some i =>
-      have hpre : h.HI (Classical.choose (h.HI_surjective i)) = i :=
-        Classical.choose_spec (h.HI_surjective i)
-      have hoi : (some (Classical.choose (h.HI_surjective i))).map h.HI = some i := by simp [hpre]
+      have hoi := choose_some_map h.HI h.HI_surjective i
       calc
         Z_img.NZ s (some i) = Z_img.NZ (h.HS (Classical.choose (h.HS_surjective s))) (some i) := by rw [hx]
         _ = Z_img.NZ (h.HS (Classical.choose (h.HS_surjective s)))
@@ -240,8 +234,7 @@ theorem homomorphic_image_eq_himsy {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
             h.HS_surjective h.HI_surjective h.HO_surjective).NZ s (some i) := rfl
   · intro s
     dsimp [himsy]
-    have hx : h.HS (Classical.choose (h.HS_surjective s)) = s :=
-      Classical.choose_spec (h.HS_surjective s)
+    have hx := choose_preimage h.HS h.HS_surjective s
     calc
       Z_img.RZ s = Z_img.RZ (h.HS (Classical.choose (h.HS_surjective s))) := by rw [hx]
       _ = (Z_elab.RZ (Classical.choose (h.HS_surjective s))).map h.HO := (h.preserves_readout _).symm
@@ -382,7 +375,7 @@ theorem csy_component_homomorphic_image {n : Nat} (VSCR : PortSystemVector n)
       obtain ⟨o, ho⟩ := hAlways i (x i)
       show (some (fun op => csyOut VSCR hAlways x op)).map (csy_output_proj VSCR i) =
         (VSCR.Z i).RZ (x i)
-      simp only [Option.map_some, csy_output_proj, csy_state_proj, _root_.PJN]
+      simp only [Option.map_some]
       rw [ho]
       apply Option.some_inj.mpr
       have hfn : Classical.choose (hAlways i (x i)) = o :=
