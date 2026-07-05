@@ -59,8 +59,6 @@ worked examples (beyond Dyck-1 in [DPDAExamples](DPDAExamples.lean)), `Reaches` 
 - **Nontrivial vs CF power:** A DPDA may recognize a non-regular language while remaining
   Wymore-trivial when `G` is constant (see Dyck-1 in [DPDAExamples](DPDAExamples.lean)).
 
-See [formalization_roadmap.md](../formalization_roadmap.md) for backlog and
-[formalization_roadmap.md §6](formalization_roadmap.md#6-rigor-verification) for the proof-honesty checklist.
 -/
 
 namespace DPDA
@@ -395,85 +393,57 @@ theorem stepSnapshot_preserves_wellFormed (D : DPDASystem STfin IS OZ Γ)
     (hWF : WellFormedStack D snap.2) :
     WellFormedStack D (stepSnapshot D snap inp).2 := by
   unfold stepSnapshot
-  cases snap with
-  | mk q s =>
-    cases hF : D.F q inp (peek D.z0 s) with
-    | none => simpa [hF] using hWF
-    | some v =>
-      obtain ⟨q', new_top⟩ := v
-      simpa [hF] using hR q inp s q' new_top hWF hF
+  dpda_step_destruct D, snap, inp, q, s, q_new, new_top
+  · simpa [hF] using hWF
+  · simpa [hF] using hR q inp s q_new new_top hWF hF
 
 theorem stepEps_preserves_wellFormed (D : DPDASystem STfin IS OZ Γ)
     (hR : RespectsBottomMarker D) (snap : Snapshot STfin Γ) (hWF : WellFormedStack D snap.2)
     (c' : Snapshot STfin Γ) (he : stepEps D snap = some c') :
     WellFormedStack D c'.2 := by
-  cases snap with
-  | mk q s =>
-    cases hF : D.F q none (peek D.z0 s) with
-    | none => simp [stepEps, hF] at he
-    | some v =>
-      obtain ⟨q', new_top⟩ := v
-      simp [stepEps, hF] at he
-      cases he
-      exact hR q none s q' new_top hWF hF
+  dpda_step_destruct D, snap, none, q, s, q_new, new_top
+  · simp [stepEps, hF] at he
+  · simp [stepEps, hF] at he
+    cases he
+    exact hR q none s q_new new_top hWF hF
 
 theorem stepInput_preserves_wellFormed (D : DPDASystem STfin IS OZ Γ)
     (hR : RespectsBottomMarker D) (snap : Snapshot STfin Γ) (a : IS)
     (hWF : WellFormedStack D snap.2) (c' : Snapshot STfin Γ) (he : stepInput D snap a = some c') :
     WellFormedStack D c'.2 := by
-  cases snap with
-  | mk q s =>
-    cases hF : D.F q (some a) (peek D.z0 s) with
-    | none => simp [stepInput, hF] at he
-    | some v =>
-      obtain ⟨q', new_top⟩ := v
-      simp [stepInput, hF] at he
-      cases he
-      exact hR q (some a) s q' new_top hWF hF
+  dpda_step_destruct D, snap, (some a), q, s, q_new, new_top
+  · simp [stepInput, hF] at he
+  · simp [stepInput, hF] at he
+    cases he
+    exact hR q (some a) s q_new new_top hWF hF
 
-theorem stepSnapshot_none_eq_stepEps (D : DPDASystem STfin IS OZ Γ) (c c' : Snapshot STfin Γ)
-    (he : stepEps D c = some c') : stepSnapshot D c none = c' := by
-  cases c with
-  | mk q s =>
-    cases hF : D.F q none (peek D.z0 s) with
-    | none => simp [stepEps, hF] at he
-    | some v =>
-      obtain ⟨q', new⟩ := v
-      simp [stepSnapshot, stepEps, hF] at he ⊢
-      cases he
-      rfl
+theorem stepSnapshot_none_eq_stepEps (D : DPDASystem STfin IS OZ Γ) (snap c' : Snapshot STfin Γ)
+    (he : stepEps D snap = some c') : stepSnapshot D snap none = c' := by
+  dpda_step_destruct D, snap, none, q, s, q_new, new_top
+  · simp [stepEps, hF] at he
+  · simp [stepSnapshot, stepEps, hF] at he ⊢
+    cases he
+    rfl
 
 theorem stepSnapshot_some_eq_stepInput (D : DPDASystem STfin IS OZ Γ) (c c' : Snapshot STfin Γ)
     (a : IS) (he : stepInput D c a = some c') : stepSnapshot D c (some a) = c' := by
-  cases c with
-  | mk q s =>
-    cases hF : D.F q (some a) (peek D.z0 s) with
-    | none => simp [stepInput, hF] at he
-    | some v =>
-      obtain ⟨q', new⟩ := v
-      simp [stepSnapshot, stepInput, hF] at he ⊢
-      cases he
-      rfl
+  dpda_step_destruct D, c, (some a), q, s, q_new, new_top
+  · simp [stepInput, hF] at he
+  · simp [stepSnapshot, stepInput, hF] at he ⊢
+    cases he
+    rfl
 
 theorem stepSnapshot_none_id (D : DPDASystem STfin IS OZ Γ) (c : Snapshot STfin Γ)
     (h : stepEps D c = none) : stepSnapshot D c none = c := by
-  cases c with
-  | mk q s =>
-    cases hF : D.F q none (peek D.z0 s) with
-    | none => simp [stepSnapshot, hF]
-    | some v =>
-      obtain ⟨q', new⟩ := v
-      simp [stepEps, hF] at h
+  dpda_step_destruct D, c, none, q, s, q_new, new_top
+  · simp [stepSnapshot, hF]
+  · simp [stepEps, hF] at h
 
 theorem stepSnapshot_some_id (D : DPDASystem STfin IS OZ Γ) (c : Snapshot STfin Γ) (a : IS)
     (h : stepInput D c a = none) : stepSnapshot D c (some a) = c := by
-  cases c with
-  | mk q s =>
-    cases hF : D.F q (some a) (peek D.z0 s) with
-    | none => simp [stepSnapshot, hF]
-    | some v =>
-      obtain ⟨q', new⟩ := v
-      simp [stepInput, hF] at h
+  dpda_step_destruct D, c, (some a), q, s, q_new, new_top
+  · simp [stepSnapshot, hF]
+  · simp [stepInput, hF] at h
 
 /-! ## Language / Acceptance over finite words
 
