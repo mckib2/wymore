@@ -152,6 +152,47 @@ theorem fsm_trace_satisfies_compiled (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ
   simp only [Trace.models, compileFSM, satisfiesAt]
   exact ⟨fsmTrace_models_transitionsGlobally F s0 f, fsmTrace_models_readoutsGlobally F s0 f⟩
 
+/-- Assertional fragment uses per-clause formulas; `compileFSM` wraps them in global `G`.
+    Satisfaction of `compileFSM` implies satisfaction of each dynamics-table clause. -/
+theorem fsmTrace_models_compileFSM_implies_dynamicsClause (F : FSMSystem SZ IZ OZ) (s0 : SZ)
+    (f : ITZ IZ) (φ : LTL (Atom SZ IZ OZ))
+    (hmem : φ ∈ transitionClauses F ∨ φ ∈ readoutClauses F)
+    (h : (fsmTrace F s0 f).models (compileFSM F)) :
+    (fsmTrace F s0 f).models φ := by
+  rcases hmem with hmem | hmem
+  · rcases (mem_transitionClauses_iff F φ).mp hmem with ⟨s, i, heq⟩
+    subst heq
+    have hG := h.1
+    simp only [transitionsGlobally, satisfiesAt_G] at hG
+    have ht := hG 0 (Nat.zero_le 0)
+    rw [satisfiesAt_listAnd] at ht
+    exact ht (transitionClause F s i) ((mem_transitionClauses_iff F (transitionClause F s i)).2 ⟨s, i, rfl⟩)
+  · rcases (mem_readoutClauses_iff F φ).mp hmem with ⟨s, heq⟩
+    subst heq
+    have hG := h.2
+    simp only [readoutsGlobally, satisfiesAt_G] at hG
+    have ht := hG 0 (Nat.zero_le 0)
+    rw [satisfiesAt_listAnd] at ht
+    exact ht (readoutClause F s) ((mem_readoutClauses_iff F (readoutClause F s)).2 ⟨s, rfl⟩)
+
+/-- On canonical traces, per-clause satisfaction at time zero implies global transition conjunct. -/
+theorem fsmTrace_models_dynamicsClause_at_all_times (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ)
+    (s : SZ) (i : IZ) :
+    satisfiesAt (transitionClause F s i) (fsmTrace F s0 f) 0 →
+      satisfiesAt (transitionsGlobally F) (fsmTrace F s0 f) 0 := by
+  intro _hclause
+  simp only [transitionsGlobally, satisfiesAt_G, satisfiesAt]
+  intro t _
+  rw [satisfiesAt_listAnd]
+  intro φ hmem
+  simp only [transitionClauses, List.mem_flatMap, List.mem_map, Finset.mem_toList] at hmem
+  rcases hmem with ⟨s', _, i', _, rfl⟩
+  exact fsmTrace_satisfies_transitionClause F s0 f t s' i'
+
+/-- Assertional ↔ hom bi-implications use per-clause dynamics tables, not `compileFSM`. -/
+noncomputable def dynamicsClauseList (F : FSMSystem SZ IZ OZ) : List (LTL (Atom SZ IZ OZ)) :=
+  transitionClauses F ++ readoutClauses F
+
 /-- LTL atom for wrong state does not hold on canonical trace (negative test). -/
 theorem fsmTrace_state_false {F : FSMSystem SZ IZ OZ} {s0 : SZ} {f : ITZ IZ} {t : Time}
     {s : SZ} (hne : generateStateTrajectory F s0 f t ≠ s) :

@@ -185,28 +185,41 @@ theorem fsm_satisfies_implies_extEqual {F_spec F_impl : FSMSystem SZ IZ OZ}
       FSM.generateStateTrajectory_zero] at hnext
     exact hnext.symm
 
+theorem fsm_satisfies_dynamics_spec_extEqual {F_spec F_spec' F_impl : FSMSystem SZ IZ OZ}
+    (h : FSMExtEqual F_spec F_spec') :
+    FSMSatisfiesDynamics F_spec F_impl ↔ FSMSatisfiesDynamics F_spec' F_impl := by
+  constructor
+  · intro hSat
+    have hExt := fsm_satisfies_implies_extEqual hSat
+    refine fsm_extEqual_implies_satisfies_dynamics ?_
+    constructor
+    · intro s; rw [← h.1 s, hExt.1 s]
+    · intro s i; rw [← h.2 s i, hExt.2 s i]
+  · intro hSat
+    have hExt := fsm_satisfies_implies_extEqual hSat
+    refine fsm_extEqual_implies_satisfies_dynamics ?_
+    constructor
+    · intro s; rw [h.1 s, hExt.1 s]
+    · intro s i; rw [h.2 s i, hExt.2 s i]
+
+theorem fsm_satisfies_dynamics_impl_extEqual {F_spec F_impl F_impl' : FSMSystem SZ IZ OZ}
+    (h : FSMExtEqual F_impl F_impl') :
+    FSMSatisfiesDynamics F_spec F_impl ↔ FSMSatisfiesDynamics F_spec F_impl' := by
+  constructor
+  · intro hSat
+    have hExt := fsm_satisfies_implies_extEqual hSat
+    refine fsm_extEqual_implies_satisfies_dynamics ?_
+    constructor
+    · intro s; rw [hExt.1 s, h.1 s]
+    · intro s i; rw [hExt.2 s i, h.2 s i]
+  · intro hSat
+    have hExt := fsm_satisfies_implies_extEqual hSat
+    refine fsm_extEqual_implies_satisfies_dynamics ?_
+    constructor
+    · intro s; rw [hExt.1 s, h.1 s]
+    · intro s i; rw [hExt.2 s i, h.2 s i]
+
 end PropertyFragment.FSM
-
-namespace SpecFromProperties
-
-variable {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
-variable [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ]
-variable [Nonempty IZ]
-
-open PropertyFragment.FSM FSM
-
-/-- Canonical reference FSM for a dynamics property set. -/
-def synthesizeFsmSpec (F : FSMSystem SZ IZ OZ) : FSMSystem SZ IZ OZ := F
-
-theorem synthesizeFsmSpec_satisfies (F : FSMSystem SZ IZ OZ) :
-    FSMSatisfiesOutputTable F F :=
-  fsm_satisfies_reflexive F
-
-theorem synthesizeFsmSpec_satisfies_dynamics (F : FSMSystem SZ IZ OZ) :
-    FSMSatisfiesDynamics F F :=
-  fsm_dynamics_satisfies_reflexive F
-
-end SpecFromProperties
 
 namespace FSMProperties
 
@@ -214,7 +227,7 @@ variable {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
 variable [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ]
 variable [Nonempty IZ]
 
-open PropertyFragment.FSM SpecFromProperties FSM PropertySemantics TemporalLogic
+open PropertyFragment.FSM FSM PropertySemantics TemporalLogic
 
 structure FSMIdentityHomomorphicImageWitness (F_spec F_impl : FSMSystem SZ IZ OZ) where
   preserves_readout : ∀ s, F_impl.RZ s = F_spec.RZ s
@@ -290,11 +303,5 @@ theorem fsm_dynamics_implies_extEqual {F_spec F_impl : FSMSystem SZ IZ OZ}
     (h : FSMSatisfiesDynamics F_spec F_impl) :
     FSMExtEqual F_spec F_impl :=
   fsm_satisfies_implies_extEqual h
-
-/-- Canonical synthesized spec: dynamics bi-implication with implementation. -/
-theorem fsm_synthesized_property_iff_hom (F : FSMSystem SZ IZ OZ) (F_impl : FSMSystem SZ IZ OZ) :
-    FSMSatisfiesDynamics F F_impl ↔
-      FSMIsIdentityHomomorphicImage (synthesizeFsmSpec F) F_impl :=
-  fsm_property_iff_hom F F_impl
 
 end FSMProperties

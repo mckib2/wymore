@@ -1,6 +1,7 @@
 import Mbse.Homomorphism
 import Mbse.PropertyFragment
 import Mbse.FSMProperties
+import Mbse.SpecFromProperties
 
 /-!
 # Homomorphism preservation of assertional properties
@@ -12,7 +13,7 @@ properties.
 
 namespace HomomorphismProperties
 
-open PropertyFragment PropertySemantics Combinational Homomorphism
+open PropertyFragment PropertySemantics Combinational Homomorphism SpecFromProperties
 
 /-! ## Combinational layer -/
 
@@ -84,6 +85,49 @@ theorem comb_hom_spec_satisfies_impl {IZ OZ : Type}
     CombSatisfiesFunction C_impl F :=
   comb_identity_hom_impl_satisfies F w hSpec
 
+/-- Pointwise readout agreement through surjective maps. -/
+def CombReadoutAgreement {IZ1 OZ1 IZ2 OZ2 : Type}
+    (C_spec : CombinationalSystem IZ1 OZ1) (C_impl : CombinationalSystem IZ2 OZ2)
+    (w : CombHomomorphicImageWitness C_spec C_impl) : Prop :=
+  ∀ i, w.HO (C_impl.RZ i) = C_spec.RZ (w.HI i)
+
+theorem comb_hom_witness_readoutAgreement {IZ1 OZ1 IZ2 OZ2 : Type}
+    {C_spec : CombinationalSystem IZ1 OZ1} {C_impl : CombinationalSystem IZ2 OZ2}
+    (w : CombHomomorphicImageWitness C_spec C_impl) :
+    CombReadoutAgreement C_spec C_impl w :=
+  w.preserves_readout
+
+/-- General homomorphic image ↔ witness (definition unfolding). -/
+theorem comb_isHomomorphicImage_iff {IZ1 OZ1 IZ2 OZ2 : Type}
+    {C_spec : CombinationalSystem IZ1 OZ1} {C_impl : CombinationalSystem IZ2 OZ2} :
+    CombIsHomomorphicImage C_spec C_impl ↔
+      ∃ w, CombReadoutAgreement C_spec C_impl w := by
+  constructor
+  · rintro ⟨w⟩; exact ⟨w, w.preserves_readout⟩
+  · rintro ⟨w, _⟩; exact ⟨w⟩
+
+/-- Surjective general hom + canonical spec satisfaction ⇒ impl readout matches table. -/
+theorem comb_general_hom_spec_satisfies {IZ1 OZ1 IZ2 OZ2 : Type}
+    {C_spec : CombinationalSystem IZ1 OZ1} {C_impl : CombinationalSystem IZ2 OZ2}
+    (F : IZ1 → OZ1) (w : CombHomomorphicImageWitness C_spec C_impl)
+    (hSpec : CombSatisfiesFunction C_spec F) (i : IZ2) :
+    w.HO (C_impl.RZ i) = F (w.HI i) :=
+  comb_hom_preserves_function w F hSpec i
+
+/-- Cardinality side condition: `#IZ_impl ≥ #IZ_spec` for surjective input map. -/
+theorem comb_input_cardinality {IZ1 IZ2 : Type} [Fintype IZ1] [Fintype IZ2]
+    (w : IZ2 → IZ1) (hw : Function.Surjective w) :
+    Fintype.card IZ1 ≤ Fintype.card IZ2 :=
+  Fintype.card_le_of_surjective w hw
+
+/-- Canonical general bi-implication: hom image of `synthesizeCombSpec F` ↔ readout agreement. -/
+theorem comb_general_property_iff_hom {IZ1 OZ1 IZ2 OZ2 : Type} [Fintype IZ1] [Fintype OZ1]
+    (F : IZ1 → OZ1) (C_impl : CombinationalSystem IZ2 OZ2) :
+    CombIsHomomorphicImage (synthesizeCombSpec F) C_impl ↔
+      ∃ w : CombHomomorphicImageWitness (synthesizeCombSpec F) C_impl,
+        CombReadoutAgreement (synthesizeCombSpec F) C_impl w :=
+  comb_isHomomorphicImage_iff
+
 /-! ## FSM layer -/
 
 open PropertyFragment.FSM FSM FSMProperties
@@ -109,6 +153,13 @@ theorem fsm_hom_spec_satisfies_dynamics {SZ IZ OZ : Type} [Fintype SZ] [Fintype 
   fsm_extEqual_implies_satisfies_dynamics
     (F_spec := F_spec) (F_impl := F_impl)
     ⟨fun s => (w.preserves_readout s).symm, fun s i => (w.preserves_transition s i).symm⟩
+
+/-- FSM surjective homomorphic image ↔ witness (FiniteWymore layer). -/
+theorem fsm_isHomomorphicImage_iff {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {F_spec : FSMSystem SZ1 IZ1 OZ1} {F_impl : FSMSystem SZ2 IZ2 OZ2} :
+    FSM.IsHomomorphicImage F_spec F_impl ↔
+      Nonempty (FSM.HomomorphicImageWitness F_spec F_impl) :=
+  Iff.rfl
 
 /-! ## General discrete-system layer (output-visible formulas) -/
 

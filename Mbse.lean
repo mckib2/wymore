@@ -12,15 +12,17 @@ import Mbse.FOLTL
 import Mbse.SystemToFormula
 import Mbse.SystemToLTL
 import Mbse.SwarmExamples
-import Mbse.SwarmCaseStudy
 import Mbse.PropertySemantics
 import Mbse.PropertyFragment
+import Mbse.PropertyFragmentSpec
+import Mbse.GeneralPropertyFragment
 import Mbse.SpecFromProperties
 import Mbse.ObservablesFromSpec
 import Mbse.HomomorphismProperties
 import Mbse.CombinationalProperties
 import Mbse.FSMProperties
+import Mbse.GeneralProperties
+import Mbse.PropertySemanticsBridge
+import Mbse.HomSoundness
 import Mbse.GeneralCharacterization
 import Mbse.PathologyExamples
-
-

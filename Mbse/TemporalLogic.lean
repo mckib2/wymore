@@ -22,11 +22,21 @@ inductive LTL (AP : Type) where
   | not (φ : LTL AP)
   | imp (φ ψ : LTL AP)
   | X (φ : LTL AP)
+  | F (φ : LTL AP)
   | G (φ : LTL AP)
 
 /-- An infinite trace: which atomic propositions hold at each tick. -/
 structure Trace (AP : Type) where
   holds : Time → AP → Prop
+
+@[ext]
+theorem Trace.ext {AP : Type} {σ1 σ2 : Trace AP}
+    (h : ∀ t a, σ1.holds t a ↔ σ2.holds t a) : σ1 = σ2 := by
+  cases σ1
+  cases σ2
+  congr
+  funext t a
+  exact propext (h t a)
 
 /-- Satisfaction of `φ` on trace `σ` at time `t`. -/
 def satisfiesAt {AP : Type} : LTL AP → Trace AP → Time → Prop
@@ -38,6 +48,7 @@ def satisfiesAt {AP : Type} : LTL AP → Trace AP → Time → Prop
   | .not φ, σ, t => ¬ satisfiesAt φ σ t
   | .imp φ ψ, σ, t => satisfiesAt φ σ t → satisfiesAt ψ σ t
   | .X φ, σ, t => satisfiesAt φ σ (t + 1)
+  | .F φ, σ, t => ∃ t', t ≤ t' ∧ satisfiesAt φ σ t'
   | .G φ, σ, t => ∀ t', t ≤ t' → satisfiesAt φ σ t'
 
 /-- `σ` models `φ` from time zero (standard LTL semantics). -/
