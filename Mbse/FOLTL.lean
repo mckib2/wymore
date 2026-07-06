@@ -1,4 +1,5 @@
 import Mbse.Wymore
+import Mbse.TemporalLogic
 
 /-!
 # FO-LTL over Wymore trajectories (minimal fragment)
@@ -60,5 +61,10 @@ theorem step_not_satisfied_invalid_g {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ
   have hvalid := h
   simp only [SatisfiesFO] at hvalid
   exact hstep (hvalid t)
+
+/-! ### Property-fragment bridge -/
+
+/-- Assertional properties use propositional `LTL`, kept separate from execution `FOLFormula`. -/
+abbrev PropertyLTL (AP : Type) := TemporalLogic.LTL AP
 
 end FOLTL
