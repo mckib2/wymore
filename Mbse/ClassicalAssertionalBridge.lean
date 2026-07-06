@@ -10,6 +10,7 @@ import Mbse.PathologyExamples
 import Mbse.WymorePathologyExamples
 import Mbse.SpecFromProperties
 import Mbse.WymorePropertyFragment
+import Mbse.PartialDynamicsHomFragment
 import Mbse.GeneralProperties
 import Mbse.GeneralPropertyFragment
 
@@ -19,6 +20,12 @@ import Mbse.GeneralPropertyFragment
 Documents partial bridges already in the library and blockers to naive global
 `FC_constructive = FC_assertional` equivalence. Full cotyledon-level set equality
 without side conditions remains open.
+
+**Headline (proved):** fragment-qualified hom projection equivalence
+(`qualified_equivalence_homProjection`).
+
+**Legacy:** pinned finite `PinnedAssertionalFCMembership` retains the old decidable
+projection for tooling; it is not the headline assertional FC definition.
 -/
 
 namespace ClassicalAssertionalBridge
@@ -26,18 +33,32 @@ namespace ClassicalAssertionalBridge
 open BlockerAudit BiImplicationFailures FragmentPathologyRegistry PropertySemantics
   HomSoundness ExtensionalDynamicsFragment WymoreCharacterization TracePropertyLayer
   PathologyExamples WymorePathologyExamples SpecFromProperties WymorePropertyFragment
-  GeneralProperties PropertyFragment.General PropertyFragment.FSM FSMProperties Homomorphism
+  PartialDynamicsHomFragment GeneralProperties PropertyFragment.General
+  PropertyFragment.FSM FSMProperties Homomorphism
 
 variable {SZ IZ OZ SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
 
 /-! ## Membership predicates (documentation) -/
 
-/-- Classical FC membership: implementation homomorphically simulates reference `Z_spec`. -/
-def ClassicalFCMembership (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) : Prop :=
+/-- Classical FC membership: implementation is a Wymore Def.~4.3 homomorphic image of
+reference `Z_spec` (cross-type allowed). -/
+def ClassicalFCMembership
+    (Z_spec : DiscreteSystem SZ1 IZ1 OZ1) (Z_impl : DiscreteSystem SZ2 IZ2 OZ2) : Prop :=
   IsHomomorphicImage Z_spec Z_impl
 
-/-- Assertional FC membership: implementation satisfies compiled dynamics-encoding Φ from `Z_spec`. -/
-def AssertionalFCMembership {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+/-- Dynamics-encoding bridge FC membership (headline hom projection tier). -/
+def AssertionalFCHomMembership
+    (Z_spec : DiscreteSystem SZ1 IZ1 OZ1) (Z_impl : DiscreteSystem SZ2 IZ2 OZ2) : Prop :=
+  SystemSatisfiesPartialDynamicsHom Z_spec Z_impl
+
+/-- Shared fixed-table bridge FC membership (same `(S,I,O)`, literal impl-state atoms). -/
+def AssertionalFCPartialOpenMembership [DecidableEq IZ]
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) : Prop :=
+  SystemSatisfiesPartialDynamicsOpen Z_spec Z_impl
+
+/-- Legacy pinned finite assertional membership (decidable projection; requires
+`AlwaysOutputs` and finite enumeration). Not the headline definition. -/
+def PinnedAssertionalFCMembership [Fintype SZ] [Fintype IZ] [Fintype OZ]
     (Z_spec Z_impl : DiscreteSystem SZ IZ OZ)
     (hZ : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) : Prop :=
   SystemSatisfiesDynamics Z_spec Z_impl hZ hImpl
@@ -58,7 +79,26 @@ abbrev blockedExecutionFOProp :=
     ¬ SystemIsIdentityHomomorphicImageOpen foUnreachableSpec foUnreachableImpl
       foUnreachableSpec_alwaysOutputs foUnreachableImpl_alwaysOutputs
 
-/-! ## Partial bridge (already proved) -/
+/-! ## Qualified equivalence (proved on dynamics-encoding fragment) -/
+
+/-- Fragment-qualified bridge: constructive FC membership ↔ hom-relative dynamics-encoding
+satisfaction (headline hom projection tier; ungated). -/
+theorem qualified_equivalence_homProjection
+    (Z_spec : DiscreteSystem SZ1 IZ1 OZ1) (Z_impl : DiscreteSystem SZ2 IZ2 OZ2) :
+    ClassicalFCMembership Z_spec Z_impl ↔
+      AssertionalFCHomMembership Z_spec Z_impl := by
+  unfold ClassicalFCMembership AssertionalFCHomMembership
+  exact partialDynamicsHom_iff_hom.symm
+
+/-- Shared fixed-table specialization: literal partial dynamics ↔ partial identity hom. -/
+theorem qualified_equivalence_partialOpen [DecidableEq IZ]
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) :
+    AssertionalFCPartialOpenMembership Z_spec Z_impl ↔
+      PartialIsIdentityHomomorphicImage Z_spec Z_impl := by
+  unfold AssertionalFCPartialOpenMembership
+  exact partialDynamicsOpen_iff_hom
+
+/-! ## Partial bridge (synthesis / legacy projections) -/
 
 theorem hom_implies_assertionalCross {Z : DiscreteSystem SZ1 IZ1 OZ1}
     {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}

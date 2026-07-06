@@ -48,6 +48,7 @@ inductive PaperClaimTag where
   | pinnedAutonomousNone
   | barePhiUniqueSpec
   | assertionalFOWithoutBridge
+  | homProjectionEquivalence
   | classicalAssertionalEquivalence
 
 /-- Workaround tags paired with blockers. -/
@@ -209,6 +210,7 @@ def paperClaimStatus : PaperClaimTag → PaperClaimStatus
   | .pinnedAutonomousNone => .blocked
   | .barePhiUniqueSpec => .blocked
   | .assertionalFOWithoutBridge => .blocked
+  | .homProjectionEquivalence => .safe
   | .classicalAssertionalEquivalence => .openQuestion
 
 theorem paperClaim_executionEncoding_safe :
@@ -222,6 +224,9 @@ theorem paperClaim_executionFO_blocked :
 
 theorem paperClaim_barePhi_blocked :
     paperClaimStatus .barePhiUniqueSpec = .blocked := rfl
+
+theorem paperClaim_homProjection_safe :
+    paperClaimStatus .homProjectionEquivalence = .safe := rfl
 
 /-- Map impossibility / semantic-limit blockers to `BiImplicationFailures` theorem names. -/
 def biImpFailsTheorem : BlockerTag → Option String
@@ -243,6 +248,7 @@ def paperClaimTheorem : PaperClaimTag → Option String
   | .fInTracePropertyLayer => some "paperClaim_traceProperty_qualified"
   | .executionFOSubstitutesHom => some "paperClaim_executionFO_blocked"
   | .barePhiUniqueSpec => some "paperClaim_barePhi_blocked"
+  | .homProjectionEquivalence => some "audit_homProjection_equivalence"
   | .classicalAssertionalEquivalence => some "audit_classicalAssertional_open"
   | _ => none
 

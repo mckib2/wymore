@@ -7,12 +7,10 @@ import Mbse.WymorePathologyExamples
 # Partial dynamics hom headline tier
 
 Hom-relative partial dynamics: witness-free satisfaction via surjective Def 4.3 maps
-(`SystemSatisfiesPartialDynamicsHom`) — the primary Wymore FC hom↔Φ bi-implication
-(`partialDynamicsHom_iff_hom`).
+(`SystemSatisfiesPartialDynamicsHom`) — the primary Wymore FC hom↔Φ bi-implication.
 
-The **shared fixed-table** specialization (`SystemSatisfiesPartialDynamicsOpen`,
-`partialDynamicsOpen_iff_hom`) applies when spec and impl share `(S,I,O)` with literal
-impl-state atoms; it collapses to this tier under partial identity hom.
+Pattern classes covered (see comparative report): cross-type elaboration, same-type
+state renaming, infinite state with closed readout.
 
 Semantic content coincides with [`SystemSatisfiesExtensionalCross`]. This module supplies
 engineering-facing names, collapse theorems, and hom-relative trace/LTL/FO encodings
