@@ -94,6 +94,21 @@ def partialOpenFragment : FragmentSpec where
   dynamicsComplete := true
   homomorphismVisibleAtoms := [.stateAtom, .inputAtom, .outputAtom]
 
+/-- Partial open (predicate-indexed): infinite-capable assertional laws without `Fintype`. -/
+def partialOpenPredicateFragment : FragmentSpec where
+  allowedConnectives := [.imp, .GConn, .XConn]
+  disjunctionPolicy := .canonicalCommitment
+  eventuallyPolicy := .excluded
+  finiteClauseEnumeration := false
+  dynamicsComplete := true
+  homomorphismVisibleAtoms := [.stateAtom, .inputAtom, .outputAtom]
+
+theorem partialOpenPredicate_no_finite_enum :
+    partialOpenPredicateFragment.finiteClauseEnumeration = false := rfl
+
+theorem partialOpenPredicate_dynamicsComplete :
+    partialOpenPredicateFragment.dynamicsComplete = true := rfl
+
 /-- FO assertional formulas (`FOLTL`); no finite state enumeration. -/
 def foAssertionalFragment : FragmentSpec where
   allowedConnectives := [.imp, .GConn]
@@ -144,7 +159,8 @@ structure PinnedFiniteSideConditions (SZ IZ OZ : Type) (Z : DiscreteSystem SZ IZ
 
 Readout-completeness (`ReadoutSpecComplete`) and dynamics-completeness (`DynamicsSpecComplete`
 in `WymorePropertyFragment`) replace `AlwaysOutputs` when closed readout or autonomous-input
-states need explicit clauses. -/
+states need explicit clauses. On arbitrary `SZ`, use `ReadoutSpecCompleteOpen` /
+`DynamicsSpecCompleteOpen` with `SystemSatisfiesPartialDynamicsOpen`. -/
 structure PartialOpenSideConditions (SZ IZ OZ : Type) (Z : DiscreteSystem SZ IZ OZ) : Prop where
   sz_finite : Nonempty (Fintype SZ)
   iz_finite : Nonempty (Fintype IZ)

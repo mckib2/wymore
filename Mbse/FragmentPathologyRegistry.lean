@@ -113,8 +113,18 @@ theorem resolved_partialClosedReadout :
 theorem resolved_infinitePartialReadout :
     ¬ AlwaysOutputs counterClosedReadout ∧
       SystemSatisfiesExtensionalPartial counterClosedReadout counterClosedReadout ∧
+        PartialIsIdentityHomomorphicImage counterClosedReadout counterClosedReadout := by
+  rcases counterClosedReadout_resolved with ⟨hNot, _, hExt, hHom⟩
+  exact ⟨hNot, hExt, hHom⟩
+
+/-- Infinite assertional partial dynamics (predicate-indexed, no `Fintype`). -/
+theorem resolved_infinitePartialDynamicsOpen :
+    ¬ AlwaysOutputs counterClosedReadout ∧
+      SystemSatisfiesPartialDynamicsOpen counterClosedReadout counterClosedReadout ∧
         PartialIsIdentityHomomorphicImage counterClosedReadout counterClosedReadout :=
-  counterClosedReadout_resolved
+  ⟨counterClosedReadout_not_alwaysOutputs, counterClosedReadout_satisfiesOpen_refl,
+    (partialDynamicsOpen_iff_hom (readoutSpecCompleteOpen_of counterClosedReadout)).1
+      counterClosedReadout_satisfiesOpen_refl⟩
 
 theorem blocked_foAssertionalCompleteness :
     foAssertionalFragment.finiteClauseEnumeration = false ∧

@@ -355,12 +355,22 @@ theorem counterClosedReadout_extensional_partial_refl :
     SystemSatisfiesExtensionalPartial counterClosedReadout counterClosedReadout :=
   ⟨fun _ => rfl, fun _ _ => rfl⟩
 
+theorem counterClosedReadout_satisfiesOpen_refl :
+    SystemSatisfiesPartialDynamicsOpen counterClosedReadout counterClosedReadout :=
+  partialDynamicsOpen_satisfies_reflexive counterClosedReadout
+
 theorem counterClosedReadout_resolved :
     ¬ AlwaysOutputs counterClosedReadout ∧
-      SystemSatisfiesExtensionalPartial counterClosedReadout counterClosedReadout ∧
-        PartialIsIdentityHomomorphicImage counterClosedReadout counterClosedReadout :=
-  ⟨counterClosedReadout_not_alwaysOutputs, counterClosedReadout_extensional_partial_refl,
+      SystemSatisfiesPartialDynamicsOpen counterClosedReadout counterClosedReadout ∧
+        SystemSatisfiesExtensionalPartial counterClosedReadout counterClosedReadout ∧
+          PartialIsIdentityHomomorphicImage counterClosedReadout counterClosedReadout :=
+  ⟨counterClosedReadout_not_alwaysOutputs, counterClosedReadout_satisfiesOpen_refl,
+    counterClosedReadout_extensional_partial_refl,
     (extensional_partial_iff_hom).1 counterClosedReadout_extensional_partial_refl⟩
+
+theorem closedSystem_satisfiesOpen :
+    SystemSatisfiesPartialDynamicsOpen closedSystem closedSystemImpl :=
+  partialDynamicsOpen_satisfies_reflexive closedSystem
 
 /-! ## Partial dynamics: finite enumeration witness -/
 

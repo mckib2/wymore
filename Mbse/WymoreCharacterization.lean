@@ -319,6 +319,27 @@ theorem stageWymore_resolved_infinitePartialReadout :
         PartialIsIdentityHomomorphicImage counterClosedReadout counterClosedReadout :=
   resolved_infinitePartialReadout
 
+theorem stageWymore_resolved_infinitePartialDynamicsOpen :
+    ¬ AlwaysOutputs counterClosedReadout ∧
+      SystemSatisfiesPartialDynamicsOpen counterClosedReadout counterClosedReadout ∧
+        PartialIsIdentityHomomorphicImage counterClosedReadout counterClosedReadout :=
+  resolved_infinitePartialDynamicsOpen
+
+theorem stageWymore_partialDynamicsOpen_iff_hom {SZ IZ OZ : Type} [DecidableEq IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hComplete : ReadoutSpecCompleteOpen Z_spec) :
+    SystemSatisfiesPartialDynamicsOpen Z_spec Z_impl ↔
+      PartialIsIdentityHomomorphicImage Z_spec Z_impl :=
+  partialDynamicsOpen_iff_hom hComplete
+
+theorem stageWymore_partialDynamics_table_iff_open {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
+    [DecidableEq SZ] [DecidableEq IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hComplete : ReadoutSpecCompleteOpen Z_spec) :
+    SystemSatisfiesPartialDynamics Z_spec Z_impl ↔
+      SystemSatisfiesPartialDynamicsOpen Z_spec Z_impl :=
+  partialDynamics_table_iff_open hComplete
+
 theorem stageWymore_partial_verification {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
     [DecidableEq SZ] [DecidableEq IZ] [Nonempty IZ]
     {Z Z_impl : DiscreteSystem SZ IZ OZ}
@@ -511,6 +532,13 @@ theorem wymore_verification_extensional_partial {SZ IZ OZ : Type}
     SystemSatisfiesExtensionalPartial Z_spec Z_impl ↔
       PartialIsIdentityHomomorphicImage Z_spec Z_impl :=
   extensional_partial_iff_hom
+
+theorem wymore_verification_partial_open {SZ IZ OZ : Type} [DecidableEq IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hComplete : ReadoutSpecCompleteOpen Z_spec) :
+    SystemSatisfiesPartialDynamicsOpen Z_spec Z_impl ↔
+      PartialIsIdentityHomomorphicImage Z_spec Z_impl :=
+  partialDynamicsOpen_iff_hom hComplete
 
 theorem wymore_verification_extensional_cross {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     {Z : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}

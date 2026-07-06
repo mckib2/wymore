@@ -80,6 +80,20 @@ theorem extensional_partial_iff_hom {SZ IZ OZ : Type}
       PartialIsIdentityHomomorphicImage Z_spec Z_impl :=
   partial_extEqual_iff_identityHom
 
+theorem extensionalPartial_iff_partialDynamicsOpen {SZ IZ OZ : Type} [DecidableEq IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hComplete : ReadoutSpecCompleteOpen Z_spec) :
+    SystemSatisfiesExtensionalPartial Z_spec Z_impl ↔
+      SystemSatisfiesPartialDynamicsOpen Z_spec Z_impl := by
+  simp [SystemSatisfiesExtensionalPartial]
+  exact (partialDynamicsOpen_iff_extEqual (Z_impl := Z_impl) hComplete).symm
+
+theorem partialExtEqual_iff_partialDynamicsOpen {SZ IZ OZ : Type} [DecidableEq IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hComplete : ReadoutSpecCompleteOpen Z_spec) :
+    PartialExtEqual Z_spec Z_impl ↔ SystemSatisfiesPartialDynamicsOpen Z_spec Z_impl :=
+  (partialDynamicsOpen_iff_extEqual (Z_impl := Z_impl) hComplete).symm
+
 theorem partialExtEqual_of_extensional {SZ IZ OZ : Type}
     {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
     (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
