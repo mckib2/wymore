@@ -8,7 +8,7 @@ import Mbse.FSMProperties
 /-!
 # Fragment pathology registry
 
-Consolidated index mapping each `FragmentSpec` tier failure mode to a single machine-checked theorem.
+Consolidated index mapping each `FragmentSpec` failure mode to a single machine-checked theorem.
 Cited by the comparative report §5 and §9.
 -/
 
@@ -18,14 +18,15 @@ open PropertyFragmentSpec PathologyExamples WymorePathologyExamples WymoreProper
   ExtensionalDynamicsFragment PropertyFragment.FSM PropertyFragment.General FSMProperties
   TemporalLogic SpecFromProperties HimsySynthesis FSM
 
-/-- Failure modes blocking assertional Φ ↔ hom completeness outside pinned finite tier. -/
+/-- Failure modes blocking assertional Φ ↔ hom completeness outside pinned finite fragment. -/
 inductive BlockerTag where
   | infiniteSZ
   | partialRZ
   | readoutOnly
   | eventuallyF
   | rawBranchingNZ
-  | partialSilentReadout
+  | incompleteReadout
+  | autonomousInputIncomplete
   | foAssertionalCompleteness
 
 def blockerFragment : BlockerTag → FragmentSpec
@@ -34,7 +35,8 @@ def blockerFragment : BlockerTag → FragmentSpec
   | .readoutOnly => readoutOnlyFragment
   | .eventuallyF => pinnedFragment
   | .rawBranchingNZ => partialOpenFragment
-  | .partialSilentReadout => partialOpenFragment
+  | .incompleteReadout => partialOpenFragment
+  | .autonomousInputIncomplete => pinnedFiniteFragment
   | .foAssertionalCompleteness => foAssertionalFragment
 
 /-! ## One theorem per BLOCKED failure mode -/
@@ -43,7 +45,7 @@ theorem blocked_infiniteSZ :
     ¬ RequiresFiniteStateEnumeration Nat :=
   counterSystem_no_finite_dynamicsTable
 
-/-- Finite enumeration remains blocked; extensional tier bypasses it for hom↔Φ. -/
+/-- Finite enumeration remains blocked; extensional fragment bypasses it for hom↔Φ. -/
 theorem resolved_infiniteSZ_extensional :
     extensionalDynamicsFragment.finiteClauseEnumeration = false ∧
       SystemSatisfiesExtensional counterSystem counterSystem counterSystem_alwaysOutputs
@@ -73,25 +75,46 @@ theorem resolved_himsySynthesis :
       IsHomomorphicImage counterSystem counterElab :=
   ⟨counterSystem_eq_himsy_counterElab, counterElab_hom_to_counterSystem⟩
 
-/-- Witness-gated inverse table recovery on finite pinned tier (`fsmStay`). -/
+/-- Witness-gated inverse table recovery on finite pinned fragment (`fsmStay`). -/
 theorem resolved_inverseTableRecovery :
     IsRecoverableExtensionalTable
       (dynamicsTable fsmStay.toDiscreteSystem (fsm_alwaysOutputs fsmStay))
       fsmStay.toDiscreteSystem (fsm_alwaysOutputs fsmStay) :=
   fsmStay_recoverable_table
 
-theorem blocked_partialSilentReadout :
+theorem blocked_incompleteReadout :
     partialOpenFragment.dynamicsComplete = true ∧
-      SystemSatisfiesPartialDynamicsSilentLegacy silentReadoutSpec spuriousOutputImpl ∧
+      SystemSatisfiesPartialDynamicsIncompleteReadout silentReadoutSpec spuriousOutputImpl ∧
         ¬ PartialExtEqual silentReadoutSpec spuriousOutputImpl :=
-  ⟨partialOpen_dynamicsComplete, partial_satisfies_silentLegacy_not_implies_extEqual⟩
+  ⟨partialOpen_dynamicsComplete, partial_satisfies_incompleteReadout_not_implies_extEqual⟩
+
+theorem blocked_autonomousInputIncomplete :
+    pinnedFiniteFragment.dynamicsComplete = true ∧
+      SystemSatisfiesDynamics autoNoneSpec autoNoneImpl autoNoneSpec_alwaysOutputs
+        autoNoneImpl_alwaysOutputs ∧
+        ¬ PartialExtEqual autoNoneSpec autoNoneImpl :=
+  ⟨pinnedFragment_dynamicsComplete, pinnedDynamics_not_implies_extEqual_at_none⟩
+
+theorem blocked_pinnedDynamicsIncomplete :
+    pinnedFiniteFragment.dynamicsComplete = true ∧
+      SystemSatisfiesDynamics autoNoneSpec autoNoneImpl autoNoneSpec_alwaysOutputs
+        autoNoneImpl_alwaysOutputs ∧
+        ¬ SystemSatisfiesPartialDynamics autoNoneSpec autoNoneImpl :=
+  ⟨pinnedFragment_dynamicsComplete, pinnedDynamics_not_implies_partialDynamics⟩
 
 /-- Closed readout covered by readout-complete partial table (no `AlwaysOutputs` required). -/
 theorem resolved_partialClosedReadout :
-    ReadoutSpecComplete closedShapeSpec ∧
-      (SystemSatisfiesPartialDynamics closedShapeSpec closedShapeImpl ↔
-        PartialIsIdentityHomomorphicImage closedShapeSpec closedShapeImpl) :=
-  closedShapeSpec_resolved
+    ReadoutSpecComplete closedSystem ∧
+      (SystemSatisfiesPartialDynamics closedSystem closedSystemImpl ↔
+        PartialIsIdentityHomomorphicImage closedSystem closedSystemImpl) :=
+  closedSystem_resolved
+
+/-- Infinite partial readout: extensional partial ↔ hom without `AlwaysOutputs`. -/
+theorem resolved_infinitePartialReadout :
+    ¬ AlwaysOutputs counterClosedReadout ∧
+      SystemSatisfiesExtensionalPartial counterClosedReadout counterClosedReadout ∧
+        PartialIsIdentityHomomorphicImage counterClosedReadout counterClosedReadout :=
+  counterClosedReadout_resolved
 
 theorem blocked_foAssertionalCompleteness :
     foAssertionalFragment.finiteClauseEnumeration = false ∧

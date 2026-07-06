@@ -78,7 +78,7 @@ theorem compileObservables_synthesizeSpec {SZ IZ OZ : Type} [Fintype SZ] [Fintyp
     compileObservables (synthesizeSpec Z hOut) hOut = dynamicsTable Z hOut := by
   simp [compileObservables, synthesizeSpec, dynamicsTable]
 
-/-! ## General extensional (Track D; arbitrary `SZ`) -/
+/-! ## General extensional (arbitrary `SZ`) -/
 
 /-- Canonical extensional spec from a reference system (identity synthesis today). -/
 def synthesizeExtensionalSpec {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :

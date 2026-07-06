@@ -74,7 +74,7 @@ inductive EnumerationPolicy where
   | predicateIndexed
   | foQuantified
 
-/-- Fragment tier for Stages 1–3 (finite total open Moore via FSM embed). -/
+/-- Fragment specification for Stages 1–3 (finite total open Moore via FSM embed). -/
 def pinnedFiniteFragment : FragmentSpec where
   allowedConnectives := [.imp, .GConn, .XConn]
   disjunctionPolicy := .canonicalCommitment
@@ -85,7 +85,7 @@ def pinnedFiniteFragment : FragmentSpec where
 
 theorem pinnedFinite_eq_pinned : pinnedFiniteFragment = pinnedFragment := rfl
 
-/-- Track A: partial `Option` readout/input on general `DiscreteSystem`. -/
+/-- Partial open: `Option` readout/input on general `DiscreteSystem`. -/
 def partialOpenFragment : FragmentSpec where
   allowedConnectives := [.imp, .GConn, .XConn]
   disjunctionPolicy := .canonicalCommitment
@@ -94,7 +94,7 @@ def partialOpenFragment : FragmentSpec where
   dynamicsComplete := true
   homomorphismVisibleAtoms := [.stateAtom, .inputAtom, .outputAtom]
 
-/-- Track B: FO assertional formulas (`FOLTL`); no finite state enumeration. -/
+/-- FO assertional formulas (`FOLTL`); no finite state enumeration. -/
 def foAssertionalFragment : FragmentSpec where
   allowedConnectives := [.imp, .GConn]
   disjunctionPolicy := .canonicalCommitment
@@ -103,7 +103,7 @@ def foAssertionalFragment : FragmentSpec where
   dynamicsComplete := true
   homomorphismVisibleAtoms := [.stateAtom, .inputAtom, .outputAtom]
 
-/-- Track D: extensional predicate-indexed dynamics; no finite state enumeration. -/
+/-- Extensional predicate-indexed dynamics; no finite state enumeration. -/
 def extensionalDynamicsFragment : FragmentSpec where
   allowedConnectives := [.imp, .GConn]
   disjunctionPolicy := .canonicalCommitment
@@ -118,7 +118,7 @@ theorem extensionalDynamics_no_finite_enum :
 theorem extensionalDynamics_dynamicsComplete :
     extensionalDynamicsFragment.dynamicsComplete = true := rfl
 
-/-- Track C: LTS trace refinement (nondeterministic abstract specs). -/
+/-- LTS trace refinement (nondeterministic abstract specs). -/
 def ltsRefinementFragment : FragmentSpec where
   allowedConnectives := [.imp, .GConn]
   disjunctionPolicy := .excluded
@@ -131,7 +131,7 @@ theorem foAssertional_no_finite_enum : foAssertionalFragment.finiteClauseEnumera
 
 theorem partialOpen_dynamicsComplete : partialOpenFragment.dynamicsComplete = true := rfl
 
-/-! ## Fragment tier side conditions (TL-side gates) -/
+/-! ## Fragment side conditions (TL-side gates) -/
 
 /-- Side conditions for pinned finite Stages 1–3 bi-implication. -/
 structure PinnedFiniteSideConditions (SZ IZ OZ : Type) (Z : DiscreteSystem SZ IZ OZ) : Prop where
@@ -140,10 +140,11 @@ structure PinnedFiniteSideConditions (SZ IZ OZ : Type) (Z : DiscreteSystem SZ IZ
   iz_finite : Nonempty (Fintype IZ)
   oz_finite : Nonempty (Fintype OZ)
 
-/-- Side conditions for Track A partial-open clause tables.
+/-- Side conditions for partial-open clause tables.
 
-Readout-completeness (`ReadoutSpecComplete` in `WymorePropertyFragment`) replaces
-`AlwaysOutputs` when closed readout states need explicit `none` clauses. -/
+Readout-completeness (`ReadoutSpecComplete`) and dynamics-completeness (`DynamicsSpecComplete`
+in `WymorePropertyFragment`) replace `AlwaysOutputs` when closed readout or autonomous-input
+states need explicit clauses. -/
 structure PartialOpenSideConditions (SZ IZ OZ : Type) (Z : DiscreteSystem SZ IZ OZ) : Prop where
   sz_finite : Nonempty (Fintype SZ)
   iz_finite : Nonempty (Fintype IZ)

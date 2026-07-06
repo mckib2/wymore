@@ -6,11 +6,11 @@ import Mbse.FOLTL
 Maps a discrete system and initial state to a formula whose satisfaction matches
 Wymore execution semantics (`generateStateTrajectory`, `IsValidStateTrajectory`).
 
-Track B layers:
+FO assertional layers:
 - **Execution FO** (`compileSystemFO`): Link A vehicle; full iff with `IsWymoreExecution`.
 - **Assertional FO** (`compileAssertionalFO`): adds `compileReadoutInv`, currently a placeholder
   tautology (`Z.RZ s = Z.RZ s`). Meaningful infinite-state assertional completeness lives on the
-  **extensional tier** (`compileObservablesExt` in `ExtensionalDynamicsFragment`), not FO replay.
+  **extensional dynamics fragment** (`compileObservablesExt` in `ExtensionalDynamicsFragment`), not FO replay.
 
 The compiler and `SatisfiesFO` interpreter are **separate**; equivalence is proved below.
 -/
@@ -43,16 +43,16 @@ def compileSystemFO {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) :
     FOLFormula SZ IZ OZ :=
   .and (.init s0) (.and (.step Z) (.readout Z))
 
-/-- Assertional readout invariant: placeholder tick-wise state predicate (Track B).
+/-- Assertional readout invariant: placeholder tick-wise state predicate (FO assertional).
 
-Not a meaningful assertional layer yet — see `SystemToFormula` module doc and extensional tier. -/
+Not a meaningful assertional layer yet — see `SystemToFormula` module doc and extensional dynamics fragment. -/
 def compileReadoutInv {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) : FOLFormula SZ IZ OZ :=
   .stateInv fun s => Z.RZ s = Z.RZ s
 
-/-- Dynamics + assertional readout layer (Track B packaging).
+/-- Dynamics + assertional readout layer (FO assertional packaging).
 
 Uses placeholder `compileReadoutInv`; hom→FO soundness is proved, but assertional completeness
-for infinite `SZ` is delegated to the extensional dynamics tier. -/
+for infinite `SZ` is delegated to the extensional dynamics fragment. -/
 def compileAssertionalFO {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) :
     FOLFormula SZ IZ OZ :=
   .and (compileSystemFO Z s0) (compileReadoutInv Z)

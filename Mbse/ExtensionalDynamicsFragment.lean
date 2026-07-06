@@ -13,14 +13,6 @@ import Mbse.TemporalLogic
 /-!
 # Extensional dynamics fragment (infinite-state assertional Φ)
 
-## Fragment discovery (Phase 0)
-
-| Candidate | Compile on infinite `Z` | hom→Φ | Φ→hom (same-type) | Decision |
-|---|---|---|---|---|
-| A. Extensional predicate | yes (`compileObservablesExt`) | yes | **yes** | **Adopted** |
-| B. Universal FO overlay | yes (Link A) | partial | uncertain | Fallback / paper encoding only |
-| C. Hybrid FO + extensional | yes | yes (Track B) | via A | Integration layer in Phase 4 |
-
 FO-LTL (`compileSystemFO`) supports Z_spec→Φ encoding (Link A). This module carries
 hom↔Φ completeness for unbounded `SZ` via predicate-indexed extensional laws, not finite
 clause enumeration.
@@ -28,7 +20,8 @@ clause enumeration.
 `compileObservablesExt Z_spec` names the spec-side NZ/RZ laws. Cross-type satisfaction
 means ∃ surjective hom maps making the elaboration project onto those laws (Def 4.3).
 Same-type satisfaction (`SystemSatisfiesExtensional`) is pointwise NZ/RZ agreement under
-`AlwaysOutputs`.
+`AlwaysOutputs`. Partial I/O without total readout uses `SystemSatisfiesExtensionalPartial`
+(=`PartialExtEqual`).
 -/
 
 namespace ExtensionalDynamicsFragment
@@ -71,6 +64,56 @@ def SystemSatisfiesExtensional {SZ IZ OZ : Type}
     (Z_spec Z_impl : DiscreteSystem SZ IZ OZ)
     (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) : Prop :=
   SystemExtEqualOpen Z_spec Z_impl hSpec hImpl
+
+/-- Pointwise `Option` readout / full `NZ` agreement (no `AlwaysOutputs`, no `Fintype`). -/
+abbrev SystemExtEqualPartial {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) : Prop :=
+  PartialExtEqual Z_spec Z_impl
+
+abbrev SystemSatisfiesExtensionalPartial {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) : Prop :=
+  PartialExtEqual Z_spec Z_impl
+
+theorem extensional_partial_iff_hom {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ} :
+    SystemSatisfiesExtensionalPartial Z_spec Z_impl ↔
+      PartialIsIdentityHomomorphicImage Z_spec Z_impl :=
+  partial_extEqual_iff_identityHom
+
+theorem partialExtEqual_of_extensional {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (h : SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl) :
+    PartialExtEqual Z_spec Z_impl := by
+  constructor
+  · intro s
+    rcases hSpec s with ⟨o, ho⟩
+    rcases hImpl s with ⟨o', ho'⟩
+    have hEq := h.1 s
+    rw [show totalRz Z_spec hSpec s = o from by simp [totalRz, ho],
+      show totalRz Z_impl hImpl s = o' from by simp [totalRz, ho']] at hEq
+    rw [ho, ho', congr_arg Option.some hEq]
+  · exact h.2
+
+theorem extensional_of_partialExtEqual {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (h : PartialExtEqual Z_spec Z_impl) :
+    SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl := by
+  constructor
+  · intro s
+    rcases hSpec s with ⟨o, ho⟩
+    rcases hImpl s with ⟨o', ho'⟩
+    have hEq := h.1 s
+    rw [ho, ho'] at hEq
+    simp [totalRz, ho, ho', hEq]
+  · exact h.2
+
+theorem extensional_iff_partialExtEqual {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) :
+    SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl ↔ PartialExtEqual Z_spec Z_impl :=
+  ⟨partialExtEqual_of_extensional hSpec hImpl, extensional_of_partialExtEqual hSpec hImpl⟩
 
 /-! ## Identity hom (same-type, infinite-capable) -/
 
@@ -227,7 +270,7 @@ theorem rz_eq_of_totalRz_eq {SZ IZ OZ : Type}
   simp only [totalRz, ho_impl, ho_spec, Option.get_some] at h
   rw [ho_impl, ho_spec, h]
 
-/-! ## Same-type collapse (Track D specialization) -/
+/-! ## Same-type collapse (extensional specialization) -/
 
 theorem extensional_sameType_implies_cross {SZ IZ OZ : Type}
     {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
@@ -259,7 +302,7 @@ theorem extensional_sameType_collapse_iff_hom {SZ IZ OZ : Type}
   · intro ⟨_, hHom⟩
     exact extensional_hom_implies_satisfies hSpec hImpl hHom
 
-/-! ## Finite-tier agreement (unifies with pinned Stages 1–3) -/
+/-! ## Finite agreement (unifies with pinned Stages 1–3) -/
 
 theorem totalRz_eq_fsmRz {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
     (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) (s : SZ) :
@@ -374,7 +417,7 @@ theorem extensional_implies_systemSatisfiesSpecFOAt {SZ IZ OZ : Type}
     SystemSatisfiesSpecFOAt Z_spec Z_impl s0 f :=
   extensional_implies_impl_satisfies_specFO hSpec hImpl h s0 f
 
-/-! ## Extensional synthesis + PhiAdequate (Track D verification template)
+/-! ## Extensional synthesis + PhiAdequate (verification template)
 
 Synthesis is identity today; adequacy gate is structurally required for the paper template.
 Cross-type `SystemSatisfiesExtensionalCross` is the general hom↔Φ result; same-type pointwise
@@ -504,7 +547,7 @@ theorem extensional_synthesized_compiled_iff_hom {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type
       IsHomomorphicImage (synthesizeExtensionalSpec Z) Z_impl :=
   extensional_synthesized_cross_iff_hom
 
-/-! ## Tier unification (finite pinned ↔ extensional) -/
+/-! ## Finite unification (pinned ↔ extensional) -/
 
 theorem extensional_satisfies_iff_dynamics_ofTotal {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
     [Fintype OZ] [Nonempty IZ]
@@ -568,5 +611,55 @@ theorem extensional_synthesized_implies_pinned_synthesized {SZ IZ OZ : Type}
     SystemSatisfiesExtensional Z Z_impl hZ hImpl →
       SystemSatisfiesDynamics Z Z_impl hZ hImpl :=
   extensional_implies_dynamicsTable hZ hImpl
+
+theorem partial_satisfies_implies_pinnedDynamics {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
+    [Fintype OZ] [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (hComplete : ReadoutSpecComplete Z_spec)
+    (h : SystemSatisfiesPartialDynamics Z_spec Z_impl) :
+    SystemSatisfiesDynamics Z_spec Z_impl hSpec hImpl :=
+  extensional_implies_dynamicsTable hSpec hImpl
+    (extensional_of_partialExtEqual hSpec hImpl
+      (partial_satisfies_implies_extEqual_readoutComplete hComplete h))
+
+theorem extensional_iff_partialDynamics {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    [DecidableEq SZ] [DecidableEq IZ] [Nonempty IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (hComplete : ReadoutSpecComplete Z_spec) :
+    SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl ↔
+      SystemSatisfiesPartialDynamics Z_spec Z_impl :=
+  Iff.trans (extensional_iff_partialExtEqual hSpec hImpl)
+    (Iff.symm (partialDynamics_iff_extEqual_readoutComplete hComplete))
+
+theorem extensional_openHom_iff_partialHom {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    [DecidableEq SZ] [DecidableEq IZ] [Nonempty IZ]
+    {Z Z_impl : DiscreteSystem SZ IZ OZ}
+    (hZ : AlwaysOutputs Z) (hImpl : AlwaysOutputs Z_impl)
+    (hComplete : ReadoutSpecComplete Z) :
+    SystemIsIdentityHomomorphicImageOpen (synthesizeExtensionalSpec Z) Z_impl hZ hImpl ↔
+      PartialIsIdentityHomomorphicImage (synthesizePartialSpec Z) Z_impl :=
+  (extensional_synthesized_sameType_iff_hom hZ hImpl).symm.trans
+    (Iff.trans (extensional_iff_partialDynamics hZ hImpl hComplete)
+      (partial_synthesized_property_iff_hom_readoutComplete hComplete))
+
+theorem iff_iff_iff {A B C D : Prop} (hAC : A ↔ C) (hBD : B ↔ D) : (A ↔ B) ↔ (C ↔ D) :=
+  ⟨fun hAB =>
+    ⟨fun c => hBD.mp (hAB.mp (hAC.mpr c)), fun d => hAC.mp (hAB.mpr (hBD.symm.mp d))⟩,
+   fun hCD =>
+    ⟨fun a => hBD.symm.mp (hCD.mp (hAC.mp a)), fun b => hAC.mpr (hCD.symm.mp (hBD.mp b))⟩⟩
+
+theorem extensional_synthesized_iff_partial_synthesized_readoutComplete {SZ IZ OZ : Type}
+    [Fintype SZ] [Fintype IZ] [Fintype OZ] [DecidableEq SZ] [DecidableEq IZ] [Nonempty IZ]
+    {Z Z_impl : DiscreteSystem SZ IZ OZ}
+    (hZ : AlwaysOutputs Z) (hImpl : AlwaysOutputs Z_impl)
+    (hComplete : ReadoutSpecComplete Z) :
+    (SystemSatisfiesExtensional Z Z_impl hZ hImpl ↔
+        SystemIsIdentityHomomorphicImageOpen (synthesizeExtensionalSpec Z) Z_impl hZ hImpl) ↔
+      (SystemSatisfiesPartialDynamics Z Z_impl ↔
+        PartialIsIdentityHomomorphicImage (synthesizePartialSpec Z) Z_impl) :=
+  iff_iff_iff (extensional_iff_partialDynamics hZ hImpl hComplete)
+    (extensional_openHom_iff_partialHom hZ hImpl hComplete)
 
 end ExtensionalDynamicsFragment

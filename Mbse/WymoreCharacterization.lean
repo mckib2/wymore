@@ -15,10 +15,11 @@ import Mbse.ObservablesFromSpec
 import Mbse.SystemToLTL
 
 /-!
-# General Wymore property characterization (Tracks A, B, D)
+# General Wymore property characterization
 
 Consolidates FO assertional soundness, impossibility results, partial-open fragment,
-and predicate-indexed alternatives. Track C (LTS) lives in [`LTSCharacterization`](LTSCharacterization.lean).
+extensional dynamics, and predicate-indexed alternatives. LTS refinement lives in
+[`LTSCharacterization`](LTSCharacterization.lean).
 -/
 
 namespace WymoreCharacterization
@@ -29,7 +30,7 @@ open WymorePropertyFragment WymorePathologyExamples FragmentPathologyRegistry
   TemporalLogic ExtensionalDynamicsFragment FOLTL SpecFromProperties HimsySynthesis
   GeneralCharacterization ObservablesFromSpec SystemToLTL FSM
 
-/-! ## Track B: FO assertional -/
+/-! ## FO assertional -/
 
 theorem stageWymore_fo_compile {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) :
     compileObservablesFO Z s0 = compileSystemFO Z s0 :=
@@ -77,13 +78,13 @@ theorem stageWymore_counterSystem_fo :
     SystemSatisfiesFO counterSystem 0 (fun _ => some true) :=
   counterSystem_satisfies_own_FO
 
-/-- Track B FO assertional tier: hom→Φ soundness only; completeness is on extensional tier. -/
+/-- FO assertional fragment: hom→Φ soundness only; completeness is on extensional fragment. -/
 theorem stageWymore_fo_soundness_only_note :
     foAssertionalFragment.finiteClauseEnumeration = false ∧
       extensionalDynamicsFragment.dynamicsComplete = true :=
   ⟨foAssertional_no_finite_enum, extensionalDynamics_dynamicsComplete⟩
 
-/-! ## Track D: extensional dynamics (infinite `SZ`) -/
+/-! ## Extensional dynamics (infinite `SZ`) -/
 
 theorem stageWymore_extensional_compile {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
     compileObservablesExt Z = compileObservablesExt Z :=
@@ -120,7 +121,7 @@ theorem stageWymore_extensional_subsumes_executionFO {SZ IZ OZ : Type}
     SystemSatisfiesExtensional Z Z hOut hOut → SystemSatisfiesFO Z s0 f :=
   extensional_subsumes_executionFO Z hOut s0 f
 
-theorem stageWymore_fo_extensional_completeness_tier {SZ IZ OZ : Type}
+theorem stageWymore_fo_extensional_completeness {SZ IZ OZ : Type}
     {Z Z_impl : DiscreteSystem SZ IZ OZ}
     (hZ : AlwaysOutputs Z) (hImpl : AlwaysOutputs Z_impl)
     (hAdeq : PhiAdequateExtensionalOpen Z hZ) :
@@ -137,7 +138,7 @@ theorem stageWymore_blocked_foAssertionalCompleteness :
           foUnreachableSpec_alwaysOutputs foUnreachableImpl_alwaysOutputs :=
   blocked_foAssertionalCompleteness
 
-/-! ## Track D: cross-type extensional bi-implication -/
+/-! ## Cross-type extensional bi-implication -/
 
 theorem stageWymore_extensional_cross_iff_hom {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     {Z_spec : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2} :
@@ -171,7 +172,7 @@ theorem stageWymore_extensional_sameType_collapse {SZ IZ OZ : Type}
         SystemIsIdentityHomomorphicImageOpen Z_spec Z_impl hSpec hImpl) :=
   extensional_sameType_collapse_iff_hom hSpec hImpl
 
-/-! ## Track D: extensional synthesis + PhiAdequate -/
+/-! ## Extensional synthesis + PhiAdequate -/
 
 theorem stageWymore_extensional_synthesize_eq {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
     synthesizeExtensionalSpec Z = Z :=
@@ -229,7 +230,7 @@ theorem stageWymore_counterSystem_synthesis :
   ⟨counterSystem_phi_adequate_cross, counterElab_satisfies_extensional_cross,
     counterElab_synthesized_hom⟩
 
-/-! ## Track B/D: infinite state impossibility (finite enumeration) -/
+/-! ## Infinite state impossibility (finite enumeration) -/
 
 theorem stageWymore_infinite_no_finite_enum :
     ¬ RequiresFiniteStateEnumeration Nat :=
@@ -239,7 +240,7 @@ theorem stageWymore_predicate_schema {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ
     compileObservablesPred Z = compileObservablesPred Z :=
   compileObservablesPred_wellformed Z
 
-/-! ## Track A: partial open -/
+/-! ## Partial open fragment -/
 
 theorem stageWymore_partial_adequate {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
     [DecidableEq SZ] [DecidableEq IZ] [Nonempty IZ] (Z : DiscreteSystem SZ IZ OZ) :
@@ -262,7 +263,7 @@ theorem stageWymore_partial_identity_hom {Z_spec Z_impl : DiscreteSystem wymPath
     (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
     (hDyn : SystemSatisfiesDynamics Z_spec Z_impl hSpec hImpl) :
     SystemIsIdentityHomomorphicImage Z_spec Z_impl hSpec hImpl :=
-  partial_identity_hom_via_pinned hSpec hImpl hDyn
+  system_satisfies_implies_hom hSpec hImpl hDyn
 
 theorem stageWymore_partial_dynamics {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
     [DecidableEq SZ] [DecidableEq IZ] [Nonempty IZ]
@@ -280,23 +281,43 @@ theorem stageWymore_partial_iff_hom_readoutComplete {SZ IZ OZ : Type} [Fintype S
       PartialIsIdentityHomomorphicImage Z_spec Z_impl :=
   partial_property_iff_hom_readoutComplete hComplete
 
-theorem stageWymore_closedShape_partial :
-    ReadoutSpecComplete closedShapeSpec ∧
-      (SystemSatisfiesPartialDynamics closedShapeSpec closedShapeImpl ↔
-        PartialIsIdentityHomomorphicImage closedShapeSpec closedShapeImpl) :=
-  closedShapeSpec_resolved
+theorem stageWymore_closedSystem_partial :
+    ReadoutSpecComplete closedSystem ∧
+      (SystemSatisfiesPartialDynamics closedSystem closedSystemImpl ↔
+        PartialIsIdentityHomomorphicImage closedSystem closedSystemImpl) :=
+  closedSystem_resolved
 
-theorem stageWymore_blocked_partialSilentReadout :
+theorem stageWymore_blocked_incompleteReadout :
     partialOpenFragment.dynamicsComplete = true ∧
-      SystemSatisfiesPartialDynamicsSilentLegacy silentReadoutSpec spuriousOutputImpl ∧
+      SystemSatisfiesPartialDynamicsIncompleteReadout silentReadoutSpec spuriousOutputImpl ∧
         ¬ PartialExtEqual silentReadoutSpec spuriousOutputImpl :=
-  blocked_partialSilentReadout
+  blocked_incompleteReadout
 
 theorem stageWymore_resolved_partialClosedReadout :
-    ReadoutSpecComplete closedShapeSpec ∧
-      (SystemSatisfiesPartialDynamics closedShapeSpec closedShapeImpl ↔
-        PartialIsIdentityHomomorphicImage closedShapeSpec closedShapeImpl) :=
+    ReadoutSpecComplete closedSystem ∧
+      (SystemSatisfiesPartialDynamics closedSystem closedSystemImpl ↔
+        PartialIsIdentityHomomorphicImage closedSystem closedSystemImpl) :=
   resolved_partialClosedReadout
+
+theorem stageWymore_blocked_autonomousInputIncomplete :
+    pinnedFiniteFragment.dynamicsComplete = true ∧
+      SystemSatisfiesDynamics autoNoneSpec autoNoneImpl autoNoneSpec_alwaysOutputs
+        autoNoneImpl_alwaysOutputs ∧
+        ¬ PartialExtEqual autoNoneSpec autoNoneImpl :=
+  blocked_autonomousInputIncomplete
+
+theorem stageWymore_blocked_pinnedDynamicsIncomplete :
+    pinnedFiniteFragment.dynamicsComplete = true ∧
+      SystemSatisfiesDynamics autoNoneSpec autoNoneImpl autoNoneSpec_alwaysOutputs
+        autoNoneImpl_alwaysOutputs ∧
+        ¬ SystemSatisfiesPartialDynamics autoNoneSpec autoNoneImpl :=
+  blocked_pinnedDynamicsIncomplete
+
+theorem stageWymore_resolved_infinitePartialReadout :
+    ¬ AlwaysOutputs counterClosedReadout ∧
+      SystemSatisfiesExtensionalPartial counterClosedReadout counterClosedReadout ∧
+        PartialIsIdentityHomomorphicImage counterClosedReadout counterClosedReadout :=
+  resolved_infinitePartialReadout
 
 theorem stageWymore_partial_verification {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
     [DecidableEq SZ] [DecidableEq IZ] [Nonempty IZ]
@@ -371,17 +392,17 @@ theorem stageWymore_blocked_rawBranchingNZ :
   refine ⟨partialOpen_dynamicsComplete, ?_⟩
   exact partial_readout_only_not_complete
 
-/-! ## Fragment tier alignment -/
+/-! ## Fragment specification alignment -/
 
-theorem stageWymore_pinnedFinite_tier :
+theorem stageWymore_pinnedFinite_fragment :
     pinnedFiniteFragment = pinnedFragment :=
   pinnedFinite_eq_pinned
 
-theorem stageWymore_fo_tier :
+theorem stageWymore_fo_fragment :
     foAssertionalFragment.finiteClauseEnumeration = false :=
   foAssertional_no_finite_enum
 
-theorem stageWymore_extensional_tier :
+theorem stageWymore_extensional_fragment :
     extensionalDynamicsFragment.finiteClauseEnumeration = false ∧
       extensionalDynamicsFragment.dynamicsComplete = true := by
   exact ⟨extensionalDynamics_no_finite_enum, extensionalDynamics_dynamicsComplete⟩
@@ -424,7 +445,81 @@ theorem stageWymore_fsmStay_recoverable :
       fsmStay.toDiscreteSystem (fsm_alwaysOutputs fsmStay) :=
   fsmStay_recoverable_table
 
-/-! ## Tier unification (finite pinned ↔ extensional) -/
+/-! ## Finite unification (extensional ↔ partial ↔ pinned) -/
+
+theorem stageWymore_extensional_iff_partialDynamics {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
+    [Fintype OZ] [DecidableEq SZ] [DecidableEq IZ] [Nonempty IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (hComplete : ReadoutSpecComplete Z_spec) :
+    SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl ↔
+      SystemSatisfiesPartialDynamics Z_spec Z_impl :=
+  extensional_iff_partialDynamics hSpec hImpl hComplete
+
+theorem stageWymore_extensional_iff_partialExtEqual {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) :
+    SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl ↔ PartialExtEqual Z_spec Z_impl :=
+  extensional_iff_partialExtEqual hSpec hImpl
+
+theorem stageWymore_partialDynamics_iff_extEqual_readoutComplete {SZ IZ OZ : Type}
+    [Fintype SZ] [Fintype IZ] [DecidableEq SZ] [DecidableEq IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hComplete : ReadoutSpecComplete Z_spec) :
+    SystemSatisfiesPartialDynamics Z_spec Z_impl ↔ PartialExtEqual Z_spec Z_impl :=
+  partialDynamics_iff_extEqual_readoutComplete hComplete
+
+theorem stageWymore_extensional_synthesized_iff_partial_synthesized {SZ IZ OZ : Type}
+    [Fintype SZ] [Fintype IZ] [Fintype OZ] [DecidableEq SZ] [DecidableEq IZ] [Nonempty IZ]
+    {Z Z_impl : DiscreteSystem SZ IZ OZ}
+    (hZ : AlwaysOutputs Z) (hImpl : AlwaysOutputs Z_impl)
+    (hComplete : ReadoutSpecComplete Z) :
+    (SystemSatisfiesExtensional Z Z_impl hZ hImpl ↔
+        SystemIsIdentityHomomorphicImageOpen (synthesizeExtensionalSpec Z) Z_impl hZ hImpl) ↔
+      (SystemSatisfiesPartialDynamics Z Z_impl ↔
+        PartialIsIdentityHomomorphicImage (synthesizePartialSpec Z) Z_impl) :=
+  extensional_synthesized_iff_partial_synthesized_readoutComplete hZ hImpl hComplete
+
+/-! ## Unified verification templates -/
+
+theorem wymore_verification_pinned {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    [Nonempty IZ] {Z Z_impl : DiscreteSystem SZ IZ OZ}
+    (hZ : AlwaysOutputs Z) (hImpl : AlwaysOutputs Z_impl) :
+    SystemSatisfiesDynamics Z Z_impl hZ hImpl ↔
+      SystemIsIdentityHomomorphicImage (synthesizeSpec Z hZ) Z_impl hZ hImpl :=
+  system_synthesized_property_iff_hom hZ hImpl
+
+theorem wymore_verification_partial_readoutComplete {SZ IZ OZ : Type} [Fintype SZ]
+    [Fintype IZ] [DecidableEq SZ] [DecidableEq IZ] [Nonempty IZ]
+    {Z Z_impl : DiscreteSystem SZ IZ OZ}
+    (hComplete : ReadoutSpecComplete Z)
+    (_hAdeq : PhiAdequatePartialOpen Z) :
+    SystemSatisfiesPartialDynamics Z Z_impl ↔
+      PartialIsIdentityHomomorphicImage (synthesizePartialSpec Z) Z_impl :=
+  partial_synthesized_property_iff_hom_readoutComplete hComplete
+
+theorem wymore_verification_extensional {SZ IZ OZ : Type}
+    {Z Z_impl : DiscreteSystem SZ IZ OZ}
+    (hZ : AlwaysOutputs Z) (hImpl : AlwaysOutputs Z_impl)
+    (_hAdeq : PhiAdequateExtensionalOpen Z hZ) :
+    SystemSatisfiesExtensional Z Z_impl hZ hImpl ↔
+      SystemIsIdentityHomomorphicImageOpen (synthesizeExtensionalSpec Z) Z_impl hZ hImpl :=
+  extensional_synthesized_verification_open hZ hImpl _hAdeq
+
+theorem wymore_verification_extensional_partial {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ} :
+    SystemSatisfiesExtensionalPartial Z_spec Z_impl ↔
+      PartialIsIdentityHomomorphicImage Z_spec Z_impl :=
+  extensional_partial_iff_hom
+
+theorem wymore_verification_extensional_cross {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}
+    (_hAdeq : PhiAdequateExtensionalCross Z) :
+    SystemSatisfiesExtensionalCross (synthesizeExtensionalSpec Z) Z_impl ↔
+      IsHomomorphicImage (synthesizeExtensionalSpec Z) Z_impl :=
+  extensional_synthesized_verification_cross _hAdeq
+
+/-! ## Finite unification (pinned ↔ extensional) -/
 
 theorem stageWymore_synthesizeExtensional_eq_synthesize {SZ IZ OZ : Type} [Fintype SZ]
     [Fintype IZ] [Fintype OZ] (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :

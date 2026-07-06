@@ -2,6 +2,7 @@ import Mbse.WymorePropertyFragment
 import Mbse.PropertyFragmentSpec
 import Mbse.PathologyExamples
 import Mbse.GeneralProperties
+import Mbse.FSMProperties
 import Mbse.FiniteWymore
 import Mbse.SystemToFormula
 import Mbse.GeneralPropertyFragment
@@ -19,8 +20,9 @@ Documents failure modes for infinite state, partial I/O, and finite enumeration.
 namespace WymorePathologyExamples
 
 open WymorePropertyFragment PropertyFragmentSpec PathologyExamples GeneralProperties FSM
-  SystemToFormula FOLTL PropertyFragment.General ExtensionalDynamicsFragment Homomorphism
-  SpecFromProperties HimsySynthesis
+  SystemToFormula FOLTL PropertyFragment.General PropertyFragment.FSM
+  ExtensionalDynamicsFragment Homomorphism SpecFromProperties HimsySynthesis GeneralFSMBridge
+  FSMProperties
 
 /-! ## Infinite state (`counterSystem`) -/
 
@@ -146,13 +148,13 @@ theorem closedSystem_excluded_from_pinned :
       ¬ AlwaysOutputs closedSystem := by
   refine ⟨pinnedFragment_dynamicsComplete, closedSystem_not_alwaysOutputs⟩
 
-/-! ## Predicate schema works on infinite state (Track D) -/
+/-! ## Predicate schema works on infinite state -/
 
 theorem counterSystem_predicate_schema :
     compileObservablesPred counterSystem = compileObservablesPred counterSystem :=
   compileObservablesPred_wellformed counterSystem
 
-/-! ## Partial dynamics: readout-only still incomplete (Track A pathology) -/
+/-! ## Partial dynamics: readout-only still incomplete -/
 
 abbrev wymPathStates := Fin 2
 abbrev wymPathInputs := Fin 1
@@ -205,9 +207,9 @@ theorem partial_readout_only_not_complete :
     wymoreStay_jump_same_readout
   refine ⟨hcross.1, hcross.2, wymoreStay_jump_different_step⟩
 
-/-! ## Silent readout without closed clauses (Track A pathology) -/
+/-! ## Incomplete readout table (pathology) -/
 
-/-- Spec with silent readout (`RZ = none`); legacy table emits no readout clause at that state. -/
+/-- Spec with silent readout (`RZ = none`); incomplete table emits no readout clause at that state. -/
 def silentReadoutSpec : DiscreteSystem wymPathStates wymPathInputs wymPathOutputs where
   sz_nonempty := ⟨0⟩
   NZ := wymoreStay.NZ
@@ -219,24 +221,22 @@ def spuriousOutputImpl : DiscreteSystem wymPathStates wymPathInputs wymPathOutpu
   NZ := wymoreStay.NZ
   RZ := fun _ => some 0
 
-theorem silentReadoutSpec_silent : silentReadoutSpec.RZ 0 = none := rfl
-
 theorem spuriousOutputImpl_not_extEqual :
     ¬ PartialExtEqual silentReadoutSpec spuriousOutputImpl := by
   intro h
   simpa [silentReadoutSpec, spuriousOutputImpl] using h.1 0
 
-theorem partial_satisfies_silentLegacy_not_implies_extEqual :
-    SystemSatisfiesPartialDynamicsSilentLegacy silentReadoutSpec spuriousOutputImpl ∧
+theorem partial_satisfies_incompleteReadout_not_implies_extEqual :
+    SystemSatisfiesPartialDynamicsIncompleteReadout silentReadoutSpec spuriousOutputImpl ∧
       ¬ PartialExtEqual silentReadoutSpec spuriousOutputImpl := by
   refine ⟨?_, spuriousOutputImpl_not_extEqual⟩
   intro s0 f φ hmem
-  dsimp [partialDynamicsTableSilentLegacy] at hmem
+  dsimp [partialDynamicsTableIncompleteReadout] at hmem
   rw [List.mem_append] at hmem
   rcases hmem with hmem | hmem
   · rw [List.mem_append] at hmem
     rcases hmem with hmem | hmem
-    · dsimp [partialReadoutClausesSilentLegacy] at hmem
+    · dsimp [partialReadoutClausesIncomplete] at hmem
       rw [List.mem_flatMap] at hmem
       rcases hmem with ⟨s, _, hmatch⟩
       simp [silentReadoutSpec] at hmatch
@@ -255,46 +255,112 @@ theorem partial_satisfies_silentLegacy_not_implies_extEqual :
     simpa [partialTransitionClause, silentReadoutSpec, spuriousOutputImpl, wymoreStay] using
       wymoreTrace_models_partialTransition spuriousOutputImpl s0 f s i
 
-/-! ## Closed readout shape (Track A positive witness) -/
+/-! ## Autonomous input incomplete in pinned dynamics (pathology) -/
 
-/-- Closed Moore shape with `Unit` I/O (fragment-compatible; mirrors `closedSystem`). -/
-def closedShapeSpec : DiscreteSystem Unit Unit Unit where
-  sz_nonempty := ⟨()⟩
-  NZ := fun s _ => s
-  RZ := fun _ => none
+def autoNoneSharedRz : wymPathStates → wymPathOutputs := fun _ => 0
 
-def closedShapeImpl : DiscreteSystem Unit Unit Unit where
-  sz_nonempty := ⟨()⟩
-  NZ := fun s _ => s
-  RZ := fun _ => none
+def autoNoneSpec : DiscreteSystem wymPathStates wymPathInputs wymPathOutputs where
+  sz_nonempty := ⟨0⟩
+  NZ := fun s oi =>
+    match oi with
+    | some _ => if s = 0 then 0 else 0
+    | none => if s = 0 then 0 else 0
+  RZ := fun s => some (autoNoneSharedRz s)
 
-theorem closedShapeSpec_not_alwaysOutputs : ¬ AlwaysOutputs closedShapeSpec := by
+def autoNoneImpl : DiscreteSystem wymPathStates wymPathInputs wymPathOutputs where
+  sz_nonempty := ⟨0⟩
+  NZ := fun s oi =>
+    match oi with
+    | some _ => if s = 0 then 0 else 0
+    | none => if s = 0 then 0 else 1
+  RZ := fun s => some (autoNoneSharedRz s)
+
+theorem autoNoneSpec_alwaysOutputs : AlwaysOutputs autoNoneSpec :=
+  fun s => ⟨autoNoneSharedRz s, rfl⟩
+
+theorem autoNoneImpl_alwaysOutputs : AlwaysOutputs autoNoneImpl :=
+  fun s => ⟨autoNoneSharedRz s, rfl⟩
+
+theorem autoNone_differ_at_none :
+    autoNoneSpec.NZ 1 none = 0 ∧ autoNoneImpl.NZ 1 none = 1 ∧
+      autoNoneSpec.NZ 1 none ≠ autoNoneImpl.NZ 1 none := by
+  native_decide
+
+theorem autoNone_not_extEqual : ¬ PartialExtEqual autoNoneSpec autoNoneImpl := by
   intro h
-  have hz : closedShapeSpec.RZ () = none := rfl
-  rcases h () with ⟨w, hw⟩
+  rcases autoNone_differ_at_none with ⟨_, _, hne⟩
+  exact hne (h.2 1 none).symm
+
+theorem autoNone_fsm_extEqual :
+    FSMExtEqual (ofDiscreteSystem autoNoneSpec autoNoneSpec_alwaysOutputs)
+      (ofDiscreteSystem autoNoneImpl autoNoneImpl_alwaysOutputs) := by
+  constructor
+  · intro s; rfl
+  · intro s i; simp [ofDiscreteSystem, autoNoneSpec, autoNoneImpl]
+
+theorem autoNone_pinned_dynamics :
+    FSMSatisfiesDynamics (ofDiscreteSystem autoNoneSpec autoNoneSpec_alwaysOutputs)
+      (ofDiscreteSystem autoNoneImpl autoNoneImpl_alwaysOutputs) :=
+  fsm_extEqual_implies_satisfies_dynamics autoNone_fsm_extEqual
+
+theorem pinnedDynamics_not_implies_extEqual_at_none :
+    SystemSatisfiesDynamics autoNoneSpec autoNoneImpl
+      autoNoneSpec_alwaysOutputs autoNoneImpl_alwaysOutputs ∧
+      ¬ PartialExtEqual autoNoneSpec autoNoneImpl := by
+  refine ⟨(SystemSatisfiesDynamics_iff_fsm _ _).1 autoNone_pinned_dynamics, autoNone_not_extEqual⟩
+
+theorem pinnedDynamics_not_implies_partialDynamics :
+    SystemSatisfiesDynamics autoNoneSpec autoNoneImpl
+      autoNoneSpec_alwaysOutputs autoNoneImpl_alwaysOutputs ∧
+      ¬ SystemSatisfiesPartialDynamics autoNoneSpec autoNoneImpl := by
+  rcases pinnedDynamics_not_implies_extEqual_at_none with ⟨hPinned, hNe⟩
+  refine ⟨hPinned, ?_⟩
+  intro hPart
+  exact hNe (partial_satisfies_implies_extEqual_readoutComplete (readoutSpecComplete_of autoNoneSpec) hPart)
+
+/-! ## Closed system partial witness -/
+
+def closedSystemImpl : DiscreteSystem Unit Empty Empty :=
+  closedSystem
+
+theorem closedSystem_readoutComplete : ReadoutSpecComplete closedSystem :=
+  readoutSpecComplete_of closedSystem
+
+theorem closedSystem_partial_iff_hom :
+    SystemSatisfiesPartialDynamics closedSystem closedSystemImpl ↔
+      PartialIsIdentityHomomorphicImage closedSystem closedSystemImpl :=
+  partial_property_iff_hom_readoutComplete closedSystem_readoutComplete
+
+theorem closedSystem_resolved :
+    ReadoutSpecComplete closedSystem ∧
+      (SystemSatisfiesPartialDynamics closedSystem closedSystemImpl ↔
+        PartialIsIdentityHomomorphicImage closedSystem closedSystemImpl) :=
+  ⟨closedSystem_readoutComplete, closedSystem_partial_iff_hom⟩
+
+/-! ## Infinite closed readout witness -/
+
+def counterClosedReadout : DiscreteSystem Nat Bool (Option Nat) where
+  sz_nonempty := ⟨0⟩
+  NZ := counterSystem.NZ
+  RZ := fun n => if n = 0 then none else some n
+
+theorem counterClosedReadout_not_alwaysOutputs : ¬ AlwaysOutputs counterClosedReadout := by
+  intro h
+  have hz : counterClosedReadout.RZ 0 = none := rfl
+  rcases h 0 with ⟨w, hw⟩
   rw [hz] at hw
   cases hw
 
-theorem closedShapeSpec_readoutComplete : ReadoutSpecComplete closedShapeSpec :=
-  readoutSpecComplete_of closedShapeSpec
+theorem counterClosedReadout_extensional_partial_refl :
+    SystemSatisfiesExtensionalPartial counterClosedReadout counterClosedReadout :=
+  ⟨fun _ => rfl, fun _ _ => rfl⟩
 
-theorem closedShapeSpec_partial_iff_hom :
-    SystemSatisfiesPartialDynamics closedShapeSpec closedShapeImpl ↔
-      PartialIsIdentityHomomorphicImage closedShapeSpec closedShapeImpl :=
-  partial_property_iff_hom_readoutComplete closedShapeSpec_readoutComplete
-
-theorem closedShapeSpec_resolved :
-    ReadoutSpecComplete closedShapeSpec ∧
-      (SystemSatisfiesPartialDynamics closedShapeSpec closedShapeImpl ↔
-        PartialIsIdentityHomomorphicImage closedShapeSpec closedShapeImpl) :=
-  ⟨closedShapeSpec_readoutComplete, closedShapeSpec_partial_iff_hom⟩
-
-/-- Under `AlwaysOutputs`, pinned Stage 3 bi-implication remains the identity-hom witness. -/
-theorem partial_identity_hom_via_pinned {Z_spec Z_impl : DiscreteSystem wymPathStates wymPathInputs wymPathOutputs}
-    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
-    (hDyn : SystemSatisfiesDynamics Z_spec Z_impl hSpec hImpl) :
-    SystemIsIdentityHomomorphicImage Z_spec Z_impl hSpec hImpl :=
-  (system_property_iff_hom hSpec hImpl).mp hDyn
+theorem counterClosedReadout_resolved :
+    ¬ AlwaysOutputs counterClosedReadout ∧
+      SystemSatisfiesExtensionalPartial counterClosedReadout counterClosedReadout ∧
+        PartialIsIdentityHomomorphicImage counterClosedReadout counterClosedReadout :=
+  ⟨counterClosedReadout_not_alwaysOutputs, counterClosedReadout_extensional_partial_refl,
+    (extensional_partial_iff_hom).1 counterClosedReadout_extensional_partial_refl⟩
 
 /-! ## Partial dynamics: finite enumeration witness -/
 
@@ -305,7 +371,7 @@ theorem partial_agrees_with_pinned_when_alwaysOutputs {SZ IZ OZ : Type}
     RequiresFiniteStateEnumeration SZ :=
   requiresFiniteStateEnumeration_of_fintype (SZ := SZ)
 
-/-! ## FO execution without extensional/hom (Track B pathology) -/
+/-! ## FO execution without extensional/hom -/
 
 abbrev foPathStates := Fin 2
 abbrev foPathInputs := Fin 1

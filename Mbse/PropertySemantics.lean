@@ -71,7 +71,7 @@ abbrev HasHomomorphism {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
 def PhiAdequateSpec (satisfies : Prop) (canonical : Prop) : Prop :=
   satisfies ∧ canonical
 
-/-- FO assertional tier: reference satisfies its compiled FO at a chosen execution witness. -/
+/-- FO assertional fragment: reference satisfies its compiled FO at a chosen execution witness. -/
 def PhiAdequateFO (selfSatisfies : Prop) : Prop :=
   selfSatisfies
 

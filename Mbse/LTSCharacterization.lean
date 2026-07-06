@@ -2,7 +2,7 @@ import Mbse.LTSWymore
 import Mbse.PropertyFragmentSpec
 
 /-!
-# Track C: LTS refinement characterization
+# LTS refinement characterization
 
 Optional module for the LTS↔Wymore integration paper. Not imported by the default `Mbse` library root.
 -/

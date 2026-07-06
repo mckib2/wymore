@@ -139,7 +139,7 @@ theorem stage3_generalizes_fsm {SZ IZ OZ : Type} [Nonempty IZ] (F_spec F_impl : 
       FSMIsIdentityHomomorphicImage F_spec F_impl :=
   fsm_property_iff_hom_via_embed F_spec F_impl
 
-/-! ## Tier unification (finite pinned ↔ extensional) -/
+/-! ## Finite unification (pinned ↔ extensional) -/
 
 theorem stage4_synthesizeExtensional_eq_synthesize {SZ IZ OZ : Type} [Fintype SZ]
     [Fintype IZ] [Fintype OZ] (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :

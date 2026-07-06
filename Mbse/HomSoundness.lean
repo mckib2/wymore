@@ -64,7 +64,7 @@ theorem stage3_verification_equivalence {SZ IZ OZ : Type} [Fintype SZ] [Fintype 
         (synthesizeSpec Z hZ = synthesizeSpec Z hZ)) :=
   verificationEquivalence_of_adequate (system_synthesized_property_iff_hom hZ hImpl)
 
-/-! ## Track D extensional templates -/
+/-! ## Extensional templates -/
 
 theorem extensional_cross_verification_equivalence {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     {Z : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2} :
