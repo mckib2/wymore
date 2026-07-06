@@ -198,4 +198,14 @@ theorem fsmTrace_state_false {F : FSMSystem SZ IZ OZ} {s0 : SZ} {f : ITZ IZ} {t 
   intro h
   exact hne (by simpa [fsmTrace] using h)
 
+theorem fsmTrace_models_compileFSM_iff_dynamicsClause (F : FSMSystem SZ IZ OZ) (s0 : SZ)
+    (f : ITZ IZ) (φ : LTL (Atom SZ IZ OZ))
+    (hmem : φ ∈ transitionClauses F ∨ φ ∈ readoutClauses F) :
+    (fsmTrace F s0 f).models (compileFSM F) ↔ (fsmTrace F s0 f).models φ := by
+  constructor
+  · exact fsmTrace_models_compileFSM_implies_dynamicsClause F s0 f φ hmem
+  · intro hφ
+    simp only [Trace.models, compileFSM, satisfiesAt]
+    exact ⟨fsmTrace_models_transitionsGlobally F s0 f, fsmTrace_models_readoutsGlobally F s0 f⟩
+
 end SystemToLTL

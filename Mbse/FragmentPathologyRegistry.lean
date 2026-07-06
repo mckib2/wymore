@@ -5,6 +5,7 @@ import Mbse.WymorePropertyFragment
 import Mbse.ExtensionalDynamicsFragment
 import Mbse.FSMProperties
 import Mbse.Homomorphism
+import Mbse.HomomorphismProperties
 import Mbse.SystemToFormula
 
 /-!
@@ -19,6 +20,7 @@ namespace FragmentPathologyRegistry
 open PropertyFragmentSpec PathologyExamples WymorePathologyExamples WymorePropertyFragment
   ExtensionalDynamicsFragment PropertyFragment.FSM PropertyFragment.General FSMProperties
   TemporalLogic SpecFromProperties HimsySynthesis FSM Homomorphism SystemToFormula
+  Combinational CombinationalProperties HomomorphismProperties
 
 /-- Failure modes blocking assertional Φ ↔ hom completeness outside pinned finite fragment. -/
 inductive BlockerTag where
@@ -29,7 +31,10 @@ inductive BlockerTag where
   | rawBranchingNZ
   | incompleteReadout
   | autonomousInputIncomplete
+  | pinnedDynamicsIncomplete
   | foAssertionalCompleteness
+  | executionFOHomCompleteness
+  | barePhiUniqueZ
 
 def blockerFragment : BlockerTag → FragmentSpec
   | .infiniteSZ => pinnedFiniteFragment
@@ -39,13 +44,21 @@ def blockerFragment : BlockerTag → FragmentSpec
   | .rawBranchingNZ => partialOpenFragment
   | .incompleteReadout => partialOpenFragment
   | .autonomousInputIncomplete => pinnedFiniteFragment
+  | .pinnedDynamicsIncomplete => pinnedFiniteFragment
   | .foAssertionalCompleteness => foAssertionalFragment
+  | .executionFOHomCompleteness => foAssertionalFragment
+  | .barePhiUniqueZ => readoutOnlyFragment
 
 /-! ## One theorem per BLOCKED failure mode -/
 
+/-- `Nat` (hence `counterSystem`) lacks finite clause enumeration for pinned tables. -/
 theorem blocked_infiniteSZ :
     ¬ RequiresFiniteStateEnumeration Nat :=
   counterSystem_no_finite_dynamicsTable
+
+theorem blocked_infiniteSZ_counterSystem :
+    ¬ RequiresFiniteStateEnumeration Nat :=
+  blocked_infiniteSZ
 
 /-- Finite enumeration remains blocked; extensional fragment bypasses it for hom↔Φ. -/
 theorem resolved_infiniteSZ_extensional :
@@ -172,13 +185,20 @@ theorem resolved_sameTypeSurjectiveHomSeparation :
             swapSpecSys_alwaysOutputs swapImplSys_alwaysOutputs :=
   sameType_surjectiveHom_separation
 
+/-- Execution FO at a fixed witness does not imply extensional/hom agreement (`foUnreachable`). -/
+theorem blocked_executionFOHomCompleteness :
+    SystemSatisfiesSpecFOAt foUnreachableSpec foUnreachableImpl 0 foUnreachableInput ∧
+      ¬ SystemSatisfiesExtensional foUnreachableSpec foUnreachableImpl
+        foUnreachableSpec_alwaysOutputs foUnreachableImpl_alwaysOutputs :=
+  ⟨fo_execution_not_complete_for_hom.1, fo_execution_not_complete_for_hom.2.1⟩
+
+/-- Historical alias: use `blocked_executionFOHomCompleteness` (assertional FO is resolved separately). -/
 theorem blocked_foAssertionalCompleteness :
-    foAssertionalFragment.finiteClauseEnumeration = false ∧
-      SystemSatisfiesSpecFOAt foUnreachableSpec foUnreachableImpl 0 foUnreachableInput ∧
+    (foAssertionalFragment.finiteClauseEnumeration = false) ∧
+      (SystemSatisfiesSpecFOAt foUnreachableSpec foUnreachableImpl 0 foUnreachableInput ∧
         ¬ SystemSatisfiesExtensional foUnreachableSpec foUnreachableImpl
-          foUnreachableSpec_alwaysOutputs foUnreachableImpl_alwaysOutputs :=
-  ⟨foAssertional_no_finite_enum, fo_execution_not_complete_for_hom.1,
-    fo_execution_not_complete_for_hom.2.1⟩
+          foUnreachableSpec_alwaysOutputs foUnreachableImpl_alwaysOutputs) :=
+  ⟨foAssertional_no_finite_enum, blocked_executionFOHomCompleteness⟩
 
 theorem blocked_partialRZ :
     pinnedFragment.dynamicsComplete = true ∧ ¬ AlwaysOutputs closedSystem :=
@@ -191,6 +211,7 @@ theorem blocked_readoutOnly :
         ¬ FSMIsIdentityHomomorphicImage fsmStay fsmJump) :=
   ⟨partial_readoutOnly_not_dynamicsComplete, example2_readout_table_incomplete⟩
 
+/-- G-only dynamics fragment policy excludes `F`; trace-level witnesses differ on `F(q)`. -/
 theorem blocked_eventuallyF :
     pinnedFragment.eventuallyPolicy = .excluded ∧
       (∀ t, traceNoQ.holds t StutterAtom.p) ∧
@@ -199,6 +220,26 @@ theorem blocked_eventuallyF :
       ¬ traceNoQ.models (LTL.F (LTL.atom StutterAtom.q)) := by
   rcases example3_F_obstruction with ⟨h1, h2, h3, h4⟩
   exact ⟨pinnedFragment_no_F, h1, h2, h3, h4⟩
+
+/-- Same G-only output-table satisfaction; `F` state mission distinguishes traces. -/
+theorem blocked_eventuallyF_wymore :
+    FSMSatisfiesOutputTable fsmStay fsmStay ∧
+      FSMSatisfiesOutputTable fsmStay fsmJump ∧
+        (SystemToLTL.fsmTrace fsmJump 0 (fun _ => 0)).models (LTL.F (LTL.atom (.state 1))) ∧
+          ¬ (SystemToLTL.fsmTrace fsmStay 0 (fun _ => 0)).models (LTL.F (LTL.atom (.state 1))) :=
+  PathologyExamples.blocked_eventuallyF_wymore
+
+/-- Output-table Φ does not determine unique FSM (`fsmStay` vs `fsmJump`). -/
+theorem blocked_barePhi_uniqueZ :
+    fsmOutputTable fsmStay = fsmOutputTable fsmJump ∧
+      ¬ FSMExtEqual fsmStay fsmJump :=
+  ⟨rfl, fsmStay_jump_not_extEqual⟩
+
+/-- Canonical combinational synthesis restores Stage-1 bi-implication (Example 1). -/
+theorem resolved_canonicalDisjunction :
+    PropertyFragment.CombSatisfiesFunction implSystem implTable ↔
+      CombIsIdentityHomomorphicImage (synthesizeCombSpec implTable) implSystem :=
+  example1_refuted_for_canonical_spec
 
 theorem blocked_rawBranchingNZ :
     partialOpenFragment.dynamicsComplete = true ∧

@@ -4,6 +4,7 @@ import Mbse.WymoreSimp
 # Wymore proof tactics
 
 Macro tactics wrapping the lemma library in [`Trajectory`](Trajectory.lean).
+See [`LTLTactics`](LTLTactics.lean) for clause-satisfaction helpers.
 -/
 
 open Lean Parser Tactic
@@ -52,10 +53,6 @@ private def eraseMacroScopesRec (stx : Syntax) : Syntax :=
 DPDA snapshot `snap` into its state `q` and stack `s`, then generalises the
 transition `D.F q inp (peek D.z0 s)` as hypothesis `hF` and case-splits
 the result into `none` (first goal) and `some (q_new, new_top)` (second goal).
-
-The hypothesis is always named `hF`.  This avoids a Lean 4 quotation
-parsing ambiguity where `$x :` inside a quasi-quotation is interpreted as
-a typed antiquotation rather than a splice followed by a colon.
 -/
 syntax (name := dpdaStepDestruct)
   "dpda_step_destruct" ident "," term "," term ","

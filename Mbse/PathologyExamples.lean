@@ -172,4 +172,21 @@ theorem example3_F_obstruction :
       ¬ traceNoQ.models (LTL.F (LTL.atom StutterAtom.q)) := by
   refine ⟨fun t => by simp [traceNoQ], fun t => by simp [traceWithQ], stutter_Fq_withQ, stutter_Fq_noQ⟩
 
+/-- `G`-only output-table properties agree; `F` mission on state distinguishes traces. -/
+theorem blocked_eventuallyF_wymore :
+    FSMSatisfiesOutputTable fsmStay fsmStay ∧
+      FSMSatisfiesOutputTable fsmStay fsmJump ∧
+        (fsmTrace fsmJump 0 (fun _ => 0)).models (LTL.F (LTL.atom (.state 1))) ∧
+          ¬ (fsmTrace fsmStay 0 (fun _ => 0)).models (LTL.F (LTL.atom (.state 1))) := by
+  refine ⟨fsm_satisfies_reflexive fsmStay, fsmJump_satisfies_stay_output_table, ?_, ?_⟩
+  · simp only [Trace.models, satisfiesAt, fsmTrace, SystemToLTL.fsmTrace]
+    refine ⟨1, Nat.zero_le 1, ?_⟩
+    simp [fsmJump, FSM.generateStateTrajectory_succ, FSM.generateStateTrajectory_zero]
+  · intro h
+    rcases h with ⟨t, _, ht⟩
+    simp only [satisfiesAt, fsmTrace, SystemToLTL.fsmTrace] at ht
+    rcases t with _ | t
+    · simp [fsmStay, FSM.generateStateTrajectory_zero] at ht
+    · simp [fsmStay, FSM.generateStateTrajectory_succ] at ht
+
 end PathologyExamples

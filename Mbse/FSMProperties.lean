@@ -319,4 +319,20 @@ theorem fsm_dynamics_implies_extEqual {F_spec F_impl : FSMSystem SZ IZ OZ}
     FSMExtEqual F_spec F_impl :=
   fsm_satisfies_implies_extEqual h
 
+/-! ## Monolithic `compileFSM` ↔ per-clause dynamics table -/
+
+omit [Nonempty IZ] in
+theorem fsm_satisfiesDynamics_self_iff_models_compileFSM (F : FSMSystem SZ IZ OZ) :
+    FSMSatisfiesDynamics F F ↔
+      ∀ (s0 : SZ) (f : ITZ IZ), (SystemToLTL.fsmTrace F s0 f).models (SystemToLTL.compileFSM F) := by
+  constructor
+  · intro _h s0 f
+    exact SystemToLTL.fsm_trace_satisfies_compiled F s0 f
+  · intro h s0 f φ hmem
+    have hmodels := h s0 f
+    rw [mem_fsmDynamicsTable_iff] at hmem
+    rcases hmem with hmem | hmem
+    · exact (SystemToLTL.fsmTrace_models_compileFSM_iff_dynamicsClause F s0 f φ (Or.inl hmem)).mp hmodels
+    · exact (SystemToLTL.fsmTrace_models_compileFSM_iff_dynamicsClause F s0 f φ (Or.inr hmem)).mp hmodels
+
 end FSMProperties

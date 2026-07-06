@@ -14,6 +14,7 @@ import Mbse.GeneralCharacterization
 import Mbse.ObservablesFromSpec
 import Mbse.SystemToLTL
 import Mbse.Homomorphism
+import Mbse.HomomorphismProperties
 
 /-!
 # General Wymore property characterization
@@ -29,7 +30,7 @@ open WymorePropertyFragment WymorePathologyExamples FragmentPathologyRegistry
   PropertyFragmentSpec PropertySemantics HomSoundness GeneralProperties
   SystemToFormula PropertyFragment.General PropertyFragment.FSM FSMProperties PathologyExamples
   TemporalLogic ExtensionalDynamicsFragment FOLTL SpecFromProperties HimsySynthesis
-  GeneralCharacterization ObservablesFromSpec SystemToLTL FSM Homomorphism
+  GeneralCharacterization ObservablesFromSpec SystemToLTL FSM Homomorphism HomomorphismProperties
 
 /-! ## FO assertional -/
 
@@ -470,6 +471,35 @@ theorem stageWymore_blocked_eventuallyF :
           traceWithQ.models (LTL.F (LTL.atom StutterAtom.q)) ∧
             ¬ traceNoQ.models (LTL.F (LTL.atom StutterAtom.q)) :=
   blocked_eventuallyF
+
+theorem stageWymore_blocked_eventuallyF_wymore :
+    FSMSatisfiesOutputTable fsmStay fsmStay ∧
+      FSMSatisfiesOutputTable fsmStay fsmJump ∧
+        (SystemToLTL.fsmTrace fsmJump 0 (fun _ => 0)).models (LTL.F (LTL.atom (.state 1))) ∧
+          ¬ (SystemToLTL.fsmTrace fsmStay 0 (fun _ => 0)).models (LTL.F (LTL.atom (.state 1))) :=
+  FragmentPathologyRegistry.blocked_eventuallyF_wymore
+
+theorem stageWymore_blocked_barePhi_uniqueZ :
+    fsmOutputTable fsmStay = fsmOutputTable fsmJump ∧ ¬ FSMExtEqual fsmStay fsmJump :=
+  blocked_barePhi_uniqueZ
+
+theorem stageWymore_blocked_executionFOHomCompleteness :
+    SystemSatisfiesSpecFOAt foUnreachableSpec foUnreachableImpl 0 foUnreachableInput ∧
+      ¬ SystemSatisfiesExtensional foUnreachableSpec foUnreachableImpl
+        foUnreachableSpec_alwaysOutputs foUnreachableImpl_alwaysOutputs :=
+  blocked_executionFOHomCompleteness
+
+theorem stageWymore_resolved_canonicalDisjunction :
+    PropertyFragment.CombSatisfiesFunction implSystem implTable ↔
+      CombIsIdentityHomomorphicImage (synthesizeCombSpec implTable) implSystem :=
+  resolved_canonicalDisjunction
+
+theorem stageWymore_propositional_ltl_corollary {SZ IZ OZ : Type} [Nonempty IZ]
+    (F : FSMSystem SZ IZ OZ) :
+    FSMSatisfiesDynamics F F ↔
+      ∀ (s0 : SZ) (f : ITZ IZ),
+        (SystemToLTL.fsmTrace F s0 f).models (SystemToLTL.compileFSM F) :=
+  fsm_satisfiesDynamics_self_iff_models_compileFSM F
 
 theorem stageWymore_blocked_rawBranchingNZ :
     partialOpenFragment.dynamicsComplete = true ∧
