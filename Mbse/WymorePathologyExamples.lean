@@ -8,6 +8,7 @@ import Mbse.GeneralPropertyFragment
 import Mbse.ExtensionalDynamicsFragment
 import Mbse.Homomorphism
 import Mbse.SpecFromProperties
+import Mbse.HimsySynthesis
 
 /-!
 # Pathology examples for the general Wymore property track
@@ -19,7 +20,7 @@ namespace WymorePathologyExamples
 
 open WymorePropertyFragment PropertyFragmentSpec PathologyExamples GeneralProperties FSM
   SystemToFormula PropertyFragment.General ExtensionalDynamicsFragment Homomorphism
-  SpecFromProperties
+  SpecFromProperties HimsySynthesis
 
 /-! ## Infinite state (`counterSystem`) -/
 
@@ -114,6 +115,24 @@ theorem counterElab_synthesized_hom :
 theorem counterSystem_self_synthesizable :
     IsSynthesizableExtensional counterSystem counterSystem_alwaysOutputs :=
   extensional_self_synthesizable counterSystem counterSystem_alwaysOutputs
+
+/-! ## HIMSY synthesis witness -/
+
+theorem counterSystem_eq_himsy_counterElab :
+    HimsySpecEqual counterSystem (synthesizeHimsySpec counterElab_witness) :=
+  synthesizeHimsySpec_eq_spec counterElab_witness
+
+theorem counterSystem_himsy_phi_adequate :
+    PhiAdequateHimsy counterElab_witness :=
+  himsy_phi_adequate_of_witness counterElab_witness
+
+/-! ## Inverse table recovery witness (finite pinned) -/
+
+theorem fsmStay_recoverable_table :
+    IsRecoverableExtensionalTable
+      (dynamicsTable fsmStay.toDiscreteSystem (fsm_alwaysOutputs fsmStay))
+      fsmStay.toDiscreteSystem (fsm_alwaysOutputs fsmStay) :=
+  isRecoverableExtensionalTable_of _ _ _ (fsm_table_synthesizable fsmStay)
 
 /-! ## Partial readout (`closedSystem`) -/
 

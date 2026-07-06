@@ -6,6 +6,7 @@ import Mbse.FSMProperties
 import Mbse.PropertyFragmentSpec
 import Mbse.SpecFromProperties
 import Mbse.ExtensionalDynamicsFragment
+import Mbse.HimsySynthesis
 
 /-!
 # Cross-cutting hom soundness and Link C templates
@@ -19,7 +20,7 @@ namespace HomSoundness
 open PropertySemantics PropertySemanticsBridge PropertyFragment PropertyFragment.FSM
   PropertyFragment.General HomomorphismProperties CombinationalProperties FSMProperties
   SpecFromProperties GeneralProperties PropertyFragmentSpec Homomorphism
-  Combinational FSM ExtensionalDynamicsFragment
+  Combinational FSM ExtensionalDynamicsFragment HimsySynthesis
 
 /-! ## Combinational templates -/
 
@@ -81,6 +82,17 @@ theorem extensional_open_verification_equivalence {SZ IZ OZ : Type}
       (SystemIsIdentityHomomorphicImageOpen (synthesizeExtensionalSpec Z) Z_impl hZ hImpl)
       (PhiAdequateExtensionalOpen Z hZ) :=
   verificationEquivalence_of_adequate (extensional_synthesized_sameType_iff_hom hZ hImpl)
+
+/-! ## HIMSY synthesis templates -/
+
+theorem himsy_verification_equivalence {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z_spec : DiscreteSystem SZ1 IZ1 OZ1} {Z_elab : DiscreteSystem SZ2 IZ2 OZ2}
+    (w : HomomorphicImageWitness Z_spec Z_elab) {Z_impl : DiscreteSystem SZ2 IZ2 OZ2} :
+    VerificationEquivalence
+      (SystemSatisfiesExtensionalCross (synthesizeHimsySpec w) Z_impl)
+      (IsHomomorphicImage (synthesizeHimsySpec w) Z_impl)
+      (PhiAdequateHimsy w) :=
+  verificationEquivalence_of_adequate (himsy_synthesized_cross_iff_hom w)
 
 /-! ## One-way hom → Φ (soundness) -/
 

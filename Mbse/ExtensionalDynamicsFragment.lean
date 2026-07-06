@@ -8,6 +8,7 @@ import Mbse.SystemToFormula
 import Mbse.WymorePropertyFragment
 import Mbse.SpecFromProperties
 import Mbse.PropertySemantics
+import Mbse.TemporalLogic
 
 /-!
 # Extensional dynamics fragment (infinite-state assertional Φ)
@@ -34,7 +35,7 @@ namespace ExtensionalDynamicsFragment
 
 open PropertyFragmentSpec PropertyFragment.General GeneralFSMBridge GeneralProperties
   FSM FSMProperties Homomorphism SystemToFormula WymorePropertyFragment FOLTL
-  SpecFromProperties PropertySemantics
+  SpecFromProperties PropertySemantics TemporalLogic SystemToLTL
 
 /-! ## Resolved total maps under `AlwaysOutputs` -/
 
@@ -419,6 +420,18 @@ theorem extensional_self_synthesizable {SZ IZ OZ : Type} (Z : DiscreteSystem SZ 
     IsSynthesizableExtensional Z hOut :=
   ⟨extensional_satisfies_reflexive Z hOut, synthesizeExtensionalSpec_eq Z⟩
 
+/-- Finite reference recoverable from dynamics table + extensional self-satisfaction. -/
+def IsRecoverableExtensionalTable {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    (Phi : PropertySet (LTL (Atom SZ IZ OZ))) (Z : DiscreteSystem SZ IZ OZ)
+    (hOut : AlwaysOutputs Z) : Prop :=
+  IsSynthesizableTable Phi Z hOut ∧ IsSynthesizableExtensional Z hOut
+
+theorem isRecoverableExtensionalTable_of {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
+    [Fintype OZ] (Phi : PropertySet (LTL (Atom SZ IZ OZ))) (Z : DiscreteSystem SZ IZ OZ)
+    (hOut : AlwaysOutputs Z) (hTable : IsSynthesizableTable Phi Z hOut) :
+    IsRecoverableExtensionalTable Phi Z hOut :=
+  ⟨hTable, extensional_self_synthesizable Z hOut⟩
+
 theorem extensional_synthesized_cross_iff_hom {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     {Z : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2} :
     SystemSatisfiesExtensionalCross (synthesizeExtensionalSpec Z) Z_impl ↔
@@ -452,5 +465,70 @@ theorem extensional_synthesized_compiled_iff_hom {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type
     SystemSatisfiesCompiledExtensional (synthesizeExtensionalSpec Z) Z_impl ↔
       IsHomomorphicImage (synthesizeExtensionalSpec Z) Z_impl :=
   extensional_synthesized_cross_iff_hom
+
+/-! ## Tier unification (finite pinned ↔ extensional) -/
+
+theorem extensional_satisfies_iff_dynamics_ofTotal {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
+    [Fintype OZ] [Nonempty IZ]
+    {NZ_spec NZ_impl : SZ → IZ → SZ} {RZ_spec RZ_impl : SZ → OZ}
+    (hNE_spec : Nonempty SZ) (hNE_impl : Nonempty SZ)
+    (hSpec : AlwaysOutputs (DiscreteSystem.ofTotal NZ_spec RZ_spec hNE_spec))
+    (hImpl : AlwaysOutputs (DiscreteSystem.ofTotal NZ_impl RZ_impl hNE_impl)) :
+    SystemSatisfiesExtensional
+      (DiscreteSystem.ofTotal NZ_spec RZ_spec hNE_spec)
+      (DiscreteSystem.ofTotal NZ_impl RZ_impl hNE_impl) hSpec hImpl ↔
+      SystemSatisfiesDynamics
+        (DiscreteSystem.ofTotal NZ_spec RZ_spec hNE_spec)
+        (DiscreteSystem.ofTotal NZ_impl RZ_impl hNE_impl) hSpec hImpl :=
+  ⟨fun h => extensional_implies_dynamicsTable hSpec hImpl h,
+    extensional_dynamicsTable_implies_extensional_ofTotal hNE_spec hNE_impl⟩
+
+theorem synthesizeExtensional_eq_synthesize {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
+    [Fintype OZ] (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
+    synthesizeExtensionalSpec Z = synthesizeSpec Z hOut := rfl
+
+theorem identityHom_open_iff_finite_ofTotal {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
+    [Fintype OZ] [Nonempty IZ]
+    {NZ_spec NZ_impl : SZ → IZ → SZ} {RZ_spec RZ_impl : SZ → OZ}
+    (hNE_spec : Nonempty SZ) (hNE_impl : Nonempty SZ)
+    (hSpec : AlwaysOutputs (DiscreteSystem.ofTotal NZ_spec RZ_spec hNE_spec))
+    (hImpl : AlwaysOutputs (DiscreteSystem.ofTotal NZ_impl RZ_impl hNE_impl)) :
+    SystemIsIdentityHomomorphicImageOpen
+      (DiscreteSystem.ofTotal NZ_spec RZ_spec hNE_spec)
+      (DiscreteSystem.ofTotal NZ_impl RZ_impl hNE_impl) hSpec hImpl ↔
+      SystemIsIdentityHomomorphicImage
+        (DiscreteSystem.ofTotal NZ_spec RZ_spec hNE_spec)
+        (DiscreteSystem.ofTotal NZ_impl RZ_impl hNE_impl) hSpec hImpl := by
+  constructor
+  · intro ⟨w⟩
+    exact ⟨openHomWitness_to_finite hSpec hImpl w⟩
+  · intro ⟨w⟩
+    exact ⟨finiteHomWitness_to_open_ofTotal hNE_spec hNE_impl hSpec hImpl w⟩
+
+theorem extensional_synthesized_iff_pinned_synthesized_ofTotal {SZ IZ OZ : Type}
+    [Fintype SZ] [Fintype IZ] [Fintype OZ] [Nonempty IZ]
+    {NZ Z_impl_NZ : SZ → IZ → SZ} {RZ Z_impl_RZ : SZ → OZ}
+    (hNE : Nonempty SZ) :
+    let Z_spec := DiscreteSystem.ofTotal NZ RZ hNE
+    let Z_impl := DiscreteSystem.ofTotal Z_impl_NZ Z_impl_RZ hNE
+    let hZ := ofTotal_alwaysOutputs NZ RZ hNE
+    let hImpl := ofTotal_alwaysOutputs Z_impl_NZ Z_impl_RZ hNE
+    (SystemSatisfiesExtensional Z_spec Z_impl hZ hImpl ↔
+        SystemIsIdentityHomomorphicImageOpen (synthesizeExtensionalSpec Z_spec) Z_impl hZ hImpl) ↔
+      (SystemSatisfiesDynamics Z_spec Z_impl hZ hImpl ↔
+        SystemIsIdentityHomomorphicImage (synthesizeSpec Z_spec hZ) Z_impl hZ hImpl) := by
+  dsimp only
+  have hZ := ofTotal_alwaysOutputs NZ RZ hNE
+  have hImpl := ofTotal_alwaysOutputs Z_impl_NZ Z_impl_RZ hNE
+  rw [extensional_synthesized_sameType_iff_hom hZ hImpl, system_synthesized_property_iff_hom hZ hImpl]
+  simp only [synthesizeExtensionalSpec, synthesizeSpec]
+
+theorem extensional_synthesized_implies_pinned_synthesized {SZ IZ OZ : Type}
+    [Fintype SZ] [Fintype IZ] [Fintype OZ] [Nonempty IZ]
+    {Z Z_impl : DiscreteSystem SZ IZ OZ}
+    (hZ : AlwaysOutputs Z) (hImpl : AlwaysOutputs Z_impl) :
+    SystemSatisfiesExtensional Z Z_impl hZ hImpl →
+      SystemSatisfiesDynamics Z Z_impl hZ hImpl :=
+  extensional_implies_dynamicsTable hZ hImpl
 
 end ExtensionalDynamicsFragment

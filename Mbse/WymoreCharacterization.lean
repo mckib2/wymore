@@ -9,6 +9,10 @@ import Mbse.GeneralPropertyFragment
 import Mbse.ExtensionalDynamicsFragment
 import Mbse.TemporalLogic
 import Mbse.SpecFromProperties
+import Mbse.HimsySynthesis
+import Mbse.GeneralCharacterization
+import Mbse.ObservablesFromSpec
+import Mbse.SystemToLTL
 
 /-!
 # General Wymore property characterization (Tracks A, B, D)
@@ -22,7 +26,8 @@ namespace WymoreCharacterization
 open WymorePropertyFragment WymorePathologyExamples FragmentPathologyRegistry
   PropertyFragmentSpec PropertySemantics HomSoundness GeneralProperties
   SystemToFormula PropertyFragment.General PropertyFragment.FSM FSMProperties PathologyExamples
-  TemporalLogic ExtensionalDynamicsFragment FOLTL SpecFromProperties
+  TemporalLogic ExtensionalDynamicsFragment FOLTL SpecFromProperties HimsySynthesis
+  GeneralCharacterization ObservablesFromSpec SystemToLTL FSM
 
 /-! ## Track B: FO assertional -/
 
@@ -339,5 +344,50 @@ theorem stageWymore_extensional_tier :
     extensionalDynamicsFragment.finiteClauseEnumeration = false ∧
       extensionalDynamicsFragment.dynamicsComplete = true := by
   exact ⟨extensionalDynamics_no_finite_enum, extensionalDynamics_dynamicsComplete⟩
+
+/-! ## HIMSY constructive synthesis -/
+
+theorem stageWymore_himsy_eq_spec :
+    HimsySpecEqual counterSystem (synthesizeHimsySpec counterElab_witness) :=
+  counterSystem_eq_himsy_counterElab
+
+theorem stageWymore_himsy_phi_adequate :
+    PhiAdequateHimsy counterElab_witness :=
+  counterSystem_himsy_phi_adequate
+
+theorem stageWymore_himsy_verification {Z_impl : DiscreteSystem (Nat × Bool) Bool Nat} :
+    PhiAdequateHimsy counterElab_witness →
+      (SystemSatisfiesExtensionalCross (synthesizeHimsySpec counterElab_witness) Z_impl ↔
+        IsHomomorphicImage (synthesizeHimsySpec counterElab_witness) Z_impl) :=
+  himsy_synthesized_verification counterElab_witness
+
+theorem stageWymore_himsy_verification_equivalence {Z_impl : DiscreteSystem (Nat × Bool) Bool Nat} :
+    VerificationEquivalence
+      (SystemSatisfiesExtensionalCross (synthesizeHimsySpec counterElab_witness) Z_impl)
+      (IsHomomorphicImage (synthesizeHimsySpec counterElab_witness) Z_impl)
+      (PhiAdequateHimsy counterElab_witness) :=
+  himsy_verification_equivalence counterElab_witness
+
+/-! ## Inverse table recovery -/
+
+theorem stageWymore_recoverSpecFromTable {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    (Phi : PropertySet (LTL (Atom SZ IZ OZ))) (Z : DiscreteSystem SZ IZ OZ)
+    (hOut : AlwaysOutputs Z) (h : IsSynthesizableTable Phi Z hOut) :
+    recoverSpecFromTable Phi Z hOut = Z ∧
+      compileObservables (recoverSpecFromTable Phi Z hOut) hOut = Phi :=
+  ⟨recoverSpecFromTable_eq Phi Z hOut h, recoverSpecFromTable_compiles Phi Z hOut h⟩
+
+theorem stageWymore_fsmStay_recoverable :
+    IsRecoverableExtensionalTable
+      (dynamicsTable fsmStay.toDiscreteSystem (fsm_alwaysOutputs fsmStay))
+      fsmStay.toDiscreteSystem (fsm_alwaysOutputs fsmStay) :=
+  fsmStay_recoverable_table
+
+/-! ## Tier unification (finite pinned ↔ extensional) -/
+
+theorem stageWymore_synthesizeExtensional_eq_synthesize {SZ IZ OZ : Type} [Fintype SZ]
+    [Fintype IZ] [Fintype OZ] (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
+    synthesizeExtensionalSpec Z = synthesizeSpec Z hOut :=
+  stage4_synthesizeExtensional_eq_synthesize Z hOut
 
 end WymoreCharacterization

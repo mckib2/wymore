@@ -5,6 +5,7 @@ import Mbse.SpecFromProperties
 import Mbse.ObservablesFromSpec
 import Mbse.HomomorphismProperties
 import Mbse.HomSoundness
+import Mbse.ExtensionalDynamicsFragment
 
 /-!
 # General characterization of TL-side conditions
@@ -16,7 +17,7 @@ namespace GeneralCharacterization
 
 
 open CombinationalProperties FSMProperties GeneralProperties SpecFromProperties
-  ObservablesFromSpec HomomorphismProperties HomSoundness
+  ObservablesFromSpec HomomorphismProperties HomSoundness ExtensionalDynamicsFragment
   PropertyFragment PropertyFragment.FSM PropertyFragment.General
   PropertySemantics Combinational FSM
 
@@ -137,5 +138,44 @@ theorem stage3_generalizes_fsm {SZ IZ OZ : Type} [Nonempty IZ] (F_spec F_impl : 
       (FSM.fsm_alwaysOutputs F_spec) (FSM.fsm_alwaysOutputs F_impl) ↔
       FSMIsIdentityHomomorphicImage F_spec F_impl :=
   fsm_property_iff_hom_via_embed F_spec F_impl
+
+/-! ## Tier unification (finite pinned ↔ extensional) -/
+
+theorem stage4_synthesizeExtensional_eq_synthesize {SZ IZ OZ : Type} [Fintype SZ]
+    [Fintype IZ] [Fintype OZ] (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
+    synthesizeExtensionalSpec Z = synthesizeSpec Z hOut :=
+  synthesizeExtensional_eq_synthesize Z hOut
+
+theorem stage4_extensional_satisfies_iff_dynamics_ofTotal {SZ IZ OZ : Type} [Fintype SZ]
+    [Fintype IZ] [Fintype OZ] [Nonempty IZ]
+    {NZ_spec NZ_impl : SZ → IZ → SZ} {RZ_spec RZ_impl : SZ → OZ}
+    (hNE_spec : Nonempty SZ) (hNE_impl : Nonempty SZ)
+    (hSpec : AlwaysOutputs (DiscreteSystem.ofTotal NZ_spec RZ_spec hNE_spec))
+    (hImpl : AlwaysOutputs (DiscreteSystem.ofTotal NZ_impl RZ_impl hNE_impl)) :
+    SystemSatisfiesExtensional (DiscreteSystem.ofTotal NZ_spec RZ_spec hNE_spec)
+        (DiscreteSystem.ofTotal NZ_impl RZ_impl hNE_impl) hSpec hImpl ↔
+      SystemSatisfiesDynamics (DiscreteSystem.ofTotal NZ_spec RZ_spec hNE_spec)
+        (DiscreteSystem.ofTotal NZ_impl RZ_impl hNE_impl) hSpec hImpl :=
+  extensional_satisfies_iff_dynamics_ofTotal hNE_spec hNE_impl hSpec hImpl
+
+theorem stage4_extensional_synthesized_iff_pinned_ofTotal {SZ IZ OZ : Type}
+    [Fintype SZ] [Fintype IZ] [Fintype OZ] [Nonempty IZ]
+    {NZ Z_impl_NZ : SZ → IZ → SZ} {RZ Z_impl_RZ : SZ → OZ} (hNE : Nonempty SZ) :
+    let Z_spec := DiscreteSystem.ofTotal NZ RZ hNE
+    let Z_impl := DiscreteSystem.ofTotal Z_impl_NZ Z_impl_RZ hNE
+    let hZ := ofTotal_alwaysOutputs NZ RZ hNE
+    let hImpl := ofTotal_alwaysOutputs Z_impl_NZ Z_impl_RZ hNE
+    (SystemSatisfiesExtensional Z_spec Z_impl hZ hImpl ↔
+        SystemIsIdentityHomomorphicImageOpen (synthesizeExtensionalSpec Z_spec) Z_impl hZ hImpl) ↔
+      (SystemSatisfiesDynamics Z_spec Z_impl hZ hImpl ↔
+        SystemIsIdentityHomomorphicImage (synthesizeSpec Z_spec hZ) Z_impl hZ hImpl) :=
+  extensional_synthesized_iff_pinned_synthesized_ofTotal hNE
+
+theorem stage4_extensional_synthesized_implies_pinned {SZ IZ OZ : Type} [Fintype SZ]
+    [Fintype IZ] [Fintype OZ] [Nonempty IZ] {Z Z_impl : DiscreteSystem SZ IZ OZ}
+    (hZ : AlwaysOutputs Z) (hImpl : AlwaysOutputs Z_impl) :
+    SystemSatisfiesExtensional Z Z_impl hZ hImpl →
+      SystemSatisfiesDynamics Z Z_impl hZ hImpl :=
+  extensional_synthesized_implies_pinned_synthesized hZ hImpl
 
 end GeneralCharacterization

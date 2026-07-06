@@ -15,7 +15,8 @@ Cited by the comparative report §5 and §9.
 namespace FragmentPathologyRegistry
 
 open PropertyFragmentSpec PathologyExamples WymorePathologyExamples WymorePropertyFragment
-  ExtensionalDynamicsFragment PropertyFragment.FSM FSMProperties TemporalLogic SpecFromProperties
+  ExtensionalDynamicsFragment PropertyFragment.FSM PropertyFragment.General FSMProperties
+  TemporalLogic SpecFromProperties HimsySynthesis FSM
 
 /-- Failure modes blocking assertional Φ ↔ hom completeness outside pinned finite tier. -/
 inductive BlockerTag where
@@ -61,6 +62,19 @@ theorem resolved_extensionalSynthesis :
       (SystemSatisfiesExtensionalCross (synthesizeExtensionalSpec counterSystem) counterElab ↔
         IsHomomorphicImage (synthesizeExtensionalSpec counterSystem) counterElab) :=
   ⟨counterSystem_phi_adequate_cross, counterSystem_synthesized_cross_iff_hom⟩
+
+/-- HIMSY constructive spec = homomorphic image (`counterSystem` = HIMSY(`counterElab`)). -/
+theorem resolved_himsySynthesis :
+    HimsySpecEqual counterSystem (synthesizeHimsySpec counterElab_witness) ∧
+      IsHomomorphicImage counterSystem counterElab :=
+  ⟨counterSystem_eq_himsy_counterElab, counterElab_hom_to_counterSystem⟩
+
+/-- Witness-gated inverse table recovery on finite pinned tier (`fsmStay`). -/
+theorem resolved_inverseTableRecovery :
+    IsRecoverableExtensionalTable
+      (dynamicsTable fsmStay.toDiscreteSystem (fsm_alwaysOutputs fsmStay))
+      fsmStay.toDiscreteSystem (fsm_alwaysOutputs fsmStay) :=
+  fsmStay_recoverable_table
 
 theorem blocked_partialRZ :
     pinnedFragment.dynamicsComplete = true ∧ ¬ AlwaysOutputs closedSystem :=

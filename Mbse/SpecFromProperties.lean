@@ -88,12 +88,44 @@ def synthesizeExtensionalSpec {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
 theorem synthesizeExtensionalSpec_eq {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
     synthesizeExtensionalSpec Z = Z := rfl
 
-/-! ## Inverse synthesis (partial) -/
+/-! ## Inverse synthesis (partial)
+
+Recovery from Φ requires a witness reference `Z` (or hom witness for cross-type via HIMSY).
+Bare `PropertySet` decode without canonical structure is intentionally not provided.
+-/
 
 def IsSynthesizableTable {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
     (Phi : PropertySet (LTL (Atom SZ IZ OZ))) (Z : DiscreteSystem SZ IZ OZ)
     (hOut : AlwaysOutputs Z) : Prop :=
   compileObservables Z hOut = Phi ∧ synthesizeSpec Z hOut = Z
+
+def recoverSpecFromTable {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    (_Phi : PropertySet (LTL (Atom SZ IZ OZ)))
+    (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) : DiscreteSystem SZ IZ OZ :=
+  synthesizeSpec Z hOut
+
+theorem recoverSpecFromTable_eq {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    (Phi : PropertySet (LTL (Atom SZ IZ OZ))) (Z : DiscreteSystem SZ IZ OZ)
+    (hOut : AlwaysOutputs Z) (h : IsSynthesizableTable Phi Z hOut) :
+    recoverSpecFromTable Phi Z hOut = Z :=
+  h.2
+
+theorem recoverSpecFromTable_compiles {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    (Phi : PropertySet (LTL (Atom SZ IZ OZ))) (Z : DiscreteSystem SZ IZ OZ)
+    (hOut : AlwaysOutputs Z) (h : IsSynthesizableTable Phi Z hOut) :
+    compileObservables (recoverSpecFromTable Phi Z hOut) hOut = Phi :=
+  h.1
+
+def recoverFsmFromTable {SZ IZ OZ : Type} (F : FSMSystem SZ IZ OZ) : FSMSystem SZ IZ OZ :=
+  synthesizeFsmSpec F
+
+theorem recoverFsmFromTable_eq {SZ IZ OZ : Type} (F : FSMSystem SZ IZ OZ) :
+    recoverFsmFromTable F = F :=
+  rfl
+
+theorem recoverFsmFromTable_compiles {SZ IZ OZ : Type} (F : FSMSystem SZ IZ OZ) :
+    compileFsmObservables (recoverFsmFromTable F) = fsmDynamicsTable F := by
+  simp [recoverFsmFromTable, compileFsmObservables, synthesizeFsmSpec]
 
 theorem fsm_table_synthesizable {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
     (F : FSMSystem SZ IZ OZ) :

@@ -31,3 +31,4 @@ import Mbse.WymorePathologyExamples
 import Mbse.WymoreCharacterization
 import Mbse.FragmentPathologyRegistry
 import Mbse.ExtensionalDynamicsFragment
+import Mbse.HimsySynthesis
