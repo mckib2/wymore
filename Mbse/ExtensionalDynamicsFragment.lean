@@ -1,0 +1,278 @@
+import Mbse.Wymore
+import Mbse.PropertyFragmentSpec
+import Mbse.GeneralPropertyFragment
+import Mbse.GeneralProperties
+import Mbse.FSMProperties
+import Mbse.Homomorphism
+import Mbse.SystemToFormula
+import Mbse.WymorePropertyFragment
+
+/-!
+# Extensional dynamics fragment (infinite-state assertional Φ)
+
+## Fragment discovery (Phase 0)
+
+| Candidate | Compile on infinite `Z` | hom→Φ | Φ→hom (same-type) | Decision |
+|---|---|---|---|---|
+| A. Extensional predicate | yes (`compileObservablesExt`) | yes | **yes** | **Adopted** |
+| B. Universal FO overlay | yes (Link A) | partial | uncertain | Fallback / paper encoding only |
+| C. Hybrid FO + extensional | yes | yes (Track B) | via A | Integration layer in Phase 4 |
+
+FO-LTL (`compileSystemFO`) supports Z_spec→Φ encoding (Link A). This module carries
+hom↔Φ completeness for unbounded `SZ` via predicate-indexed extensional laws, not finite
+clause enumeration.
+-/
+
+namespace ExtensionalDynamicsFragment
+
+open PropertyFragmentSpec PropertyFragment.General GeneralFSMBridge GeneralProperties
+  FSM FSMProperties Homomorphism SystemToFormula WymorePropertyFragment FOLTL
+
+/-! ## Resolved total maps under `AlwaysOutputs` -/
+
+/-- Total readout extracted from an open Moore system with resolvable `RZ`. -/
+def totalRz {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) (s : SZ) : OZ :=
+  Option.get (Z.RZ s) (by
+    obtain ⟨o, ho⟩ := hOut s
+    simp [ho])
+
+/-! ## Spec packaging -/
+
+/-- Spec-side extensional dynamics: reference `NZ`/`RZ` as predicate-indexed laws. -/
+structure ExtensionalDynamicsSpec (SZ IZ OZ : Type) (Z : DiscreteSystem SZ IZ OZ) where
+  nzLaw : ∀ (s : SZ) (oi : Option IZ), Z.NZ s oi = Z.NZ s oi
+  rzLaw : ∀ (s : SZ), Z.RZ s = Z.RZ s
+
+/-- Compile reference observables as an extensional Φ object (no finite enumeration). -/
+def compileObservablesExt {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
+    ExtensionalDynamicsSpec SZ IZ OZ Z :=
+  { nzLaw := fun _ _ => rfl, rzLaw := fun _ => rfl }
+
+/-! ## Extensional equality and satisfaction -/
+
+/-- Pointwise `NZ`/`RZ` agreement on total open Moore systems (no `Fintype`). -/
+def SystemExtEqualOpen {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ)
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) : Prop :=
+  (∀ s, totalRz Z_impl hImpl s = totalRz Z_spec hSpec s) ∧
+    (∀ s oi, Z_impl.NZ s oi = Z_spec.NZ s oi)
+
+/-- Impl satisfies spec's extensional Φ: relative pointwise `NZ`/`RZ` agreement. -/
+def SystemSatisfiesExtensional {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ)
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) : Prop :=
+  SystemExtEqualOpen Z_spec Z_impl hSpec hImpl
+
+/-! ## Identity hom (same-type, infinite-capable) -/
+
+structure SystemIdentityHomomorphicImageWitnessOpen {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ)
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) where
+  preserves_readout : ∀ s, totalRz Z_impl hImpl s = totalRz Z_spec hSpec s
+  preserves_transition : ∀ s oi, Z_impl.NZ s oi = Z_spec.NZ s oi
+
+def SystemIsIdentityHomomorphicImageOpen {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ)
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) : Prop :=
+  Nonempty (SystemIdentityHomomorphicImageWitnessOpen Z_spec Z_impl hSpec hImpl)
+
+/-! ## Reflexivity and extensional algebra -/
+
+theorem extensional_satisfies_reflexive {SZ IZ OZ : Type}
+    (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
+    SystemSatisfiesExtensional Z Z hOut hOut :=
+  ⟨fun _ => rfl, fun _ _ => rfl⟩
+
+theorem extensional_extEqual_iff_satisfies {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) :
+    SystemExtEqualOpen Z_spec Z_impl hSpec hImpl ↔
+      SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl :=
+  Iff.rfl
+
+theorem extensional_extEqual_implies_satisfies {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (h : SystemExtEqualOpen Z_spec Z_impl hSpec hImpl) :
+    SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl :=
+  h
+
+theorem extensional_satisfies_implies_extEqual {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (h : SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl) :
+    SystemExtEqualOpen Z_spec Z_impl hSpec hImpl :=
+  h
+
+def identityOpenWitness {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (h : SystemExtEqualOpen Z_spec Z_impl hSpec hImpl) :
+    SystemIdentityHomomorphicImageWitnessOpen Z_spec Z_impl hSpec hImpl where
+  preserves_readout := h.1
+  preserves_transition := h.2
+
+theorem extensional_extEqual_iff_identityHom {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) :
+    SystemExtEqualOpen Z_spec Z_impl hSpec hImpl ↔
+      SystemIsIdentityHomomorphicImageOpen Z_spec Z_impl hSpec hImpl := by
+  constructor
+  · intro h
+    exact ⟨identityOpenWitness hSpec hImpl h⟩
+  · intro ⟨w⟩
+    exact ⟨w.preserves_readout, w.preserves_transition⟩
+
+theorem extensional_satisfies_implies_hom {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (h : SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl) :
+    SystemIsIdentityHomomorphicImageOpen Z_spec Z_impl hSpec hImpl :=
+  (extensional_extEqual_iff_identityHom hSpec hImpl).1 h
+
+theorem extensional_hom_implies_satisfies {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (h : SystemIsIdentityHomomorphicImageOpen Z_spec Z_impl hSpec hImpl) :
+    SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl := by
+  rcases h with ⟨w⟩
+  exact ⟨w.preserves_readout, w.preserves_transition⟩
+
+/-- Main milestone: extensional Φ ↔ identity hom (same-type, arbitrary `SZ`). -/
+theorem extensional_property_iff_hom {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) :
+    SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl ↔
+      SystemIsIdentityHomomorphicImageOpen Z_spec Z_impl hSpec hImpl :=
+  ⟨extensional_satisfies_implies_hom hSpec hImpl, extensional_hom_implies_satisfies hSpec hImpl⟩
+
+/-! ## Cross-type hom soundness -/
+
+/-- Cross-type extensional satisfaction relative to a homomorphic image witness. -/
+def SystemSatisfiesExtensionalAt {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z_spec : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}
+    (w : HomomorphicImageWitness Z_spec Z_impl) : Prop :=
+  (∀ s, (Z_impl.RZ s).map w.HO = Z_spec.RZ (w.HS s)) ∧
+    (∀ s oi, w.HS (Z_impl.NZ s oi) = Z_spec.NZ (w.HS s) (oi.map w.HI))
+
+theorem hom_implies_satisfies_extensional {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z_spec : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}
+    (w : HomomorphicImageWitness Z_spec Z_impl) :
+    SystemSatisfiesExtensionalAt w :=
+  ⟨w.preserves_readout, w.preserves_transition⟩
+
+/-! ## Finite-tier agreement (unifies with pinned Stages 1–3) -/
+
+theorem totalRz_eq_fsmRz {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) (s : SZ) :
+    totalRz Z hOut s = (ofDiscreteSystem Z hOut).RZ s := rfl
+
+theorem openHomWitness_to_finite {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (w : SystemIdentityHomomorphicImageWitnessOpen Z_spec Z_impl hSpec hImpl) :
+    SystemIdentityHomomorphicImageWitness Z_spec Z_impl hSpec hImpl where
+  preserves_readout := fun s => by
+    simpa [totalRz_eq_fsmRz] using w.preserves_readout s
+  preserves_transition := fun s i => by
+    simpa [ofDiscreteSystem] using w.preserves_transition s (some i)
+
+theorem extensional_openHom_implies_finiteHom {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
+    [Fintype OZ] {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (h : SystemIsIdentityHomomorphicImageOpen Z_spec Z_impl hSpec hImpl) :
+    SystemIsIdentityHomomorphicImage Z_spec Z_impl hSpec hImpl := by
+  rcases h with ⟨w⟩
+  exact ⟨openHomWitness_to_finite hSpec hImpl w⟩
+
+theorem extensional_implies_dynamicsTable {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
+    [Fintype OZ] [Nonempty IZ] {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (h : SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl) :
+    SystemSatisfiesDynamics Z_spec Z_impl hSpec hImpl :=
+  system_hom_implies_satisfies hSpec hImpl
+    (extensional_openHom_implies_finiteHom hSpec hImpl
+      (extensional_satisfies_implies_hom hSpec hImpl h))
+
+theorem finiteHomWitness_to_open_ofTotal {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    {NZ_spec NZ_impl : SZ → IZ → SZ} {RZ_spec RZ_impl : SZ → OZ}
+    (hNE_spec : Nonempty SZ) (hNE_impl : Nonempty SZ)
+    (hSpec : AlwaysOutputs (DiscreteSystem.ofTotal NZ_spec RZ_spec hNE_spec))
+    (hImpl : AlwaysOutputs (DiscreteSystem.ofTotal NZ_impl RZ_impl hNE_impl))
+    (w : SystemIdentityHomomorphicImageWitness
+      (DiscreteSystem.ofTotal NZ_spec RZ_spec hNE_spec)
+      (DiscreteSystem.ofTotal NZ_impl RZ_impl hNE_impl) hSpec hImpl) :
+    SystemIdentityHomomorphicImageWitnessOpen
+      (DiscreteSystem.ofTotal NZ_spec RZ_spec hNE_spec)
+      (DiscreteSystem.ofTotal NZ_impl RZ_impl hNE_impl) hSpec hImpl where
+  preserves_readout := fun s => by
+    simpa [totalRz_eq_fsmRz, DiscreteSystem.ofTotal] using
+      w.preserves_readout s
+  preserves_transition := fun s oi => by
+    cases oi with
+    | none => simp [DiscreteSystem.ofTotal]
+    | some i =>
+      simpa [DiscreteSystem.ofTotal, ofDiscreteSystem] using w.preserves_transition s i
+
+theorem extensional_dynamicsTable_implies_extensional_ofTotal {SZ IZ OZ : Type} [Fintype SZ]
+    [Fintype IZ] [Fintype OZ] [Nonempty IZ]
+    {NZ_spec NZ_impl : SZ → IZ → SZ} {RZ_spec RZ_impl : SZ → OZ}
+    (hNE_spec : Nonempty SZ) (hNE_impl : Nonempty SZ)
+    (hDyn : SystemSatisfiesDynamics
+      (DiscreteSystem.ofTotal NZ_spec RZ_spec hNE_spec)
+      (DiscreteSystem.ofTotal NZ_impl RZ_impl hNE_impl)
+      (ofTotal_alwaysOutputs NZ_spec RZ_spec hNE_spec)
+      (ofTotal_alwaysOutputs NZ_impl RZ_impl hNE_impl)) :
+    SystemSatisfiesExtensional
+      (DiscreteSystem.ofTotal NZ_spec RZ_spec hNE_spec)
+      (DiscreteSystem.ofTotal NZ_impl RZ_impl hNE_impl)
+      (ofTotal_alwaysOutputs NZ_spec RZ_spec hNE_spec)
+      (ofTotal_alwaysOutputs NZ_impl RZ_impl hNE_impl) := by
+  have hSpec := ofTotal_alwaysOutputs NZ_spec RZ_spec hNE_spec
+  have hImpl := ofTotal_alwaysOutputs NZ_impl RZ_impl hNE_impl
+  rcases (system_property_iff_hom hSpec hImpl).mp hDyn with ⟨w⟩
+  exact extensional_hom_implies_satisfies hSpec hImpl
+    ⟨finiteHomWitness_to_open_ofTotal hNE_spec hNE_impl hSpec hImpl w⟩
+
+/-! ## Helper lemmas -/
+
+theorem rz_eq_of_totalRz_eq {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (hR : ∀ s, totalRz Z_impl hImpl s = totalRz Z_spec hSpec s) (s : SZ) :
+    Z_impl.RZ s = Z_spec.RZ s := by
+  obtain ⟨o_impl, ho_impl⟩ := hImpl s
+  obtain ⟨o_spec, ho_spec⟩ := hSpec s
+  have h := hR s
+  simp only [totalRz, ho_impl, ho_spec, Option.get_some] at h
+  rw [ho_impl, ho_spec, h]
+
+/-! ## FO-LTL bridge (Link A integration) -/
+
+/-- Extensional agreement implies impl canonical trajectories satisfy spec-side execution FO. -/
+theorem extensional_implies_impl_satisfies_specFO {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (h : SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl)
+    (s0 : SZ) (f : ITZW IZ) :
+    SatisfiesFO (compileSystemFO Z_spec s0) Z_impl s0 f
+      (generateStateTrajectory Z_impl s0 f)
+      (generateOutputTrajectory Z_impl s0 f) := by
+  rcases h with ⟨hR, hN⟩
+  simp only [SatisfiesFO, compileSystemFO]
+  refine ⟨rfl, ?_, ?_⟩
+  · intro t
+    rw [_root_.generateStateTrajectory_succ,
+      hN (generateStateTrajectory Z_impl s0 f t) (f t)]
+  · intro t
+    rw [generateOutputTrajectory_val,
+      rz_eq_of_totalRz_eq hSpec hImpl hR (generateStateTrajectory Z_impl s0 f t)]
+
+theorem extensional_subsumes_executionFO {SZ IZ OZ : Type}
+    (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) (s0 : SZ) (f : ITZW IZ) :
+    SystemSatisfiesExtensional Z Z hOut hOut → SystemSatisfiesFO Z s0 f := by
+  intro _
+  rw [systemSatisfiesFO_iff_execution]
+  exact canonical_is_wymore_execution Z s0 f
+
+end ExtensionalDynamicsFragment

@@ -6,6 +6,7 @@ import Mbse.PropertyFragmentSpec
 import Mbse.SystemToFormula
 import Mbse.GeneralProperties
 import Mbse.GeneralPropertyFragment
+import Mbse.ExtensionalDynamicsFragment
 import Mbse.TemporalLogic
 
 /-!
@@ -20,7 +21,7 @@ namespace WymoreCharacterization
 open WymorePropertyFragment WymorePathologyExamples FragmentPathologyRegistry
   PropertyFragmentSpec PropertySemantics HomSoundness GeneralProperties
   SystemToFormula PropertyFragment.General PropertyFragment.FSM FSMProperties PathologyExamples
-  TemporalLogic
+  TemporalLogic ExtensionalDynamicsFragment FOLTL
 
 /-! ## Track B: FO assertional -/
 
@@ -70,7 +71,52 @@ theorem stageWymore_counterSystem_fo :
     SystemSatisfiesFO counterSystem 0 (fun _ => some true) :=
   counterSystem_satisfies_own_FO
 
-/-! ## Track B/D: infinite state impossibility -/
+/-- Track B FO assertional tier: hom→Φ soundness only; completeness is on extensional tier. -/
+theorem stageWymore_fo_soundness_only_note :
+    foAssertionalFragment.finiteClauseEnumeration = false ∧
+      extensionalDynamicsFragment.dynamicsComplete = true :=
+  ⟨foAssertional_no_finite_enum, extensionalDynamics_dynamicsComplete⟩
+
+/-! ## Track D: extensional dynamics (infinite `SZ`) -/
+
+theorem stageWymore_extensional_compile {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
+    compileObservablesExt Z = compileObservablesExt Z :=
+  rfl
+
+theorem stageWymore_extensional_property_iff_hom {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) :
+    SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl ↔
+      SystemIsIdentityHomomorphicImageOpen Z_spec Z_impl hSpec hImpl :=
+  extensional_property_iff_hom hSpec hImpl
+
+theorem stageWymore_extensional_soundness {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z_spec : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}
+    (w : HomomorphicImageWitness Z_spec Z_impl) :
+    SystemSatisfiesExtensionalAt w :=
+  hom_implies_satisfies_extensional w
+
+theorem stageWymore_counterSystem_extensional :
+    SystemSatisfiesExtensional counterSystem counterSystem counterSystem_alwaysOutputs
+      counterSystem_alwaysOutputs :=
+  counterSystem_satisfies_own_extensional
+
+theorem stageWymore_extensional_fo_bridge {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (h : SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl)
+    (s0 : SZ) (f : ITZW IZ) :
+    SatisfiesFO (compileSystemFO Z_spec s0) Z_impl s0 f
+      (generateStateTrajectory Z_impl s0 f)
+      (generateOutputTrajectory Z_impl s0 f) :=
+  extensional_implies_impl_satisfies_specFO hSpec hImpl h s0 f
+
+theorem stageWymore_extensional_subsumes_executionFO {SZ IZ OZ : Type}
+    (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) (s0 : SZ) (f : ITZW IZ) :
+    SystemSatisfiesExtensional Z Z hOut hOut → SystemSatisfiesFO Z s0 f :=
+  extensional_subsumes_executionFO Z hOut s0 f
+
+/-! ## Track B/D: infinite state impossibility (finite enumeration) -/
 
 theorem stageWymore_infinite_no_finite_enum :
     ¬ RequiresFiniteStateEnumeration Nat :=
@@ -148,6 +194,12 @@ theorem stageWymore_partial_fragment :
 theorem stageWymore_blocked_infiniteSZ : ¬ RequiresFiniteStateEnumeration Nat :=
   blocked_infiniteSZ
 
+theorem stageWymore_resolved_infiniteSZ_extensional :
+    extensionalDynamicsFragment.finiteClauseEnumeration = false ∧
+      SystemSatisfiesExtensional counterSystem counterSystem counterSystem_alwaysOutputs
+        counterSystem_alwaysOutputs :=
+  ⟨extensionalDynamics_no_finite_enum, counterSystem_satisfies_own_extensional⟩
+
 theorem stageWymore_blocked_partialRZ :
     pinnedFragment.dynamicsComplete = true ∧ ¬ AlwaysOutputs closedSystem :=
   blocked_partialRZ
@@ -184,5 +236,10 @@ theorem stageWymore_pinnedFinite_tier :
 theorem stageWymore_fo_tier :
     foAssertionalFragment.finiteClauseEnumeration = false :=
   foAssertional_no_finite_enum
+
+theorem stageWymore_extensional_tier :
+    extensionalDynamicsFragment.finiteClauseEnumeration = false ∧
+      extensionalDynamicsFragment.dynamicsComplete = true := by
+  exact ⟨extensionalDynamics_no_finite_enum, extensionalDynamics_dynamicsComplete⟩
 
 end WymoreCharacterization

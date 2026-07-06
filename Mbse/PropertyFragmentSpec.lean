@@ -103,6 +103,21 @@ def foAssertionalFragment : FragmentSpec where
   dynamicsComplete := true
   homomorphismVisibleAtoms := [.stateAtom, .inputAtom, .outputAtom]
 
+/-- Track D: extensional predicate-indexed dynamics; no finite state enumeration. -/
+def extensionalDynamicsFragment : FragmentSpec where
+  allowedConnectives := [.imp, .GConn]
+  disjunctionPolicy := .canonicalCommitment
+  eventuallyPolicy := .excluded
+  finiteClauseEnumeration := false
+  dynamicsComplete := true
+  homomorphismVisibleAtoms := [.stateAtom, .inputAtom, .outputAtom]
+
+theorem extensionalDynamics_no_finite_enum :
+    extensionalDynamicsFragment.finiteClauseEnumeration = false := rfl
+
+theorem extensionalDynamics_dynamicsComplete :
+    extensionalDynamicsFragment.dynamicsComplete = true := rfl
+
 /-- Track C: LTS trace refinement (nondeterministic abstract specs). -/
 def ltsRefinementFragment : FragmentSpec where
   allowedConnectives := [.imp, .GConn]
@@ -134,6 +149,16 @@ structure PartialOpenSideConditions (SZ IZ OZ : Type) (Z : DiscreteSystem SZ IZ 
 theorem partialOpenSideConditions_dynamics {SZ IZ OZ : Type} {Z : DiscreteSystem SZ IZ OZ}
     (h : PartialOpenSideConditions SZ IZ OZ Z) :
     partialOpenFragment.dynamicsComplete = true :=
+  h.dynamicsComplete
+
+/-- Side conditions for extensional dynamics (arbitrary `SZ`; requires resolvable readout). -/
+structure InfiniteOpenSideConditions (SZ IZ OZ : Type) (Z : DiscreteSystem SZ IZ OZ) : Prop where
+  alwaysOutputs : AlwaysOutputs Z
+  dynamicsComplete : extensionalDynamicsFragment.dynamicsComplete = true
+
+theorem infiniteOpenSideConditions_dynamics {SZ IZ OZ : Type} {Z : DiscreteSystem SZ IZ OZ}
+    (h : InfiniteOpenSideConditions SZ IZ OZ Z) :
+    extensionalDynamicsFragment.dynamicsComplete = true :=
   h.dynamicsComplete
 
 end PropertyFragmentSpec

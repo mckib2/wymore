@@ -2,6 +2,7 @@ import Mbse.WymorePathologyExamples
 import Mbse.PathologyExamples
 import Mbse.PropertyFragmentSpec
 import Mbse.WymorePropertyFragment
+import Mbse.ExtensionalDynamicsFragment
 import Mbse.FSMProperties
 
 /-!
@@ -14,7 +15,7 @@ Cited by the comparative report §5 and §9.
 namespace FragmentPathologyRegistry
 
 open PropertyFragmentSpec PathologyExamples WymorePathologyExamples WymorePropertyFragment
-  PropertyFragment.FSM FSMProperties TemporalLogic
+  ExtensionalDynamicsFragment PropertyFragment.FSM FSMProperties TemporalLogic
 
 /-- Failure modes blocking assertional Φ ↔ hom completeness outside pinned finite tier. -/
 inductive BlockerTag where
@@ -36,6 +37,17 @@ def blockerFragment : BlockerTag → FragmentSpec
 theorem blocked_infiniteSZ :
     ¬ RequiresFiniteStateEnumeration Nat :=
   counterSystem_no_finite_dynamicsTable
+
+/-- Finite enumeration remains blocked; extensional tier bypasses it for hom↔Φ. -/
+theorem resolved_infiniteSZ_extensional :
+    extensionalDynamicsFragment.finiteClauseEnumeration = false ∧
+      SystemSatisfiesExtensional counterSystem counterSystem counterSystem_alwaysOutputs
+        counterSystem_alwaysOutputs ∧
+      SystemIsIdentityHomomorphicImageOpen counterSystem counterSystem
+        counterSystem_alwaysOutputs counterSystem_alwaysOutputs :=
+  ⟨extensionalDynamics_no_finite_enum, counterSystem_satisfies_own_extensional,
+    extensional_satisfies_implies_hom counterSystem_alwaysOutputs counterSystem_alwaysOutputs
+      counterSystem_satisfies_own_extensional⟩
 
 theorem blocked_partialRZ :
     pinnedFragment.dynamicsComplete = true ∧ ¬ AlwaysOutputs closedSystem :=

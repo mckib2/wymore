@@ -5,6 +5,7 @@ import Mbse.GeneralProperties
 import Mbse.FiniteWymore
 import Mbse.SystemToFormula
 import Mbse.GeneralPropertyFragment
+import Mbse.ExtensionalDynamicsFragment
 
 /-!
 # Pathology examples for the general Wymore property track
@@ -15,7 +16,7 @@ Documents failure modes for infinite state, partial I/O, and finite enumeration.
 namespace WymorePathologyExamples
 
 open WymorePropertyFragment PropertyFragmentSpec PathologyExamples GeneralProperties FSM
-  SystemToFormula PropertyFragment.General
+  SystemToFormula PropertyFragment.General ExtensionalDynamicsFragment
 
 /-! ## Infinite state (`counterSystem`) -/
 
@@ -36,6 +37,20 @@ theorem counterSystem_satisfies_own_FO :
     SystemSatisfiesFO counterSystem 0 (fun _ => some true) := by
   rw [systemSatisfiesFO_iff_execution]
   exact canonical_is_wymore_execution counterSystem 0 (fun _ => some true)
+
+/-- Extensional Φ is reflexively satisfied on infinite `counterSystem`. -/
+theorem counterSystem_satisfies_own_extensional :
+    SystemSatisfiesExtensional counterSystem counterSystem counterSystem_alwaysOutputs
+      counterSystem_alwaysOutputs :=
+  extensional_satisfies_reflexive counterSystem counterSystem_alwaysOutputs
+
+/-- Extensional Φ ↔ identity hom on infinite `counterSystem` (same-type witness). -/
+theorem counterSystem_extensional_iff_hom :
+    SystemSatisfiesExtensional counterSystem counterSystem counterSystem_alwaysOutputs
+      counterSystem_alwaysOutputs ↔
+      SystemIsIdentityHomomorphicImageOpen counterSystem counterSystem
+        counterSystem_alwaysOutputs counterSystem_alwaysOutputs :=
+  extensional_property_iff_hom counterSystem_alwaysOutputs counterSystem_alwaysOutputs
 
 /-! ## Partial readout (`closedSystem`) -/
 
