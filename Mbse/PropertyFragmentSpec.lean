@@ -67,4 +67,52 @@ theorem pinnedFragment_dynamicsComplete : pinnedFragment.dynamicsComplete = true
 theorem pinnedFragment_disjunctionCanonical :
     pinnedFragment.disjunctionPolicy = .canonicalCommitment := rfl
 
+/-- Enumeration policy for clause tables. -/
+inductive EnumerationPolicy where
+  | finiteClauseList
+  | predicateIndexed
+  | foQuantified
+
+/-- Fragment tier for Stages 1–3 (finite total open Moore via FSM embed). -/
+def pinnedFiniteFragment : FragmentSpec where
+  allowedConnectives := [.imp, .GConn, .XConn]
+  disjunctionPolicy := .canonicalCommitment
+  eventuallyPolicy := .excluded
+  finiteClauseEnumeration := true
+  dynamicsComplete := true
+  homomorphismVisibleAtoms := [.stateAtom, .inputAtom, .outputAtom]
+
+theorem pinnedFinite_eq_pinned : pinnedFiniteFragment = pinnedFragment := rfl
+
+/-- Track A: partial `Option` readout/input on general `DiscreteSystem`. -/
+def partialOpenFragment : FragmentSpec where
+  allowedConnectives := [.imp, .GConn, .XConn]
+  disjunctionPolicy := .canonicalCommitment
+  eventuallyPolicy := .excluded
+  finiteClauseEnumeration := true
+  dynamicsComplete := true
+  homomorphismVisibleAtoms := [.stateAtom, .inputAtom, .outputAtom]
+
+/-- Track B: FO assertional formulas (`FOLTL`); no finite state enumeration. -/
+def foAssertionalFragment : FragmentSpec where
+  allowedConnectives := [.imp, .GConn]
+  disjunctionPolicy := .canonicalCommitment
+  eventuallyPolicy := .excluded
+  finiteClauseEnumeration := false
+  dynamicsComplete := true
+  homomorphismVisibleAtoms := [.stateAtom, .inputAtom, .outputAtom]
+
+/-- Track C: LTS trace refinement (nondeterministic abstract specs). -/
+def ltsRefinementFragment : FragmentSpec where
+  allowedConnectives := [.imp, .GConn]
+  disjunctionPolicy := .excluded
+  eventuallyPolicy := .excluded
+  finiteClauseEnumeration := false
+  dynamicsComplete := false
+  homomorphismVisibleAtoms := [.inputAtom, .outputAtom]
+
+theorem foAssertional_no_finite_enum : foAssertionalFragment.finiteClauseEnumeration = false := rfl
+
+theorem partialOpen_dynamicsComplete : partialOpenFragment.dynamicsComplete = true := rfl
+
 end PropertyFragmentSpec

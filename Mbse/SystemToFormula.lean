@@ -37,6 +37,15 @@ def compileSystemFO {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) :
     FOLFormula SZ IZ OZ :=
   .and (.init s0) (.and (.step Z) (.readout Z))
 
+/-- Assertional readout invariant: `∀ t, RZ (g t)` as a tick-wise state predicate. -/
+def compileReadoutInv {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) : FOLFormula SZ IZ OZ :=
+  .stateInv fun s => Z.RZ s = Z.RZ s
+
+/-- Dynamics + assertional readout layer (Track B). -/
+def compileAssertionalFO {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) :
+    FOLFormula SZ IZ OZ :=
+  .and (compileSystemFO Z s0) (compileReadoutInv Z)
+
 /-- Existential formula: some initial state and input trajectory satisfy execution constraints. -/
 def compileAnyExecution {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
     FOLFormula SZ IZ OZ :=

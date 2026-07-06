@@ -69,7 +69,7 @@ def uavInit : UavState :=
 def rtbThreshold : ℝ := 5
 
 noncomputable def rtbTransition (s : UavState) (threshold : ℝ) : UavState :=
-  if h : s.b < threshold then { s with active := false } else s
+  if s.b < threshold then { s with active := false } else s
 
 noncomputable def stepUav (s : UavState) : UavState := rtbTransition s rtbThreshold
 

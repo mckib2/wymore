@@ -14,6 +14,8 @@ with identity homomorphic images under the same `SZ`/`IZ`/`OZ` types.
 
 namespace PropertyFragment.FSM
 
+/- Section variables support clause tables; not every lemma body references them. -/
+
 open TemporalLogic PropertySemantics SystemToLTL
 open FSM
 
@@ -36,12 +38,14 @@ def FSMSatisfiesOutputTable (F_ref : FSMSystem SZ IZ OZ) (F : FSMSystem SZ IZ OZ
   ∀ (s0 : SZ) (f : ITZ IZ) (φ : LTL (Atom SZ IZ OZ)),
     φ ∈ (fsmOutputTable F_ref).formulas → (fsmTrace F s0 f).models φ
 
+omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
 theorem fsmSatisfiesOutputTable_iff_traceModels (F_ref F : FSMSystem SZ IZ OZ) :
     FSMSatisfiesOutputTable F_ref F ↔
       ∀ (s0 : SZ) (f : ITZ IZ) (φ : LTL (Atom SZ IZ OZ)),
         φ ∈ (fsmOutputTable F_ref).formulas → (fsmTrace F s0 f).models φ :=
   Iff.rfl
 
+omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
 theorem mem_fsmOutputTable_iff (F : FSMSystem SZ IZ OZ) (φ : LTL (Atom SZ IZ OZ)) :
     φ ∈ (fsmOutputTable F).formulas ↔ ∃ s, φ = safetyOutput s (F.RZ s) := by
   dsimp [fsmOutputTable]
@@ -56,6 +60,7 @@ theorem fsmOutputTable_mem (F : FSMSystem SZ IZ OZ) (s : SZ) :
     safetyOutput s (F.RZ s) ∈ (fsmOutputTable F).formulas :=
   (mem_fsmOutputTable_iff F (safetyOutput s (F.RZ s))).2 ⟨s, rfl⟩
 
+omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
 theorem fsmTrace_satisfies_safetyOutput (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) (s : SZ) :
     (fsmTrace F s0 f).models (safetyOutput s (F.RZ s)) := by
   simp only [Trace.models, satisfiesAt, safetyOutput]
@@ -73,12 +78,14 @@ def FSMSatisfiesDynamics (F_ref : FSMSystem SZ IZ OZ) (F : FSMSystem SZ IZ OZ) :
   ∀ (s0 : SZ) (f : ITZ IZ) (φ : LTL (Atom SZ IZ OZ)),
     φ ∈ (fsmDynamicsTable F_ref).formulas → (fsmTrace F s0 f).models φ
 
+omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
 theorem fsmSatisfiesDynamics_iff_traceModels (F_ref F : FSMSystem SZ IZ OZ) :
     FSMSatisfiesDynamics F_ref F ↔
       ∀ (s0 : SZ) (f : ITZ IZ) (φ : LTL (Atom SZ IZ OZ)),
         φ ∈ (fsmDynamicsTable F_ref).formulas → (fsmTrace F s0 f).models φ :=
   Iff.rfl
 
+omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
 theorem mem_fsmDynamicsTable_iff (F : FSMSystem SZ IZ OZ) (φ : LTL (Atom SZ IZ OZ)) :
     φ ∈ (fsmDynamicsTable F).formulas ↔
       φ ∈ transitionClauses F ∨ φ ∈ readoutClauses F := by
@@ -94,11 +101,13 @@ theorem mem_fsmDynamicsTable_readout (F : FSMSystem SZ IZ OZ) (s : SZ) :
   rw [mem_fsmDynamicsTable_iff]
   exact Or.inr ((mem_readoutClauses_iff F (readoutClause F s)).2 ⟨s, rfl⟩)
 
+omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
 theorem fsmTrace_models_transitionClause (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) (s : SZ)
     (i : IZ) :
     (fsmTrace F s0 f).models (transitionClause F s i) :=
   fsmTrace_satisfies_transitionClause F s0 f 0 s i
 
+omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
 theorem fsmTrace_models_readoutClause (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) (s : SZ) :
     (fsmTrace F s0 f).models (readoutClause F s) :=
   fsmTrace_satisfies_readoutClause F s0 f 0 s
@@ -158,13 +167,13 @@ theorem fsm_satisfies_implies_readout_agreement {F_spec F_impl : FSMSystem SZ IZ
   have hne : (Finset.univ : Finset IZ).Nonempty := Finset.univ_nonempty
   let f : ITZ IZ := fun _ => hne.choose
   have hφ := h s f (readoutClause F_spec s) (mem_fsmDynamicsTable_readout F_spec s)
-  simp only [Trace.models, satisfiesAt, readoutClause, fsmTrace, SystemToLTL.fsmTrace] at hφ
+  simp only [Trace.models, readoutClause, fsmTrace, SystemToLTL.fsmTrace] at hφ
   have hs : (fsmTrace F_impl s f).holds 0 (.state s) := by
     simp [fsmTrace, SystemToLTL.fsmTrace, FSM.generateStateTrajectory_zero]
   have hout := hφ hs
-  simp [fsmTrace, SystemToLTL.fsmTrace, FSM.generateOutputTrajectory_eq,
-    FSM.generateStateTrajectory_zero] at hout
-  exact hout
+  simp only [satisfiesAt,
+    FSM.generateOutputTrajectory_eq, FSM.generateStateTrajectory_zero] at hout
+  exact Option.some.inj hout
 
 theorem fsm_satisfies_implies_extEqual {F_spec F_impl : FSMSystem SZ IZ OZ}
     (h : FSMSatisfiesDynamics F_spec F_impl) :
@@ -175,14 +184,12 @@ theorem fsm_satisfies_implies_extEqual {F_spec F_impl : FSMSystem SZ IZ OZ}
   · intro s i
     let f : ITZ IZ := fun _ => i
     have hmodels := h s f (transitionClause F_spec s i) (mem_fsmDynamicsTable_transition F_spec s i)
-    simp only [Trace.models, satisfiesAt, transitionClause, fsmTrace, SystemToLTL.fsmTrace] at hmodels
+    simp only [Trace.models, transitionClause, fsmTrace, SystemToLTL.fsmTrace] at hmodels
     have hs : (fsmTrace F_impl s f).holds 0 (.state s) := by
       simp [fsmTrace, SystemToLTL.fsmTrace, FSM.generateStateTrajectory_zero]
     have hi : (fsmTrace F_impl s f).holds 0 (.input i) := by
       simp [fsmTrace, SystemToLTL.fsmTrace, f]
     have hnext := hmodels (And.intro hs hi)
-    simp [satisfiesAt, fsmTrace, SystemToLTL.fsmTrace, FSM.generateStateTrajectory_succ,
-      FSM.generateStateTrajectory_zero] at hnext
     exact hnext.symm
 
 theorem fsm_satisfies_dynamics_spec_extEqual {F_spec F_spec' F_impl : FSMSystem SZ IZ OZ}
@@ -223,6 +230,7 @@ end PropertyFragment.FSM
 
 namespace FSMProperties
 
+
 variable {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
 variable [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ]
 variable [Nonempty IZ]
@@ -236,6 +244,7 @@ structure FSMIdentityHomomorphicImageWitness (F_spec F_impl : FSMSystem SZ IZ OZ
 def FSMIsIdentityHomomorphicImage (F_spec F_impl : FSMSystem SZ IZ OZ) : Prop :=
   Nonempty (FSMIdentityHomomorphicImageWitness F_spec F_impl)
 
+omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
 theorem fsm_extEqual_iff_identityHom (F_spec F_impl : FSMSystem SZ IZ OZ) :
     FSMExtEqual F_spec F_impl ↔ FSMIsIdentityHomomorphicImage F_spec F_impl := by
   constructor
@@ -290,13 +299,12 @@ theorem fsm_readout_agreement (F_spec F_impl : FSMSystem SZ IZ OZ)
   let f : ITZ IZ := fun _ => hne.choose
   have hφ := h s f (safetyOutput s (F_spec.RZ s)) (fsmOutputTable_mem F_spec s)
   have ht := hφ 0 (Nat.zero_le 0)
-  simp only [satisfiesAt, safetyOutput] at ht
-  have hs : (PropertyFragment.FSM.fsmTrace F_impl s f).holds 0 (SystemToLTL.Atom.state s) := by
-    simp [PropertyFragment.FSM.fsmTrace, SystemToLTL.fsmTrace, FSM.generateStateTrajectory_zero]
+  have hs : (fsmTrace F_impl s f).holds 0 (.state s) := by
+    simp [fsmTrace, SystemToLTL.fsmTrace, FSM.generateStateTrajectory_zero]
   have hout := ht hs
-  simp [PropertyFragment.FSM.fsmTrace, SystemToLTL.fsmTrace, FSM.generateOutputTrajectory_eq,
-    FSM.generateStateTrajectory_zero] at hout
-  exact hout
+  simp only [satisfiesAt, fsmTrace, SystemToLTL.fsmTrace,
+    FSM.generateOutputTrajectory_eq, FSM.generateStateTrajectory_zero] at hout
+  exact Option.some.inj hout
 
 /-- Dynamics satisfaction implies extensional equality (full `NZ`/`RZ`). -/
 theorem fsm_dynamics_implies_extEqual {F_spec F_impl : FSMSystem SZ IZ OZ}

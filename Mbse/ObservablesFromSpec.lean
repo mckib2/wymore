@@ -11,6 +11,7 @@ Homomorphism-visible properties compiled from reference systems (Link B: spec â†
 
 namespace ObservablesFromSpec
 
+
 open PropertyFragment PropertyFragment.FSM PropertyFragment.General Combinational FSM
   PropertySemantics TemporalLogic SystemToLTL
 
@@ -38,6 +39,7 @@ noncomputable def compileFsmObservables (F : FSMSystem SZ IZ OZ) :
     PropertySet (LTL (Atom SZ IZ OZ)) :=
   fsmDynamicsTable F
 
+omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ] in
 theorem compileFsmObservables_eq_dynamics (F : FSMSystem SZ IZ OZ) :
     compileFsmObservables F = fsmDynamicsTable F := rfl
 
@@ -48,6 +50,7 @@ noncomputable def compileObservables (Z : DiscreteSystem SZ IZ OZ) (hOut : Alway
     PropertySet (LTL (Atom SZ IZ OZ)) :=
   dynamicsTable Z hOut
 
+omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ] in
 theorem compileObservables_eq_dynamics (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
     compileObservables Z hOut = dynamicsTable Z hOut := rfl
 

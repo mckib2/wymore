@@ -148,7 +148,7 @@ theorem toDiscreteSystem_output_trajectory (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f
 theorem generateOutputTrajectory_eq (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) (t : Time) :
     generateOutputTrajectory F s0 f t = some (F.RZ (generateStateTrajectory F s0 f t)) := by
   unfold generateOutputTrajectory generateStateTrajectory liftInput
-  simp only [_root_.generateOutputTrajectory, _root_.generateStateTrajectory,
+  simp only [_root_.generateOutputTrajectory,
     FSMSystem.toDiscreteSystem, DiscreteSystem.ofTotal]
 
 theorem reachable_iff (F : FSMSystem SZ IZ OZ) (s0 s : SZ) :
@@ -271,7 +271,7 @@ theorem z2_state_trajectory_equivalence {SZ IZ OZ : Type} (Z : FSMSystem SZ IZ O
   induction t with
   | zero => rfl
   | succ t ih =>
-    simp only [generateStateTrajectory_succ, Z2, Z2State.state]
+    simp only [generateStateTrajectory_succ, Z2]
     exact congr_arg (fun s => Z.NZ s (f t)) ih
 
 /--
@@ -713,7 +713,7 @@ def HomomorphicImageWitness.toGeneral
   HO_surjective := w.HO_surjective
   preserves_transition := fun x oi => by
     cases oi with
-    | none => simp [FSMSystem.toDiscreteSystem, DiscreteSystem.ofTotal, w.preserves_transition]
+    | none => simp [FSMSystem.toDiscreteSystem, DiscreteSystem.ofTotal]
     | some p => simp [FSMSystem.toDiscreteSystem, DiscreteSystem.ofTotal, w.preserves_transition]
   preserves_readout := fun x => by
     simp [FSMSystem.toDiscreteSystem, DiscreteSystem.ofTotal, w.preserves_readout, Option.map_some]
@@ -745,7 +745,7 @@ def HimsyWellDefined {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
 noncomputable def himsy {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     [Fintype SZ1] [Fintype IZ1] [Fintype OZ1] [Nonempty SZ1]
     (F2 : FSMSystem SZ2 IZ2 OZ2) (HS : SZ2 → SZ1) (HI : IZ2 → IZ1) (HO : OZ2 → OZ1)
-    (hwd : HimsyWellDefined F2 HS HI HO)
+    (_hwd : HimsyWellDefined F2 HS HI HO)
     (hS : Function.Surjective HS) (hI : Function.Surjective HI) (_hO : Function.Surjective HO) :
     FSMSystem SZ1 IZ1 OZ1 where
   sz_nonempty := inferInstance
@@ -858,7 +858,7 @@ theorem csy_component_homomorphic_image {n : Nat} (VSCR : PortSystemVector n) (i
     HO_surjective := fun co => ⟨csy_fill_output VSCR i hOut co, csy_fill_output_proj VSCR i hOut co⟩
     preserves_transition := fun x po => rfl
     preserves_readout := fun x => by
-      simp only [_root_.PJN, csy_output_proj, csy]
+      simp only [_root_.PJN, csy]
       funext op
       rfl
   }⟩

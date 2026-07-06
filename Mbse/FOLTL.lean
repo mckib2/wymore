@@ -22,6 +22,8 @@ inductive FOLFormula (SZ IZ OZ : Type) where
   | and (φ ψ : FOLFormula SZ IZ OZ)
   | existsState (φ : SZ → FOLFormula SZ IZ OZ)
   | existsInput (φ : ITZW IZ → FOLFormula SZ IZ OZ)
+  /-- Assertional connective: state predicate holds at every tick (`G`-style over `g`). -/
+  | stateInv (P : SZ → Prop)
 
 /--
   Interpret a formula under concrete trajectories. Existential quantifiers range over
@@ -41,6 +43,8 @@ def SatisfiesFO {SZ IZ OZ : Type} :
       ∃ s0' : SZ, SatisfiesFO (φ s0') Z s0' f g y
   | .existsInput φ, Z, s0, _, g, y =>
       ∃ f' : ITZW IZ, SatisfiesFO (φ f') Z s0 f' g y
+  | .stateInv P, _, _, _, g, _ =>
+      ∀ t : Time, P (g t)
 
 /-! ### Negative tests -/
 

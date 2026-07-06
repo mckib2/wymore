@@ -26,3 +26,6 @@ import Mbse.PropertySemanticsBridge
 import Mbse.HomSoundness
 import Mbse.GeneralCharacterization
 import Mbse.PathologyExamples
+import Mbse.WymorePropertyFragment
+import Mbse.WymorePathologyExamples
+import Mbse.WymoreCharacterization

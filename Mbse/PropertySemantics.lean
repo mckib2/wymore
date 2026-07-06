@@ -52,13 +52,13 @@ theorem projectObs_output {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
   rfl
 
 /-- `Z` satisfies every formula in `Phi` for initial state `s0` and admissible inputs. -/
-def SystemSatisfiesLTL (Z : DiscreteSystem SZ IZ OZ) (Phi : PropertySet (LTL AP))
-    (s0 : SZ) (traceOf : ITZW IZ → Trace AP)
+def SystemSatisfiesLTL (_Z : DiscreteSystem SZ IZ OZ) (Phi : PropertySet (LTL AP))
+    (_s0 : SZ) (traceOf : ITZW IZ → Trace AP)
     (Adm : ITZW IZ → Prop := AllInputs) : Prop :=
   ∀ (f : ITZW IZ), Adm f → ∀ φ, φ ∈ Phi.formulas → (traceOf f).models φ
 
 /-- Every initial state and admissible input satisfies all formulas. -/
-def SystemSatisfiesLTLAll (Z : DiscreteSystem SZ IZ OZ) (Phi : PropertySet (LTL AP))
+def SystemSatisfiesLTLAll (_Z : DiscreteSystem SZ IZ OZ) (Phi : PropertySet (LTL AP))
     (traceOf : SZ → ITZW IZ → Trace AP)
     (Adm : ITZW IZ → Prop := AllInputs) : Prop :=
   ∀ (s0 : SZ) (f : ITZW IZ), Adm f → ∀ φ, φ ∈ Phi.formulas → (traceOf s0 f).models φ

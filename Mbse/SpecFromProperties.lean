@@ -11,6 +11,7 @@ import Mbse.SystemToLTL
 
 namespace SpecFromProperties
 
+
 open PropertyFragment Combinational PropertyFragment.FSM PropertyFragment.General FSM
   FSMProperties ObservablesFromSpec PropertySemantics TemporalLogic SystemToLTL GeneralFSMBridge
 
@@ -56,13 +57,14 @@ theorem fsm_phi_adequate (F : FSMSystem SZ IZ OZ) :
   · exact fsm_dynamics_satisfies_reflexive F
   · rfl
 
+omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ] in
 theorem fsm_synthesized_observables (F : FSMSystem SZ IZ OZ) :
     compileFsmObservables (synthesizeFsmSpec F) = fsmDynamicsTable F := by
   simp [compileFsmObservables, synthesizeFsmSpec]
 
 /-! ## General total finite -/
 
-def synthesizeSpec (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) : DiscreteSystem SZ IZ OZ :=
+def synthesizeSpec (Z : DiscreteSystem SZ IZ OZ) (_hOut : AlwaysOutputs Z) : DiscreteSystem SZ IZ OZ :=
   Z
 
 theorem synthesizeSpec_satisfies (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
@@ -70,9 +72,11 @@ theorem synthesizeSpec_satisfies (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOut
   rw [PropertyFragment.General.SystemSatisfiesDynamics_iff_fsm]
   exact fsm_dynamics_satisfies_reflexive (ofDiscreteSystem Z hOut)
 
+omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ] in
 theorem synthesizeSpec_eq (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
     synthesizeSpec Z hOut = Z := rfl
 
+omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ] in
 theorem compileObservables_synthesizeSpec (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
     compileObservables (synthesizeSpec Z hOut) hOut = dynamicsTable Z hOut := by
   simp [compileObservables, synthesizeSpec, dynamicsTable]
@@ -83,6 +87,7 @@ def IsSynthesizableTable (Phi : PropertySet (LTL (Atom SZ IZ OZ))) (Z : Discrete
     (hOut : AlwaysOutputs Z) : Prop :=
   compileObservables Z hOut = Phi ∧ synthesizeSpec Z hOut = Z
 
+omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
 theorem fsm_table_synthesizable (F : FSMSystem SZ IZ OZ) :
     IsSynthesizableTable (dynamicsTable F.toDiscreteSystem (fsm_alwaysOutputs F)) F.toDiscreteSystem
       (fsm_alwaysOutputs F) := by

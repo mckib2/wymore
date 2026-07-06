@@ -14,6 +14,7 @@ Consolidates Stages 1–3 bi-implications, Link B, and side conditions.
 
 namespace GeneralCharacterization
 
+
 open CombinationalProperties FSMProperties GeneralProperties SpecFromProperties
   ObservablesFromSpec HomomorphismProperties HomSoundness
   PropertyFragment PropertyFragment.FSM PropertyFragment.General
@@ -133,6 +134,7 @@ theorem stage3_verification {Z Z_impl : DiscreteSystem SZ IZ OZ}
   intro _
   exact stage3_synthesized hZ hImpl
 
+omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ] in
 theorem stage3_link_b {Z : DiscreteSystem SZ IZ OZ} (hOut : AlwaysOutputs Z) :
     compileObservables (synthesizeSpec Z hOut) hOut = dynamicsTable Z hOut :=
   compileObservables_synthesizeSpec Z hOut

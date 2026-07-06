@@ -11,6 +11,7 @@ Lifts Stage-2 FSM results through `FSM.ofDiscreteSystem` / `toDiscreteSystem`.
 
 namespace GeneralProperties
 
+
 open PropertyFragment.General PropertyFragment.FSM FSM FSMProperties SpecFromProperties
   PropertySemantics Homomorphism GeneralFSMBridge
 
@@ -30,6 +31,7 @@ def SystemIsIdentityHomomorphicImage (Z_spec Z_impl : DiscreteSystem SZ IZ OZ)
     (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) : Prop :=
   Nonempty (SystemIdentityHomomorphicImageWitness Z_spec Z_impl hSpec hImpl)
 
+omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ] in
 theorem system_identityHom_iff_fsm {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
     (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) :
     SystemIsIdentityHomomorphicImage Z_spec Z_impl hSpec hImpl ↔
@@ -41,6 +43,7 @@ theorem system_identityHom_iff_fsm {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
   · intro ⟨w⟩
     exact ⟨⟨w.preserves_readout, w.preserves_transition⟩⟩
 
+omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
 theorem system_extEqual_iff_identityHom {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
     (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) :
     SystemExtEqual Z_spec Z_impl hSpec hImpl ↔

@@ -54,6 +54,7 @@ def SystemSatisfiesDynamics (Z_spec Z_impl : DiscreteSystem SZ IZ OZ)
     (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) : Prop :=
   FSMSatisfiesDynamics (ofDiscreteSystem Z_spec hSpec) (ofDiscreteSystem Z_impl hImpl)
 
+omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ] in
 theorem SystemSatisfiesDynamics_iff_fsm {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
     (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) :
     SystemSatisfiesDynamics Z_spec Z_impl hSpec hImpl ↔
@@ -65,6 +66,7 @@ def SystemExtEqual (Z_spec Z_impl : DiscreteSystem SZ IZ OZ)
     (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) : Prop :=
   FSMExtEqual (ofDiscreteSystem Z_spec hSpec) (ofDiscreteSystem Z_impl hImpl)
 
+omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ] in
 theorem SystemExtEqual_iff_fsm {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
     (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) :
     SystemExtEqual Z_spec Z_impl hSpec hImpl ↔
@@ -72,6 +74,7 @@ theorem SystemExtEqual_iff_fsm {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
         (ofDiscreteSystem Z_impl hImpl) :=
   Iff.rfl
 
+omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ] in
 theorem ofDiscreteSystem_extEqual_toDiscreteSystem (F : FSMSystem SZ IZ OZ) :
     FSMExtEqual (ofDiscreteSystem (_root_.FSM.FSMSystem.toDiscreteSystem F)
       (_root_.FSM.fsm_alwaysOutputs F)) F := by

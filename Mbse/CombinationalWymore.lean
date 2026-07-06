@@ -766,7 +766,7 @@ theorem delay_system_output {IZ OZ : Type} [Inhabited IZ] (C : Combinational.Com
     (x : IZ) (f : ITZ IZ) (t : Time) :
     FSM.generateOutputTrajectory (combinationalToDelaySystem C) x f (t + 1) = some (C.RZ (f t)) := by
   simp [FSM.generateOutputTrajectory_eq, FSM.generateStateTrajectory_succ,
-    FSM.generateStateTrajectory_zero, combinationalToDelaySystem]
+    combinationalToDelaySystem]
 
 theorem delay_system_initial_output {IZ OZ : Type} [Inhabited IZ]
     (C : Combinational.CombinationalSystem IZ OZ) (x : IZ) (f : ITZ IZ) :
@@ -778,7 +778,7 @@ theorem delay_system_matches_combinational_trajectory {IZ OZ : Type} [Inhabited 
     FSM.generateOutputTrajectory (combinationalToDelaySystem C) x f (t + 1) =
       some (Combinational.generateOutputTrajectory C f t) := by
   simp [FSM.generateOutputTrajectory_eq, FSM.generateStateTrajectory_succ,
-    FSM.generateStateTrajectory_zero, combinationalToDelaySystem, Combinational.generateOutputTrajectory_val]
+    combinationalToDelaySystem, Combinational.generateOutputTrajectory_val]
 
 theorem zeroDelayRequiresCombinationalOrDelay {IZ OZ : Type} [Inhabited IZ]
     (C : Combinational.CombinationalSystem IZ OZ) (f : ITZ IZ) (t : Time) :
@@ -792,7 +792,7 @@ theorem delaySystem_state_at_time {IZ OZ : Type} [Inhabited IZ]
     (C : Combinational.CombinationalSystem IZ OZ) (x : IZ) (f : ITZ IZ) (t : Time) :
     FSM.generateStateTrajectory (combinationalToDelaySystem C) x f (t + 1) = f t := by
   induction t with
-  | zero => simp [FSM.generateStateTrajectory_succ, FSM.generateStateTrajectory_zero, combinationalToDelaySystem]
+  | zero => simp [FSM.generateStateTrajectory_succ, combinationalToDelaySystem]
   | succ t _ =>
     simp [FSM.generateStateTrajectory_succ, combinationalToDelaySystem]
 
