@@ -8,9 +8,8 @@ Wymore execution semantics (`generateStateTrajectory`, `IsValidStateTrajectory`)
 
 FO assertional layers:
 - **Execution FO** (`compileSystemFO`): Link A vehicle; full iff with `IsWymoreExecution`.
-- **Assertional FO** (`compileAssertionalFO`): adds `compileReadoutInv`, currently a placeholder
-  tautology (`Z.RZ s = Z.RZ s`). Meaningful infinite-state assertional completeness lives on the
-  **extensional dynamics fragment** (`compileObservablesExt` in `ExtensionalDynamicsFragment`), not FO replay.
+- **Assertional FO** (`compileAssertionalFO`): execution FO plus spec-relative `stateLaw`
+  bundles for pointwise `RZ`/`NZ` agreement (`compileExtensionalLaws`).
 
 The compiler and `SatisfiesFO` interpreter are **separate**; equivalence is proved below.
 -/
@@ -43,19 +42,44 @@ def compileSystemFO {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) :
     FOLFormula SZ IZ OZ :=
   .and (.init s0) (.and (.step Z) (.readout Z))
 
-/-- Assertional readout invariant: placeholder tick-wise state predicate (FO assertional).
+/-- Spec-relative extensional laws as state-space `stateLaw` bundles. -/
+def compileExtensionalLaws {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) : FOLFormula SZ IZ OZ :=
+  .and
+    (.stateLaw fun s => Z_impl.RZ s = Z_spec.RZ s)
+    (.stateLaw fun s => ∀ oi, Z_impl.NZ s oi = Z_spec.NZ s oi)
 
-Not a meaningful assertional layer yet — see `SystemToFormula` module doc and extensional dynamics fragment. -/
-def compileReadoutInv {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) : FOLFormula SZ IZ OZ :=
-  .stateInv fun s => Z.RZ s = Z.RZ s
+/-- Assertional readout/dynamics invariants relative to a reference system. -/
+abbrev compileReadoutInv {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) : FOLFormula SZ IZ OZ :=
+  compileExtensionalLaws Z_spec Z_impl
 
-/-- Dynamics + assertional readout layer (FO assertional packaging).
+/-- Execution FO plus spec-relative extensional state laws. -/
+def compileAssertionalFO {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) (s0 : SZ) : FOLFormula SZ IZ OZ :=
+  .and (compileSystemFO Z_spec s0) (compileExtensionalLaws Z_spec Z_impl)
 
-Uses placeholder `compileReadoutInv`; hom→FO soundness is proved, but assertional completeness
-for infinite `SZ` is delegated to the extensional dynamics fragment. -/
-def compileAssertionalFO {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) :
-    FOLFormula SZ IZ OZ :=
-  .and (compileSystemFO Z s0) (compileReadoutInv Z)
+/-- Spec-relative partial-open laws as state-space `stateLaw` bundles.
+
+Readout agreement is stated pointwise (`RZ` equality), equivalent to the guarded
+`match Z_spec.RZ s with ...` formulation under partial-open semantics. -/
+def compilePartialAssertionalLaws {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) : FOLFormula SZ IZ OZ :=
+  .and
+    (.stateLaw fun s => Z_impl.RZ s = Z_spec.RZ s)
+    (.stateLaw fun s => ∀ oi, Z_impl.NZ s oi = Z_spec.NZ s oi)
+
+/-- Partial-open assertional FO: execution plus guarded readout and dynamics laws. -/
+def compilePartialAssertionalFO {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) (s0 : SZ) : FOLFormula SZ IZ OZ :=
+  .and (compileSystemFO Z_spec s0) (compilePartialAssertionalLaws Z_spec Z_impl)
+
+/-- Impl satisfies spec-side partial assertional FO at `(s0, f)`. -/
+def SystemSatisfiesSpecPartialAssertionalFOAt {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) (s0 : SZ) (f : ITZW IZ) : Prop :=
+  SatisfiesFO (compilePartialAssertionalFO Z_spec Z_impl s0) Z_impl s0 f
+    (generateStateTrajectory Z_impl s0 f)
+    (generateOutputTrajectory Z_impl s0 f)
 
 /-- Existential formula: some initial state and input trajectory satisfy execution constraints. -/
 def compileAnyExecution {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
@@ -85,6 +109,35 @@ theorem satisfiesFO_compileSystemFO {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ 
     (s0 : SZ) (f : ITZW IZ) (g : STZ SZ) (y : OTZ OZ) :
     SatisfiesFO (compileSystemFO Z s0) Z s0 f g y ↔ IsWymoreExecution Z s0 f g y := by
   simp [compileSystemFO, IsWymoreExecution, SatisfiesFO]
+
+@[simp]
+theorem satisfiesFO_compileExtensionalLaws {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ} (s0 : SZ) (f : ITZW IZ) (g : STZ SZ) (y : OTZ OZ) :
+    SatisfiesFO (compileExtensionalLaws Z_spec Z_impl) Z_impl s0 f g y ↔
+      (∀ s, Z_impl.RZ s = Z_spec.RZ s) ∧
+        (∀ s oi, Z_impl.NZ s oi = Z_spec.NZ s oi) := by
+  simp only [compileExtensionalLaws, SatisfiesFO]
+
+@[simp]
+theorem satisfiesFO_compileAssertionalFO {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ} (s0 : SZ) (f : ITZW IZ) (g : STZ SZ) (y : OTZ OZ) :
+    SatisfiesFO (compileAssertionalFO Z_spec Z_impl s0) Z_impl s0 f g y ↔
+      IsWymoreExecution Z_spec s0 f g y ∧
+        (∀ s, Z_impl.RZ s = Z_spec.RZ s) ∧
+          (∀ s oi, Z_impl.NZ s oi = Z_spec.NZ s oi) := by
+  simp only [compileAssertionalFO, SatisfiesFO, IsWymoreExecution, satisfiesFO_compileExtensionalLaws]
+  constructor
+  · rintro ⟨hExec, hLaws⟩
+    exact ⟨(satisfiesFO_compileSystemFO Z_spec s0 f g y).mp hExec, hLaws⟩
+  · rintro ⟨hExec, hLaws⟩
+    exact ⟨(satisfiesFO_compileSystemFO Z_spec s0 f g y).mpr hExec, hLaws⟩
+
+/-- Impl satisfies spec-side assertional FO at `(s0, f)` on canonical impl trajectories. -/
+def SystemSatisfiesSpecAssertionalFOAt {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) (s0 : SZ) (f : ITZW IZ) : Prop :=
+  SatisfiesFO (compileAssertionalFO Z_spec Z_impl s0) Z_impl s0 f
+    (generateStateTrajectory Z_impl s0 f)
+    (generateOutputTrajectory Z_impl s0 f)
 
 /-- Canonical trajectories satisfy the compiled formula. -/
 theorem canonical_execution_satisfies {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ)

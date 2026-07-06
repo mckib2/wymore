@@ -109,7 +109,7 @@ theorem partialOpenPredicate_no_finite_enum :
 theorem partialOpenPredicate_dynamicsComplete :
     partialOpenPredicateFragment.dynamicsComplete = true := rfl
 
-/-- FO assertional formulas (`FOLTL`); no finite state enumeration. -/
+/-- FO assertional formulas (`FOLTL` + `stateLaw` extensional invariants); no finite enumeration. -/
 def foAssertionalFragment : FragmentSpec where
   allowedConnectives := [.imp, .GConn]
   disjunctionPolicy := .canonicalCommitment

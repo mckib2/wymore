@@ -24,6 +24,8 @@ inductive FOLFormula (SZ IZ OZ : Type) where
   | existsInput (φ : ITZW IZ → FOLFormula SZ IZ OZ)
   /-- Assertional connective: state predicate holds at every tick (`G`-style over `g`). -/
   | stateInv (P : SZ → Prop)
+  /-- State-space law: `P s` for every state `s` (not trajectory-indexed). -/
+  | stateLaw (P : SZ → Prop)
 
 /--
   Interpret a formula under concrete trajectories. Existential quantifiers range over
@@ -45,6 +47,14 @@ def SatisfiesFO {SZ IZ OZ : Type} :
       ∃ f' : ITZW IZ, SatisfiesFO (φ f') Z s0 f' g y
   | .stateInv P, _, _, _, g, _ =>
       ∀ t : Time, P (g t)
+  | .stateLaw P, _, _, _, _, _ =>
+      ∀ s : SZ, P s
+
+@[simp]
+theorem satisfiesFO_stateLaw {SZ IZ OZ : Type} (P : SZ → Prop) (Z : DiscreteSystem SZ IZ OZ)
+    (s0 : SZ) (f : ITZW IZ) (g : STZ SZ) (y : OTZ OZ) :
+    SatisfiesFO (.stateLaw P) Z s0 f g y ↔ ∀ s, P s := by
+  simp [SatisfiesFO]
 
 /-! ### Negative tests -/
 

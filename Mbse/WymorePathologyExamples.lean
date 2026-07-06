@@ -50,6 +50,11 @@ theorem counterSystem_satisfies_own_extensional :
       counterSystem_alwaysOutputs :=
   extensional_satisfies_reflexive counterSystem counterSystem_alwaysOutputs
 
+theorem counterSystem_satisfies_assertionalFO :
+    SystemSatisfiesSpecAssertionalFOAt counterSystem counterSystem 0 (fun _ => some true) :=
+  (assertionalFO_at_iff_extensional counterSystem_alwaysOutputs counterSystem_alwaysOutputs 0
+    (fun _ => some true)).2 counterSystem_satisfies_own_extensional
+
 /-- Extensional Φ ↔ identity hom on infinite `counterSystem` (same-type witness). -/
 theorem counterSystem_extensional_iff_hom :
     SystemSatisfiesExtensional counterSystem counterSystem counterSystem_alwaysOutputs
@@ -151,8 +156,8 @@ theorem closedSystem_excluded_from_pinned :
 /-! ## Predicate schema works on infinite state -/
 
 theorem counterSystem_predicate_schema :
-    compileObservablesPred counterSystem = compileObservablesPred counterSystem :=
-  compileObservablesPred_wellformed counterSystem
+    compileObservablesPred counterSystem = compileObservablesPartialOpen counterSystem :=
+  compileObservablesPred_eq_partialOpen counterSystem
 
 /-! ## Partial dynamics: readout-only still incomplete -/
 
@@ -359,6 +364,20 @@ theorem counterClosedReadout_satisfiesOpen_refl :
     SystemSatisfiesPartialDynamicsOpen counterClosedReadout counterClosedReadout :=
   partialDynamicsOpen_satisfies_reflexive counterClosedReadout
 
+theorem counterClosedReadout_satisfiesCompiled_refl :
+    SystemSatisfiesPartialDynamicsCompiled counterClosedReadout counterClosedReadout
+      (compileObservablesPartialOpen counterClosedReadout) :=
+  partialDynamicsCompiled_satisfies_reflexive counterClosedReadout
+
+def counterClosedReadoutInput : ITZW Bool := fun _ => none
+
+theorem counterClosedReadout_satisfiesPartialAssertionalFO_refl :
+    SystemSatisfiesSpecPartialAssertionalFOAt counterClosedReadout counterClosedReadout 0
+      counterClosedReadoutInput :=
+  (partialAssertionalFO_at_iff_partialDynamicsOpen
+    (readoutSpecCompleteOpen_of counterClosedReadout) 0 counterClosedReadoutInput).2
+    counterClosedReadout_satisfiesOpen_refl
+
 theorem counterClosedReadout_resolved :
     ¬ AlwaysOutputs counterClosedReadout ∧
       SystemSatisfiesPartialDynamicsOpen counterClosedReadout counterClosedReadout ∧
@@ -380,6 +399,88 @@ theorem partial_agrees_with_pinned_when_alwaysOutputs {SZ IZ OZ : Type}
     [Nonempty IZ] (Z : DiscreteSystem SZ IZ OZ) (_hOut : AlwaysOutputs Z) :
     RequiresFiniteStateEnumeration SZ :=
   requiresFiniteStateEnumeration_of_fintype (SZ := SZ)
+
+/-! ## Same-type surjective non-identity hom (separation witness) -/
+
+abbrev swapHomStates := Fin 2
+
+def swapHS : swapHomStates → swapHomStates
+  | ⟨0, _⟩ => ⟨1, by decide⟩
+  | ⟨1, _⟩ => ⟨0, by decide⟩
+
+theorem swapHS_surjective : Function.Surjective swapHS := by
+  intro s
+  match s with
+  | ⟨0, _⟩ => exact ⟨⟨1, by decide⟩, rfl⟩
+  | ⟨1, _⟩ => exact ⟨⟨0, by decide⟩, rfl⟩
+
+theorem swapHS_ne_id : swapHS ≠ id := by
+  intro h
+  have := congrFun h ⟨0, by decide⟩
+  simp [swapHS] at this
+
+def swapSpecNZ : swapHomStates → Unit → swapHomStates := fun s _ => s
+def swapImplNZ : swapHomStates → Unit → swapHomStates := fun s _ => s
+
+def swapSpecRZ : swapHomStates → Bool := fun s => s != 0
+def swapImplRZ : swapHomStates → Bool := fun s => s = 0
+
+def swapSpecSys : DiscreteSystem swapHomStates Unit Bool :=
+  DiscreteSystem.ofTotal swapSpecNZ swapSpecRZ ⟨0⟩
+
+def swapImplSys : DiscreteSystem swapHomStates Unit Bool :=
+  DiscreteSystem.ofTotal swapImplNZ swapImplRZ ⟨0⟩
+
+def swapHomWitness : HomomorphicImageWitness swapSpecSys swapImplSys where
+  HS := swapHS
+  HI := id
+  HO := id
+  HS_surjective := swapHS_surjective
+  HI_surjective := Function.surjective_id
+  HO_surjective := Function.surjective_id
+  preserves_transition := by
+    intro x oi
+    cases x <;> cases oi <;> simp [swapHS, swapSpecSys, swapImplSys, DiscreteSystem.ofTotal,
+      swapSpecNZ, swapImplNZ]
+  preserves_readout := by
+    intro x
+    match x with
+    | ⟨0, _⟩ => simp [swapHS, swapSpecSys, swapImplSys, DiscreteSystem.ofTotal, swapSpecRZ, swapImplRZ]
+    | ⟨1, _⟩ => simp [swapHS, swapSpecSys, swapImplSys, DiscreteSystem.ofTotal, swapSpecRZ, swapImplRZ]
+
+theorem swapSpecSys_alwaysOutputs : AlwaysOutputs swapSpecSys :=
+  ofTotal_alwaysOutputs _ _ _
+
+theorem swapImplSys_alwaysOutputs : AlwaysOutputs swapImplSys :=
+  ofTotal_alwaysOutputs _ _ _
+
+theorem swapHom_isNonIdentity : IsNonIdentityWitness swapHomWitness :=
+  Or.inl swapHS_ne_id
+
+theorem swapHom_sameType_image : SameTypeHomomorphicImage swapSpecSys swapImplSys :=
+  ⟨swapHomWitness⟩
+
+theorem swapHom_satisfies_cross :
+    SystemSatisfiesExtensionalCross swapSpecSys swapImplSys :=
+  extensional_cross_of_hom ⟨swapHomWitness⟩
+
+theorem swapHom_not_extensional :
+    ¬ SystemSatisfiesExtensional swapSpecSys swapImplSys
+      swapSpecSys_alwaysOutputs swapImplSys_alwaysOutputs := by
+  intro h
+  have hR := h.1
+  simp only [totalRz, swapSpecSys, swapImplSys, DiscreteSystem.ofTotal, swapSpecRZ, swapImplRZ,
+    Option.get_some] at hR
+  have := hR ⟨0, by decide⟩
+  simp at this
+
+theorem sameType_surjectiveHom_separation :
+    SameTypeHomomorphicImage swapSpecSys swapImplSys ∧
+      SystemSatisfiesExtensionalCross swapSpecSys swapImplSys ∧
+        IsNonIdentityWitness swapHomWitness ∧
+          ¬ SystemSatisfiesExtensional swapSpecSys swapImplSys
+            swapSpecSys_alwaysOutputs swapImplSys_alwaysOutputs :=
+  ⟨swapHom_sameType_image, swapHom_satisfies_cross, swapHom_isNonIdentity, swapHom_not_extensional⟩
 
 /-! ## FO execution without extensional/hom -/
 
@@ -437,6 +538,13 @@ theorem foUnreachable_not_extensional :
   intro h
   rcases foUnreachable_differ_at_unreachable with ⟨_, _, hne⟩
   exact hne (h.2 1 (some 0)).symm
+
+theorem foUnreachable_not_assertionalFO :
+    ¬ SystemSatisfiesSpecAssertionalFOAt foUnreachableSpec foUnreachableImpl 0 foUnreachableInput := by
+  intro h
+  have := (assertionalFO_at_iff_extensional foUnreachableSpec_alwaysOutputs
+    foUnreachableImpl_alwaysOutputs 0 foUnreachableInput).1 h
+  exact foUnreachable_not_extensional this
 
 theorem fo_execution_not_complete_for_hom :
     SystemSatisfiesSpecFOAt foUnreachableSpec foUnreachableImpl 0 foUnreachableInput ∧

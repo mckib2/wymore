@@ -13,6 +13,7 @@ import Mbse.HimsySynthesis
 import Mbse.GeneralCharacterization
 import Mbse.ObservablesFromSpec
 import Mbse.SystemToLTL
+import Mbse.Homomorphism
 
 /-!
 # General Wymore property characterization
@@ -28,7 +29,7 @@ open WymorePropertyFragment WymorePathologyExamples FragmentPathologyRegistry
   PropertyFragmentSpec PropertySemantics HomSoundness GeneralProperties
   SystemToFormula PropertyFragment.General PropertyFragment.FSM FSMProperties PathologyExamples
   TemporalLogic ExtensionalDynamicsFragment FOLTL SpecFromProperties HimsySynthesis
-  GeneralCharacterization ObservablesFromSpec SystemToLTL FSM
+  GeneralCharacterization ObservablesFromSpec SystemToLTL FSM Homomorphism
 
 /-! ## FO assertional -/
 
@@ -44,8 +45,16 @@ theorem stageWymore_fo_satisfies_iff_execution {SZ IZ OZ : Type}
         (generateOutputTrajectory Z s0 f) :=
   systemSatisfiesFO_iff_execution Z s0 f
 
-theorem stageWymore_fo_assertional_compile {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) :
-    compileObservablesAssertionalFO Z s0 = compileAssertionalFO Z s0 := rfl
+theorem stageWymore_fo_assertional_compile {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) (s0 : SZ) :
+    compileObservablesAssertionalFO Z_spec Z_impl s0 = compileAssertionalFO Z_spec Z_impl s0 := rfl
+
+theorem stageWymore_fo_assertional_iff_extensional {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) (s0 : SZ) (f : ITZW IZ) :
+    SystemSatisfiesSpecAssertionalFOAt Z_spec Z_impl s0 f ↔
+      SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl :=
+  assertionalFO_at_iff_extensional hSpec hImpl s0 f
 
 theorem stageWymore_fo_verification {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     {Z_spec : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}
@@ -137,6 +146,25 @@ theorem stageWymore_blocked_foAssertionalCompleteness :
         ¬ SystemSatisfiesExtensional foUnreachableSpec foUnreachableImpl
           foUnreachableSpec_alwaysOutputs foUnreachableImpl_alwaysOutputs :=
   blocked_foAssertionalCompleteness
+
+theorem stageWymore_resolved_foAssertionalEncoding :
+    SystemSatisfiesSpecAssertionalFOAt counterSystem counterSystem 0 (fun _ => some true) ∧
+      ¬ SystemSatisfiesSpecAssertionalFOAt foUnreachableSpec foUnreachableImpl 0 foUnreachableInput :=
+  resolved_foAssertionalEncoding
+
+theorem stageWymore_resolved_sameTypeSurjectiveHomSeparation :
+    SameTypeHomomorphicImage swapSpecSys swapImplSys ∧
+      SystemSatisfiesExtensionalCross swapSpecSys swapImplSys ∧
+        IsNonIdentityWitness swapHomWitness ∧
+          ¬ SystemSatisfiesExtensional swapSpecSys swapImplSys
+            swapSpecSys_alwaysOutputs swapImplSys_alwaysOutputs :=
+  resolved_sameTypeSurjectiveHomSeparation
+
+theorem stageWymore_resolved_predicateIndexedPartialCompile :
+    SystemSatisfiesPartialDynamicsCompiled counterClosedReadout counterClosedReadout
+      (compileObservablesPartialOpen counterClosedReadout) ∧
+      PartialIsIdentityHomomorphicImage counterClosedReadout counterClosedReadout :=
+  resolved_predicateIndexedPartialCompile
 
 /-! ## Cross-type extensional bi-implication -/
 
@@ -236,9 +264,16 @@ theorem stageWymore_infinite_no_finite_enum :
     ¬ RequiresFiniteStateEnumeration Nat :=
   counterSystem_no_finite_dynamicsTable
 
-theorem stageWymore_predicate_schema {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
-    compileObservablesPred Z = compileObservablesPred Z :=
-  compileObservablesPred_wellformed Z
+theorem stageWymore_predicate_schema {SZ IZ OZ : Type} [DecidableEq IZ]
+    (Z : DiscreteSystem SZ IZ OZ) :
+    compileObservablesPred Z = compileObservablesPartialOpen Z :=
+  compileObservablesPred_eq_partialOpen Z
+
+theorem stageWymore_partialDynamicsCompiled_iff_open {SZ IZ OZ : Type} [DecidableEq IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ} :
+    SystemSatisfiesPartialDynamicsCompiled Z_spec Z_impl (compileObservablesPartialOpen Z_spec) ↔
+      SystemSatisfiesPartialDynamicsOpen Z_spec Z_impl :=
+  partialDynamicsCompiled_iff_open
 
 /-! ## Partial open fragment -/
 
@@ -324,6 +359,12 @@ theorem stageWymore_resolved_infinitePartialDynamicsOpen :
       SystemSatisfiesPartialDynamicsOpen counterClosedReadout counterClosedReadout ∧
         PartialIsIdentityHomomorphicImage counterClosedReadout counterClosedReadout :=
   resolved_infinitePartialDynamicsOpen
+
+theorem stageWymore_resolved_partialAssertionalFO :
+    SystemSatisfiesSpecPartialAssertionalFOAt counterClosedReadout counterClosedReadout 0
+      counterClosedReadoutInput ∧
+      PartialIsIdentityHomomorphicImage counterClosedReadout counterClosedReadout :=
+  resolved_partialAssertionalFO
 
 theorem stageWymore_partialDynamicsOpen_iff_hom {SZ IZ OZ : Type} [DecidableEq IZ]
     {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
@@ -527,6 +568,14 @@ theorem wymore_verification_extensional {SZ IZ OZ : Type}
       SystemIsIdentityHomomorphicImageOpen (synthesizeExtensionalSpec Z) Z_impl hZ hImpl :=
   extensional_synthesized_verification_open hZ hImpl _hAdeq
 
+theorem wymore_verification_assertional_fo {SZ IZ OZ : Type}
+    {Z Z_impl : DiscreteSystem SZ IZ OZ}
+    (hZ : AlwaysOutputs Z) (hImpl : AlwaysOutputs Z_impl)
+    (_hAdeq : PhiAdequateExtensionalOpen Z hZ) :
+    ∀ s0 f, SystemSatisfiesSpecAssertionalFOAt Z Z_impl s0 f ↔
+      SystemSatisfiesExtensional Z Z_impl hZ hImpl :=
+  fun s0 f => assertionalFO_at_iff_extensional hZ hImpl s0 f
+
 theorem wymore_verification_extensional_partial {SZ IZ OZ : Type}
     {Z_spec Z_impl : DiscreteSystem SZ IZ OZ} :
     SystemSatisfiesExtensionalPartial Z_spec Z_impl ↔
@@ -539,6 +588,13 @@ theorem wymore_verification_partial_open {SZ IZ OZ : Type} [DecidableEq IZ]
     SystemSatisfiesPartialDynamicsOpen Z_spec Z_impl ↔
       PartialIsIdentityHomomorphicImage Z_spec Z_impl :=
   partialDynamicsOpen_iff_hom hComplete
+
+theorem wymore_verification_partial_assertional_fo {SZ IZ OZ : Type} [DecidableEq IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hComplete : ReadoutSpecCompleteOpen Z_spec) (s0 : SZ) (f : ITZW IZ) :
+    SystemSatisfiesSpecPartialAssertionalFOAt Z_spec Z_impl s0 f ↔
+      PartialIsIdentityHomomorphicImage Z_spec Z_impl :=
+  partialAssertionalFO_at_iff_hom hComplete s0 f
 
 theorem wymore_verification_extensional_cross {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     {Z : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}

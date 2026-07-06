@@ -4,6 +4,8 @@ import Mbse.PropertyFragmentSpec
 import Mbse.WymorePropertyFragment
 import Mbse.ExtensionalDynamicsFragment
 import Mbse.FSMProperties
+import Mbse.Homomorphism
+import Mbse.SystemToFormula
 
 /-!
 # Fragment pathology registry
@@ -16,7 +18,7 @@ namespace FragmentPathologyRegistry
 
 open PropertyFragmentSpec PathologyExamples WymorePathologyExamples WymorePropertyFragment
   ExtensionalDynamicsFragment PropertyFragment.FSM PropertyFragment.General FSMProperties
-  TemporalLogic SpecFromProperties HimsySynthesis FSM
+  TemporalLogic SpecFromProperties HimsySynthesis FSM Homomorphism SystemToFormula
 
 /-- Failure modes blocking assertional Φ ↔ hom completeness outside pinned finite fragment. -/
 inductive BlockerTag where
@@ -125,6 +127,37 @@ theorem resolved_infinitePartialDynamicsOpen :
   ⟨counterClosedReadout_not_alwaysOutputs, counterClosedReadout_satisfiesOpen_refl,
     (partialDynamicsOpen_iff_hom (readoutSpecCompleteOpen_of counterClosedReadout)).1
       counterClosedReadout_satisfiesOpen_refl⟩
+
+/-- Predicate-indexed partial compile object on infinite `Nat`. -/
+theorem resolved_predicateIndexedPartialCompile :
+    SystemSatisfiesPartialDynamicsCompiled counterClosedReadout counterClosedReadout
+      (compileObservablesPartialOpen counterClosedReadout) ∧
+      PartialIsIdentityHomomorphicImage counterClosedReadout counterClosedReadout :=
+  ⟨counterClosedReadout_satisfiesCompiled_refl,
+    (partialDynamicsCompiled_iff_hom (readoutSpecCompleteOpen_of counterClosedReadout)).1
+      counterClosedReadout_satisfiesCompiled_refl⟩
+
+theorem resolved_foAssertionalEncoding :
+    SystemSatisfiesSpecAssertionalFOAt counterSystem counterSystem 0 (fun _ => some true) ∧
+      ¬ SystemSatisfiesSpecAssertionalFOAt foUnreachableSpec foUnreachableImpl 0 foUnreachableInput :=
+  ⟨counterSystem_satisfies_assertionalFO, foUnreachable_not_assertionalFO⟩
+
+theorem resolved_partialAssertionalFO :
+    SystemSatisfiesSpecPartialAssertionalFOAt counterClosedReadout counterClosedReadout 0
+      counterClosedReadoutInput ∧
+      PartialIsIdentityHomomorphicImage counterClosedReadout counterClosedReadout :=
+  ⟨counterClosedReadout_satisfiesPartialAssertionalFO_refl,
+    (partialDynamicsOpen_iff_hom (readoutSpecCompleteOpen_of counterClosedReadout)).1
+      counterClosedReadout_satisfiesOpen_refl⟩
+
+/-- Same-type surjective non-identity hom satisfies Cross, not pointwise Extensional. -/
+theorem resolved_sameTypeSurjectiveHomSeparation :
+    SameTypeHomomorphicImage swapSpecSys swapImplSys ∧
+      SystemSatisfiesExtensionalCross swapSpecSys swapImplSys ∧
+        IsNonIdentityWitness swapHomWitness ∧
+          ¬ SystemSatisfiesExtensional swapSpecSys swapImplSys
+            swapSpecSys_alwaysOutputs swapImplSys_alwaysOutputs :=
+  sameType_surjectiveHom_separation
 
 theorem blocked_foAssertionalCompleteness :
     foAssertionalFragment.finiteClauseEnumeration = false ∧

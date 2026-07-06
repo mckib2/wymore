@@ -284,6 +284,15 @@ theorem rz_eq_of_totalRz_eq {SZ IZ OZ : Type}
   simp only [totalRz, ho_impl, ho_spec, Option.get_some] at h
   rw [ho_impl, ho_spec, h]
 
+theorem totalRz_eq_of_rz_eq {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (hR : ∀ s, Z_impl.RZ s = Z_spec.RZ s) (s : SZ) :
+    totalRz Z_impl hImpl s = totalRz Z_spec hSpec s := by
+  obtain ⟨o, ho⟩ := hSpec s
+  have ho_impl : Z_impl.RZ s = some o := (hR s).trans ho
+  simp only [totalRz, ho, ho_impl, Option.get_some]
+
 /-! ## Same-type collapse (extensional specialization) -/
 
 theorem extensional_sameType_implies_cross {SZ IZ OZ : Type}
@@ -315,6 +324,27 @@ theorem extensional_sameType_collapse_iff_hom {SZ IZ OZ : Type}
       extensional_satisfies_implies_hom hSpec hImpl h⟩
   · intro ⟨_, hHom⟩
     exact extensional_hom_implies_satisfies hSpec hImpl hHom
+
+/-- Def 4.3 same-type hom satisfies cross-type extensional Φ. -/
+theorem sameType_hom_implies_cross {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (h : SameTypeHomomorphicImage Z_spec Z_impl) :
+    SystemSatisfiesExtensionalCross Z_spec Z_impl :=
+  extensional_cross_of_hom h
+
+/-- Same-type witness is not identity on all three component maps. -/
+def IsNonIdentityWitness {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (w : HomomorphicImageWitness Z_spec Z_impl) : Prop :=
+  w.HS ≠ id ∨ w.HI ≠ id ∨ w.HO ≠ id
+
+theorem sameType_extensional_iff_cross_and_identityHom {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) :
+    SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl ↔
+      (SystemSatisfiesExtensionalCross Z_spec Z_impl ∧
+        SystemIsIdentityHomomorphicImageOpen Z_spec Z_impl hSpec hImpl) :=
+  extensional_sameType_collapse_iff_hom hSpec hImpl
 
 /-! ## Finite agreement (unifies with pinned Stages 1–3) -/
 
@@ -431,6 +461,37 @@ theorem extensional_implies_systemSatisfiesSpecFOAt {SZ IZ OZ : Type}
     SystemSatisfiesSpecFOAt Z_spec Z_impl s0 f :=
   extensional_implies_impl_satisfies_specFO hSpec hImpl h s0 f
 
+theorem assertionalFO_at_iff_extensional {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) (s0 : SZ) (f : ITZW IZ) :
+    SystemSatisfiesSpecAssertionalFOAt Z_spec Z_impl s0 f ↔
+      SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl := by
+  dsimp [SystemSatisfiesSpecAssertionalFOAt]
+  simp only [satisfiesFO_compileAssertionalFO]
+  constructor
+  · intro ⟨_hExec, hR, hN⟩
+    refine ⟨fun s => totalRz_eq_of_rz_eq hSpec hImpl hR s, hN⟩
+  · intro hExt
+    refine ⟨extensional_implies_impl_satisfies_specFO hSpec hImpl hExt s0 f, ?_, hExt.2⟩
+    intro s
+    exact rz_eq_of_totalRz_eq hSpec hImpl hExt.1 s
+
+theorem extensional_implies_assertionalFO_at {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (h : SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl) (s0 : SZ) (f : ITZW IZ) :
+    SystemSatisfiesSpecAssertionalFOAt Z_spec Z_impl s0 f :=
+  (assertionalFO_at_iff_extensional hSpec hImpl s0 f).2 h
+
+theorem hom_implies_assertionalFO_at {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (hHom : SystemIsIdentityHomomorphicImageOpen Z_spec Z_impl hSpec hImpl)
+    (s0 : SZ) (f : ITZW IZ) :
+    SystemSatisfiesSpecAssertionalFOAt Z_spec Z_impl s0 f :=
+  (assertionalFO_at_iff_extensional hSpec hImpl s0 f).2
+    (extensional_hom_implies_satisfies hSpec hImpl hHom)
+
 /-! ## Extensional synthesis + PhiAdequate (verification template)
 
 Synthesis is identity today; adequacy gate is structurally required for the paper template.
@@ -472,6 +533,19 @@ theorem extensional_phi_adequate_open {SZ IZ OZ : Type} (Z : DiscreteSystem SZ I
   constructor
   · exact extensional_satisfies_reflexive Z hOut
   · exact synthesizeExtensionalSpec_eq Z
+
+theorem assertionalFO_adequate_bridge {SZ IZ OZ : Type}
+    {Z Z_impl : DiscreteSystem SZ IZ OZ}
+    (hZ : AlwaysOutputs Z) (hImpl : AlwaysOutputs Z_impl)
+    (_hAdeq : PhiAdequateExtensionalOpen Z hZ) :
+    (SystemSatisfiesExtensional Z Z_impl hZ hImpl ↔
+        SystemIsIdentityHomomorphicImageOpen Z Z_impl hZ hImpl) ∧
+      (∀ s0 f, SystemSatisfiesSpecAssertionalFOAt Z Z_impl s0 f ↔
+        SystemSatisfiesExtensional Z Z_impl hZ hImpl) := by
+  constructor
+  · exact extensional_property_iff_hom hZ hImpl
+  · intro s0 f
+    exact assertionalFO_at_iff_extensional hZ hImpl s0 f
 
 /-- Gated verification: extensional adequacy yields hom↔Φ and FO execution on canonical trajectories. -/
 theorem extensional_adequate_verification_fo_bridge {SZ IZ OZ : Type}

@@ -14,9 +14,9 @@ Parallel to the FSM-embed Stage 3 API. Works on arbitrary `DiscreteSystem` value
 without `ofDiscreteSystem`. Covers partial open dynamics, FO assertional compile, and
 predicate-indexed schemas.
 
-FO assertional (`compileObservablesAssertionalFO`) packages execution FO plus a placeholder
-readout invariant. Infinite-state assertional hom↔Φ completeness is via extensional dynamics
-(`ExtensionalDynamicsFragment`), not direct FO assertional replay.
+FO assertional (`compileObservablesAssertionalFO`) packages execution FO plus spec-relative
+`stateLaw` extensional invariants. Infinite-state hom↔Φ completeness also lives on the
+extensional dynamics fragment (`ExtensionalDynamicsFragment`).
 -/
 
 namespace WymorePropertyFragment
@@ -25,15 +25,15 @@ open TemporalLogic PropertySemantics PropertyFragmentSpec FOLTL SystemToFormula 
 
 /-! ## FO assertional layer -/
 
-/-- FO assertional property set compiled from a reference system at initial state `s0`. -/
+/-- FO assertional property set compiled from reference and implementation at initial state `s0`. -/
+def compileObservablesAssertionalFO {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) (s0 : SZ) : FOLFormula SZ IZ OZ :=
+  compileAssertionalFO Z_spec Z_impl s0
+
+/-- FO execution property set compiled from a reference system at initial state `s0`. -/
 def compileObservablesFO {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) :
     FOLFormula SZ IZ OZ :=
   compileSystemFO Z s0
-
-/-- Assertional FO layer: execution plus tick-wise readout invariants. -/
-def compileObservablesAssertionalFO {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) :
-    FOLFormula SZ IZ OZ :=
-  compileAssertionalFO Z s0
 
 theorem compileObservablesFO_definable {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) :
     compileObservablesFO Z s0 = compileSystemFO Z s0 := rfl
@@ -149,20 +149,6 @@ theorem hom_implies_satisfies_specFO {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
   dsimp [SystemSatisfiesFOAt]
   exact wymore_execution_satisfies Z_spec (w.HS s0) (projectedInput w.HI f) _ _ hCanon
 
-/-! ## Predicate-indexed schema -/
-
-/-- Predicate-indexed dynamics schema: step and readout laws as `Prop`-valued families. -/
-structure PredicateDynamicsSchema (SZ IZ OZ : Type) (Z : DiscreteSystem SZ IZ OZ) where
-  stepLaw : ∀ (s : SZ) (oi : Option IZ), Z.NZ s oi = Z.NZ s oi
-  readoutLaw : ∀ (s : SZ), Z.RZ s = Z.RZ s
-
-def compileObservablesPred {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
-    PredicateDynamicsSchema SZ IZ OZ Z :=
-  { stepLaw := fun _ _ => rfl, readoutLaw := fun _ => rfl }
-
-theorem compileObservablesPred_wellformed {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
-    compileObservablesPred Z = compileObservablesPred Z := rfl
-
 /-! ## Partial open fragment -/
 
 /-- Side conditions for FO assertional soundness packaging. -/
@@ -202,6 +188,34 @@ def partialTransitionClause {SZ IZ OZ : Type} [DecidableEq IZ] (Z : DiscreteSyst
     (s : SZ) (i : IZ) : LTL (WymoreAtom SZ IZ OZ) :=
   LTL.imp (LTL.and (LTL.atom (.state s)) (LTL.atom (.input (some i))))
     (LTL.X (LTL.atom (.state (Z.NZ s (some i)))))
+
+/-! ## Predicate-indexed partial dynamics compile (infinite-capable) -/
+
+/-- Predicate-indexed partial dynamics: one LTL clause per state (and input when nonempty). -/
+structure PartialDynamicsOpenCompile (SZ IZ OZ : Type) (Z : DiscreteSystem SZ IZ OZ) where
+  readoutOpen : ∀ (_s : SZ) (o : OZ), Z.RZ _s = some o → LTL (WymoreAtom SZ IZ OZ)
+  readoutClosed : ∀ (_s : SZ), Z.RZ _s = none → LTL (WymoreAtom SZ IZ OZ)
+  autonomous : ∀ (_s : SZ), LTL (WymoreAtom SZ IZ OZ)
+  transition : ∀ (_s : SZ) (_i : IZ), LTL (WymoreAtom SZ IZ OZ)
+
+def compileObservablesPartialOpen {SZ IZ OZ : Type} [DecidableEq IZ] (Z : DiscreteSystem SZ IZ OZ) :
+    PartialDynamicsOpenCompile SZ IZ OZ Z where
+  readoutOpen := fun s o _ => partialReadoutClause Z s o
+  readoutClosed := fun s _ => partialClosedReadoutClause Z s
+  autonomous := partialAutonomousClause Z
+  transition := partialTransitionClause Z
+
+/-- Alias for predicate-indexed compile entry point. -/
+abbrev compileObservablesPred {SZ IZ OZ : Type} [DecidableEq IZ] (Z : DiscreteSystem SZ IZ OZ) :=
+  compileObservablesPartialOpen Z
+
+theorem compileObservablesPred_eq_partialOpen {SZ IZ OZ : Type} [DecidableEq IZ]
+    (Z : DiscreteSystem SZ IZ OZ) :
+    compileObservablesPred Z = compileObservablesPartialOpen Z := rfl
+
+theorem compileObservablesPartialOpen_wellformed {SZ IZ OZ : Type} [DecidableEq IZ]
+    (Z : DiscreteSystem SZ IZ OZ) :
+    compileObservablesPartialOpen Z = compileObservablesPartialOpen Z := rfl
 
 noncomputable def partialTransitionClauses {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
     [DecidableEq SZ] [DecidableEq IZ] (Z : DiscreteSystem SZ IZ OZ) :
@@ -260,22 +274,6 @@ theorem dynamicsSpecComplete_of {SZ IZ OZ : Type} [Fintype SZ] [DecidableEq SZ]
   rw [List.mem_map]
   exact ⟨s, Finset.mem_toList.mpr (Finset.mem_univ s), rfl⟩
 
-/-! ## Predicate-indexed partial dynamics (infinite-capable) -/
-
-/-- Predicate-indexed partial dynamics: one law per state (and input when nonempty). -/
-structure PartialDynamicsOpenSpec (SZ IZ OZ : Type) (Z : DiscreteSystem SZ IZ OZ) where
-  hasReadoutOpen : ∀ (s : SZ) (o : OZ), Z.RZ s = some o → Prop
-  hasReadoutClosed : ∀ (s : SZ), Z.RZ s = none → Prop
-  hasAutonomous : ∀ (_s : SZ), Prop
-  hasTransition : ∀ (_s : SZ) (_i : IZ), Prop
-
-def compileObservablesPartialOpen {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
-    PartialDynamicsOpenSpec SZ IZ OZ Z where
-  hasReadoutOpen := fun _ _ _ => True
-  hasReadoutClosed := fun _ _ => True
-  hasAutonomous := fun _ => True
-  hasTransition := fun _ _ => True
-
 /-- Every state carries an explicit readout law (open or closed) in the open spec. -/
 def ReadoutSpecCompleteOpen {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) : Prop :=
   ∀ (s : SZ), match Z.RZ s with | none => True | some _ => True
@@ -311,6 +309,27 @@ def SystemSatisfiesPartialDynamicsOpen {SZ IZ OZ : Type} [DecidableEq IZ]
   · exact SystemSatisfiesPartialDynamicsOpenCore Z_spec Z_impl ∧
       SystemSatisfiesPartialDynamicsOpenTransitions Z_spec Z_impl
   · exact SystemSatisfiesPartialDynamicsOpenCore Z_spec Z_impl
+
+def SystemSatisfiesPartialDynamicsCompiledCore {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ)
+    (Φ : PartialDynamicsOpenCompile SZ IZ OZ Z_spec) : Prop :=
+  (∀ s o hR, ∀ s0 f, (wymoreTrace Z_impl s0 f).models (Φ.readoutOpen s o hR)) ∧
+    (∀ s hR, ∀ s0 f, (wymoreTrace Z_impl s0 f).models (Φ.readoutClosed s hR)) ∧
+      (∀ s s0 f, (wymoreTrace Z_impl s0 f).models (Φ.autonomous s))
+
+def SystemSatisfiesPartialDynamicsCompiledTransitions {SZ IZ OZ : Type} [DecidableEq IZ]
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ)
+    (Φ : PartialDynamicsOpenCompile SZ IZ OZ Z_spec) : Prop :=
+  ∀ s i s0 f, (wymoreTrace Z_impl s0 f).models (Φ.transition s i)
+
+def SystemSatisfiesPartialDynamicsCompiled {SZ IZ OZ : Type} [DecidableEq IZ]
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ)
+    (Φ : PartialDynamicsOpenCompile SZ IZ OZ Z_spec) : Prop := by
+  classical
+  by_cases _h : Nonempty IZ
+  · exact SystemSatisfiesPartialDynamicsCompiledCore Z_spec Z_impl Φ ∧
+      SystemSatisfiesPartialDynamicsCompiledTransitions Z_spec Z_impl Φ
+  · exact SystemSatisfiesPartialDynamicsCompiledCore Z_spec Z_impl Φ
 
 noncomputable def partialDynamicsTableCore {SZ IZ OZ : Type} [Fintype SZ] [DecidableEq SZ]
     (Z : DiscreteSystem SZ IZ OZ) :
@@ -395,6 +414,12 @@ theorem synthesizePartialSpec_eq {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ)
 def PhiAdequatePartialOpen {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
     [DecidableEq SZ] [DecidableEq IZ] (Z : DiscreteSystem SZ IZ OZ) : Prop :=
   PhiAdequateSpec (SystemSatisfiesPartialDynamics Z Z) (synthesizePartialSpec Z = Z)
+
+def PhiAdequatePartialOpenPred {SZ IZ OZ : Type} [DecidableEq IZ]
+    (Z : DiscreteSystem SZ IZ OZ) : Prop :=
+  PhiAdequateSpec
+    (SystemSatisfiesPartialDynamicsCompiled Z Z (compileObservablesPartialOpen Z))
+    (synthesizePartialSpec Z = Z)
 
 structure PartialDynamicsAdequate {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
     [DecidableEq SZ] [DecidableEq IZ] (Z : DiscreteSystem SZ IZ OZ) : Prop where
@@ -1109,6 +1134,111 @@ theorem partialDynamicsOpen_iff_table_readoutComplete {SZ IZ OZ : Type} [Fintype
     SystemSatisfiesPartialDynamicsOpen Z_spec Z_impl ↔
       SystemSatisfiesPartialDynamics Z_spec Z_impl :=
   (partialDynamics_table_iff_open (readoutSpecCompleteOpen_of Z_spec)).symm
+
+theorem partialDynamicsCompiled_iff_open {SZ IZ OZ : Type} [DecidableEq IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ} :
+    SystemSatisfiesPartialDynamicsCompiled Z_spec Z_impl (compileObservablesPartialOpen Z_spec) ↔
+      SystemSatisfiesPartialDynamicsOpen Z_spec Z_impl := by
+  classical
+  have hCore :
+      SystemSatisfiesPartialDynamicsCompiledCore Z_spec Z_impl (compileObservablesPartialOpen Z_spec) ↔
+        SystemSatisfiesPartialDynamicsOpenCore Z_spec Z_impl := by
+    simp [SystemSatisfiesPartialDynamicsCompiledCore, SystemSatisfiesPartialDynamicsOpenCore,
+      compileObservablesPartialOpen]
+  have hTrans :
+      SystemSatisfiesPartialDynamicsCompiledTransitions Z_spec Z_impl (compileObservablesPartialOpen Z_spec) ↔
+        SystemSatisfiesPartialDynamicsOpenTransitions Z_spec Z_impl := by
+    simp [SystemSatisfiesPartialDynamicsCompiledTransitions, SystemSatisfiesPartialDynamicsOpenTransitions,
+      compileObservablesPartialOpen]
+  unfold SystemSatisfiesPartialDynamicsCompiled SystemSatisfiesPartialDynamicsOpen
+  split_ifs with hne
+  · rw [hCore, hTrans]
+  · rw [hCore]
+
+theorem partialDynamicsCompiled_iff_table {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
+    [DecidableEq SZ] [DecidableEq IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hComplete : ReadoutSpecCompleteOpen Z_spec) :
+    SystemSatisfiesPartialDynamicsCompiled Z_spec Z_impl (compileObservablesPartialOpen Z_spec) ↔
+      SystemSatisfiesPartialDynamics Z_spec Z_impl :=
+  (partialDynamicsCompiled_iff_open).trans (partialDynamics_table_iff_open hComplete).symm
+
+theorem partialDynamicsCompiled_iff_hom {SZ IZ OZ : Type} [DecidableEq IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hComplete : ReadoutSpecCompleteOpen Z_spec) :
+    SystemSatisfiesPartialDynamicsCompiled Z_spec Z_impl (compileObservablesPartialOpen Z_spec) ↔
+      PartialIsIdentityHomomorphicImage Z_spec Z_impl :=
+  (partialDynamicsCompiled_iff_open).trans (partialDynamicsOpen_iff_hom hComplete)
+
+theorem partialDynamicsCompiled_satisfies_reflexive {SZ IZ OZ : Type} [DecidableEq IZ]
+    (Z : DiscreteSystem SZ IZ OZ) :
+    SystemSatisfiesPartialDynamicsCompiled Z Z (compileObservablesPartialOpen Z) :=
+  (partialDynamicsCompiled_iff_open).2 (partialDynamicsOpen_satisfies_reflexive Z)
+
+theorem phiAdequatePartialOpenPred_iff {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
+    [DecidableEq SZ] [DecidableEq IZ] (Z : DiscreteSystem SZ IZ OZ) :
+    PhiAdequatePartialOpenPred Z ↔ PhiAdequatePartialOpen Z := by
+  constructor
+  · intro ⟨hSat, hCanon⟩
+    exact ⟨(partialDynamicsCompiled_iff_table (readoutSpecCompleteOpen_of Z)).1 hSat, hCanon⟩
+  · intro ⟨hSat, hCanon⟩
+    exact ⟨(partialDynamicsCompiled_iff_table (readoutSpecCompleteOpen_of Z)).2 hSat, hCanon⟩
+
+/-! ## Partial-open assertional FO -/
+
+@[simp]
+theorem satisfiesFO_compilePartialAssertionalLaws {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ} (s0 : SZ) (f : ITZW IZ) (g : STZ SZ) (y : OTZ OZ) :
+    SatisfiesFO (compilePartialAssertionalLaws Z_spec Z_impl) Z_impl s0 f g y ↔
+      PartialExtEqual Z_spec Z_impl := by
+  simp only [compilePartialAssertionalLaws, PartialExtEqual, SatisfiesFO]
+
+@[simp]
+theorem satisfiesFO_compilePartialAssertionalFO {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ} (s0 : SZ) (f : ITZW IZ) (g : STZ SZ) (y : OTZ OZ) :
+    SatisfiesFO (compilePartialAssertionalFO Z_spec Z_impl s0) Z_impl s0 f g y ↔
+      IsWymoreExecution Z_spec s0 f g y ∧ PartialExtEqual Z_spec Z_impl := by
+  simp only [compilePartialAssertionalFO, SatisfiesFO, IsWymoreExecution, satisfiesFO_compilePartialAssertionalLaws]
+  constructor
+  · rintro ⟨hExec, hExt⟩
+    exact ⟨(satisfiesFO_compileSystemFO Z_spec s0 f g y).mp hExec, hExt⟩
+  · rintro ⟨hExec, hExt⟩
+    exact ⟨(satisfiesFO_compileSystemFO Z_spec s0 f g y).mpr hExec, hExt⟩
+
+theorem partialAssertionalFO_at_iff_partialDynamicsOpen {SZ IZ OZ : Type} [DecidableEq IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hComplete : ReadoutSpecCompleteOpen Z_spec) (s0 : SZ) (f : ITZW IZ) :
+    SystemSatisfiesSpecPartialAssertionalFOAt Z_spec Z_impl s0 f ↔
+      SystemSatisfiesPartialDynamicsOpen Z_spec Z_impl := by
+  constructor
+  · intro h
+    dsimp [SystemSatisfiesSpecPartialAssertionalFOAt] at h
+    simp only [satisfiesFO_compilePartialAssertionalFO] at h
+    exact (partialDynamicsOpen_iff_extEqual hComplete).2 h.2
+  · intro hOpen
+    dsimp [SystemSatisfiesSpecPartialAssertionalFOAt]
+    have hExt := (partialDynamicsOpen_iff_extEqual hComplete).1 hOpen
+    have hExec : IsWymoreExecution Z_spec s0 f
+        (generateStateTrajectory Z_impl s0 f) (generateOutputTrajectory Z_impl s0 f) := by
+      refine ⟨rfl, ?_, ?_⟩
+      · intro t
+        rw [_root_.generateStateTrajectory_succ,
+          hExt.2 (generateStateTrajectory Z_impl s0 f t) (f t)]
+      · intro t
+        rw [generateOutputTrajectory_val, hExt.1 (generateStateTrajectory Z_impl s0 f t)]
+    exact And.intro
+      ((satisfiesFO_compileSystemFO Z_spec s0 f
+        (generateStateTrajectory Z_impl s0 f) (generateOutputTrajectory Z_impl s0 f)).mpr hExec)
+      ((satisfiesFO_compilePartialAssertionalLaws (Z_spec := Z_spec) (Z_impl := Z_impl) s0 f
+        (generateStateTrajectory Z_impl s0 f) (generateOutputTrajectory Z_impl s0 f)).mpr hExt)
+
+theorem partialAssertionalFO_at_iff_hom {SZ IZ OZ : Type} [DecidableEq IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hComplete : ReadoutSpecCompleteOpen Z_spec) (s0 : SZ) (f : ITZW IZ) :
+    SystemSatisfiesSpecPartialAssertionalFOAt Z_spec Z_impl s0 f ↔
+      PartialIsIdentityHomomorphicImage Z_spec Z_impl :=
+  (partialAssertionalFO_at_iff_partialDynamicsOpen hComplete s0 f).trans
+    (partialDynamicsOpen_iff_hom hComplete)
 
 /-! ## Finite enumeration requires `Fintype` -/
 def RequiresFiniteStateEnumeration (SZ : Type) : Prop := Nonempty (Fintype SZ)

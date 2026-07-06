@@ -63,6 +63,11 @@ def IsHomomorphicImage {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     (Z_img : DiscreteSystem SZ1 IZ1 OZ1) (Z_elab : DiscreteSystem SZ2 IZ2 OZ2) : Prop :=
   Nonempty (HomomorphicImageWitness Z_img Z_elab)
 
+/-- Same-type Def 4.3 homomorphic image (alias when `SZ/IZ/OZ` coincide). -/
+abbrev SameTypeHomomorphicImage {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) : Prop :=
+  IsHomomorphicImage Z_spec Z_impl
+
 theorem homomorphicImage_preserves_state_trajectory
     {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     {Z_img : DiscreteSystem SZ1 IZ1 OZ1} {Z_elab : DiscreteSystem SZ2 IZ2 OZ2}
