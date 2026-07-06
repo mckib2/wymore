@@ -19,7 +19,7 @@ Documents failure modes for infinite state, partial I/O, and finite enumeration.
 namespace WymorePathologyExamples
 
 open WymorePropertyFragment PropertyFragmentSpec PathologyExamples GeneralProperties FSM
-  SystemToFormula PropertyFragment.General ExtensionalDynamicsFragment Homomorphism
+  SystemToFormula FOLTL PropertyFragment.General ExtensionalDynamicsFragment Homomorphism
   SpecFromProperties HimsySynthesis
 
 /-! ## Infinite state (`counterSystem`) -/
@@ -205,6 +205,90 @@ theorem partial_readout_only_not_complete :
     wymoreStay_jump_same_readout
   refine ⟨hcross.1, hcross.2, wymoreStay_jump_different_step⟩
 
+/-! ## Silent readout without closed clauses (Track A pathology) -/
+
+/-- Spec with silent readout (`RZ = none`); legacy table emits no readout clause at that state. -/
+def silentReadoutSpec : DiscreteSystem wymPathStates wymPathInputs wymPathOutputs where
+  sz_nonempty := ⟨0⟩
+  NZ := wymoreStay.NZ
+  RZ := fun _ => none
+
+/-- Same dynamics, spurious output at silent spec states. -/
+def spuriousOutputImpl : DiscreteSystem wymPathStates wymPathInputs wymPathOutputs where
+  sz_nonempty := ⟨0⟩
+  NZ := wymoreStay.NZ
+  RZ := fun _ => some 0
+
+theorem silentReadoutSpec_silent : silentReadoutSpec.RZ 0 = none := rfl
+
+theorem spuriousOutputImpl_not_extEqual :
+    ¬ PartialExtEqual silentReadoutSpec spuriousOutputImpl := by
+  intro h
+  simpa [silentReadoutSpec, spuriousOutputImpl] using h.1 0
+
+theorem partial_satisfies_silentLegacy_not_implies_extEqual :
+    SystemSatisfiesPartialDynamicsSilentLegacy silentReadoutSpec spuriousOutputImpl ∧
+      ¬ PartialExtEqual silentReadoutSpec spuriousOutputImpl := by
+  refine ⟨?_, spuriousOutputImpl_not_extEqual⟩
+  intro s0 f φ hmem
+  dsimp [partialDynamicsTableSilentLegacy] at hmem
+  rw [List.mem_append] at hmem
+  rcases hmem with hmem | hmem
+  · rw [List.mem_append] at hmem
+    rcases hmem with hmem | hmem
+    · dsimp [partialReadoutClausesSilentLegacy] at hmem
+      rw [List.mem_flatMap] at hmem
+      rcases hmem with ⟨s, _, hmatch⟩
+      simp [silentReadoutSpec] at hmatch
+    · dsimp [partialAutonomousClauses] at hmem
+      rw [List.mem_map] at hmem
+      rcases hmem with ⟨s, _, heq⟩
+      rw [← heq]
+      simpa [partialAutonomousClause, silentReadoutSpec, spuriousOutputImpl, wymoreStay] using
+        wymoreTrace_models_partialAutonomous spuriousOutputImpl s0 f s
+  · dsimp [partialTransitionClauses] at hmem
+    rw [List.mem_flatMap] at hmem
+    rcases hmem with ⟨s, _, hmap⟩
+    rw [List.mem_map] at hmap
+    rcases hmap with ⟨i, _, heq⟩
+    rw [← heq]
+    simpa [partialTransitionClause, silentReadoutSpec, spuriousOutputImpl, wymoreStay] using
+      wymoreTrace_models_partialTransition spuriousOutputImpl s0 f s i
+
+/-! ## Closed readout shape (Track A positive witness) -/
+
+/-- Closed Moore shape with `Unit` I/O (fragment-compatible; mirrors `closedSystem`). -/
+def closedShapeSpec : DiscreteSystem Unit Unit Unit where
+  sz_nonempty := ⟨()⟩
+  NZ := fun s _ => s
+  RZ := fun _ => none
+
+def closedShapeImpl : DiscreteSystem Unit Unit Unit where
+  sz_nonempty := ⟨()⟩
+  NZ := fun s _ => s
+  RZ := fun _ => none
+
+theorem closedShapeSpec_not_alwaysOutputs : ¬ AlwaysOutputs closedShapeSpec := by
+  intro h
+  have hz : closedShapeSpec.RZ () = none := rfl
+  rcases h () with ⟨w, hw⟩
+  rw [hz] at hw
+  cases hw
+
+theorem closedShapeSpec_readoutComplete : ReadoutSpecComplete closedShapeSpec :=
+  readoutSpecComplete_of closedShapeSpec
+
+theorem closedShapeSpec_partial_iff_hom :
+    SystemSatisfiesPartialDynamics closedShapeSpec closedShapeImpl ↔
+      PartialIsIdentityHomomorphicImage closedShapeSpec closedShapeImpl :=
+  partial_property_iff_hom_readoutComplete closedShapeSpec_readoutComplete
+
+theorem closedShapeSpec_resolved :
+    ReadoutSpecComplete closedShapeSpec ∧
+      (SystemSatisfiesPartialDynamics closedShapeSpec closedShapeImpl ↔
+        PartialIsIdentityHomomorphicImage closedShapeSpec closedShapeImpl) :=
+  ⟨closedShapeSpec_readoutComplete, closedShapeSpec_partial_iff_hom⟩
+
 /-- Under `AlwaysOutputs`, pinned Stage 3 bi-implication remains the identity-hom witness. -/
 theorem partial_identity_hom_via_pinned {Z_spec Z_impl : DiscreteSystem wymPathStates wymPathInputs wymPathOutputs}
     (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
@@ -220,5 +304,75 @@ theorem partial_agrees_with_pinned_when_alwaysOutputs {SZ IZ OZ : Type}
     [Nonempty IZ] (Z : DiscreteSystem SZ IZ OZ) (_hOut : AlwaysOutputs Z) :
     RequiresFiniteStateEnumeration SZ :=
   requiresFiniteStateEnumeration_of_fintype (SZ := SZ)
+
+/-! ## FO execution without extensional/hom (Track B pathology) -/
+
+abbrev foPathStates := Fin 2
+abbrev foPathInputs := Fin 1
+abbrev foPathOutputs := Fin 1
+
+def foUnreachableSharedRz : foPathStates → foPathOutputs := fun _ => 0
+
+def foUnreachableSpec : DiscreteSystem foPathStates foPathInputs foPathOutputs :=
+  DiscreteSystem.ofTotal (fun s _ => if s = 0 then 0 else 0) foUnreachableSharedRz ⟨0⟩
+
+def foUnreachableImpl : DiscreteSystem foPathStates foPathInputs foPathOutputs :=
+  DiscreteSystem.ofTotal (fun s _ => if s = 0 then 0 else 1) foUnreachableSharedRz ⟨0⟩
+
+def foUnreachableInput : ITZW foPathInputs := fun _ => some 0
+
+theorem foUnreachable_stay_at_zero (t : Time) :
+    _root_.generateStateTrajectory foUnreachableImpl 0 foUnreachableInput t = 0 := by
+  induction t with
+  | zero => rfl
+  | succ t ih =>
+    calc _root_.generateStateTrajectory foUnreachableImpl 0 foUnreachableInput (t + 1)
+        = foUnreachableImpl.NZ (_root_.generateStateTrajectory foUnreachableImpl 0 foUnreachableInput t)
+            (foUnreachableInput t) := rfl
+      _ = 0 := by rw [ih, foUnreachableInput]; simp [foUnreachableImpl, DiscreteSystem.ofTotal]
+
+theorem foUnreachableSpec_alwaysOutputs : AlwaysOutputs foUnreachableSpec :=
+  ofTotal_alwaysOutputs _ _ _
+
+theorem foUnreachableImpl_alwaysOutputs : AlwaysOutputs foUnreachableImpl :=
+  ofTotal_alwaysOutputs _ _ _
+
+theorem foUnreachable_differ_at_unreachable :
+    foUnreachableSpec.NZ 1 (some 0) = 0 ∧
+      foUnreachableImpl.NZ 1 (some 0) = 1 ∧
+        foUnreachableSpec.NZ 1 (some 0) ≠ foUnreachableImpl.NZ 1 (some 0) := by
+  native_decide
+
+theorem foUnreachable_impl_satisfies_specFO :
+    SystemSatisfiesSpecFOAt foUnreachableSpec foUnreachableImpl 0 foUnreachableInput := by
+  dsimp [SystemSatisfiesSpecFOAt, compileSystemFO]
+  simp only [SatisfiesFO]
+  refine ⟨rfl, ?_, ?_⟩
+  · intro t
+    rw [foUnreachable_stay_at_zero t, foUnreachable_stay_at_zero (t + 1), foUnreachableInput]
+    simp [foUnreachableSpec, DiscreteSystem.ofTotal]
+  · intro t
+    rw [_root_.generateOutputTrajectory_val, foUnreachable_stay_at_zero t]
+    simp [foUnreachableSpec, foUnreachableSharedRz, foUnreachableImpl, DiscreteSystem.ofTotal]
+
+theorem foUnreachable_not_extensional :
+    ¬ SystemSatisfiesExtensional foUnreachableSpec foUnreachableImpl
+      foUnreachableSpec_alwaysOutputs foUnreachableImpl_alwaysOutputs := by
+  intro h
+  rcases foUnreachable_differ_at_unreachable with ⟨_, _, hne⟩
+  exact hne (h.2 1 (some 0)).symm
+
+theorem fo_execution_not_complete_for_hom :
+    SystemSatisfiesSpecFOAt foUnreachableSpec foUnreachableImpl 0 foUnreachableInput ∧
+      ¬ SystemSatisfiesExtensional foUnreachableSpec foUnreachableImpl
+        foUnreachableSpec_alwaysOutputs foUnreachableImpl_alwaysOutputs ∧
+        ¬ SystemIsIdentityHomomorphicImageOpen foUnreachableSpec foUnreachableImpl
+          foUnreachableSpec_alwaysOutputs foUnreachableImpl_alwaysOutputs := by
+  refine ⟨foUnreachable_impl_satisfies_specFO, ?_, ?_⟩
+  · exact foUnreachable_not_extensional
+  · intro hHom
+    exact foUnreachable_not_extensional
+      ((extensional_property_iff_hom foUnreachableSpec_alwaysOutputs
+        foUnreachableImpl_alwaysOutputs).mpr hHom)
 
 end WymorePathologyExamples

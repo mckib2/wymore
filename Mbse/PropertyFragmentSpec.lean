@@ -140,7 +140,10 @@ structure PinnedFiniteSideConditions (SZ IZ OZ : Type) (Z : DiscreteSystem SZ IZ
   iz_finite : Nonempty (Fintype IZ)
   oz_finite : Nonempty (Fintype OZ)
 
-/-- Side conditions for Track A partial-open clause tables. -/
+/-- Side conditions for Track A partial-open clause tables.
+
+Readout-completeness (`ReadoutSpecComplete` in `WymorePropertyFragment`) replaces
+`AlwaysOutputs` when closed readout states need explicit `none` clauses. -/
 structure PartialOpenSideConditions (SZ IZ OZ : Type) (Z : DiscreteSystem SZ IZ OZ) : Prop where
   sz_finite : Nonempty (Fintype SZ)
   iz_finite : Nonempty (Fintype IZ)

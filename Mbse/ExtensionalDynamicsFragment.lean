@@ -360,6 +360,20 @@ theorem extensional_subsumes_executionFO {SZ IZ OZ : Type}
   rw [systemSatisfiesFO_iff_execution]
   exact canonical_is_wymore_execution Z s0 f
 
+/-- Impl canonical execution satisfies spec-side FO at `(s0, f)` (Link A on projected trajectories). -/
+def SystemSatisfiesSpecFOAt {SZ IZ OZ : Type} (Z_spec Z_impl : DiscreteSystem SZ IZ OZ)
+    (s0 : SZ) (f : ITZW IZ) : Prop :=
+  SatisfiesFO (compileSystemFO Z_spec s0) Z_impl s0 f
+    (generateStateTrajectory Z_impl s0 f)
+    (generateOutputTrajectory Z_impl s0 f)
+
+theorem extensional_implies_systemSatisfiesSpecFOAt {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (h : SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl) (s0 : SZ) (f : ITZW IZ) :
+    SystemSatisfiesSpecFOAt Z_spec Z_impl s0 f :=
+  extensional_implies_impl_satisfies_specFO hSpec hImpl h s0 f
+
 /-! ## Extensional synthesis + PhiAdequate (Track D verification template)
 
 Synthesis is identity today; adequacy gate is structurally required for the paper template.
@@ -401,6 +415,30 @@ theorem extensional_phi_adequate_open {SZ IZ OZ : Type} (Z : DiscreteSystem SZ I
   constructor
   · exact extensional_satisfies_reflexive Z hOut
   · exact synthesizeExtensionalSpec_eq Z
+
+/-- Gated verification: extensional adequacy yields hom↔Φ and FO execution on canonical trajectories. -/
+theorem extensional_adequate_verification_fo_bridge {SZ IZ OZ : Type}
+    {Z Z_impl : DiscreteSystem SZ IZ OZ}
+    (hZ : AlwaysOutputs Z) (hImpl : AlwaysOutputs Z_impl)
+    (_hAdeq : PhiAdequateExtensionalOpen Z hZ) :
+    (SystemSatisfiesExtensional Z Z_impl hZ hImpl ↔
+        SystemIsIdentityHomomorphicImageOpen Z Z_impl hZ hImpl) ∧
+      (SystemSatisfiesExtensional Z Z_impl hZ hImpl →
+        ∀ s0 f, SystemSatisfiesSpecFOAt Z Z_impl s0 f) := by
+  constructor
+  · exact extensional_property_iff_hom hZ hImpl
+  · intro hExt s0 f
+    exact extensional_implies_systemSatisfiesSpecFOAt hZ hImpl hExt s0 f
+
+theorem extensional_cross_adequate_fo_bridge {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z_spec : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}
+    (w : HomomorphicImageWitness Z_spec Z_impl) (s0 : SZ2) (f : ITZW IZ2)
+    (_hAdeq : PhiAdequateExtensionalCross Z_spec)
+    (hExec : IsWymoreExecution Z_impl s0 f
+      (generateStateTrajectory Z_impl s0 f)
+      (generateOutputTrajectory Z_impl s0 f)) :
+    SystemSatisfiesFOAt Z_spec (w.HS s0) (projectedInput w.HI f) :=
+  hom_implies_satisfies_specFO w s0 f hExec
 
 theorem extensionalDynamicsAdequate_iff {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
     ExtensionalDynamicsAdequate Z ↔ PhiAdequateExtensionalCross Z := by

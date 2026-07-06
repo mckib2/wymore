@@ -25,6 +25,8 @@ inductive BlockerTag where
   | readoutOnly
   | eventuallyF
   | rawBranchingNZ
+  | partialSilentReadout
+  | foAssertionalCompleteness
 
 def blockerFragment : BlockerTag → FragmentSpec
   | .infiniteSZ => pinnedFiniteFragment
@@ -32,6 +34,8 @@ def blockerFragment : BlockerTag → FragmentSpec
   | .readoutOnly => readoutOnlyFragment
   | .eventuallyF => pinnedFragment
   | .rawBranchingNZ => partialOpenFragment
+  | .partialSilentReadout => partialOpenFragment
+  | .foAssertionalCompleteness => foAssertionalFragment
 
 /-! ## One theorem per BLOCKED failure mode -/
 
@@ -75,6 +79,27 @@ theorem resolved_inverseTableRecovery :
       (dynamicsTable fsmStay.toDiscreteSystem (fsm_alwaysOutputs fsmStay))
       fsmStay.toDiscreteSystem (fsm_alwaysOutputs fsmStay) :=
   fsmStay_recoverable_table
+
+theorem blocked_partialSilentReadout :
+    partialOpenFragment.dynamicsComplete = true ∧
+      SystemSatisfiesPartialDynamicsSilentLegacy silentReadoutSpec spuriousOutputImpl ∧
+        ¬ PartialExtEqual silentReadoutSpec spuriousOutputImpl :=
+  ⟨partialOpen_dynamicsComplete, partial_satisfies_silentLegacy_not_implies_extEqual⟩
+
+/-- Closed readout covered by readout-complete partial table (no `AlwaysOutputs` required). -/
+theorem resolved_partialClosedReadout :
+    ReadoutSpecComplete closedShapeSpec ∧
+      (SystemSatisfiesPartialDynamics closedShapeSpec closedShapeImpl ↔
+        PartialIsIdentityHomomorphicImage closedShapeSpec closedShapeImpl) :=
+  closedShapeSpec_resolved
+
+theorem blocked_foAssertionalCompleteness :
+    foAssertionalFragment.finiteClauseEnumeration = false ∧
+      SystemSatisfiesSpecFOAt foUnreachableSpec foUnreachableImpl 0 foUnreachableInput ∧
+        ¬ SystemSatisfiesExtensional foUnreachableSpec foUnreachableImpl
+          foUnreachableSpec_alwaysOutputs foUnreachableImpl_alwaysOutputs :=
+  ⟨foAssertional_no_finite_enum, fo_execution_not_complete_for_hom.1,
+    fo_execution_not_complete_for_hom.2.1⟩
 
 theorem blocked_partialRZ :
     pinnedFragment.dynamicsComplete = true ∧ ¬ AlwaysOutputs closedSystem :=
