@@ -21,6 +21,11 @@ import Mbse.WymorePropertyFragment
 FO-LTL (`compileSystemFO`) supports Z_spec→Φ encoding (Link A). This module carries
 hom↔Φ completeness for unbounded `SZ` via predicate-indexed extensional laws, not finite
 clause enumeration.
+
+`compileObservablesExt Z_spec` names the spec-side NZ/RZ laws. Cross-type satisfaction
+means ∃ surjective hom maps making the elaboration project onto those laws (Def 4.3).
+Same-type satisfaction (`SystemSatisfiesExtensional`) is pointwise NZ/RZ agreement under
+`AlwaysOutputs`.
 -/
 
 namespace ExtensionalDynamicsFragment
@@ -146,9 +151,47 @@ theorem extensional_property_iff_hom {SZ IZ OZ : Type}
       SystemIsIdentityHomomorphicImageOpen Z_spec Z_impl hSpec hImpl :=
   ⟨extensional_satisfies_implies_hom hSpec hImpl, extensional_hom_implies_satisfies hSpec hImpl⟩
 
-/-! ## Cross-type hom soundness -/
+/-! ## Cross-type extensional satisfaction (witness-free) -/
 
-/-- Cross-type extensional satisfaction relative to a homomorphic image witness. -/
+/-- Witness-free extensional content of Def 4.3: ∃ surjective `HS`/`HI`/`HO` with NZ/RZ laws. -/
+def SystemSatisfiesExtensionalCross {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    (Z_spec : DiscreteSystem SZ1 IZ1 OZ1) (Z_impl : DiscreteSystem SZ2 IZ2 OZ2) : Prop :=
+  ∃ (HS : SZ2 → SZ1) (HI : IZ2 → IZ1) (HO : OZ2 → OZ1),
+    Function.Surjective HS ∧ Function.Surjective HI ∧ Function.Surjective HO ∧
+      (∀ s oi, HS (Z_impl.NZ s oi) = Z_spec.NZ (HS s) (oi.map HI)) ∧
+        (∀ s, (Z_impl.RZ s).map HO = Z_spec.RZ (HS s))
+
+/-- Impl satisfies compiled extensional Φ from `compileObservablesExt Z_spec`. -/
+def SystemSatisfiesCompiledExtensional {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    (Z_spec : DiscreteSystem SZ1 IZ1 OZ1) (Z_impl : DiscreteSystem SZ2 IZ2 OZ2) : Prop :=
+  SystemSatisfiesExtensionalCross Z_spec Z_impl
+
+theorem extensional_cross_of_hom {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z_spec : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}
+    (h : IsHomomorphicImage Z_spec Z_impl) :
+    SystemSatisfiesExtensionalCross Z_spec Z_impl := by
+  rcases h with ⟨w⟩
+  refine ⟨w.HS, w.HI, w.HO, w.HS_surjective, w.HI_surjective, w.HO_surjective, ?_, ?_⟩
+  · exact w.preserves_transition
+  · exact w.preserves_readout
+
+theorem extensional_hom_of_cross {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z_spec : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}
+    (h : SystemSatisfiesExtensionalCross Z_spec Z_impl) :
+    IsHomomorphicImage Z_spec Z_impl := by
+  rcases h with ⟨HS, HI, HO, hS, hI, hO, hN, hR⟩
+  exact ⟨⟨HS, HI, HO, hS, hI, hO, hN, hR⟩⟩
+
+/-- Main cross-type milestone: assertional Φ ↔ homomorphic image (Def 4.3). -/
+theorem extensional_cross_property_iff_hom {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z_spec : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2} :
+    SystemSatisfiesExtensionalCross Z_spec Z_impl ↔
+      IsHomomorphicImage Z_spec Z_impl :=
+  ⟨extensional_hom_of_cross, extensional_cross_of_hom⟩
+
+/-! ## Witness-indexed cross-type helper (soundness only) -/
+
+/-- Witness-indexed packaging of Def 4.3 laws — not the bi-implication LHS (use `SystemSatisfiesExtensionalCross`). -/
 def SystemSatisfiesExtensionalAt {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     {Z_spec : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}
     (w : HomomorphicImageWitness Z_spec Z_impl) : Prop :=
@@ -160,6 +203,57 @@ theorem hom_implies_satisfies_extensional {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     (w : HomomorphicImageWitness Z_spec Z_impl) :
     SystemSatisfiesExtensionalAt w :=
   ⟨w.preserves_readout, w.preserves_transition⟩
+
+theorem extensional_cross_at_of_witness {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z_spec : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}
+    (w : HomomorphicImageWitness Z_spec Z_impl) :
+    SystemSatisfiesExtensionalAt w → SystemSatisfiesExtensionalCross Z_spec Z_impl :=
+  fun _ => extensional_cross_of_hom ⟨w⟩
+
+/-! ## Helper lemmas -/
+
+theorem rz_eq_of_totalRz_eq {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (hR : ∀ s, totalRz Z_impl hImpl s = totalRz Z_spec hSpec s) (s : SZ) :
+    Z_impl.RZ s = Z_spec.RZ s := by
+  obtain ⟨o_impl, ho_impl⟩ := hImpl s
+  obtain ⟨o_spec, ho_spec⟩ := hSpec s
+  have h := hR s
+  simp only [totalRz, ho_impl, ho_spec, Option.get_some] at h
+  rw [ho_impl, ho_spec, h]
+
+/-! ## Same-type collapse (Track D specialization) -/
+
+theorem extensional_sameType_implies_cross {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (h : SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl) :
+    SystemSatisfiesExtensionalCross Z_spec Z_impl := by
+  rcases h with ⟨hR, hN⟩
+  refine ⟨id, id, id, Function.surjective_id, Function.surjective_id, Function.surjective_id, ?_, ?_⟩
+  · intro s oi; simp [hN]
+  · intro s; simp [rz_eq_of_totalRz_eq hSpec hImpl hR s]
+
+theorem extensional_cross_implies_sameType_of_identityHom {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (hHom : SystemIsIdentityHomomorphicImageOpen Z_spec Z_impl hSpec hImpl) :
+    SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl :=
+  extensional_hom_implies_satisfies hSpec hImpl hHom
+
+theorem extensional_sameType_collapse_iff_hom {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) :
+    SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl ↔
+      (SystemSatisfiesExtensionalCross Z_spec Z_impl ∧
+        SystemIsIdentityHomomorphicImageOpen Z_spec Z_impl hSpec hImpl) := by
+  constructor
+  · intro h
+    exact ⟨extensional_sameType_implies_cross hSpec hImpl h,
+      extensional_satisfies_implies_hom hSpec hImpl h⟩
+  · intro ⟨_, hHom⟩
+    exact extensional_hom_implies_satisfies hSpec hImpl hHom
 
 /-! ## Finite-tier agreement (unifies with pinned Stages 1–3) -/
 
@@ -233,19 +327,6 @@ theorem extensional_dynamicsTable_implies_extensional_ofTotal {SZ IZ OZ : Type} 
   rcases (system_property_iff_hom hSpec hImpl).mp hDyn with ⟨w⟩
   exact extensional_hom_implies_satisfies hSpec hImpl
     ⟨finiteHomWitness_to_open_ofTotal hNE_spec hNE_impl hSpec hImpl w⟩
-
-/-! ## Helper lemmas -/
-
-theorem rz_eq_of_totalRz_eq {SZ IZ OZ : Type}
-    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
-    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
-    (hR : ∀ s, totalRz Z_impl hImpl s = totalRz Z_spec hSpec s) (s : SZ) :
-    Z_impl.RZ s = Z_spec.RZ s := by
-  obtain ⟨o_impl, ho_impl⟩ := hImpl s
-  obtain ⟨o_spec, ho_spec⟩ := hSpec s
-  have h := hR s
-  simp only [totalRz, ho_impl, ho_spec, Option.get_some] at h
-  rw [ho_impl, ho_spec, h]
 
 /-! ## FO-LTL bridge (Link A integration) -/
 

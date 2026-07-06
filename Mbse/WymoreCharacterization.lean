@@ -116,6 +116,40 @@ theorem stageWymore_extensional_subsumes_executionFO {SZ IZ OZ : Type}
     SystemSatisfiesExtensional Z Z hOut hOut → SystemSatisfiesFO Z s0 f :=
   extensional_subsumes_executionFO Z hOut s0 f
 
+/-! ## Track D: cross-type extensional bi-implication -/
+
+theorem stageWymore_extensional_cross_iff_hom {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z_spec : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2} :
+    SystemSatisfiesExtensionalCross Z_spec Z_impl ↔
+      IsHomomorphicImage Z_spec Z_impl :=
+  extensional_cross_property_iff_hom
+
+theorem stageWymore_extensional_cross_soundness {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z_spec : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}
+    (h : IsHomomorphicImage Z_spec Z_impl) :
+    SystemSatisfiesExtensionalCross Z_spec Z_impl :=
+  extensional_cross_of_hom h
+
+theorem stageWymore_counterElab_cross :
+    SystemSatisfiesExtensionalCross counterSystem counterElab ∧
+      IsHomomorphicImage counterSystem counterElab :=
+  ⟨counterElab_satisfies_extensional_cross, counterElab_hom_to_counterSystem⟩
+
+theorem stageWymore_extensional_sameType_implies_cross {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
+    (h : SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl) :
+    SystemSatisfiesExtensionalCross Z_spec Z_impl :=
+  extensional_sameType_implies_cross hSpec hImpl h
+
+theorem stageWymore_extensional_sameType_collapse {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) :
+    SystemSatisfiesExtensional Z_spec Z_impl hSpec hImpl ↔
+      (SystemSatisfiesExtensionalCross Z_spec Z_impl ∧
+        SystemIsIdentityHomomorphicImageOpen Z_spec Z_impl hSpec hImpl) :=
+  extensional_sameType_collapse_iff_hom hSpec hImpl
+
 /-! ## Track B/D: infinite state impossibility (finite enumeration) -/
 
 theorem stageWymore_infinite_no_finite_enum :
@@ -199,6 +233,11 @@ theorem stageWymore_resolved_infiniteSZ_extensional :
       SystemSatisfiesExtensional counterSystem counterSystem counterSystem_alwaysOutputs
         counterSystem_alwaysOutputs :=
   ⟨extensionalDynamics_no_finite_enum, counterSystem_satisfies_own_extensional⟩
+
+theorem stageWymore_resolved_crossTypeExtensional :
+    SystemSatisfiesExtensionalCross counterSystem counterElab ∧
+      IsHomomorphicImage counterSystem counterElab :=
+  resolved_crossTypeExtensional
 
 theorem stageWymore_blocked_partialRZ :
     pinnedFragment.dynamicsComplete = true ∧ ¬ AlwaysOutputs closedSystem :=

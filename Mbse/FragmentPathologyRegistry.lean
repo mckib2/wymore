@@ -49,6 +49,12 @@ theorem resolved_infiniteSZ_extensional :
     extensional_satisfies_implies_hom counterSystem_alwaysOutputs counterSystem_alwaysOutputs
       counterSystem_satisfies_own_extensional⟩
 
+/-- Cross-type extensional Φ ↔ hom (Def 4.3); witness `counterElab` → `counterSystem`. -/
+theorem resolved_crossTypeExtensional :
+    SystemSatisfiesExtensionalCross counterSystem counterElab ∧
+      IsHomomorphicImage counterSystem counterElab :=
+  ⟨counterElab_satisfies_extensional_cross, counterElab_hom_to_counterSystem⟩
+
 theorem blocked_partialRZ :
     pinnedFragment.dynamicsComplete = true ∧ ¬ AlwaysOutputs closedSystem :=
   closedSystem_excluded_from_pinned

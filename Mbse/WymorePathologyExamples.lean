@@ -6,6 +6,7 @@ import Mbse.FiniteWymore
 import Mbse.SystemToFormula
 import Mbse.GeneralPropertyFragment
 import Mbse.ExtensionalDynamicsFragment
+import Mbse.Homomorphism
 
 /-!
 # Pathology examples for the general Wymore property track
@@ -16,7 +17,7 @@ Documents failure modes for infinite state, partial I/O, and finite enumeration.
 namespace WymorePathologyExamples
 
 open WymorePropertyFragment PropertyFragmentSpec PathologyExamples GeneralProperties FSM
-  SystemToFormula PropertyFragment.General ExtensionalDynamicsFragment
+  SystemToFormula PropertyFragment.General ExtensionalDynamicsFragment Homomorphism
 
 /-! ## Infinite state (`counterSystem`) -/
 
@@ -51,6 +52,42 @@ theorem counterSystem_extensional_iff_hom :
       SystemIsIdentityHomomorphicImageOpen counterSystem counterSystem
         counterSystem_alwaysOutputs counterSystem_alwaysOutputs :=
   extensional_property_iff_hom counterSystem_alwaysOutputs counterSystem_alwaysOutputs
+
+/-! ## Cross-type extensional (`counterElab` → `counterSystem`) -/
+
+/-- Elaboration with redundant `Bool` state component; `fst` projects to `counterSystem`. -/
+def counterElab : DiscreteSystem (Nat × Bool) Bool Nat :=
+  DiscreteSystem.ofTotal (fun (n, b) (_ : Bool) => (n + 1, b)) (fun (n, _) => n) ⟨(0, true)⟩
+
+theorem counterElab_alwaysOutputs : AlwaysOutputs counterElab :=
+  ofTotal_alwaysOutputs _ _ _
+
+def counterElab_witness : HomomorphicImageWitness counterSystem counterElab where
+  HS := Prod.fst
+  HI := id
+  HO := id
+  HS_surjective := fun n => ⟨⟨n, true⟩, rfl⟩
+  HI_surjective := Function.surjective_id
+  HO_surjective := Function.surjective_id
+  preserves_transition := fun ⟨n, b⟩ oi => by
+    cases oi with
+    | none => simp [counterElab, counterSystem, DiscreteSystem.ofTotal]
+    | some i => simp [counterElab, counterSystem, DiscreteSystem.ofTotal]
+  preserves_readout := fun ⟨n, b⟩ => by
+    simp [counterElab, counterSystem, DiscreteSystem.ofTotal, Option.map_some]
+
+theorem counterElab_hom_to_counterSystem :
+    IsHomomorphicImage counterSystem counterElab :=
+  ⟨counterElab_witness⟩
+
+theorem counterElab_satisfies_extensional_cross :
+    SystemSatisfiesExtensionalCross counterSystem counterElab :=
+  extensional_cross_of_hom counterElab_hom_to_counterSystem
+
+theorem counterElab_cross_iff_hom :
+    SystemSatisfiesExtensionalCross counterSystem counterElab ↔
+      IsHomomorphicImage counterSystem counterElab :=
+  extensional_cross_property_iff_hom
 
 /-! ## Partial readout (`closedSystem`) -/
 
