@@ -1,0 +1,34 @@
+\section{DSYSTEM to FO-LTL Encoding}
+\label{app:encoding}
+
+This appendix presents the encoding summarized in Section~\ref{sec:dsystem-encoding}. The full bi-implication is machine-checked in a companion Lean~4 library \parencite{demoura21lean4}.
+
+Given $Z = (S,I,O,\delta,\rho)$ and initial state $s_0 \in S$, the compiler produces a formula over trajectory variables $f : T \to I$, $g : T \to S$, and $y : T \to O$.
+
+\miniheading{Algorithm 1: \texttt{compileSystemFO}}
+\begin{enumerate}[label=\arabic*., leftmargin=1.2em]
+    \item \textbf{CompileInit}$(s_0)$ $\leftarrow$ $\text{init}(s_0)$, i.e., the constraint $g(0) = s_0$.
+    \item \textbf{CompileStep}$(Z)$ $\leftarrow$ $\text{step}(Z)$, i.e., $\forall t \in T,\; g(t{+}1) = \delta(g(t), f(t))$.
+    \item \textbf{CompileReadout}$(Z)$ $\leftarrow$ $\text{readout}(Z)$, i.e., $\forall t \in T,\; y(t) = \rho(g(t))$.
+    \item \textbf{CompileSystemFO}$(Z, s_0)$ $\leftarrow$ CompileInit$(s_0)$ $\wedge$ CompileStep$(Z)$ $\wedge$ CompileReadout$(Z)$.
+\end{enumerate}
+
+Write $(f,g,y) \models_{\mathrm{FO}} \varphi$ when formula $\varphi$ holds under the interpretation of Section~\ref{sec:dsystem-encoding}. For the atomic constructors:
+\begin{align*}
+    (f,g,y) \models_{\mathrm{FO}} \text{init}(s_0') &\Leftrightarrow g(0) = s_0' \\
+    (f,g,y) \models_{\mathrm{FO}} \text{step}(Z) &\Leftrightarrow \forall t,\; g(t{+}1) = \delta(g(t), f(t)) \\
+    (f,g,y) \models_{\mathrm{FO}} \text{readout}(Z) &\Leftrightarrow \forall t,\; y(t) = \rho(g(t))
+\end{align*}
+Conjunction is interpreted componentwise. This matches Wymore's trajectory equations \eqref{eq:trace-init}--\eqref{eq:trace-readout}.
+
+\begin{quote}
+\textbf{Theorem (execution equivalence).} Fix $Z$, $s_0$, and $f$. Trajectories $(g,y)$ form a valid Wymore execution (initial state $s_0$, recurrence under $\delta$, readout under $\rho$) if and only if $(f,g,y) \models_{\mathrm{FO}} \texttt{compileSystemFO}(Z,s_0)$.
+\end{quote}
+
+\paragraph{Proof ($\Rightarrow$).} Let $g_{\mathrm{canon}}$ and $y_{\mathrm{canon}}$ be Wymore's uniquely defined trajectories from $(Z,s_0,f)$. By Wymore's trajectory construction, $g_{\mathrm{canon}}(0) = s_0$, $g_{\mathrm{canon}}(t{+}1) = \delta(g_{\mathrm{canon}}(t), f(t))$, and $y_{\mathrm{canon}}(t) = \rho(g_{\mathrm{canon}}(t))$. Hence $(f,g_{\mathrm{canon}},y_{\mathrm{canon}})$ satisfies all three conjuncts.
+
+\paragraph{Proof ($\Leftarrow$).} Suppose $(f,g,y) \models_{\mathrm{FO}} \texttt{compileSystemFO}(Z,s_0)$. Then $g(0) = s_0$ and $g$ satisfies the step recurrence. Wymore's trajectory uniqueness theorem implies $g(t) = g_{\mathrm{canon}}(t)$ for all $t$. The readout conjunct gives $y(t) = \rho(g(t)) = \rho(g_{\mathrm{canon}}(t)) = y_{\mathrm{canon}}(t)$.
+
+\subsection{Finite-State Corollary}
+
+When $|S|$, $|I|$, and $|O|$ are strictly finite, each state, input, and output value can be represented as a propositional atom at each tick, and $\text{step}(Z)$ becomes a finite set of $G$-guarded implications $\mathit{state}_s \wedge \mathit{input}_i \rightarrow X\,\mathit{state}_{\delta(s,i)}$. A compiled propositional-LTL formula exists for finite Moore machines.  However, this is a syntactic expressibility result, not a practical encoder for large $|S| \cdot |I|$.

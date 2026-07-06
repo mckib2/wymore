@@ -1,0 +1,169 @@
+\section{Dynamics-Encoding Bi-Implication (Hom Projection)}
+\label{app:hom-biimp}
+
+This appendix is for readers who want to \emph{follow the proof}, not just the headline statement in Section~\ref{sec:dynamics-encoding-fragment}. No prior experience with formal logic is assumed. We move slowly: first we fix notation, then we state exactly what each side of the bi-implication means, then we prove each direction in small steps.
+
+\paragraph{Road map.}
+We prove:
+\begin{quote}
+\textbf{Headline bi-implication.}\;
+$Z_{\text{impl}}$ satisfies the hom-relative dynamics-encoding property set compiled from $Z_{\text{spec}}$
+if and only if
+there exists a Wymore system homomorphism $h : Z_{\text{impl}} \to Z_{\text{spec}}$ (Def.~4.3, surjective on states, inputs, and outputs, preserving transitions and readouts under projection).
+\end{quote}
+Section~\ref{app:hom-setup} recalls trajectories. Section~\ref{app:hom-fragment} defines the temporal property set. Section~\ref{app:hom-def} defines homomorphism. Section~\ref{app:hom-bridge} connects ``properties on runs'' to two static laws engineers can read off a table. Sections~\ref{app:hom-forward} and~\ref{app:hom-backward} prove the two directions. Section~\ref{app:hom-fixed} notes the shared fixed-table specialization from the main text.
+
+\subsection{Setup: systems, trajectories, and projection}
+\label{app:hom-setup}
+
+Write $Z_{\text{spec}} = (S_{\text{spec}}, I_{\text{spec}}, O_{\text{spec}}, \delta_{\text{spec}}, \rho_{\text{spec}})$ and $Z_{\text{impl}} = (S_{\text{impl}}, I_{\text{impl}}, O_{\text{impl}}, \delta_{\text{impl}}, \rho_{\text{impl}})$. Types may differ: elaboration often uses richer state or IO sets than the reference.
+
+A \emph{run} (or \emph{trajectory}) of $Z_{\text{impl}}$ is determined by an initial impl state $s_0 \in S_{\text{impl}}$ and an input stream $f : T \to I_{\text{impl}} \cup \{\text{none}\}$. Wymore defines state $g(t)$ and output $y(t)$ at each tick $t$ by \eqref{eq:trace-init}--\eqref{eq:trace-readout} with $\delta_{\text{impl}}$ and $\rho_{\text{impl}}$.
+
+When a homomorphism $h = (h_S, h_I, h_O)$ is in play, read $h_S : S_{\text{impl}} \twoheadrightarrow S_{\text{spec}}$ (surjective), $h_I : I_{\text{impl}} \twoheadrightarrow I_{\text{spec}}$, $h_O : O_{\text{impl}} \twoheadrightarrow O_{\text{spec}}$. Extend $h_I$ to $\text{Option}(I_{\text{impl}})$ by mapping $\text{none}$ to $\text{none}$ and $i$ to $h_I(i)$; write this ``lifted'' map $h_I^\ast$.
+
+Intuition: $h_S$ tells you which \emph{specification state label} an implementation state ``counts as.'' Two impl states may map to the same spec state (quotient/refinement); every spec state must be the label of at least one impl state (surjectivity).
+
+\subsection{Hom-relative dynamics-encoding fragment}
+\label{app:hom-fragment}
+
+Section~\ref{sec:dynamics-encoding-fragment} lists four clause \emph{families} indexed by the reference table. On the hom headline tier, clauses are indexed by \textbf{spec} states $s \in S_{\text{spec}}$, but they are checked on \textbf{implementation} runs using a ``currently projected to $s$'' atom rather than ``impl is literally in state $s$.''
+
+Define the hom-relative atom $\mathit{specState}(s)$ to hold at tick $t$ on run $(g,f,y)$ when
+\[
+  h_S\bigl(g(t)\bigr) = s.
+\]
+Inputs and outputs on the run still refer to impl-side values $(f(t), y(t))$; readout is compared \emph{after} projection through $h_O$.
+
+\miniheading{Four clause families (hom-relative).}
+For each spec state $s$ and each table entry in $Z_{\text{spec}}$:
+\begin{enumerate}[label=(\roman*), leftmargin=2em]
+    \item \textbf{Open readout.} If $\rho_{\text{spec}}(s) = o$ then whenever $\mathit{specState}(s)$ holds at tick $t$,
+    \[
+      h_O\bigl(y(t)\bigr) = o.
+    \]
+    \item \textbf{Closed readout.} If $\rho_{\text{spec}}(s) = \text{none}$ then whenever $\mathit{specState}(s)$ holds,
+    \[
+      h_O\bigl(y(t)\bigr) = \text{none}.
+    \]
+    \item \textbf{Autonomous transition.} Whenever $\mathit{specState}(s)$ and $f(t)=\text{none}$,
+    \[
+      h_S\bigl(g(t{+}1)\bigr) = \delta_{\text{spec}}(s, \text{none}).
+    \]
+    \item \textbf{Guided transition.} Whenever $\mathit{specState}(s)$, $f(t)=i_{\text{impl}}$, and $h_I(i_{\text{impl}})=i_{\text{spec}}$,
+    \[
+      h_S\bigl(g(t{+}1)\bigr) = \delta_{\text{spec}}(s, i_{\text{spec}}).
+    \]
+\end{enumerate}
+Write $\Phi^{\mathrm{hom}}_{Z_{\text{spec}}}$ for the conjunction of all such clauses (one per row of the spec table). We say $Z_{\text{impl}} \models_{\mathrm{dyn}} \Phi^{\mathrm{hom}}_{Z_{\text{spec}}}$ when there exist surjective maps $h_S,h_I,h_O$ such that \textbf{every} admissible impl run satisfies \textbf{every} clause with respect to those maps. (Section~\ref{app:hom-bridge} shows that this run-based condition is the same as checking the static laws~\eqref{eq:hom-readout-static}--\eqref{eq:hom-step-static} state by state.)
+
+\paragraph{Remark (shared fixed table).}
+If $S_{\text{spec}} = S_{\text{impl}}$ and $h_S,h_I,h_O$ are all identity maps, $\mathit{specState}(s)$ becomes ordinary $\mathit{state}(s)$ on the impl run. The four families reduce to the literal-table clauses in Section~\ref{sec:dynamics-encoding-fragment}. Section~\ref{app:hom-fixed} returns to this specialization.
+
+\subsection{Wymore system homomorphism (Def.~4.3)}
+\label{app:hom-def}
+
+A \emph{system homomorphism} $h : Z_{\text{impl}} \to Z_{\text{spec}}$ consists of surjective maps $h_S,h_I,h_O$ satisfying two \emph{static} consistency laws for \textbf{every} impl state $x \in S_{\text{impl}}$:
+\begin{align}
+  h_O\bigl(\rho_{\text{impl}}(x)\bigr) &= \rho_{\text{spec}}\bigl(h_S(x)\bigr) \label{eq:hom-readout-static}\\
+  h_S\bigl(\delta_{\text{impl}}(x, oi)\bigr) &= \delta_{\text{spec}}\bigl(h_S(x), oi.\mathit{map}(h_I)\bigr)
+  \quad\text{for all } oi \in I_{\text{impl}} \cup \{\text{none}\}. \label{eq:hom-step-static}
+\end{align}
+Here $oi.\mathit{map}(h_I)$ applies $h_I$ inside $\mathit{some}(i)$ and leaves $\text{none}$ unchanged.
+
+Equation~\eqref{eq:hom-readout-static} says: ``project the impl output, and you get the spec output at the projected state.'' Equation~\eqref{eq:hom-step-static} says: ``project the next impl state, and you get the spec transition from the projected state on the projected input.'' These are the algebraic form Wymore uses in constructive FC proofs.
+
+\subsection{Bridge lemma: clauses on runs \texorpdfstring{$\Leftrightarrow$}{↔} static laws}
+\label{app:hom-bridge}
+
+The temporal clauses look like properties of \emph{time}. Equations~\eqref{eq:hom-readout-static}--\eqref{eq:hom-step-static} look like row-by-row table checks. They match.
+
+\begin{quote}
+\textbf{Lemma (bridge).}\;
+Fix surjective $h_S,h_I,h_O$. The following are equivalent:
+\begin{enumerate}[label=(\alph*), leftmargin=2em]
+    \item \label{bridge:static} Equations~\eqref{eq:hom-readout-static} and~\eqref{eq:hom-step-static} hold for every impl state $x$.
+    \item \label{bridge:trace} Every impl run satisfies all four hom-relative clause families in Section~\ref{app:hom-fragment} with respect to $h$.
+\end{enumerate}
+\end{quote}
+
+\paragraph{Proof of \ref{bridge:static}$\Rightarrow$\ref{bridge:trace}.}
+Take any admissible run $(g,f,y)$ from some $s_0$. Wymore's trajectory equations imply $g(t{+}1)=\delta_{\text{impl}}(g(t), f(t))$ and $y(t)=\rho_{\text{impl}}(g(t))$.
+
+\emph{Readout clauses.} Fix tick $t$ and spec state $s$ with $h_S(g(t))=s$. By~\eqref{eq:hom-readout-static} at $x=g(t)$,
+$h_O(y(t)) = h_O(\rho_{\text{impl}}(g(t))) = \rho_{\text{spec}}(h_S(g(t))) = \rho_{\text{spec}}(s)$.
+If $\rho_{\text{spec}}(s)=o$ (open case) or $\text{none}$ (closed case), the corresponding readout clause follows immediately.
+
+\emph{Autonomous clause.} Suppose $h_S(g(t))=s$ and $f(t)=\text{none}$. By~\eqref{eq:hom-step-static} at $x=g(t)$ with $oi=\text{none}$,
+$h_S(g(t{+}1)) = h_S(\delta_{\text{impl}}(g(t),\text{none})) = \delta_{\text{spec}}(h_S(g(t)), \text{none}) = \delta_{\text{spec}}(s,\text{none})$.
+
+\emph{Guided clause.} Suppose $h_S(g(t))=s$, $f(t)=i_{\text{impl}}$, and $h_I(i_{\text{impl}})=i_{\text{spec}}$. Apply~\eqref{eq:hom-step-static} at $x=g(t)$ with $oi=\mathit{some}(i_{\text{impl}})$ to obtain
+$h_S(g(t{+}1)) = \delta_{\text{spec}}(s, i_{\text{spec}})$.
+
+\paragraph{Proof of \ref{bridge:trace}$\Rightarrow$\ref{bridge:static}.}
+We show~\eqref{eq:hom-readout-static};~\eqref{eq:hom-step-static} is similar.
+
+Fix an impl state $x$. Run the system from $s_0=x$ with input stream $f(t)=\text{none}$ for all $t$. Then $g(0)=x$ and $\mathit{specState}(h_S(x))$ holds at $t=0$. The open/closed readout clause for $s=h_S(x)$ gives $h_O(y(0))=\rho_{\text{spec}}(s)$. But $y(0)=\rho_{\text{impl}}(x)$ by~\eqref{eq:trace-readout}, so $h_O(\rho_{\text{impl}}(x))=\rho_{\text{spec}}(h_S(x))$.
+
+For~\eqref{eq:hom-step-static}, run from $s_0=x$ with constant input $f(0)=oi$ (any fixed $oi$) and arbitrary continuation afterward. At $t=0$, apply the autonomous or guided clause; use $g(1)=\delta_{\text{impl}}(x,oi)$ from~\eqref{eq:trace-step}. This yields the transition law at $x$ for that $oi$. Because $oi$ was arbitrary,~\eqref{eq:hom-step-static} holds at $x$.
+
+\subsection{Forward direction: homomorphism \texorpdfstring{$\Rightarrow$}{⇒} property satisfaction}
+\label{app:hom-forward}
+
+\begin{quote}
+\textbf{Claim.}\; If $h : Z_{\text{impl}} \to Z_{\text{spec}}$ is a Wymore homomorphism, then $Z_{\text{impl}} \models_{\mathrm{dyn}} \Phi^{\mathrm{hom}}_{Z_{\text{spec}}}$.
+\end{quote}
+
+\paragraph{Proof.}
+Suppose $h$ is a Wymore homomorphism with component maps $h_S,h_I,h_O$. By definition,~\eqref{eq:hom-readout-static} and~\eqref{eq:hom-step-static} hold at every impl state. By the bridge lemma (direction~\ref{bridge:static}$\Rightarrow$\ref{bridge:trace}), every admissible run satisfies every hom-relative clause with respect to these maps. That is exactly $Z_{\text{impl}} \models_{\mathrm{dyn}} \Phi^{\mathrm{hom}}_{Z_{\text{spec}}}$.
+
+\paragraph{Engineering reading.}
+If you already have (or have constructed) the three surjective maps in a constructive FC proof, you do \emph{not} need to re-check each temporal clause by hand on every scenario: the static laws at each impl state imply \emph{all} runs obey the spec table up to projection.
+
+\subsection{Backward direction: property satisfaction \texorpdfstring{$\Rightarrow$}{⇒} homomorphism}
+\label{app:hom-backward}
+
+\begin{quote}
+\textbf{Claim.}\; If $Z_{\text{impl}} \models_{\mathrm{dyn}} \Phi^{\mathrm{hom}}_{Z_{\text{spec}}}$, then there exists a Wymore homomorphism $h : Z_{\text{impl}} \to Z_{\text{spec}}$.
+\end{quote}
+
+\paragraph{Proof.}
+Assume $Z_{\text{impl}} \models_{\mathrm{dyn}} \Phi^{\mathrm{hom}}_{Z_{\text{spec}}}$. Then there exist surjective maps $h_S,h_I,h_O$ such that every admissible run satisfies all hom-relative clauses. By the bridge lemma (direction~\ref{bridge:trace}$\Rightarrow$\ref{bridge:static}),~\eqref{eq:hom-readout-static} and~\eqref{eq:hom-step-static} hold at every impl state $x$. The triple $(h_S,h_I,h_O)$ is therefore a Wymore homomorphism $Z_{\text{impl}} \to Z_{\text{spec}}$.
+
+\paragraph{Where surjectivity enters.}
+Surjectivity of $h_S$ is not a cosmetic detail. It ensures every spec state row in $\Phi^{\mathrm{hom}}_{Z_{\text{spec}}}$ is meaningful: some impl state must project to each $s \in S_{\text{spec}}$. Without surjectivity, an impl could satisfy a smaller ``shadow'' spec and miss entire regions of the reference table.
+
+\paragraph{Engineering reading.}
+If automated checking of $\Phi^{\mathrm{hom}}_{Z_{\text{spec}}}$ succeeds (or you have verified the static laws directly), you may \emph{extract} the witness maps $h_S,h_I,h_O$ and reuse them in a classical T3SD implementability argument---the assertional and constructive readings coincide on this fragment.
+
+\subsection{Main theorem and shared fixed-table corollary}
+\label{app:hom-fixed}
+
+Combining Sections~\ref{app:hom-forward} and~\ref{app:hom-backward}:
+
+\begin{quote}
+\textbf{Theorem (headline dynamics-encoding bi-implication).}
+\[
+  Z_{\text{impl}} \models_{\mathrm{dyn}} \Phi^{\mathrm{hom}}_{Z_{\text{spec}}}
+  \;\;\Longleftrightarrow\;\;
+  \exists\, h : Z_{\text{impl}} \to Z_{\text{spec}}\ \text{Wymore homomorphism}.
+\]
+\end{quote}
+
+\paragraph{Shared fixed-table specialization.}
+Suppose $S_{\text{spec}} = S_{\text{impl}}$, $I_{\text{spec}} = I_{\text{impl}}$, $O_{\text{spec}} = O_{\text{impl}}$, and the engineer uses identity maps $h_S = h_I = h_O = \mathit{id}$. Then $\mathit{specState}(s)$ is just ``impl is in state $s$,'' and~\eqref{eq:hom-readout-static}--\eqref{eq:hom-step-static} become pointwise equality of $\rho$ and $\delta$ on shared labels:
+\[
+  \rho_{\text{impl}}(s) = \rho_{\text{spec}}(s),
+  \qquad
+  \delta_{\text{impl}}(s, oi) = \delta_{\text{spec}}(s, oi).
+\]
+The headline theorem reduces to
+\[
+  Z_{\text{impl}} \models_{\mathrm{dyn}}^{\mathrm{lit}} \Phi^{\mathrm{lit}}_{Z_{\text{spec}}}
+  \;\;\Longleftrightarrow\;\;
+  Z_{\text{impl}} \text{ matches } Z_{\text{spec}} \text{ row-by-row on } (S,I,O),
+\]
+where $\Phi^{\mathrm{lit}}_{Z_{\text{spec}}}$ is the literal-table fragment from Section~\ref{sec:dynamics-encoding-fragment}. This is the convenient same-type workflow when state names are shared; it is \emph{not} the general Wymore elaboration story (cross-type or renamed states require the full hom headline).
+
+\paragraph{What this appendix did not prove.}
+Mission-level properties with $F$ (``eventually''), bare $\Phi$ without a reference system, and output-table-only encodings are outside the dynamics-encoding fragment; the main text explains why those paths are blocked or deferred. Execution-only FO ($\psi_Z$ without table clauses) is treated separately in Appendix~\ref{app:encoding}.

@@ -1,39 +1,52 @@
 # Makefile for compiling the INCOSE LaTeX paper
 
-LATEXMK = latexmk
-FLAGS = -pdf -outdir=build -interaction=nonstopmode
-SRC = main.tex refs.bib
+LATEXMK  ?= latexmk
+MAIN     := main
+BUILD_DIR := build
+PDF      := $(BUILD_DIR)/$(MAIN).pdf
 
-PYTHON       ?= python3
-REPO_ROOT    := ../..
-SWARM_SCRIPT := $(REPO_ROOT)/scripts/render_swarm_systems.py
-SWARM_LEAN   := $(REPO_ROOT)/Mbse/SwarmCaseStudy.lean \
-                $(REPO_ROOT)/Mbse/SwarmExamples.lean
-SWARM_THEME  := $(REPO_ROOT)/scripts/swarm_diagram_theme.py
-BUILD_DIR    := build
-SWARM_TEX    := $(BUILD_DIR)/swarm_verification.tex
-SWARM_AGENTS ?= 3
+FLAGS := -pdf -outdir=$(BUILD_DIR) -auxdir=$(BUILD_DIR) -interaction=nonstopmode
 
-FIGURES := $(SWARM_TEX)
+# Driver and every \input{} target listed in main.tex
+TEX_SOURCES := \
+	main.tex \
+	preamble.tex \
+	frontmatter.tex \
+	sections/introduction.tex \
+	sections/background.tex \
+	sections/methodology.tex \
+	sections/case-study.tex \
+	sections/discussion.tex \
+	sections/conclusions.tex \
+	sections/references.tex \
+	sections/biography.tex \
+	appendix/hom-biimp.tex \
+	appendix/encoding.tex
 
-.PHONY: all figures clean
+# Optional appendix (commented out in main.tex); rebuild if enabled later
+TEX_OPTIONAL := appendix/pathology-sketches.tex
 
-all: build/main.pdf
+ASSETS := refs.bib \
+	$(wildcard template-images/*) \
+	$(wildcard figures/*)
 
-figures: $(FIGURES)
+# Root-level artifacts from older in-tree builds (removed by distclean)
+ROOT_ARTIFACTS := \
+	$(MAIN).aux $(MAIN).bbl $(MAIN).bcf $(MAIN).blg \
+	$(MAIN).fdb_latexmk $(MAIN).fls $(MAIN).log $(MAIN).out \
+	$(MAIN).pdf $(MAIN).run.xml $(MAIN).synctex.gz
 
-$(SWARM_TEX): $(SWARM_LEAN) $(SWARM_SCRIPT) $(SWARM_THEME)
+.PHONY: all clean distclean
+
+all: $(PDF)
+
+$(PDF): $(TEX_SOURCES) $(TEX_OPTIONAL) $(ASSETS) Makefile .latexmkrc
 	mkdir -p $(BUILD_DIR)
-	$(PYTHON) $(SWARM_SCRIPT) \
-	  --case-study $(REPO_ROOT)/Mbse/SwarmCaseStudy.lean \
-	  --examples $(REPO_ROOT)/Mbse/SwarmExamples.lean \
-	  --out-dir $(BUILD_DIR) \
-	  --agents $(SWARM_AGENTS)
-
-build/main.pdf: $(SRC) $(FIGURES)
-	mkdir -p build
-	$(LATEXMK) $(FLAGS) main.tex
+	$(LATEXMK) $(FLAGS) $(MAIN).tex
 
 clean:
-	$(LATEXMK) -C -outdir=build
-	rm -rf build
+	$(LATEXMK) -C -outdir=$(BUILD_DIR) -auxdir=$(BUILD_DIR) $(MAIN).tex
+	rm -rf $(BUILD_DIR)
+
+distclean: clean
+	rm -f $(ROOT_ARTIFACTS)

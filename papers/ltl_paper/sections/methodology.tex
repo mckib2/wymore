@@ -1,0 +1,180 @@
+\section{Methodology} \label{sec:methodology}
+
+\subsection{Verification Paradigm Comparison}
+Figure~\ref{fig:comparison} instantiates the verification workflow sketched in Figure~\ref{fig:t3sd-cotyledons}: panel~A formalizes requirements as reference system $Z_{\text{spec}}$ and verifies $Z_{\text{impl}}$ via homomorphism $h$; panel~B encodes requirements as $\Phi$ (directly or optionally via $Z_{\text{spec}}$) and verifies $Z_{\text{impl}}$ through property checking. Table~\ref{tab:comparison} summarizes the generic comparison.  When implementations change structure, maintaining universal constructive proofs over $Z_{\text{spec}}$ and $h$ can require substantial re-verification. Assertional checking instead evaluates whether the post-change $Z_{\text{impl}}$ still satisfies $\Phi$ on its trajectories, without necessitating the construction of a new reference system.
+
+\begin{figure}[t]
+  \centering
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[auto, >=stealth, thick,
+    block/.style={draw=blue!60, fill=blue!5, rectangle, rounded corners, minimum width=2.8cm, minimum height=1.1cm, align=center, thick},
+    model/.style={draw=orange!60, fill=orange!5, rectangle, rounded corners, minimum width=2.8cm, minimum height=1.1cm, align=center, thick},
+    arrow/.style={->, >=stealth, thick, draw=black!70},
+    dashedarrow/.style={->, >=stealth, dashed, thick, draw=blue!80}
+  ]
+    \begin{scope}
+      \node (reqA) [block] {System\\Requirements};
+      \node (specA) [model, right=2.4cm of reqA] {Specification\\System $Z_{\text{spec}}$};
+      \node (implA) [model, below=1.0cm of specA] {Implementation\\System $Z_{\text{impl}}$};
+      \path[arrow] (reqA) -- node[above, font=\footnotesize] {formalized as} (specA);
+      \path[arrow] (implA) -- node[right=3pt, font=\footnotesize] {Homomorphism $h$} (specA);
+      \node[inner sep=6pt, fit=(reqA)(specA)(implA)] (panelAbox) {};
+      \node[below=0.2cm of panelAbox, font=\headingfont\bfseries] {A. Classical Constructive T3SD};
+    \end{scope}
+    \begin{scope}[xshift=9.8cm]
+      \node (reqB) [block] {System\\Requirements};
+      \node (phiB) [block, right=2.4cm of reqB] {Temporal Properties\\$\Phi$};
+      \node (specB) [model, right=1.6cm of phiB] {Specification\\System $Z_{\text{spec}}$};
+      \node (implB) [model, below=1.0cm of phiB] {Implementation\\System $Z_{\text{impl}}$};
+      \draw[arrow] (reqB.north) .. controls ($(reqB.north)+(0,1.35)$) and ($(specB.north)+(0,1.35)$) ..
+        node[midway, above, font=\footnotesize] {formalized as} (specB.north);
+      \path[dashedarrow] (reqB.east) -- (phiB.west);
+      \path[arrow] (specB.west) -- node[above, font=\footnotesize] {encode} (phiB.east);
+      \path[dashedarrow] (implB.north) -- node[left=3pt, font=\footnotesize, align=center] {Property checking\\$Z_{\text{impl}} \models_{\mathcal{L}} \Phi$} (phiB.south);
+      \node[inner sep=8pt, fit=(reqB)(phiB)(specB)(implB)] (panelBbox) {};
+      \node[below=0.2cm of panelBbox, font=\headingfont\bfseries] {B. Proposed Assertional FC};
+    \end{scope}
+  \end{tikzpicture}%
+  }
+  \caption{Classical constructive verification (A) versus assertional property checking (B). Panel~B may encode requirements directly as $\Phi$ (dashed arrow) or optionally via $Z_{\text{spec}}$ (formalized as, then encode to $\Phi$); $Z_{\text{spec}}$ is not required. $Z_{\text{impl}}$ is verified against $\Phi$ by property checking, without homomorphism $h$.}
+  \label{fig:comparison}
+\end{figure}
+
+\subsection{Formal Trace Definitions and Observability}
+\label{sec:trace-observability}
+For $Z = (S, I, O, \delta, \rho)$ and trajectories $(f, g, y)$, we write $g(t)$ for state and $y(t)$ for output at tick $t \in T$. Wymore's standard trajectory construction is:
+\begin{align}
+    g(0) &= s_0 \label{eq:trace-init}\\
+    g(t+1) &= \delta(g(t), f(t)) \label{eq:trace-step}\\
+    y(t) &= \rho(g(t)) \label{eq:trace-readout}
+\end{align}
+We define the execution trace induced by initial state $s_0$ and input trajectory $f$ as $\sigma = (f, g, y)$, where $g$ and $y$ are given by \eqref{eq:trace-init}--\eqref{eq:trace-readout}. Temporal requirements may use mixed observability:
+\begin{itemize}
+    \item External (black-box): $\Phi_{\text{ext}}$ over outputs $y(t)$ and inputs $f(t)$ only.
+    \item Internal (white-box): properties over state components in $g(t)$.
+\end{itemize}
+We also write $(g(t), y(t))_{t \in T}$ when the input component of $\sigma$ is clear from context.
+
+Under the assertional workflow, systems engineers (i)~elicit boundary requirements, (ii)~encode $\Phi$ in dialect $\mathcal{L}$ (optionally splitting $\Phi_{\text{ext}}$ and internal properties), (iii)~obtain $Z_{\text{impl}}$ (possibly via some known system coupling recipe), and (iv)~check $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$ under a stated admissible input class. Admissible input trajectories $f$ are those consistent with assumptions at the system boundary, not arbitrary elements of $I^T$ unless explicitly required \parencite{salado2019mbse}. Port-level liveness and coordination belong in $\Phi_{\text{ext}}$; physical invariants not exported at ports are checked over $g$.
+
+We say a system defined by $Z$ satisfies $\Phi$, written $Z \models_{\mathcal{L}} \Phi$, if for every admissible input trajectory $f$ and initial state $s_0$ in the stated class, the induced trace $\sigma$ satisfies $\sigma \models_{\mathcal{L}} \Phi$ under dialect $\mathcal{L}$ \parencite{Pnueli1977,BaierKatoen2008}. We write $\mathcal{FC}_{\mathcal{L}}(\Phi) = \{ Z \mid Z \models_{\mathcal{L}} \Phi \}$ for the assertional Functionality Cotyledon. Verifying implementation $Z_{\text{impl}}$ is the membership test $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$. When $\mathcal{L}$ is clear we write simply $\models \Phi$. Verification is scoped to Wymore DSYSTEMS at discrete ticks; $S$, $I$, and $O$ may be infinite, and checking strategy is tool-dependent \parencite{Wymore1993,BaierKatoen2008}. Subsystems may advance via internal $\delta$ when no external command arrives (i.e., autonomous state transition).  We treat such steps as ticks with hold-last-input or environment-defined $f(t)$, so $\delta(g(t), f(t))$ remains defined. Assertional and classical FC need not coincide: existence of a homomorphism $h$ guarantees that every implementation trajectory is simulated by a specification trajectory (i.e., $h$ is a trajectory simulation); $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$ judges only the variables referenced in $\Phi$. Two implementations may therefore satisfy the same black-box properties while differing in unobserved state (under-specification relative to $h$), and a liveness clause may demand progress not encoded in a given $Z_{\text{spec}}$ transition structure, leading to over-constraint relative to $h$.
+
+\subsection{Encoding Wymore DSYSTEMs in FO-LTL}
+\label{sec:dsystem-encoding}
+
+Equations~\eqref{eq:trace-init}--\eqref{eq:trace-readout} define valid execution of $Z = (S,I,O,\delta,\rho)$ under input trajectory $f$ and initial state $s_0$. We separate two FO-LTL roles: an execution encoding $\psi_Z$ that states what it means for trajectories $(f,g,y)$ to obey $Z$, and a requirement set $\Phi$ that states mission intent (e.g., safety and liveness clauses over $y(t)$ and $g(t)$). Requirement checking asks whether implementation trajectories satisfy $\Phi$; the encoding theorem below guarantees that $\psi_Z$ captures Wymore dynamics exactly.
+
+Define formula constructors over trajectory variables $g : T \to S$, $f : T \to I$, and $y : T \to O$:
+\begin{align}
+    \text{init}(s_0) &\Leftrightarrow g(0) = s_0 \label{eq:fo-init}\\
+    \text{step}(Z) &\Leftrightarrow \forall t \in T,\; g(t{+}1) = \delta(g(t), f(t)) \label{eq:fo-step}\\
+    \text{readout}(Z) &\Leftrightarrow \forall t \in T,\; y(t) = \rho(g(t)) \label{eq:fo-readout}
+\end{align}
+The map $\texttt{compileSystemFO}$ is a structural compiler (not a solver):
+\[
+    \texttt{compileSystemFO}(Z, s_0) \;:=\; \text{init}(s_0) \wedge \text{step}(Z) \wedge \text{readout}(Z).
+\]
+We write $\psi_Z(s_0)$ for $\texttt{compileSystemFO}(Z,s_0)$ when $s_0$ is fixed. This use of \emph{compile} is distinct from encoding natural-language requirements as $\Phi$ or formalizing them as $Z_{\text{spec}}$. Autonomous ticks are handled at $\delta(g(t), f(t))$ when $f(t)$ is hold-last-input or environment-defined, consistent with Section~\ref{sec:trace-observability}.
+
+A trajectory $(f,g,y)$ is a valid Wymore execution of $Z$ from $s_0$ when it satisfies $\psi_Z(s_0)$. The bi-implication between valid execution and FO-LTL satisfaction is proved in Appendix~\ref{app:encoding}. For strictly finite $S$, $I$, and $O$, a propositional LTL corollary also exists, but we do not develop it further here.
+
+\subsection{Automated Requirement Checking}
+\label{sec:automated-checking}
+
+Step~(iv) of the assertional workflow (Section~\ref{sec:trace-observability}) becomes concrete once $Z_{\text{impl}}$ and/or $\Phi$ are fixed. Systems engineers supply the implementation system 5-tuple, requirement formulas in $\mathcal{L}$, and a class of admissible input trajectories. Checking $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$ typically proceeds by unrolling $\delta_{\text{impl}}$ and $\rho_{\text{impl}}$ over a finite horizon (bounded model checking) or by abstracting to a finite-state model, then invoking a model checker or SMT solver \parencite{BaierKatoen2008,deMouraZ32008}. The compiled execution constraints $\psi_{Z_{\text{impl}}}$ can be conjoined with $\Phi$ in the same tick-indexed vocabulary: solvers receive ground constraints at each $t$.
+
+\paragraph{Benefits.} Assertional checking does not require constructing or maintaining $Z_{\text{spec}}$ or homomorphism $h$. When structure changes, systems engineers re-run property checking on the same $\Phi$ rather than rebuilding an interactive homomorphism proof. For safety properties over tick-local state, SMT solvers handle arithmetic and finite unrollings effectively.
+
+\paragraph{Tradeoffs.} Satisfaction of $\Phi$ guarantees only what $\Phi$ states, not trajectory simulation under $h$. Universal quantification over \emph{all} admissible environment trajectories $f$ and unbounded-time liveness ($F$) are not fully automatic in general: FO-LTL over infinite state and real-valued coordinates is undecidable \parencite{BaierKatoen2008}, and practitioners must rely on bounded horizons, abstractions, environment models, or finite-state projections. Propositional LTL on finite abstractions, on the other hand, is mature and largely automated via model checking \parencite{BaierKatoen2008}.
+
+\paragraph{Contrast with proof assistants.} Interactive theorem provers (e.g., Lean~4 \parencite{demoura21lean4}) yield reusable proof objects: a verified homomorphism is strong evidence for all trajectories. The engineering cost is upfront proof development that scales poorly with conjunctive composition, product state, and dynamic reconfiguration. Solvers lower marginal cost per change, but result in weaker assurance, tool dependence, and incompleteness outside decidable fragments.
+
+\subsection{Constructive Verification Criteria}
+\label{sec:constructive-criteria}
+Classical FC seeks a system homomorphism $h : Z_{\text{impl}} \rightarrow Z_{\text{spec}}$: surjective maps on states, inputs, and outputs that preserve $\delta$ and $\rho$ \parencite{Wymore1993}. Intuitively, every trajectory of $Z_{\text{impl}}$ is simulated by a corresponding trajectory in $Z_{\text{spec}}$. When $Z_{\text{impl}}$ is built from concurrent subsystems, Wymore's conjunctive composition (CSY) forms a resultant system with shared input ports and per-component readouts \parencite{Wymore1993}; the homomorphism obligation then relates the composed implementation to a (typically simpler) reference system.
+
+\begingroup
+\renewcommand{\arraystretch}{1.5}
+\begin{tabularx}{\textwidth}{@{}P{0.28\textwidth}YY@{}}
+    \rowcolor{tableheader}
+    \headingfont\bfseries Feature & \headingfont\bfseries Constructive & \headingfont\bfseries Assertional \\
+    \addlinespace[4pt]
+    Spec Form & Reference System & Temporal properties $\Phi$ (dialect $\mathcal{L}$) \\
+    \addlinespace[4pt]
+    Proof Type & Homomorphism $h$ & Property checking \\
+    \addlinespace[4pt]
+    Guarantee & Trajectory simulation & Temporal satisfaction \\
+    \addlinespace[4pt]
+    Verification effort & Homomorphism construction / maintenance & Property checking \\
+    \addlinespace[4pt]
+    Expressiveness & Simulation under $h$ & Dialect-dependent ($\mathcal{L}$) \\
+\end{tabularx}
+\captionof{table}{Verification workflow comparison (generic). Logical equivalence between paradigms is open. ``Verification effort'' compares typical engineering cost.}
+\label{tab:comparison}
+\endgroup
+\vspace{6pt}
+
+\subsection{The dynamics-encoding fragment: A Systems-Engineering Perspective}
+\label{sec:dynamics-encoding-fragment}
+
+When assertional verification is used \emph{together with} classical T3SD---to relate a reference system $Z_{\text{spec}}$ and implementation $Z_{\text{impl}}$ via homomorphism---the temporal properties $\Phi$ cannot be arbitrary FO-LTL. We use a \emph{dynamics-encoding} fragment. 
+
+For a systems engineer, this fragment is best understood as a direct logical translation of a state-transition and readout table. Instead of black-box mission requirements, we write tick-local temporal logic clauses $\Phi_Z$ over a discrete system $Z = (S, I, O, \delta, \rho)$ using safety operators ($G$, $X$, and implication). The atomic propositions in the logic assert the system state ($state(s)$), the input at the current tick ($input(i)$), and the output at the current tick ($output(o)$). We define a general \emph{predicate-indexed} dynamics-encoding fragment consisting of four types of rules:
+\begin{enumerate}
+    \item \textbf{Open Readout Rules:} For every state $s \in S$ where the system defines an output $o = \rho(s)$:
+    \[ G(state(s) \implies output(o)) \]
+    \item \textbf{Closed Readout Rules:} For every state $s \in S$ where the system has no output ($\rho(s) = \text{none}$):
+    \[ G(state(s) \implies output(\text{none})) \]
+    \item \textbf{Autonomous Transition Rules:} For every state $s \in S$ when no external input is received ($input(\text{none})$):
+    \[ G((state(s) \wedge input(\text{none})) \implies X(state(\delta(s, \text{none})))) \]
+    \item \textbf{Guided Transition Rules:} For every state $s \in S$ and every input $i \in I$ ($input(i)$):
+    \[ G((state(s) \wedge input(i)) \implies X(state(\delta(s, i)))) \]
+\end{enumerate}
+
+By structuring the requirement set $\Phi_Z$ using this predicate-indexed schema, we achieve several critical goals:
+\begin{itemize}
+    \item \textbf{Infinite State-Spaces:} Because the property set is indexed using functions/predicates over states and inputs rather than compiled into a flat propositional table, the system spaces $S$, $I$, and $O$ can be infinitely large (e.g., modeling real-valued variables, unbounded queues, or coordinate spaces).
+    \item \textbf{Moore Readout Unification:} The logic explicitly models states with no output using the $output(\text{none})$ literal (closed readouts), preventing implementations from outputting arbitrary values on states where the specification is silent.
+    \item \textbf{Autonomous Step Completeness:} Wymore's autonomous step $\delta(s, \text{none})$ is fully encoded via transition rules, ensuring that implementations cannot diverge on unguided ticks.
+\end{itemize}
+
+\paragraph{Headline theorem (Wymore FC hom projection).}
+The companion formalization's primary dynamics-encoding bi-implication aligns assertional FC with classical T3SD constructive verification: a buildable $Z_{\text{impl}}$ satisfies the hom-relative property set compiled from reference $Z_{\text{spec}}$ if and only if $Z_{\text{impl}}$ is a Wymore Def.~4.3 homomorphic image of $Z_{\text{spec}}$---existence of surjective maps $HS, HI, HO$ with partial readout and full transition laws under Option projection (`SystemSatisfiesPartialDynamicsHom`; machine-checked anchor \texttt{partialDynamicsHom\_iff\_hom}). This is the native elaboration$\to$spec verification question: cross-type refinement (witness \texttt{counterElab}), same-type rename (witness \texttt{swapSpecSys}/\texttt{swapImplSys}), and identity specialization all factor through the same tier. The bi-implication is \emph{ungated}---no finiteness, total readout (\texttt{AlwaysOutputs}), or readout-enumeration preconditions on the reference. Appendix~\ref{app:hom-biimp} gives a step-by-step proof aimed at systems engineers.
+
+\paragraph{Shared fixed table specialization.}
+When $Z_{\text{spec}}$ and $Z_{\text{impl}}$ share $(S, I, O)$ and the engineer treats the spec table as the \emph{canonical labeling} of states and IO, a narrower encoding applies: predicate-indexed satisfaction with \emph{literal} impl-state atoms (`SystemSatisfiesPartialDynamicsOpen`; compiled LTL or partial assertional FO). On this tier,
+\[
+  Z_{\text{impl}} \models_{\mathrm{dyn}}^{\mathrm{lit}} \Phi_{Z_{\text{spec}}}
+  \;\;\Longleftrightarrow\;\;
+  Z_{\text{impl}} \text{ is a partial identity homomorphic image of } Z_{\text{spec}},
+\]
+where $\models_{\mathrm{dyn}}^{\mathrm{lit}}$ requires pointwise $\delta$/$\rho$ agreement at shared labels (identity witness), not a surjective rename. Anchor: \texttt{partialDynamicsOpen\_iff\_hom}. Witness \texttt{counterClosedReadout} shows infinite $|S|$ and closed readouts on this path. When a supplied hom is non-identity or cross-type, hom projection holds but literal-table satisfaction may fail (`swapHom\_hom\_separation`); under partial identity hom the two tiers coincide (`partialDynamicsHom\_iff\_open\_of\_identityHom`).
+
+\paragraph{Hom-relative trace and FO encoding.}
+Hom-relative $\Phi_{Z_{\text{spec}}}$ indexes the four clause families by \emph{spec} states and evaluates satisfaction on implementation trajectories in the hom fibre ($\mathit{HS}(g(t))=s$). Hom-relative trace atoms (\texttt{HomRelativeAtom.specState}) and trajectory laws (\texttt{homTrace\_readoutOpen}, etc.) package open/closed readout and autonomous/guided transitions under projected readout. The equivalence chain \texttt{partialDynamicsHomTrace\_iff\_partialDynamicsHom} $\Leftrightarrow$ \texttt{partialDynamicsHom\_iff\_hom} pairs this encoding with Def.~4.3 hom; FO mirror \texttt{compileObservablesPartialHomFO} and \texttt{partialDynamicsHomTrace\_iff\_partialAssertionalHomFO} tie the tier to spec-indexed \texttt{stateLaw} bundles. The shared fixed-table tier uses literal impl atoms instead; under identity hom the encodings collapse.
+
+The dynamics-encoding schema is required throughout: output-table-only encodings, bare $\Phi$ without a reference system, execution FO alone, and mission-level $F$ formulas conflated with dynamics tables are blocked in the companion library. Further projections---finite propositional tables, pinned Moore FSMs, extensional synthesis---add side conditions for decidable checking and classical alignment; they do not weaken the headline hom iff. Table~\ref{tab:verification-tiers} summarizes these tiers.
+
+\begingroup
+\renewcommand{\arraystretch}{1.35}
+\footnotesize
+\begin{tabularx}{\textwidth}{@{}A{0.25\textwidth} A{0.20\textwidth} A{0.51\textwidth}@{}}
+    \rowcolor{tableheader}
+    \headingfont\bfseries Verification Tier & \headingfont\bfseries System Constraints & \headingfont\bfseries Meaning for the Systems Engineer \\
+    \addlinespace[2pt]
+    Partial dynamics hom (headline) & Surjective Def.~4.3 $h$; ungated & Primary FC fragment: Wymore elaboration$\to$spec hom$\leftrightarrow\Phi$ (`partialDynamicsHom\_iff\_hom`; \texttt{counterElab}, \texttt{swapHom}). \\
+    \addlinespace[2pt]
+    Shared fixed table & Same $(S,I,O)$; literal impl-state atoms & Specialization when spec labels are canonical: partial identity hom (`partialDynamicsOpen\_iff\_hom`; \texttt{counterClosedReadout}). \\
+    \addlinespace[2pt]
+    Extensional cross-type (alias) & Surjective $h$; $\Phi$-adequacy for synthesis & Same semantic content as hom headline; retained for synthesis templates (`extensional\_cross\_property\_iff\_hom`). \\
+    \addlinespace[2pt]
+    Finite open table & Finite $S, I$; readout enumeration & Propositional MC projection: flat LTL formula list from finite enumeration. \\
+    \addlinespace[2pt]
+    Pinned finite FSM & Finite $S, I$; total readout & Classical Moore alignment; autonomous transitions ($\text{none}$) dropped. \\
+    \addlinespace[2pt]
+    Trace properties ($F$) separate & Excludes eventually ($F$) & Mission/liveness checked on traces \emph{outside} this hom$\leftrightarrow\Phi$ ladder. \\
+\end{tabularx}
+\captionof{table}{Projections of the dynamics-encoding fragment for decidable checking and classical alignment. The hom projection row (first) carries the primary Wymore FC hom$\leftrightarrow\Phi$ bi-implication; the shared fixed-table row is its same-type identity specialization.}
+\label{tab:verification-tiers}
+\endgroup
+\vspace{6pt}

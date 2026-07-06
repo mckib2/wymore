@@ -1,0 +1,65 @@
+\section{Discussion} \label{sec:discussion}
+
+Encoding system requirements as temporal logic moves intent from natural-language statements into a checkable formal language \parencite{salado2019mbse,BaierKatoen2008}, enabling explicit semantics and execution/analysis against system trajectories. Assertional property checking aligns with open-system verification practice in systems engineering \parencite{salado2019mbse}.%, though we do not claim normative alignment with any particular process. %When $\delta$ or $\rho$ change, engineers may re-check $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$ rather than rebuilding homomorphisms.
+
+T3SD pedagogy traditionally introduces constructive FC first: students formalize $Z_{\text{spec}}$ and prove $h$ \parencite{Wymore1993}. Assertional FC is offered here as a reinterpretation of the same Functionality Cotyledon for verification workflow, not a replacement of its structure or of classical T3SD when a reference system and homomorphism already exist. We suggest that Wymore's allowance for not-necessarily-finite state and trajectory-based semantics supports evaluation of temporal logic at ticks as a dual reading of the same design space.
+
+\subsection{Relationship to Classical Functionality Cotyledon}
+\label{sec:classical-fc}
+
+Classical T3SD defines functional designs constructively while assertional FC defines them by temporal properties in dialect $\mathcal{L}$. Existence of a Wymore system homomorphism $h$ implies trajectory simulation: every implementation trace maps under $h$ to a valid specification trace. Conversely, $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$ does not imply existence of $h$ to a given $Z_{\text{spec}}$ when $\Phi$ is mis-encoded or not reference-relative (Section~\ref{sec:trace-observability}).
+
+\paragraph{Headline bridge.}
+Under the predicate-indexed dynamics-encoding fragment (Section~\ref{sec:dynamics-encoding-fragment}), the primary link to classical T3SD is the hom projection bi-implication: $Z_{\text{impl}} \models_{\mathrm{dyn}} \Phi_{Z_{\text{spec}}}$ (hom-relative encoding) iff $Z_{\text{impl}}$ is a Wymore homomorphic image of $Z_{\text{spec}}$ (`partialDynamicsHom\_iff\_hom`). This matches constructive FC's elaboration-to-spec verification story. When spec and impl share $(S,I,O)$ and the reference table fixes state/IO labels, the \emph{shared fixed-table} specialization recovers partial identity hom (`partialDynamicsOpen\_iff\_hom`; Table~\ref{tab:verification-tiers}, second row)---the common internal-refinement workflow, not the finite pinned Moore projection.
+
+\paragraph{Larger functionality cotyledon.}
+Classical constructive FC fixes a reference $Z_{\text{spec}}$ and accepts implementations with a Wymore homomorphic image $h : Z_{\text{impl}} \to Z_{\text{spec}}$. Assertional FC defines $\mathcal{FC}_{\mathcal{L}}(\Phi_{Z_{\text{spec}}}) = \{ Z \mid Z \models_{\mathrm{dyn}} \Phi_{Z_{\text{spec}}} \}$ where $\Phi_{Z_{\text{spec}}}$ is compiled hom-relatively from $Z_{\text{spec}}$. On the hom headline tier, membership coincides with Def.~4.3 hom for cross-type and rename witnesses; on the shared fixed-table tier it coincides with partial identity hom when labels align. The \emph{native system class} is richer than finite total Moore: infinite $|S|$, closed readout ($\rho=\text{none}$), and autonomous $\delta(s,\text{none})$ ticks are first-class. Witnesses \texttt{counterClosedReadout} and \texttt{closedSystem} satisfy the fixed-table specialization while failing pinned/\texttt{AlwaysOutputs} side conditions. Other TL projections (finite table, pinned FSM, extensional synthesis) recover decidable fragments; $\Phi$-adequacy gates \emph{synthesis} on those projections, not the ungated hom headline iff.
+
+\paragraph{Honest limits.}
+We do \emph{not} claim equivalence for bare $\Phi$ without a reference system, output-table-only encodings, execution FO alone, or mission-level $F$ properties conflated with dynamics tables. Global cotyledon-level set equality $\mathrm{FC}_{\text{constructive}}(Z_{\text{spec}}) = \mathrm{FC}_{\text{assertional}}(\Phi)$ without side conditions remains open (\texttt{ClassicalAssertionalBridge.audit\_classicalAssertional\_open}). Constructive verification may still be preferable when $|S|$ is small, $Z_{\text{spec}}$ already exists, and changes are internal refinements with fixed observable behavior.
+
+\subsection{Expressivity and Tooling}
+\label{sec:expressivity}
+
+Assertional FC is intended to capture functional intent through $\mathcal{FC}_{\mathcal{L}}(\Phi)$ without requiring a reference system $Z_{\text{spec}}$. In decidable or bounded fragments, property checking of $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$ can be partially automated via model checkers or SMT solvers. At the theoretical level, $\mathcal{L}$ may range from propositional LTL to FO-LTL over trajectory variables at ticks. Two fragments deserve separate treatment for automation.
+
+\paragraph{Execution-encoding fragment (SMT-friendly).} The constructors $\text{init}$, $\text{step}$, and $\text{readout}$ in Section~\ref{sec:dsystem-encoding} are tick-indexed equalities over $\delta$ and $\rho$. Conjoined with a finite unrolling horizon, they map directly to ground constraints in SMT \parencite{deMouraZ32008} or to finite-state transition relations for explicit model checking \parencite{BaierKatoen2008}. This fragment is intentionally aligned with Wymore's trajectory recurrence.
+
+\paragraph{Requirement fragment (harder).} Mission-level $\Phi$ often adds first-order quantifiers, $G/F$ temporal operators, and real- or integer-valued constraints (a fragment that is undecidable in general). Practitioners use tick-local SMT checks, finite abstractions, or propositional LTL on finite-state projections when $|S|$, $|I|$, and $|O|$ are small.
+
+\begingroup
+\renewcommand{\arraystretch}{1.4}
+\footnotesize
+\begin{tabularx}{\textwidth}{@{}A{0.22\textwidth} A{0.36\textwidth} A{0.36\textwidth}@{}}
+    \rowcolor{tableheader}
+    \headingfont\bfseries Dimension & \headingfont\bfseries Constructive ($h$ in proof assistant) & \headingfont\bfseries Assertional ($\Phi$ + solver/MC) \\
+    \addlinespace[2pt]
+    Proof strength & Structural simulation to $Z_{\text{spec}}$ & Satisfaction of stated $\Phi$ only \\
+    \addlinespace[2pt]
+    Upfront cost & High (proof engineering, CSY obligations) & Moderate (encoding $\Phi$, tool setup) \\
+    \addlinespace[2pt]
+    Change resilience & Low without universal invariants & Higher (re-run checker on same $\Phi$) \\
+    \addlinespace[2pt]
+    Automation level & Interactive; limited automation & High in finite/bounded fragments \\
+    \addlinespace[2pt]
+    Decidable fragment & N/A (proof object) & Finite-state LTL; bounded FO unrolling; tick-local SMT \\
+\end{tabularx}
+\captionof{table}{Automation and assurance tradeoffs (qualitative).}
+\label{tab:automation-tradeoffs}
+\endgroup
+\vspace{4pt}
+
+Propositional LTL alone remains a useful tooling subset for requirements that could otherwise be written against finite-state models \parencite{BaierKatoen2008}. The encoding theorem (Appendix~\ref{app:encoding}) supplies a propositional-LTL corollary for finite Moore systems; we do not pursue it as a secondary case study here.
+
+\subsection{Limitations and Open Questions}
+\label{sec:limitations}
+
+\begin{itemize}
+    \item \textbf{Equivalence:} We have not demonstrated that assertional and classical FC are equivalent; Table~\ref{tab:comparison} compares workflows qualitatively, not logical strength (see also Section~\ref{sec:expressivity}).  We believe that arbitrarily complex requirements may always be expressed using some temporal logic, but this is left to future work.
+    \item \textbf{Implementability vs.\ assertional membership:} Classical IC membership requires a buildable system with homomorphism to a functional reference. Assertional FC membership requires only $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$. We have not characterized when a system can lie in BC but outside IC yet still satisfy $\Phi$, nor when $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$ implies existence of $h$ to a given $Z_{\text{spec}}$ (Figure~\ref{fig:t3sd-cotyledons}).
+    \item \textbf{Encoding vs.\ decidability:} The DSYSTEM-to-FO-LTL encoding places dynamics and requirements in one vocabulary, but it does not make verification decidable. FO-LTL over real-valued coordinates remains undecidable in general \parencite{BaierKatoen2008}.
+    \item \textbf{Infinite state:} Infinite $|S|$ or real-valued state components may be checked with tick-local SMT at sampled states, an under-approximation for inter-tick motion \parencite{BaierKatoen2008,deMouraZ32008}.  Continuous-time between ticks is left to future work.
+    \item \textbf{Constructive tractability:} Universal proofs over all participation sets and real trajectories remain open; our formalization suggests substantial interactive effort even for modest systems.
+    \item \textbf{Autonomous steps:} Complete liveness semantics for ticks without external input is an area for future theoretical work.
+    \item \textbf{Empirical / MBSE evidence:} We provide no timed benchmark comparing homomorphism effort to property checking; qualitative evidence includes proof-library scale and workflow contrast. SysML requirements trace and standard tooling integration remain future work.
+\end{itemize}

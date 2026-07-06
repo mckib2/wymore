@@ -1,0 +1,28 @@
+\maketitle
+\thispagestyle{firstpage}
+
+% ---- Authors ----
+\noindent
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} A{0.48\textwidth} A{0.48\textwidth}}
+  \authorcard{Nicholas McKibben}{University of Arizona}{Department of Systems \& Industrial Engineering}{Tucson, AZ, USA}{mckib2@arizona.edu} &
+  \authorcard{Paul Wach}{University of Arizona}{Department of Systems \& Industrial Engineering}{Tucson, AZ, USA}{paulwach@arizona.edu} \\
+  \multicolumn{2}{@{}c@{}}{\rule{0pt}{0.9\baselineskip}} \\[-0.2\baselineskip]
+  \authorcard{Larry Head}{University of Arizona}{Department of Systems \& Industrial Engineering}{Tucson, AZ, USA}{klhead@arizona.edu} &
+  \authorcard{Alejandro Salado}{University of Arizona}{Department of Systems \& Industrial Engineering}{Tucson, AZ, USA}{alejandrosalado@arizona.edu}
+\end{tabular*}
+\vspace{.25in}
+
+% ---- Copyright ----
+{\headingfont\bfseries\fontsize{8pt}{12pt}\selectfont
+Copyright~\textcopyright~ \the\year{} by the author(s). Permission granted to INCOSE to publish and use.}
+\\
+
+% =========================
+% ===== Abstract/Keywords =
+% =========================
+\phantomsection
+\miniheading{Abstract}
+We propose an assertional reinterpretation of the Functionality Cotyledon in A.\ Wayne Wymore's Tricotyledon Theory of System Design (T3SD). In classical T3SD, functional intent is verified constructively between a reference system and implementation via Wymore system homomorphism. We offer an assertional reading of the FC as $\mathcal{FC}_{\mathcal{L}}(\Phi) = \{ Z \mid Z \models_{\mathcal{L}} \Phi \}$, where $\Phi$ is a set of temporal logic properties over Wymore discrete-system trajectories and $\mathcal{L}$ is a chosen temporal logic dialect (FO-LTL in the encoding theorem). We show that any Wymore DSYSTEM admits a canonical FO-LTL encoding of its execution semantics, enabling solver-based property checking as an alternative to manual or interactive homomorphism proofs (in decidable or bounded fragments). The contribution is a reinterpretation of the elements of the Functionality Cotyledon, trace semantics, encoding methodology, and workflow comparison.
+
+\paragraph{Keywords}
+Tricotyledon Theory of System Design (T3SD), First-Order Linear Temporal Logic (FO-LTL), Formal Verification, Model-Based Systems Engineering (MBSE).
