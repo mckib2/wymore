@@ -95,9 +95,18 @@ theorem wymore_readout_only_pathology :
   · simp [fsmStay, fsmJump]
   · simp [fsmStay, fsmJump, sharedRZ]
 
-theorem partial_adequate_trivial {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
+theorem partial_adequate {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
     [DecidableEq SZ] [DecidableEq IZ] [Nonempty IZ] (Z : DiscreteSystem SZ IZ OZ) :
-    PartialDynamicsAdequate Z := ⟨rfl⟩
+    PartialDynamicsAdequate Z :=
+  partialDynamicsAdequate_of Z
+
+theorem partial_readout_only_not_complete :
+    SystemSatisfiesPartialReadoutOnly wymoreJump wymoreStay ∧
+      SystemSatisfiesPartialReadoutOnly wymoreStay wymoreJump ∧
+      wymoreStay.NZ 0 (some 0) ≠ wymoreJump.NZ 0 (some 0) := by
+  have hcross := partial_readoutOnly_satisfies_cross (Z_spec := wymoreJump) (Z_impl := wymoreStay)
+    wymoreStay_jump_same_readout
+  refine ⟨hcross.1, hcross.2, wymoreStay_jump_different_step⟩
 
 /-- Under `AlwaysOutputs`, pinned Stage 3 bi-implication remains the identity-hom witness. -/
 theorem partial_identity_hom_via_pinned {Z_spec Z_impl : DiscreteSystem wymPathStates wymPathInputs wymPathOutputs}

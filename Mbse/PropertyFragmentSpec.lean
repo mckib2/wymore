@@ -1,4 +1,5 @@
 import Mbse.TemporalLogic
+import Mbse.Wymore
 
 /-!
 # TL fragment grammar specification
@@ -114,5 +115,25 @@ def ltsRefinementFragment : FragmentSpec where
 theorem foAssertional_no_finite_enum : foAssertionalFragment.finiteClauseEnumeration = false := rfl
 
 theorem partialOpen_dynamicsComplete : partialOpenFragment.dynamicsComplete = true := rfl
+
+/-! ## Fragment tier side conditions (TL-side gates) -/
+
+/-- Side conditions for pinned finite Stages 1–3 bi-implication. -/
+structure PinnedFiniteSideConditions (SZ IZ OZ : Type) (Z : DiscreteSystem SZ IZ OZ) : Prop where
+  alwaysOutputs : AlwaysOutputs Z
+  sz_finite : Nonempty (Fintype SZ)
+  iz_finite : Nonempty (Fintype IZ)
+  oz_finite : Nonempty (Fintype OZ)
+
+/-- Side conditions for Track A partial-open clause tables. -/
+structure PartialOpenSideConditions (SZ IZ OZ : Type) (Z : DiscreteSystem SZ IZ OZ) : Prop where
+  sz_finite : Nonempty (Fintype SZ)
+  iz_finite : Nonempty (Fintype IZ)
+  dynamicsComplete : partialOpenFragment.dynamicsComplete = true
+
+theorem partialOpenSideConditions_dynamics {SZ IZ OZ : Type} {Z : DiscreteSystem SZ IZ OZ}
+    (h : PartialOpenSideConditions SZ IZ OZ Z) :
+    partialOpenFragment.dynamicsComplete = true :=
+  h.dynamicsComplete
 
 end PropertyFragmentSpec

@@ -29,3 +29,4 @@ import Mbse.PathologyExamples
 import Mbse.WymorePropertyFragment
 import Mbse.WymorePathologyExamples
 import Mbse.WymoreCharacterization
+import Mbse.FragmentPathologyRegistry
