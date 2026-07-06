@@ -714,4 +714,15 @@ theorem stageWymore_fsm_decide_and_verify {SZ IZ OZ : Type} [Fintype SZ] [Fintyp
     FSMIsIdentityHomomorphicImage F_spec F_impl :=
   HomWitnessConstruction.fsm_decide_and_verify F_spec F_impl h
 
+theorem stageWymore_verificationObligation_dynamics_gated {satisfies hom adequate : Prop}
+    (hVE : VerificationEquivalence satisfies hom adequate) (hAdeq : adequate) :
+    satisfies ↔ hom :=
+  TracePropertyLayer.verificationObligation_dynamics_gated hVE hAdeq
+
+theorem stageWymore_verificationObligation_full {satisfies hom adequate traceOk : Prop}
+    (hVE : VerificationEquivalence satisfies hom adequate) (hAdeq : adequate)
+    (hSat : satisfies) (hTrace : traceOk) :
+    hom :=
+  TracePropertyLayer.verificationObligation_full hVE hAdeq hSat hTrace
+
 end WymoreCharacterization

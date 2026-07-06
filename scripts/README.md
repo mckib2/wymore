@@ -24,10 +24,11 @@ make check            # build + quality gate
 ```
 
 The script scans all `Mbse/**/*.lean` files (not a fixed list), forbids blanket
-`set_option linter.unusedSectionVars false` (prefer `F.*_finite` in clause defs,
-narrow `variable` scope, or per-theorem `omit`), and fails on banned linter
-warnings from `lake build Mbse`. Set `CHECK_MBSE_STRICT=1` to fail on any
-`warning: Mbse/` line.
+`set_option linter.* false` for unused section vars, unused simp args, and
+unnecessary seq focus (prefer structural fixes), and fails on any
+`warning: Mbse/` line from `lake build Mbse`. Add path substrings to
+`WARNING_ALLOWLIST` in `scripts/check_no_sorry.sh` only when a warning is
+intentionally accepted.
 
 ## Swarm case-study figure
 

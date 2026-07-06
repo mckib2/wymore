@@ -447,9 +447,12 @@ def swapHomWitness : HomomorphicImageWitness swapSpecSys swapImplSys where
   HI_surjective := Function.surjective_id
   HO_surjective := Function.surjective_id
   preserves_transition := by
-    intro x oi
-    cases x <;> cases oi <;> simp [swapHS, swapSpecSys, swapImplSys, DiscreteSystem.ofTotal,
-      swapSpecNZ, swapImplNZ]
+    intro s oi
+    match s, oi with
+    | ⟨0, _⟩, none => simp [swapHS, swapSpecSys, swapImplSys, DiscreteSystem.ofTotal, swapSpecNZ, swapImplNZ]
+    | ⟨0, _⟩, some _ => simp [swapHS, swapSpecSys, swapImplSys, DiscreteSystem.ofTotal, swapSpecNZ, swapImplNZ]
+    | ⟨1, _⟩, none => simp [swapHS, swapSpecSys, swapImplSys, DiscreteSystem.ofTotal, swapSpecNZ, swapImplNZ]
+    | ⟨1, _⟩, some _ => simp [swapHS, swapSpecSys, swapImplSys, DiscreteSystem.ofTotal, swapSpecNZ, swapImplNZ]
   preserves_readout := by
     intro x
     match x with

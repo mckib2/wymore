@@ -24,7 +24,7 @@ open BiImplicationFailures WymorePathologyExamples PathologyExamples
 
 /-! ## Gated verification refutations (wrong predicate + adequate reference) -/
 
-theorem silentReadout_not_phiAdequatePartialOpen :
+theorem silentReadout_wrongPredicate_fails_gatedVerification :
     ¬ VerificationEquivalence
       (SystemSatisfiesPartialDynamicsIncompleteReadout silentReadoutSpec spuriousOutputImpl)
       (PartialExtEqual silentReadoutSpec spuriousOutputImpl)
@@ -34,7 +34,7 @@ theorem silentReadout_not_phiAdequatePartialOpen :
   have hEq := hVE hAdeq
   exact biImpFails_incompleteReadout.2 (hEq.mp biImpFails_incompleteReadout.1)
 
-theorem autoNone_not_phiAdequatePartialOpen :
+theorem autoNone_pinnedDynamics_fails_gatedPartialVerification :
     ¬ VerificationEquivalence
       (SystemSatisfiesDynamics autoNoneSpec autoNoneImpl autoNoneSpec_alwaysOutputs
         autoNoneImpl_alwaysOutputs)
@@ -45,7 +45,7 @@ theorem autoNone_not_phiAdequatePartialOpen :
   have hEq := hVE hAdeq
   exact biImpFails_autonomousNone.2 (hEq.mp biImpFails_autonomousNone.1)
 
-theorem foUnreachable_not_phiAdequateExtensionalOpen :
+theorem foUnreachable_executionFO_fails_gatedExtensionalVerification :
     ¬ VerificationEquivalence
       (SystemSatisfiesSpecFOAt foUnreachableSpec foUnreachableImpl 0 foUnreachableInput)
       (SystemSatisfiesExtensional foUnreachableSpec foUnreachableImpl

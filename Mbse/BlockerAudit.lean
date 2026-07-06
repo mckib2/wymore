@@ -235,7 +235,16 @@ def biImpFailsTheorem : BlockerTag → Option String
   | .eventuallyF => some "biImpFails_eventuallyF_tracePropertyLimit"
   | .infiniteSZ => some "biImpFails_infiniteSZ_excludes_pinned"
   | .partialRZ => some "biImpFails_partialRZ_excludes_pinned"
-  | .foAssertionalCompleteness => none
+  | .foAssertionalCompleteness => some "biImpFails_executionFO"
+
+/-- Map paper claims to linking theorem names (when not a bare `rfl`). -/
+def paperClaimTheorem : PaperClaimTag → Option String
+  | .outputTableOnlyPhi => some "paperClaim_outputTableOnly_blocked"
+  | .fInTracePropertyLayer => some "paperClaim_traceProperty_qualified"
+  | .executionFOSubstitutesHom => some "paperClaim_executionFO_blocked"
+  | .barePhiUniqueSpec => some "paperClaim_barePhi_blocked"
+  | .classicalAssertionalEquivalence => some "audit_classicalAssertional_open"
+  | _ => none
 
 theorem paperClaim_classicalEquiv_open :
     paperClaimStatus .classicalAssertionalEquivalence = .openQuestion := rfl

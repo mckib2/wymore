@@ -181,7 +181,7 @@ theorem blocked_eventuallyF_wymore :
   refine ⟨fsm_satisfies_reflexive fsmStay, fsmJump_satisfies_stay_output_table, ?_, ?_⟩
   · simp only [Trace.models, satisfiesAt, fsmTrace, SystemToLTL.fsmTrace]
     refine ⟨1, Nat.zero_le 1, ?_⟩
-    simp [fsmJump, FSM.generateStateTrajectory_succ, FSM.generateStateTrajectory_zero]
+    simp [fsmJump, FSM.generateStateTrajectory_succ]
   · intro h
     rcases h with ⟨t, _, ht⟩
     simp only [satisfiesAt, fsmTrace, SystemToLTL.fsmTrace] at ht

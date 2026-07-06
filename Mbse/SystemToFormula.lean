@@ -176,8 +176,7 @@ theorem partialReadoutGuardedPair_iff {SZ IZ OZ : Type}
       (∀ s, Z_spec.RZ s = none → Z_impl.RZ s = none) ↔
       (∀ s, Z_impl.RZ s = Z_spec.RZ s) := by
   constructor
-  · intro ⟨hOpen, hClosed⟩
-    intro s
+  · intro ⟨hOpen, hClosed⟩ s
     cases eq : Z_spec.RZ s with
     | none => exact eq ▸ hClosed s eq
     | some o => exact eq ▸ hOpen s o eq

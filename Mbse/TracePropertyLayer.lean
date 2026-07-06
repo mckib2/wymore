@@ -5,6 +5,7 @@ import Mbse.GeneralProperties
 import Mbse.BiImplicationFailures
 import Mbse.SpecFromProperties
 import Mbse.ExtensionalDynamicsFragment
+import Mbse.FSMProperties
 
 /-!
 # Trace property layer vs dynamics encoding
@@ -60,16 +61,40 @@ theorem dynamicsEncoding_extensional_iff_hom {SZ IZ OZ : Type}
 
 /-! ## Layer boundary (explicit non-claim) -/
 
-/-- G-only output-table agreement + `F` trace property does not determine hom. -/
-theorem traceProperty_separate_from_hom :
-    FSMSatisfiesOutputTable PathologyExamples.fsmStay PathologyExamples.fsmStay ∧
-      FSMSatisfiesOutputTable PathologyExamples.fsmStay PathologyExamples.fsmJump ∧
-        (SystemToLTL.fsmTrace PathologyExamples.fsmJump 0 (fun _ => 0)).models
+def tracePropertySeparateProp : Prop :=
+  FSMSatisfiesOutputTable PathologyExamples.fsmStay PathologyExamples.fsmStay ∧
+    FSMSatisfiesOutputTable PathologyExamples.fsmStay PathologyExamples.fsmJump ∧
+      (SystemToLTL.fsmTrace PathologyExamples.fsmJump 0 (fun _ => 0)).models
+          (LTL.atom (.state 1)).F ∧
+        ¬ (SystemToLTL.fsmTrace PathologyExamples.fsmStay 0 (fun _ => 0)).models
             (LTL.atom (.state 1)).F ∧
-          ¬ (SystemToLTL.fsmTrace PathologyExamples.fsmStay 0 (fun _ => 0)).models
-              (LTL.atom (.state 1)).F ∧
-            ¬ FSMIsIdentityHomomorphicImage PathologyExamples.fsmStay PathologyExamples.fsmJump :=
+          ¬ FSMIsIdentityHomomorphicImage PathologyExamples.fsmStay PathologyExamples.fsmJump
+
+/-- G-only output-table agreement + `F` trace property does not determine hom. -/
+theorem traceProperty_separate_from_hom : tracePropertySeparateProp :=
   LivenessFragment.liveness_no_hom_with_F_mission
+
+/-! ## Conflated dynamics + trace-property satisfaction -/
+
+/-- Output-table agreement **and** `F(state sTarget)` on the canonical trace — mixes trace property into dynamics template. -/
+def FSMSatisfiesOutputTableAndFState {SZ IZ OZ : Type} [Fintype SZ] [DecidableEq SZ] [Nonempty IZ]
+    [OfNat SZ 0] [OfNat IZ 0]
+    (F_spec F_impl : FSMSystem SZ IZ OZ) (sTarget : SZ) : Prop :=
+  FSMSatisfiesOutputTable F_spec F_impl ∧
+    (SystemToLTL.fsmTrace F_impl 0 (fun _ => 0)).models (LTL.atom (.state sTarget)).F
+
+theorem traceProperty_conflation_fails_gatedVerification :
+    ¬ VerificationEquivalence
+      (FSMSatisfiesOutputTableAndFState PathologyExamples.fsmStay PathologyExamples.fsmJump 1)
+      (FSMIsIdentityHomomorphicImage PathologyExamples.fsmStay PathologyExamples.fsmJump)
+      (PhiAdequateSpec (FSMSatisfiesDynamics PathologyExamples.fsmStay PathologyExamples.fsmStay)
+        (synthesizeFsmSpec PathologyExamples.fsmStay = synthesizeFsmSpec PathologyExamples.fsmStay)) := by
+  intro hVE
+  have hAdeq := fsm_phi_adequate PathologyExamples.fsmStay
+  have hSat : FSMSatisfiesOutputTableAndFState PathologyExamples.fsmStay PathologyExamples.fsmJump 1 := by
+    refine ⟨PathologyExamples.fsmJump_satisfies_stay_output_table, ?_⟩
+    exact (biImpFails_eventuallyF_tracePropertyLimit).2.2.1
+  exact PathologyExamples.fsmStay_jump_not_identityHom ((hVE hAdeq).mp hSat)
 
 theorem traceProperty_conflation_fails_biImp :
     ¬ VerificationEquivalence
@@ -84,5 +109,16 @@ structure VerificationObligation where
   dynamicsEncodingAdequate : Prop
   tracePropertiesSatisfied : Prop
   homVerified : Prop
+
+theorem verificationObligation_dynamics_gated {satisfies hom adequate : Prop}
+    (hVE : VerificationEquivalence satisfies hom adequate) (hAdeq : adequate) :
+    satisfies ↔ hom :=
+  hVE hAdeq
+
+theorem verificationObligation_full {satisfies hom adequate traceOk : Prop}
+    (hVE : VerificationEquivalence satisfies hom adequate) (hAdeq : adequate)
+    (hSat : satisfies) (_hTrace : traceOk) :
+    hom :=
+  (hVE hAdeq).mp hSat
 
 end TracePropertyLayer

@@ -6,7 +6,7 @@
 #   2. No blanket linter suppressions (e.g. unusedSectionVars false)
 #      Prefer structural fixes (F.sz_finite in clause defs), narrow variable
 #      scope, or per-theorem `omit` instead of set_option.
-#   3. lint-clean `lake build Mbse` (banned warning patterns below)
+#   3. lint-clean `lake build Mbse` — fail on any `warning: Mbse/` line
 #
 # Allowlisted exceptions live in ALLOWED_SET_OPTION_* and WARNING_ALLOWLIST below.
 # To add a new exception, document why here and in scripts/README.md.
@@ -58,6 +58,8 @@ echo "OK: no sorry/admit/axiom in Mbse modules"
 # --- 2. forbidden set_option suppressions ---
 FORBIDDEN_SET_OPTION_PATTERNS=(
   'set_option[[:space:]]+linter\.unusedSectionVars[[:space:]]+false'
+  'set_option[[:space:]]+linter\.unusedSimpArgs[[:space:]]+false'
+  'set_option[[:space:]]+linter\.unnecessarySeqFocus[[:space:]]+false'
 )
 
 for pattern in "${FORBIDDEN_SET_OPTION_PATTERNS[@]}"; do
@@ -98,13 +100,7 @@ if ! (cd "$ROOT" && lake build Mbse >"$BUILD_LOG" 2>&1); then
   fail "lake build Mbse failed"
 fi
 
-# Banned Mbse warning patterns (extend as needed).
-BANNED_WARNING_PATTERNS=(
-  'automatically included section variable\(s\) unused'
-  'unusedSectionVars'
-)
-
-# Optional allowlist for warnings we explicitly accept (empty when clean).
+# Fail on any Lean warning emitted from Mbse modules (extend WARNING_ALLOWLIST to opt out).
 WARNING_ALLOWLIST=(
 )
 
@@ -121,22 +117,11 @@ filter_warnings() {
   done
 }
 
-if [[ "${CHECK_MBSE_STRICT:-0}" == "1" ]]; then
-  if mapfile -t hits < <(rg 'warning: Mbse/' "$BUILD_LOG" | filter_warnings || true); then
-    if ((${#hits[@]} > 0)); then
-      printf '%s\n' "${hits[@]}" >&2
-      fail "Mbse build emitted warnings (CHECK_MBSE_STRICT=1)"
-    fi
+if mapfile -t hits < <(rg 'warning: Mbse/' "$BUILD_LOG" | filter_warnings || true); then
+  if ((${#hits[@]} > 0)); then
+    printf '%s\n' "${hits[@]}" >&2
+    fail "Mbse build emitted linter warnings (allowlist in scripts/check_no_sorry.sh if intentional)"
   fi
-else
-  for pattern in "${BANNED_WARNING_PATTERNS[@]}"; do
-    if mapfile -t hits < <(rg "warning: Mbse/.*${pattern}" "$BUILD_LOG" | filter_warnings || true); then
-      if ((${#hits[@]} > 0)); then
-        printf '%s\n' "${hits[@]}" >&2
-        fail "Mbse build emitted banned linter warnings (pattern: ${pattern})"
-      fi
-    fi
-  done
 fi
 
 echo "OK: Mbse build is lint-clean"
