@@ -14,13 +14,10 @@ with identity homomorphic images under the same `SZ`/`IZ`/`OZ` types.
 
 namespace PropertyFragment.FSM
 
-/- Section variables support clause tables; not every lemma body references them. -/
-
 open TemporalLogic PropertySemantics SystemToLTL
 open FSM
 
-variable {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
-variable [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ]
+variable {SZ IZ OZ : Type}
 variable [Nonempty IZ]
 
 def fsmTrace (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) : Trace (Atom SZ IZ OZ) :=
@@ -32,20 +29,20 @@ def safetyOutput (s : SZ) (o : OZ) : LTL (Atom SZ IZ OZ) :=
   LTL.G (LTL.imp (LTL.atom (.state s)) (LTL.atom (.output o)))
 
 noncomputable def fsmOutputTable (F : FSMSystem SZ IZ OZ) : PropertySet (LTL (Atom SZ IZ OZ)) :=
-  ⟨Finset.univ.toList.map fun s => safetyOutput s (F.RZ s)⟩
+  ⟨(@Finset.univ SZ F.sz_finite).toList.map fun s => safetyOutput s (F.RZ s)⟩
 
 def FSMSatisfiesOutputTable (F_ref : FSMSystem SZ IZ OZ) (F : FSMSystem SZ IZ OZ) : Prop :=
   ∀ (s0 : SZ) (f : ITZ IZ) (φ : LTL (Atom SZ IZ OZ)),
     φ ∈ (fsmOutputTable F_ref).formulas → (fsmTrace F s0 f).models φ
 
-omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
+omit [Nonempty IZ] in
 theorem fsmSatisfiesOutputTable_iff_traceModels (F_ref F : FSMSystem SZ IZ OZ) :
     FSMSatisfiesOutputTable F_ref F ↔
       ∀ (s0 : SZ) (f : ITZ IZ) (φ : LTL (Atom SZ IZ OZ)),
         φ ∈ (fsmOutputTable F_ref).formulas → (fsmTrace F s0 f).models φ :=
   Iff.rfl
 
-omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
+omit [Nonempty IZ] in
 theorem mem_fsmOutputTable_iff (F : FSMSystem SZ IZ OZ) (φ : LTL (Atom SZ IZ OZ)) :
     φ ∈ (fsmOutputTable F).formulas ↔ ∃ s, φ = safetyOutput s (F.RZ s) := by
   dsimp [fsmOutputTable]
@@ -56,11 +53,12 @@ theorem mem_fsmOutputTable_iff (F : FSMSystem SZ IZ OZ) (φ : LTL (Atom SZ IZ OZ
   · rintro ⟨s, heq⟩
     exact ⟨s, heq.symm⟩
 
+omit [Nonempty IZ] in
 theorem fsmOutputTable_mem (F : FSMSystem SZ IZ OZ) (s : SZ) :
     safetyOutput s (F.RZ s) ∈ (fsmOutputTable F).formulas :=
   (mem_fsmOutputTable_iff F (safetyOutput s (F.RZ s))).2 ⟨s, rfl⟩
 
-omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
+omit [Nonempty IZ] in
 theorem fsmTrace_satisfies_safetyOutput (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) (s : SZ) :
     (fsmTrace F s0 f).models (safetyOutput s (F.RZ s)) := by
   simp only [Trace.models, satisfiesAt, safetyOutput]
@@ -78,40 +76,43 @@ def FSMSatisfiesDynamics (F_ref : FSMSystem SZ IZ OZ) (F : FSMSystem SZ IZ OZ) :
   ∀ (s0 : SZ) (f : ITZ IZ) (φ : LTL (Atom SZ IZ OZ)),
     φ ∈ (fsmDynamicsTable F_ref).formulas → (fsmTrace F s0 f).models φ
 
-omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
+omit [Nonempty IZ] in
 theorem fsmSatisfiesDynamics_iff_traceModels (F_ref F : FSMSystem SZ IZ OZ) :
     FSMSatisfiesDynamics F_ref F ↔
       ∀ (s0 : SZ) (f : ITZ IZ) (φ : LTL (Atom SZ IZ OZ)),
         φ ∈ (fsmDynamicsTable F_ref).formulas → (fsmTrace F s0 f).models φ :=
   Iff.rfl
 
-omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
+omit [Nonempty IZ] in
 theorem mem_fsmDynamicsTable_iff (F : FSMSystem SZ IZ OZ) (φ : LTL (Atom SZ IZ OZ)) :
     φ ∈ (fsmDynamicsTable F).formulas ↔
       φ ∈ transitionClauses F ∨ φ ∈ readoutClauses F := by
   simp [fsmDynamicsTable, List.mem_append]
 
+omit [Nonempty IZ] in
 theorem mem_fsmDynamicsTable_transition (F : FSMSystem SZ IZ OZ) (s : SZ) (i : IZ) :
     transitionClause F s i ∈ (fsmDynamicsTable F).formulas := by
   rw [mem_fsmDynamicsTable_iff]
   exact Or.inl ((mem_transitionClauses_iff F (transitionClause F s i)).2 ⟨s, i, rfl⟩)
 
+omit [Nonempty IZ] in
 theorem mem_fsmDynamicsTable_readout (F : FSMSystem SZ IZ OZ) (s : SZ) :
     readoutClause F s ∈ (fsmDynamicsTable F).formulas := by
   rw [mem_fsmDynamicsTable_iff]
   exact Or.inr ((mem_readoutClauses_iff F (readoutClause F s)).2 ⟨s, rfl⟩)
 
-omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
+omit [Nonempty IZ] in
 theorem fsmTrace_models_transitionClause (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) (s : SZ)
     (i : IZ) :
     (fsmTrace F s0 f).models (transitionClause F s i) :=
   fsmTrace_satisfies_transitionClause F s0 f 0 s i
 
-omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
+omit [Nonempty IZ] in
 theorem fsmTrace_models_readoutClause (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) (s : SZ) :
     (fsmTrace F s0 f).models (readoutClause F s) :=
   fsmTrace_satisfies_readoutClause F s0 f 0 s
 
+omit [Nonempty IZ] in
 theorem fsm_dynamics_satisfies_reflexive (F : FSMSystem SZ IZ OZ) :
     FSMSatisfiesDynamics F F := by
   intro s0 f φ hmem
@@ -128,6 +129,7 @@ theorem fsm_dynamics_satisfies_reflexive (F : FSMSystem SZ IZ OZ) :
 def FSMExtEqual (F G : FSMSystem SZ IZ OZ) : Prop :=
   (∀ s, F.RZ s = G.RZ s) ∧ (∀ s i, F.NZ s i = G.NZ s i)
 
+omit [Nonempty IZ] in
 theorem fsm_satisfies_reflexive (F : FSMSystem SZ IZ OZ) :
     FSMSatisfiesOutputTable F F := by
   intro s0 f φ hmem
@@ -135,6 +137,7 @@ theorem fsm_satisfies_reflexive (F : FSMSystem SZ IZ OZ) :
   subst heq
   exact fsmTrace_satisfies_safetyOutput F s0 f s
 
+omit [Nonempty IZ] in
 theorem fsm_extEqual_implies_satisfies_output {F_spec F_impl : FSMSystem SZ IZ OZ}
     (h : FSMExtEqual F_spec F_impl) :
     FSMSatisfiesOutputTable F_spec F_impl := by
@@ -145,6 +148,7 @@ theorem fsm_extEqual_implies_satisfies_output {F_spec F_impl : FSMSystem SZ IZ O
   rw [← h.1 s] at hout
   exact hout
 
+omit [Nonempty IZ] in
 theorem fsm_extEqual_implies_satisfies_dynamics {F_spec F_impl : FSMSystem SZ IZ OZ}
     (h : FSMExtEqual F_spec F_impl) :
     FSMSatisfiesDynamics F_spec F_impl := by
@@ -164,6 +168,7 @@ theorem fsm_satisfies_implies_readout_agreement {F_spec F_impl : FSMSystem SZ IZ
     (h : FSMSatisfiesDynamics F_spec F_impl) :
     ∀ s, F_impl.RZ s = F_spec.RZ s := by
   intro s
+  haveI : Fintype IZ := F_spec.iz_finite
   have hne : (Finset.univ : Finset IZ).Nonempty := Finset.univ_nonempty
   let f : ITZ IZ := fun _ => hne.choose
   have hφ := h s f (readoutClause F_spec s) (mem_fsmDynamicsTable_readout F_spec s)
@@ -230,9 +235,7 @@ end PropertyFragment.FSM
 
 namespace FSMProperties
 
-
-variable {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
-variable [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ]
+variable {SZ IZ OZ : Type}
 variable [Nonempty IZ]
 
 open PropertyFragment.FSM FSM PropertySemantics TemporalLogic
@@ -244,7 +247,7 @@ structure FSMIdentityHomomorphicImageWitness (F_spec F_impl : FSMSystem SZ IZ OZ
 def FSMIsIdentityHomomorphicImage (F_spec F_impl : FSMSystem SZ IZ OZ) : Prop :=
   Nonempty (FSMIdentityHomomorphicImageWitness F_spec F_impl)
 
-omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
+omit [Nonempty IZ] in
 theorem fsm_extEqual_iff_identityHom (F_spec F_impl : FSMSystem SZ IZ OZ) :
     FSMExtEqual F_spec F_impl ↔ FSMIsIdentityHomomorphicImage F_spec F_impl := by
   constructor
@@ -263,6 +266,7 @@ theorem fsm_satisfies_implies_hom {F_spec F_impl : FSMSystem SZ IZ OZ}
     FSMIsIdentityHomomorphicImage F_spec F_impl :=
   ⟨identityFsmWitness (fsm_satisfies_implies_extEqual h)⟩
 
+omit [Nonempty IZ] in
 theorem fsm_hom_implies_satisfies {F_spec F_impl : FSMSystem SZ IZ OZ}
     (h : FSMIsIdentityHomomorphicImage F_spec F_impl) :
     FSMSatisfiesDynamics F_spec F_impl := by
@@ -276,10 +280,12 @@ theorem fsm_property_iff_hom (F_spec F_impl : FSMSystem SZ IZ OZ) :
       FSMIsIdentityHomomorphicImage F_spec F_impl :=
   ⟨fsm_satisfies_implies_hom, fsm_hom_implies_satisfies⟩
 
+omit [Nonempty IZ] in
 theorem fsm_extEqual_implies_hom (F : FSMSystem SZ IZ OZ) (h : FSMExtEqual F F) :
     FSMIsIdentityHomomorphicImage F F :=
   (fsm_extEqual_iff_identityHom F F).1 h
 
+omit [Nonempty IZ] in
 /-- Bi-implication under extensional equality (output-table fragment only). -/
 theorem fsm_extEqual_iff_satisfies_and_hom (F : FSMSystem SZ IZ OZ) :
     FSMExtEqual F F ↔
@@ -295,6 +301,7 @@ theorem fsm_readout_agreement (F_spec F_impl : FSMSystem SZ IZ OZ)
     (h : FSMSatisfiesOutputTable F_spec F_impl) :
     ∀ s, F_impl.RZ s = F_spec.RZ s := by
   intro s
+  haveI : Fintype IZ := F_spec.iz_finite
   have hne : (Finset.univ : Finset IZ).Nonempty := Finset.univ_nonempty
   let f : ITZ IZ := fun _ => hne.choose
   have hφ := h s f (safetyOutput s (F_spec.RZ s)) (fsmOutputTable_mem F_spec s)

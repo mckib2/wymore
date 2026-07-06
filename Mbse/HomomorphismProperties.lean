@@ -144,8 +144,7 @@ theorem fsm_hom_spec_satisfies_output {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ
     ⟨fun s => (w.preserves_readout s).symm, fun s i => (w.preserves_transition s i).symm⟩
 
 /-- One-way: identity homomorphic image + spec dynamics satisfaction implies impl satisfaction. -/
-theorem fsm_hom_spec_satisfies_dynamics {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
-    [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ]
+theorem fsm_hom_spec_satisfies_dynamics {SZ IZ OZ : Type} [Nonempty IZ]
     {F_spec F_impl : FSMSystem SZ IZ OZ}
     (w : FSMIdentityHomomorphicImageWitness F_spec F_impl)
     (_hSpec : FSMSatisfiesDynamics F_spec F_spec) :

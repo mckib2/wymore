@@ -30,28 +30,24 @@ theorem compileCombObservables_satisfies {IZ OZ : Type}
 
 /-! ## FSM -/
 
-variable {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
-variable [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ]
-variable [Nonempty IZ]
-
 /-- Property set compiled from an FSM reference (dynamics-complete). -/
-noncomputable def compileFsmObservables (F : FSMSystem SZ IZ OZ) :
+noncomputable def compileFsmObservables {SZ IZ OZ : Type} (F : FSMSystem SZ IZ OZ) :
     PropertySet (LTL (Atom SZ IZ OZ)) :=
   fsmDynamicsTable F
 
-omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ] in
-theorem compileFsmObservables_eq_dynamics (F : FSMSystem SZ IZ OZ) :
+theorem compileFsmObservables_eq_dynamics {SZ IZ OZ : Type} (F : FSMSystem SZ IZ OZ) :
     compileFsmObservables F = fsmDynamicsTable F := rfl
 
 /-! ## General total finite -/
 
 /-- Property set compiled from a total finite discrete system. -/
-noncomputable def compileObservables (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
+noncomputable def compileObservables {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
     PropertySet (LTL (Atom SZ IZ OZ)) :=
   dynamicsTable Z hOut
 
-omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ] in
-theorem compileObservables_eq_dynamics (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
+theorem compileObservables_eq_dynamics {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
     compileObservables Z hOut = dynamicsTable Z hOut := rfl
 
 end ObservablesFromSpec

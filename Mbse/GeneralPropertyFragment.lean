@@ -15,13 +15,11 @@ a TL-side restriction, not a restriction on the general `DiscreteSystem` class.
 
 namespace GeneralFSMBridge
 
-variable {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
-variable [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ]
-
 open FSM
 
 /-- Reconstruct an `FSMSystem` from a total `DiscreteSystem`. Requires `AlwaysOutputs`. -/
-def ofDiscreteSystem (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) : FSMSystem SZ IZ OZ where
+def ofDiscreteSystem {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) : FSMSystem SZ IZ OZ where
   sz_nonempty := Z.sz_nonempty
   sz_finite := inferInstance
   iz_finite := inferInstance
@@ -38,44 +36,44 @@ namespace PropertyFragment.General
 open TemporalLogic PropertySemantics SystemToLTL PropertyFragment.FSM
 open FSM GeneralFSMBridge
 
-variable {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
-variable [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ]
-variable [Nonempty IZ]
-
-def systemTrace (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) (s0 : SZ) (f : ITZ IZ) :
+def systemTrace {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) (s0 : SZ) (f : ITZ IZ) :
     Trace (Atom SZ IZ OZ) :=
   PropertyFragment.FSM.fsmTrace (ofDiscreteSystem Z hOut) s0 f
 
-noncomputable def dynamicsTable (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
+noncomputable def dynamicsTable {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
     PropertySet (LTL (Atom SZ IZ OZ)) :=
   fsmDynamicsTable (ofDiscreteSystem Z hOut)
 
-def SystemSatisfiesDynamics (Z_spec Z_impl : DiscreteSystem SZ IZ OZ)
+def SystemSatisfiesDynamics {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ)
     (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) : Prop :=
   FSMSatisfiesDynamics (ofDiscreteSystem Z_spec hSpec) (ofDiscreteSystem Z_impl hImpl)
 
-omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ] in
-theorem SystemSatisfiesDynamics_iff_fsm {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+theorem SystemSatisfiesDynamics_iff_fsm {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
     (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) :
     SystemSatisfiesDynamics Z_spec Z_impl hSpec hImpl ↔
       FSMSatisfiesDynamics (ofDiscreteSystem Z_spec hSpec)
         (ofDiscreteSystem Z_impl hImpl) :=
   Iff.rfl
 
-def SystemExtEqual (Z_spec Z_impl : DiscreteSystem SZ IZ OZ)
+def SystemExtEqual {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ)
     (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) : Prop :=
   FSMExtEqual (ofDiscreteSystem Z_spec hSpec) (ofDiscreteSystem Z_impl hImpl)
 
-omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ] in
-theorem SystemExtEqual_iff_fsm {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+theorem SystemExtEqual_iff_fsm {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
     (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) :
     SystemExtEqual Z_spec Z_impl hSpec hImpl ↔
       FSMExtEqual (ofDiscreteSystem Z_spec hSpec)
         (ofDiscreteSystem Z_impl hImpl) :=
   Iff.rfl
 
-omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ] in
-theorem ofDiscreteSystem_extEqual_toDiscreteSystem (F : FSMSystem SZ IZ OZ) :
+theorem ofDiscreteSystem_extEqual_toDiscreteSystem {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
+    [Fintype OZ] (F : FSMSystem SZ IZ OZ) :
     FSMExtEqual (ofDiscreteSystem (_root_.FSM.FSMSystem.toDiscreteSystem F)
       (_root_.FSM.fsm_alwaysOutputs F)) F := by
   constructor

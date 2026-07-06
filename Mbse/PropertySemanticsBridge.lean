@@ -27,18 +27,15 @@ theorem combSatisfiesFunction_iff_combSatisfiesLTLAll {IZ OZ : Type}
 
 /-! ## FSM -/
 
-variable {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
-variable [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ]
-variable [Nonempty IZ]
-
-noncomputable def fsmTraceAll (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZW IZ) : Trace (Atom SZ IZ OZ) :=
+noncomputable def fsmTraceAll {SZ IZ OZ : Type} [Nonempty IZ] (F : FSMSystem SZ IZ OZ) (s0 : SZ)
+    (f : ITZW IZ) : Trace (Atom SZ IZ OZ) :=
   PropertyFragment.FSM.fsmTrace F s0 (fun t =>
     match f t with
     | some i => i
     | none => Classical.arbitrary IZ)
 
-omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Fintype OZ] in
-theorem fsmSatisfiesDynamics_iff_systemSatisfiesLTLAll {F_spec F_impl : FSMSystem SZ IZ OZ} :
+theorem fsmSatisfiesDynamics_iff_systemSatisfiesLTLAll {SZ IZ OZ : Type} [Nonempty IZ]
+    {F_spec F_impl : FSMSystem SZ IZ OZ} :
     FSMSatisfiesDynamics F_spec F_impl ↔
       SystemSatisfiesLTLAll F_impl.toDiscreteSystem (fsmDynamicsTable F_spec)
         (fun s0 f => fsmTraceAll F_impl s0 f) := by
@@ -48,8 +45,8 @@ theorem fsmSatisfiesDynamics_iff_systemSatisfiesLTLAll {F_spec F_impl : FSMSyste
   · intro h s0 f φ hmem
     exact h s0 (fun t => some (f t)) trivial φ hmem
 
-omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Fintype IZ] [Fintype OZ] in
-theorem fsmSatisfiesOutputTable_iff_systemSatisfiesLTLAll {F_spec F_impl : FSMSystem SZ IZ OZ} :
+theorem fsmSatisfiesOutputTable_iff_systemSatisfiesLTLAll {SZ IZ OZ : Type} [Nonempty IZ]
+    {F_spec F_impl : FSMSystem SZ IZ OZ} :
     FSMSatisfiesOutputTable F_spec F_impl ↔
       SystemSatisfiesLTLAll F_impl.toDiscreteSystem (fsmOutputTable F_spec)
         (fun s0 f => fsmTraceAll F_impl s0 f) := by
@@ -59,12 +56,13 @@ theorem fsmSatisfiesOutputTable_iff_systemSatisfiesLTLAll {F_spec F_impl : FSMSy
   · intro h s0 f φ hmem
     exact h s0 (fun t => some (f t)) trivial φ hmem
 
-noncomputable def systemTraceAll (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) (s0 : SZ)
+noncomputable def systemTraceAll {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    [Nonempty IZ] (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) (s0 : SZ)
     (f : ITZW IZ) : Trace (Atom SZ IZ OZ) :=
   systemTrace Z hOut s0 (fun t => match f t with | some i => i | none => Classical.arbitrary IZ)
 
-omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ] in
-theorem systemSatisfiesDynamics_iff_fsmSatisfies {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+theorem systemSatisfiesDynamics_iff_fsmSatisfies {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
+    [Fintype OZ] {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
     (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl) :
     SystemSatisfiesDynamics Z_spec Z_impl hSpec hImpl ↔
       FSMSatisfiesDynamics (GeneralFSMBridge.ofDiscreteSystem Z_spec hSpec)

@@ -14,14 +14,9 @@ state/input/output labels. Formula size is `O(|S|² · |I|)`; syntactic expressi
 
 namespace SystemToLTL
 
-/- Clause-table lemmas inherit finiteness/decidability from `FSMSystem` fields;
-   section variables support definitions and are not always referenced in proof terms. -/
-
 open TemporalLogic FSM
 
 variable {SZ IZ OZ : Type}
-variable [Fintype SZ] [Fintype IZ] [Fintype OZ]
-variable [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ]
 
 /-- Atomic propositions for finite Moore FSM traces. -/
 inductive Atom (SZ IZ OZ : Type) where
@@ -44,12 +39,12 @@ def listAnd {AP : Type} (φs : List (LTL AP)) : LTL AP :=
 
 /-- All `(state, input)` transition clauses. -/
 noncomputable def transitionClauses (F : FSMSystem SZ IZ OZ) : List (LTL (Atom SZ IZ OZ)) :=
-  (Finset.univ : Finset SZ).toList.flatMap fun s =>
-    (Finset.univ : Finset IZ).toList.map fun i => transitionClause F s i
+  (@Finset.univ SZ F.sz_finite).toList.flatMap fun s =>
+    (@Finset.univ IZ F.iz_finite).toList.map fun i => transitionClause F s i
 
 /-- All readout clauses. -/
 noncomputable def readoutClauses (F : FSMSystem SZ IZ OZ) : List (LTL (Atom SZ IZ OZ)) :=
-  (Finset.univ : Finset SZ).toList.map fun s => readoutClause F s
+  (@Finset.univ SZ F.sz_finite).toList.map fun s => readoutClause F s
 
 /-- All transition clauses, globally. -/
 noncomputable def transitionsGlobally (F : FSMSystem SZ IZ OZ) : LTL (Atom SZ IZ OZ) :=
@@ -91,7 +86,6 @@ theorem satisfiesAt_G {AP : Type} (φ : LTL AP) (σ : Trace AP) (t : Time) :
     satisfiesAt (LTL.G φ) σ t ↔ ∀ t', t ≤ t' → satisfiesAt φ σ t' := by
   simp [satisfiesAt]
 
-omit [Fintype SZ] [Fintype IZ] [Fintype OZ] [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
 theorem fsmTrace_satisfies_transitionClause (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ)
     (t : Time) (s : SZ) (i : IZ) :
     satisfiesAt (transitionClause F s i) (fsmTrace F s0 f) t := by
@@ -99,7 +93,6 @@ theorem fsmTrace_satisfies_transitionClause (F : FSMSystem SZ IZ OZ) (s0 : SZ) (
   intro ⟨hs, hi⟩
   rw [FSM.generateStateTrajectory_succ, hs, hi]
 
-omit [Fintype SZ] [Fintype IZ] [Fintype OZ] [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
 theorem fsmTrace_satisfies_readoutClause (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ)
     (t : Time) (s : SZ) :
     satisfiesAt (readoutClause F s) (fsmTrace F s0 f) t := by
@@ -117,7 +110,7 @@ theorem mem_transitionClauses_iff (F : FSMSystem SZ IZ OZ) (φ : LTL (Atom SZ IZ
   · intro ⟨s, i, heq⟩
     rw [heq]
     simp only [transitionClauses, List.mem_flatMap, List.mem_map, Finset.mem_toList]
-    use s, Finset.mem_univ s, i, Finset.mem_univ i
+    use s, (@Finset.mem_univ SZ F.sz_finite s), i, (@Finset.mem_univ IZ F.iz_finite i)
 
 theorem mem_readoutClauses_iff (F : FSMSystem SZ IZ OZ) (φ : LTL (Atom SZ IZ OZ)) :
     φ ∈ readoutClauses F ↔ ∃ s, φ = readoutClause F s := by
@@ -129,9 +122,8 @@ theorem mem_readoutClauses_iff (F : FSMSystem SZ IZ OZ) (φ : LTL (Atom SZ IZ OZ
   · intro ⟨s, heq⟩
     rw [heq]
     simp only [readoutClauses, List.mem_map, Finset.mem_toList]
-    use s, Finset.mem_univ s
+    use s, (@Finset.mem_univ SZ F.sz_finite s)
 
-omit [Fintype OZ] [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
 theorem fsmTrace_models_transitionsGlobally (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) :
     satisfiesAt (transitionsGlobally F) (fsmTrace F s0 f) 0 := by
   simp only [transitionsGlobally, satisfiesAt_G]
@@ -142,7 +134,6 @@ theorem fsmTrace_models_transitionsGlobally (F : FSMSystem SZ IZ OZ) (s0 : SZ) (
   rcases hφ with ⟨s, _, i, _, rfl⟩
   exact fsmTrace_satisfies_transitionClause F s0 f t s i
 
-omit [Fintype OZ] [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
 theorem fsmTrace_models_readoutsGlobally (F : FSMSystem SZ IZ OZ) (s0 : SZ) (f : ITZ IZ) :
     satisfiesAt (readoutsGlobally F) (fsmTrace F s0 f) 0 := by
   simp only [readoutsGlobally, satisfiesAt_G]

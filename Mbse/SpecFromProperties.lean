@@ -32,63 +32,61 @@ theorem synthesizeCombSpec_satisfies {IZ OZ : Type} (F : IZ → OZ) [Fintype IZ]
 
 /-! ## FSM -/
 
-variable {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
-variable [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ]
-variable [Nonempty IZ]
+def synthesizeFsmSpec {SZ IZ OZ : Type} (F : FSMSystem SZ IZ OZ) : FSMSystem SZ IZ OZ := F
 
-def synthesizeFsmSpec (F : FSMSystem SZ IZ OZ) : FSMSystem SZ IZ OZ := F
-
-theorem synthesizeFsmSpec_satisfies (F : FSMSystem SZ IZ OZ) :
+theorem synthesizeFsmSpec_satisfies {SZ IZ OZ : Type} [Nonempty IZ] (F : FSMSystem SZ IZ OZ) :
     FSMSatisfiesOutputTable F F :=
   fsm_satisfies_reflexive F
 
-theorem synthesizeFsmSpec_satisfies_dynamics (F : FSMSystem SZ IZ OZ) :
+theorem synthesizeFsmSpec_satisfies_dynamics {SZ IZ OZ : Type} [Nonempty IZ] (F : FSMSystem SZ IZ OZ) :
     FSMSatisfiesDynamics F F :=
   fsm_dynamics_satisfies_reflexive F
 
-theorem fsm_synthesized_property_iff_hom (F : FSMSystem SZ IZ OZ) (F_impl : FSMSystem SZ IZ OZ) :
+theorem fsm_synthesized_property_iff_hom {SZ IZ OZ : Type} [Nonempty IZ] (F : FSMSystem SZ IZ OZ)
+    (F_impl : FSMSystem SZ IZ OZ) :
     FSMSatisfiesDynamics F F_impl ↔
       FSMIsIdentityHomomorphicImage (synthesizeFsmSpec F) F_impl :=
   fsm_property_iff_hom F F_impl
 
-theorem fsm_phi_adequate (F : FSMSystem SZ IZ OZ) :
+theorem fsm_phi_adequate {SZ IZ OZ : Type} [Nonempty IZ] (F : FSMSystem SZ IZ OZ) :
     PhiAdequateSpec (FSMSatisfiesDynamics F F) (synthesizeFsmSpec F = synthesizeFsmSpec F) := by
   constructor
   · exact fsm_dynamics_satisfies_reflexive F
   · rfl
 
-omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ] in
-theorem fsm_synthesized_observables (F : FSMSystem SZ IZ OZ) :
+theorem fsm_synthesized_observables {SZ IZ OZ : Type} (F : FSMSystem SZ IZ OZ) :
     compileFsmObservables (synthesizeFsmSpec F) = fsmDynamicsTable F := by
   simp [compileFsmObservables, synthesizeFsmSpec]
 
 /-! ## General total finite -/
 
-def synthesizeSpec (Z : DiscreteSystem SZ IZ OZ) (_hOut : AlwaysOutputs Z) : DiscreteSystem SZ IZ OZ :=
+def synthesizeSpec {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (_hOut : AlwaysOutputs Z) :
+    DiscreteSystem SZ IZ OZ :=
   Z
 
-theorem synthesizeSpec_satisfies (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
+theorem synthesizeSpec_satisfies {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    [Nonempty IZ] (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
     SystemSatisfiesDynamics Z Z hOut hOut := by
   rw [PropertyFragment.General.SystemSatisfiesDynamics_iff_fsm]
   exact fsm_dynamics_satisfies_reflexive (ofDiscreteSystem Z hOut)
 
-omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ] in
-theorem synthesizeSpec_eq (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
+theorem synthesizeSpec_eq {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
     synthesizeSpec Z hOut = Z := rfl
 
-omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ] in
-theorem compileObservables_synthesizeSpec (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
+theorem compileObservables_synthesizeSpec {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
     compileObservables (synthesizeSpec Z hOut) hOut = dynamicsTable Z hOut := by
   simp [compileObservables, synthesizeSpec, dynamicsTable]
 
 /-! ## Inverse synthesis (partial) -/
 
-def IsSynthesizableTable (Phi : PropertySet (LTL (Atom SZ IZ OZ))) (Z : DiscreteSystem SZ IZ OZ)
+def IsSynthesizableTable {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    (Phi : PropertySet (LTL (Atom SZ IZ OZ))) (Z : DiscreteSystem SZ IZ OZ)
     (hOut : AlwaysOutputs Z) : Prop :=
   compileObservables Z hOut = Phi ∧ synthesizeSpec Z hOut = Z
 
-omit [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
-theorem fsm_table_synthesizable (F : FSMSystem SZ IZ OZ) :
+theorem fsm_table_synthesizable {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    (F : FSMSystem SZ IZ OZ) :
     IsSynthesizableTable (dynamicsTable F.toDiscreteSystem (fsm_alwaysOutputs F)) F.toDiscreteSystem
       (fsm_alwaysOutputs F) := by
   refine ⟨?_, rfl⟩

@@ -42,11 +42,7 @@ theorem stage1_general_verification_equivalence {IZ1 OZ1 IZ2 OZ2 : Type}
 
 /-! ## FSM templates -/
 
-variable {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
-variable [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ]
-variable [Nonempty IZ]
-
-theorem stage2_verification_equivalence (F_spec F_impl : FSMSystem SZ IZ OZ) :
+theorem stage2_verification_equivalence {SZ IZ OZ : Type} [Nonempty IZ] (F_spec F_impl : FSMSystem SZ IZ OZ) :
     VerificationEquivalence
       (FSMSatisfiesDynamics F_spec F_impl)
       (FSMIsIdentityHomomorphicImage F_spec F_impl)
@@ -56,7 +52,8 @@ theorem stage2_verification_equivalence (F_spec F_impl : FSMSystem SZ IZ OZ) :
 
 /-! ## Stage 3 templates -/
 
-theorem stage3_verification_equivalence {Z Z_impl : DiscreteSystem SZ IZ OZ}
+theorem stage3_verification_equivalence {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
+    [Nonempty IZ] {Z Z_impl : DiscreteSystem SZ IZ OZ}
     (hZ : AlwaysOutputs Z) (hImpl : AlwaysOutputs Z_impl) :
     VerificationEquivalence
       (SystemSatisfiesDynamics Z Z_impl hZ hImpl)
@@ -74,7 +71,8 @@ theorem comb_hom_implies_spec_satisfies {IZ OZ : Type}
     CombSatisfiesFunction C_impl F :=
   comb_hom_spec_satisfies_impl F w hSpec
 
-theorem fsm_hom_implies_spec_satisfies_dynamics {F_spec F_impl : FSMSystem SZ IZ OZ}
+theorem fsm_hom_implies_spec_satisfies_dynamics {SZ IZ OZ : Type} [Nonempty IZ]
+    {F_spec F_impl : FSMSystem SZ IZ OZ}
     (w : FSMIdentityHomomorphicImageWitness F_spec F_impl)
     (hSpec : FSMSatisfiesDynamics F_spec F_spec) :
     FSMSatisfiesDynamics F_spec F_impl :=

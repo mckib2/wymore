@@ -12,6 +12,22 @@ Python utilities for parsing Wymore system definitions from Lean 4 and generatin
 | `traceability.py` | Verify textbook ↔ Lean traceability tags |
 | `swarm_diagram_theme.py` | Shared colors/fonts for swarm case-study figures (matches `papers/ltl_paper/main.tex`) |
 | `render_swarm_systems.py` | Generate unified swarm verification-architecture TikZ for the paper case study |
+| `check_no_sorry.sh` | Mbse proof-quality gate: sorry/admit/axiom scan, forbidden `set_option` bans, lint-clean build |
+
+## Mbse quality gate
+
+From repo root:
+
+```bash
+make check-no-sorry   # or ./scripts/check_no_sorry.sh
+make check            # build + quality gate
+```
+
+The script scans all `Mbse/**/*.lean` files (not a fixed list), forbids blanket
+`set_option linter.unusedSectionVars false` (prefer `F.*_finite` in clause defs,
+narrow `variable` scope, or per-theorem `omit`), and fails on banned linter
+warnings from `lake build Mbse`. Set `CHECK_MBSE_STRICT=1` to fail on any
+`warning: Mbse/` line.
 
 ## Swarm case-study figure
 
