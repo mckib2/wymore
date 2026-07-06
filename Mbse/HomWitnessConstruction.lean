@@ -1,8 +1,11 @@
+import Mbse.HomSoundness
 import Mbse.FSMProperties
 import Mbse.Homomorphism
 import Mbse.FiniteWymore
 import Mbse.WymorePropertyFragment
 import Mbse.FragmentPathologyRegistry
+import Mbse.PathologyExamples
+import Mbse.SpecFromProperties
 
 /-!
 # Homomorphism witness construction (finite tiers)
@@ -17,6 +20,7 @@ General automatic discovery on infinite state is not provided; see
 namespace HomWitnessConstruction
 
 open FSMProperties PropertyFragment.FSM FSM Homomorphism WymorePropertyFragment
+  PathologyExamples SpecFromProperties
 
 variable {SZ IZ OZ : Type}
 
@@ -83,5 +87,43 @@ end VerifyMaps
 theorem synthesis_automaticHomDiscovery_blocked :
     ¬ RequiresFiniteStateEnumeration Nat :=
   FragmentPathologyRegistry.blocked_infiniteSZ
+
+/-! ## Tier C: decide extEqual → verify bi-implication -/
+
+section TierC
+
+variable [Fintype SZ] [Fintype IZ] [Fintype OZ] [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ]
+variable [Nonempty IZ]
+
+omit [Fintype SZ] [Fintype IZ] [Fintype OZ] [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ]
+  [Nonempty IZ] in
+theorem fsm_decide_and_verify (F_spec F_impl : FSMSystem SZ IZ OZ)
+    (h : checkFsmExtEqual F_spec F_impl = true) :
+    FSMIsIdentityHomomorphicImage F_spec F_impl :=
+  constructIdentityHom_from_decide F_spec F_impl h
+
+omit [Fintype SZ] [Fintype IZ] [Fintype OZ] [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ]
+  [Nonempty IZ] in
+theorem fsm_decide_and_verify_iff (F_spec F_impl : FSMSystem SZ IZ OZ) :
+    checkFsmExtEqual F_spec F_impl = true ↔ FSMIsIdentityHomomorphicImage F_spec F_impl :=
+  ⟨fun h => constructIdentityHom_from_decide F_spec F_impl h,
+   fun hHom => (checkFsmExtEqual_true_iff F_spec F_impl).mpr
+     ((fsm_extEqual_iff_identityHom F_spec F_impl).2 hHom)⟩
+
+omit [Fintype SZ] [Fintype IZ] [Fintype OZ] [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] in
+theorem fsm_decide_satisfies_iff_hom (F_spec F_impl : FSMSystem SZ IZ OZ)
+    (_h : checkFsmExtEqual F_spec F_impl = true) :
+    FSMSatisfiesDynamics F_spec F_impl ↔ FSMIsIdentityHomomorphicImage F_spec F_impl :=
+  fsm_property_iff_hom F_spec F_impl
+
+theorem fsmStay_decide_self :
+    checkFsmExtEqual PathologyExamples.fsmStay PathologyExamples.fsmStay = true :=
+  (checkFsmExtEqual_true_iff _ _).mpr ⟨fun _ => rfl, fun _ _ => rfl⟩
+
+theorem fsmStayJump_decide_fails :
+    checkFsmExtEqual PathologyExamples.fsmStay PathologyExamples.fsmJump = false := by
+  simp [checkFsmExtEqual, PathologyExamples.fsmStay_jump_not_extEqual]
+
+end TierC
 
 end HomWitnessConstruction

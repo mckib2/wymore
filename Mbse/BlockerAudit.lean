@@ -42,6 +42,7 @@ inductive PaperClaimTag where
   | infiniteState
   | propositionalLTLCorollary
   | fInMissionPhi
+  | fInTracePropertyLayer
   | executionFOSubstitutesHom
   | outputTableOnlyPhi
   | pinnedAutonomousNone
@@ -57,6 +58,7 @@ inductive ResolvedTag where
   | assertionalFOBridge
   | canonicalDisjunction
   | missionPhiSeparate
+  | tracePropertySeparate
 
 structure BlockerAuditInfo where
   tag : BlockerTag
@@ -81,7 +83,7 @@ def blockerWorkaround : BlockerTag → Option ResolvedTag
   | .infiniteSZ => some .infiniteSZExtensional
   | .partialRZ => some .partialClosedReadout
   | .readoutOnly => some .dynamicsCompleteTable
-  | .eventuallyF => some .missionPhiSeparate
+  | .eventuallyF => some .tracePropertySeparate
   | .rawBranchingNZ => some .dynamicsCompleteTable
   | .incompleteReadout => some .partialClosedReadout
   | .autonomousInputIncomplete => some .dynamicsCompleteTable
@@ -94,7 +96,7 @@ def blockerBlocksClaims : BlockerTag → List PaperClaimTag
   | .infiniteSZ => [.propositionalLTLCorollary]
   | .partialRZ => []
   | .readoutOnly => [.outputTableOnlyPhi]
-  | .eventuallyF => [.fInMissionPhi]
+  | .eventuallyF => [.fInMissionPhi, .fInTracePropertyLayer]
   | .rawBranchingNZ => [.outputTableOnlyPhi]
   | .incompleteReadout => []
   | .autonomousInputIncomplete => [.pinnedAutonomousNone]
@@ -201,6 +203,7 @@ def paperClaimStatus : PaperClaimTag → PaperClaimStatus
   | .infiniteState => .safe
   | .propositionalLTLCorollary => .qualified
   | .fInMissionPhi => .qualified
+  | .fInTracePropertyLayer => .qualified
   | .executionFOSubstitutesHom => .blocked
   | .outputTableOnlyPhi => .blocked
   | .pinnedAutonomousNone => .blocked
@@ -219,6 +222,20 @@ theorem paperClaim_executionFO_blocked :
 
 theorem paperClaim_barePhi_blocked :
     paperClaimStatus .barePhiUniqueSpec = .blocked := rfl
+
+/-- Map impossibility / semantic-limit blockers to `BiImplicationFailures` theorem names. -/
+def biImpFailsTheorem : BlockerTag → Option String
+  | .readoutOnly => some "biImpFails_readoutOnly"
+  | .barePhiUniqueZ => some "biImpFails_barePhi"
+  | .executionFOHomCompleteness => some "biImpFails_executionFO"
+  | .autonomousInputIncomplete => some "biImpFails_autonomousNone"
+  | .pinnedDynamicsIncomplete => some "biImpFails_pinnedDynamics"
+  | .incompleteReadout => some "biImpFails_incompleteReadout"
+  | .rawBranchingNZ => some "biImpFails_rawBranchingNZ"
+  | .eventuallyF => some "biImpFails_eventuallyF_tracePropertyLimit"
+  | .infiniteSZ => some "biImpFails_infiniteSZ_excludes_pinned"
+  | .partialRZ => some "biImpFails_partialRZ_excludes_pinned"
+  | .foAssertionalCompleteness => none
 
 theorem paperClaim_classicalEquiv_open :
     paperClaimStatus .classicalAssertionalEquivalence = .openQuestion := rfl

@@ -15,6 +15,8 @@ import Mbse.ObservablesFromSpec
 import Mbse.SystemToLTL
 import Mbse.Homomorphism
 import Mbse.HomomorphismProperties
+import Mbse.TracePropertyLayer
+import Mbse.HomWitnessConstruction
 
 /-!
 # General Wymore property characterization
@@ -28,6 +30,9 @@ namespace WymoreCharacterization
 
 open WymorePropertyFragment WymorePathologyExamples FragmentPathologyRegistry
   PropertyFragmentSpec PropertySemantics HomSoundness GeneralProperties
+  ExtensionalDynamicsFragment SpecFromProperties HimsySynthesis GeneralCharacterization
+  ObservablesFromSpec SystemToLTL Homomorphism HomomorphismProperties
+  TracePropertyLayer HomWitnessConstruction PropertyFragment.FSM
   SystemToFormula PropertyFragment.General PropertyFragment.FSM FSMProperties PathologyExamples
   TemporalLogic ExtensionalDynamicsFragment FOLTL SpecFromProperties HimsySynthesis
   GeneralCharacterization ObservablesFromSpec SystemToLTL FSM Homomorphism HomomorphismProperties
@@ -242,6 +247,13 @@ theorem stageWymore_extensional_verification_equivalence {SZ1 IZ1 OZ1 SZ2 IZ2 OZ
       (IsHomomorphicImage (synthesizeExtensionalSpec Z) Z_impl)
       (PhiAdequateExtensionalCross Z) :=
   extensional_cross_verification_equivalence
+
+theorem stageWymore_counterSystem_gated_verification :
+    VerificationEquivalence
+      (SystemSatisfiesExtensionalCross (synthesizeExtensionalSpec counterSystem) counterElab)
+      (IsHomomorphicImage (synthesizeExtensionalSpec counterSystem) counterElab)
+      (PhiAdequateExtensionalCross counterSystem) :=
+  stageWymore_extensional_verification_equivalence
 
 theorem stageWymore_extensional_verification_equivalence_open {SZ IZ OZ : Type}
     {Z Z_impl : DiscreteSystem SZ IZ OZ}
@@ -683,5 +695,23 @@ theorem stageWymore_synthesizeExtensional_eq_synthesize {SZ IZ OZ : Type} [Finty
     [Fintype IZ] [Fintype OZ] (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) :
     synthesizeExtensionalSpec Z = synthesizeSpec Z hOut :=
   stage4_synthesizeExtensional_eq_synthesize Z hOut
+
+/-! ## Honest bi-implication tiers (TracePropertyLayer, HomWitness Tier C) -/
+
+theorem stageWymore_traceProperty_separate_from_hom :
+    FSMSatisfiesOutputTable PathologyExamples.fsmStay PathologyExamples.fsmStay ∧
+      FSMSatisfiesOutputTable PathologyExamples.fsmStay PathologyExamples.fsmJump ∧
+        (SystemToLTL.fsmTrace PathologyExamples.fsmJump 0 (fun _ => 0)).models
+            (LTL.atom (.state 1)).F ∧
+          ¬ (SystemToLTL.fsmTrace PathologyExamples.fsmStay 0 (fun _ => 0)).models
+              (LTL.atom (.state 1)).F ∧
+            ¬ FSMIsIdentityHomomorphicImage PathologyExamples.fsmStay PathologyExamples.fsmJump :=
+  TracePropertyLayer.traceProperty_separate_from_hom
+
+theorem stageWymore_fsm_decide_and_verify {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
+    [Fintype OZ] [DecidableEq SZ] [DecidableEq IZ] [DecidableEq OZ] [Nonempty IZ]
+    (F_spec F_impl : FSMSystem SZ IZ OZ) (h : HomWitnessConstruction.checkFsmExtEqual F_spec F_impl = true) :
+    FSMIsIdentityHomomorphicImage F_spec F_impl :=
+  HomWitnessConstruction.fsm_decide_and_verify F_spec F_impl h
 
 end WymoreCharacterization

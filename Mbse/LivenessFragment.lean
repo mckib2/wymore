@@ -12,7 +12,8 @@ Mission-level `F` formulas are expressible in [`TemporalLogic`](TemporalLogic.le
 **not** part of the hom↔Φ bi-implication ladder.
 
 * Trace-level: `blocked_eventuallyF` (semantic limit on synthetic traces)
-* Wymore FSM-level: `blocked_eventuallyF_wymore` (G-only output table + `F` mission)
+* Wymore FSM-level: `blocked_eventuallyF_wymore` (G-only output table + `F` trace property)
+* Trace-property layer API: [`TracePropertyLayer`](TracePropertyLayer.lean) (`traceProperty_separate_from_hom`)
 * Full hom↔Φ with `F` in dynamics Φ: **not established** in this library
 -/
 
@@ -77,5 +78,14 @@ theorem fsm_extEqual_preserves_F_state_mission {SZ IZ OZ : Type}
   simp only [satisfiesAt, SystemToLTL.fsmTrace] at ht' ⊢
   rw [fsm_extEqual_stateTraj h s0 f t] at ht'
   exact ht'
+
+/-- Alias: trace properties checked outside dynamics-encoding ladder. -/
+theorem traceProperty_separate_from_hom :
+    FSMSatisfiesOutputTable fsmStay fsmStay ∧
+      FSMSatisfiesOutputTable fsmStay fsmJump ∧
+        (SystemToLTL.fsmTrace fsmJump 0 (fun _ => 0)).models (LTL.atom (.state 1)).F ∧
+          ¬ (SystemToLTL.fsmTrace fsmStay 0 (fun _ => 0)).models (LTL.atom (.state 1)).F ∧
+            ¬ FSMIsIdentityHomomorphicImage fsmStay fsmJump :=
+  liveness_no_hom_with_F_mission
 
 end LivenessFragment
