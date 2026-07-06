@@ -150,6 +150,19 @@ theorem resolved_partialAssertionalFO :
     (partialDynamicsOpen_iff_hom (readoutSpecCompleteOpen_of counterClosedReadout)).1
       counterClosedReadout_satisfiesOpen_refl⟩
 
+theorem resolved_partialCompileUnification :
+    SystemSatisfiesPartialDynamicsCompiled counterClosedReadout counterClosedReadout
+      (compileObservablesPartialOpen counterClosedReadout) ∧
+      SystemSatisfiesSpecPartialAssertionalFOAt counterClosedReadout counterClosedReadout 0
+        counterClosedReadoutInput ∧
+      (∀ s0 f,
+        SystemSatisfiesPartialDynamicsCompiled counterClosedReadout counterClosedReadout
+          (compileObservablesPartialOpen counterClosedReadout) ↔
+          SystemSatisfiesSpecPartialAssertionalFOAt counterClosedReadout counterClosedReadout s0 f) :=
+  ⟨counterClosedReadout_satisfiesCompiled_refl, counterClosedReadout_satisfiesPartialAssertionalFO_refl,
+    fun s0 f =>
+      compileObservablesPartial_schema (readoutSpecCompleteOpen_of counterClosedReadout) s0 f⟩
+
 /-- Same-type surjective non-identity hom satisfies Cross, not pointwise Extensional. -/
 theorem resolved_sameTypeSurjectiveHomSeparation :
     SameTypeHomomorphicImage swapSpecSys swapImplSys ∧

@@ -94,7 +94,12 @@ def partialOpenFragment : FragmentSpec where
   dynamicsComplete := true
   homomorphismVisibleAtoms := [.stateAtom, .inputAtom, .outputAtom]
 
-/-- Partial open (predicate-indexed): infinite-capable assertional laws without `Fintype`. -/
+/-- Partial open (predicate-indexed): infinite-capable assertional laws without `Fintype`.
+
+Paired compile objects: LTL [`compileObservablesPartialOpen`] and FO
+[`compileObservablesPartialAssertionalFO`] with proved satisfaction equivalence
+(`compileObservablesPartial_schema`). FO laws use four guarded `stateLaw` bundles
+mirroring the LTL clause shapes. -/
 def partialOpenPredicateFragment : FragmentSpec where
   allowedConnectives := [.imp, .GConn, .XConn]
   disjunctionPolicy := .canonicalCommitment

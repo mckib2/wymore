@@ -30,6 +30,16 @@ def compileObservablesAssertionalFO {SZ IZ OZ : Type}
     (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) (s0 : SZ) : FOLFormula SZ IZ OZ :=
   compileAssertionalFO Z_spec Z_impl s0
 
+/-- Partial-open FO assertional compile: execution FO plus four guarded clause laws. -/
+noncomputable def compileObservablesPartialAssertionalFO {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) (s0 : SZ) : FOLFormula SZ IZ OZ :=
+  compilePartialAssertionalFO Z_spec Z_impl s0
+
+theorem compileObservablesPartialAssertionalFO_def {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) (s0 : SZ) :
+    compileObservablesPartialAssertionalFO Z_spec Z_impl s0 =
+      compilePartialAssertionalFO Z_spec Z_impl s0 := rfl
+
 /-- FO execution property set compiled from a reference system at initial state `s0`. -/
 def compileObservablesFO {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) :
     FOLFormula SZ IZ OZ :=
@@ -1186,12 +1196,18 @@ theorem phiAdequatePartialOpenPred_iff {SZ IZ OZ : Type} [Fintype SZ] [Fintype I
 
 /-! ## Partial-open assertional FO -/
 
+theorem partialAssertionalLaws_iff_extEqual {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ} (s0 : SZ) (f : ITZW IZ) (g : STZ SZ) (y : OTZ OZ) :
+    SatisfiesFO (compilePartialAssertionalLaws Z_spec Z_impl) Z_impl s0 f g y ↔
+      PartialExtEqual Z_spec Z_impl := by
+  simp only [PartialExtEqual, partialAssertionalLaws_iff]
+
 @[simp]
 theorem satisfiesFO_compilePartialAssertionalLaws {SZ IZ OZ : Type}
     {Z_spec Z_impl : DiscreteSystem SZ IZ OZ} (s0 : SZ) (f : ITZW IZ) (g : STZ SZ) (y : OTZ OZ) :
     SatisfiesFO (compilePartialAssertionalLaws Z_spec Z_impl) Z_impl s0 f g y ↔
-      PartialExtEqual Z_spec Z_impl := by
-  simp only [compilePartialAssertionalLaws, PartialExtEqual, SatisfiesFO]
+      PartialExtEqual Z_spec Z_impl :=
+  partialAssertionalLaws_iff_extEqual (Z_spec := Z_spec) (Z_impl := Z_impl) s0 f g y
 
 @[simp]
 theorem satisfiesFO_compilePartialAssertionalFO {SZ IZ OZ : Type}
@@ -1239,6 +1255,28 @@ theorem partialAssertionalFO_at_iff_hom {SZ IZ OZ : Type} [DecidableEq IZ]
       PartialIsIdentityHomomorphicImage Z_spec Z_impl :=
   (partialAssertionalFO_at_iff_partialDynamicsOpen hComplete s0 f).trans
     (partialDynamicsOpen_iff_hom hComplete)
+
+theorem partialAssertionalFO_at_iff_partialDynamicsCompiled {SZ IZ OZ : Type} [DecidableEq IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hComplete : ReadoutSpecCompleteOpen Z_spec) (s0 : SZ) (f : ITZW IZ) :
+    SystemSatisfiesSpecPartialAssertionalFOAt Z_spec Z_impl s0 f ↔
+      SystemSatisfiesPartialDynamicsCompiled Z_spec Z_impl (compileObservablesPartialOpen Z_spec) :=
+  (partialAssertionalFO_at_iff_partialDynamicsOpen hComplete s0 f).trans
+    (partialDynamicsCompiled_iff_open).symm
+
+theorem partialDynamicsCompiled_iff_partialAssertionalFOAt {SZ IZ OZ : Type} [DecidableEq IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hComplete : ReadoutSpecCompleteOpen Z_spec) (s0 : SZ) (f : ITZW IZ) :
+    SystemSatisfiesPartialDynamicsCompiled Z_spec Z_impl (compileObservablesPartialOpen Z_spec) ↔
+      SystemSatisfiesSpecPartialAssertionalFOAt Z_spec Z_impl s0 f :=
+  (partialAssertionalFO_at_iff_partialDynamicsCompiled hComplete s0 f).symm
+
+theorem compileObservablesPartial_schema {SZ IZ OZ : Type} [DecidableEq IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hComplete : ReadoutSpecCompleteOpen Z_spec) (s0 : SZ) (f : ITZW IZ) :
+    SystemSatisfiesPartialDynamicsCompiled Z_spec Z_impl (compileObservablesPartialOpen Z_spec) ↔
+      SystemSatisfiesSpecPartialAssertionalFOAt Z_spec Z_impl s0 f :=
+  partialDynamicsCompiled_iff_partialAssertionalFOAt hComplete s0 f
 
 /-! ## Finite enumeration requires `Fintype` -/
 def RequiresFiniteStateEnumeration (SZ : Type) : Prop := Nonempty (Fintype SZ)

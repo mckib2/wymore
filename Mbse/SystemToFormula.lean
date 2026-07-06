@@ -59,18 +59,55 @@ def compileAssertionalFO {SZ IZ OZ : Type}
     (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) (s0 : SZ) : FOLFormula SZ IZ OZ :=
   .and (compileSystemFO Z_spec s0) (compileExtensionalLaws Z_spec Z_impl)
 
-/-- Spec-relative partial-open laws as state-space `stateLaw` bundles.
-
-Readout agreement is stated pointwise (`RZ` equality), equivalent to the guarded
-`match Z_spec.RZ s with ...` formulation under partial-open semantics. -/
-def compilePartialAssertionalLaws {SZ IZ OZ : Type}
+/-- Open readout clause: spec `some o` implies impl `some o`. -/
+def compilePartialReadoutOpenLaw {SZ IZ OZ : Type}
     (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) : FOLFormula SZ IZ OZ :=
-  .and
-    (.stateLaw fun s => Z_impl.RZ s = Z_spec.RZ s)
-    (.stateLaw fun s => ∀ oi, Z_impl.NZ s oi = Z_spec.NZ s oi)
+  .stateLaw fun s => ∀ o, Z_spec.RZ s = some o → Z_impl.RZ s = some o
+
+/-- Closed readout clause: spec `none` implies impl `none`. -/
+def compilePartialReadoutClosedLaw {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) : FOLFormula SZ IZ OZ :=
+  .stateLaw fun s => Z_spec.RZ s = none → Z_impl.RZ s = none
+
+/-- Autonomous input clause: agreement at `NZ s none`. -/
+def compilePartialAutonomousLaw {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) : FOLFormula SZ IZ OZ :=
+  .stateLaw fun s => Z_impl.NZ s none = Z_spec.NZ s none
+
+/-- Transition clause: agreement at `NZ s (some i)` for all inputs `i`. -/
+def compilePartialTransitionLaw {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) : FOLFormula SZ IZ OZ :=
+  .stateLaw fun s => ∀ i, Z_impl.NZ s (some i) = Z_spec.NZ s (some i)
+
+/-- Four-clause partial-open laws (includes transition when inputs are nonempty). -/
+def compilePartialAssertionalLawsCore {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) : FOLFormula SZ IZ OZ :=
+  .and (compilePartialReadoutOpenLaw Z_spec Z_impl)
+    (.and (compilePartialReadoutClosedLaw Z_spec Z_impl)
+      (.and (compilePartialAutonomousLaw Z_spec Z_impl)
+        (compilePartialTransitionLaw Z_spec Z_impl)))
+
+/-- Readout + autonomous laws only (empty input alphabet). -/
+def compilePartialAssertionalLawsNoTransition {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) : FOLFormula SZ IZ OZ :=
+  .and (compilePartialReadoutOpenLaw Z_spec Z_impl)
+    (.and (compilePartialReadoutClosedLaw Z_spec Z_impl)
+      (compilePartialAutonomousLaw Z_spec Z_impl))
+
+/-- Spec-relative partial-open laws as four guarded `stateLaw` bundles.
+
+Implication-shaped readout and split `NZ` laws mirror [`PartialDynamicsOpenCompile`]
+clause shapes in `WymorePropertyFragment`. When `IZ` is empty, the transition bundle
+is omitted (matching compiled LTL satisfaction). -/
+noncomputable def compilePartialAssertionalLaws {SZ IZ OZ : Type}
+    (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) : FOLFormula SZ IZ OZ := by
+  classical
+  by_cases _h : Nonempty IZ
+  · exact compilePartialAssertionalLawsCore Z_spec Z_impl
+  · exact compilePartialAssertionalLawsNoTransition Z_spec Z_impl
 
 /-- Partial-open assertional FO: execution plus guarded readout and dynamics laws. -/
-def compilePartialAssertionalFO {SZ IZ OZ : Type}
+noncomputable def compilePartialAssertionalFO {SZ IZ OZ : Type}
     (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) (s0 : SZ) : FOLFormula SZ IZ OZ :=
   .and (compileSystemFO Z_spec s0) (compilePartialAssertionalLaws Z_spec Z_impl)
 
@@ -131,6 +168,80 @@ theorem satisfiesFO_compileAssertionalFO {SZ IZ OZ : Type}
     exact ⟨(satisfiesFO_compileSystemFO Z_spec s0 f g y).mp hExec, hLaws⟩
   · rintro ⟨hExec, hLaws⟩
     exact ⟨(satisfiesFO_compileSystemFO Z_spec s0 f g y).mpr hExec, hLaws⟩
+
+/-- Open + closed readout implication bundles ↔ pointwise `RZ` agreement. -/
+theorem partialReadoutGuardedPair_iff {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ} :
+    (∀ s o, Z_spec.RZ s = some o → Z_impl.RZ s = some o) ∧
+      (∀ s, Z_spec.RZ s = none → Z_impl.RZ s = none) ↔
+      (∀ s, Z_impl.RZ s = Z_spec.RZ s) := by
+  constructor
+  · intro ⟨hOpen, hClosed⟩
+    intro s
+    cases eq : Z_spec.RZ s with
+    | none => exact eq ▸ hClosed s eq
+    | some o => exact eq ▸ hOpen s o eq
+  · intro h
+    refine ⟨fun s o heq => (h s).trans heq, fun s heq => (h s).trans heq⟩
+
+/-- Autonomous + transition `NZ` bundles ↔ pointwise `NZ` agreement on all `Option IZ`. -/
+theorem partialNZGuardedPair_iff {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ} :
+    (∀ s, Z_impl.NZ s none = Z_spec.NZ s none) ∧
+      (∀ s i, Z_impl.NZ s (some i) = Z_spec.NZ s (some i)) ↔
+      (∀ s oi, Z_impl.NZ s oi = Z_spec.NZ s oi) := by
+  constructor
+  · intro ⟨hAuto, hTrans⟩ s oi
+    cases oi with
+    | none => exact hAuto s
+    | some i => exact hTrans s i
+  · intro h
+    refine ⟨fun s => h s none, fun s i => h s (some i)⟩
+
+theorem partialAssertionalLawsCore_iff {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ} (s0 : SZ) (f : ITZW IZ) (g : STZ SZ) (y : OTZ OZ) :
+    SatisfiesFO (compilePartialAssertionalLawsCore Z_spec Z_impl) Z_impl s0 f g y ↔
+      (∀ s, Z_impl.RZ s = Z_spec.RZ s) ∧
+        (∀ s oi, Z_impl.NZ s oi = Z_spec.NZ s oi) := by
+  simp only [compilePartialAssertionalLawsCore, compilePartialReadoutOpenLaw,
+    compilePartialReadoutClosedLaw, compilePartialAutonomousLaw, compilePartialTransitionLaw,
+    SatisfiesFO]
+  constructor
+  · intro ⟨hOpen, hClosed, hAuto, hTrans⟩
+    exact ⟨partialReadoutGuardedPair_iff.mp ⟨hOpen, hClosed⟩, partialNZGuardedPair_iff.mp ⟨hAuto, hTrans⟩⟩
+  · intro ⟨hR, hN⟩
+    rcases partialReadoutGuardedPair_iff.mpr hR with ⟨hOpen, hClosed⟩
+    rcases partialNZGuardedPair_iff.mpr hN with ⟨hAuto, hTrans⟩
+    exact ⟨hOpen, hClosed, hAuto, hTrans⟩
+
+theorem partialAssertionalLawsNoTransition_iff {SZ IZ OZ : Type} [IsEmpty IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ} (s0 : SZ) (f : ITZW IZ) (g : STZ SZ) (y : OTZ OZ) :
+    SatisfiesFO (compilePartialAssertionalLawsNoTransition Z_spec Z_impl) Z_impl s0 f g y ↔
+      (∀ s, Z_impl.RZ s = Z_spec.RZ s) ∧
+        (∀ s oi, Z_impl.NZ s oi = Z_spec.NZ s oi) := by
+  simp only [compilePartialAssertionalLawsNoTransition, compilePartialReadoutOpenLaw,
+    compilePartialReadoutClosedLaw, compilePartialAutonomousLaw, SatisfiesFO]
+  constructor
+  · intro ⟨hOpen, hClosed, hAuto⟩
+    refine ⟨partialReadoutGuardedPair_iff.mp ⟨hOpen, hClosed⟩, fun s oi => ?_⟩
+    cases oi with
+    | none => exact hAuto s
+    | some i => exact False.elim (IsEmpty.false i)
+  · intro ⟨hR, hN⟩
+    rcases partialReadoutGuardedPair_iff.mpr hR with ⟨hOpen, hClosed⟩
+    exact ⟨hOpen, hClosed, fun s => hN s none⟩
+
+theorem partialAssertionalLaws_iff {SZ IZ OZ : Type}
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ} (s0 : SZ) (f : ITZW IZ) (g : STZ SZ) (y : OTZ OZ) :
+    SatisfiesFO (compilePartialAssertionalLaws Z_spec Z_impl) Z_impl s0 f g y ↔
+      (∀ s, Z_impl.RZ s = Z_spec.RZ s) ∧
+        (∀ s oi, Z_impl.NZ s oi = Z_spec.NZ s oi) := by
+  classical
+  unfold compilePartialAssertionalLaws
+  split_ifs with hne
+  · exact partialAssertionalLawsCore_iff (Z_spec := Z_spec) (Z_impl := Z_impl) s0 f g y
+  · haveI : IsEmpty IZ := ⟨fun x => hne ⟨x⟩⟩
+    exact partialAssertionalLawsNoTransition_iff (Z_spec := Z_spec) (Z_impl := Z_impl) s0 f g y
 
 /-- Impl satisfies spec-side assertional FO at `(s0, f)` on canonical impl trajectories. -/
 def SystemSatisfiesSpecAssertionalFOAt {SZ IZ OZ : Type}

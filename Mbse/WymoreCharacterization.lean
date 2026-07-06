@@ -275,6 +275,20 @@ theorem stageWymore_partialDynamicsCompiled_iff_open {SZ IZ OZ : Type} [Decidabl
       SystemSatisfiesPartialDynamicsOpen Z_spec Z_impl :=
   partialDynamicsCompiled_iff_open
 
+theorem stageWymore_partialAssertionalFO_iff_partialDynamicsCompiled {SZ IZ OZ : Type} [DecidableEq IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hComplete : ReadoutSpecCompleteOpen Z_spec) (s0 : SZ) (f : ITZW IZ) :
+    SystemSatisfiesSpecPartialAssertionalFOAt Z_spec Z_impl s0 f ↔
+      SystemSatisfiesPartialDynamicsCompiled Z_spec Z_impl (compileObservablesPartialOpen Z_spec) :=
+  partialAssertionalFO_at_iff_partialDynamicsCompiled hComplete s0 f
+
+theorem stageWymore_compileObservablesPartial_schema {SZ IZ OZ : Type} [DecidableEq IZ]
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
+    (hComplete : ReadoutSpecCompleteOpen Z_spec) (s0 : SZ) (f : ITZW IZ) :
+    SystemSatisfiesPartialDynamicsCompiled Z_spec Z_impl (compileObservablesPartialOpen Z_spec) ↔
+      SystemSatisfiesSpecPartialAssertionalFOAt Z_spec Z_impl s0 f :=
+  compileObservablesPartial_schema hComplete s0 f
+
 /-! ## Partial open fragment -/
 
 theorem stageWymore_partial_adequate {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
@@ -365,6 +379,17 @@ theorem stageWymore_resolved_partialAssertionalFO :
       counterClosedReadoutInput ∧
       PartialIsIdentityHomomorphicImage counterClosedReadout counterClosedReadout :=
   resolved_partialAssertionalFO
+
+theorem stageWymore_resolved_partialCompileUnification :
+    SystemSatisfiesPartialDynamicsCompiled counterClosedReadout counterClosedReadout
+      (compileObservablesPartialOpen counterClosedReadout) ∧
+      SystemSatisfiesSpecPartialAssertionalFOAt counterClosedReadout counterClosedReadout 0
+        counterClosedReadoutInput ∧
+      (∀ s0 f,
+        SystemSatisfiesPartialDynamicsCompiled counterClosedReadout counterClosedReadout
+          (compileObservablesPartialOpen counterClosedReadout) ↔
+          SystemSatisfiesSpecPartialAssertionalFOAt counterClosedReadout counterClosedReadout s0 f) :=
+  resolved_partialCompileUnification
 
 theorem stageWymore_partialDynamicsOpen_iff_hom {SZ IZ OZ : Type} [DecidableEq IZ]
     {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
@@ -595,6 +620,25 @@ theorem wymore_verification_partial_assertional_fo {SZ IZ OZ : Type} [DecidableE
     SystemSatisfiesSpecPartialAssertionalFOAt Z_spec Z_impl s0 f ↔
       PartialIsIdentityHomomorphicImage Z_spec Z_impl :=
   partialAssertionalFO_at_iff_hom hComplete s0 f
+
+theorem wymore_verification_partial_compiled {SZ IZ OZ : Type} [DecidableEq IZ]
+    {Z Z_impl : DiscreteSystem SZ IZ OZ}
+    (hComplete : ReadoutSpecCompleteOpen Z)
+    (_hAdeq : PhiAdequatePartialOpenPred Z) :
+    SystemSatisfiesPartialDynamicsCompiled Z Z_impl (compileObservablesPartialOpen Z) ↔
+      PartialIsIdentityHomomorphicImage (synthesizePartialSpec Z) Z_impl := by
+  simp [synthesizePartialSpec, partialDynamicsCompiled_iff_hom hComplete]
+
+theorem wymore_verification_partial_unified {SZ IZ OZ : Type} [DecidableEq IZ]
+    {Z Z_impl : DiscreteSystem SZ IZ OZ}
+    (hComplete : ReadoutSpecCompleteOpen Z) (s0 : SZ) (f : ITZW IZ)
+    (_hAdeq : PhiAdequatePartialOpenPred Z) :
+    (SystemSatisfiesPartialDynamicsCompiled Z Z_impl (compileObservablesPartialOpen Z) ↔
+        SystemSatisfiesSpecPartialAssertionalFOAt Z Z_impl s0 f) ∧
+      (SystemSatisfiesPartialDynamicsCompiled Z Z_impl (compileObservablesPartialOpen Z) ↔
+        PartialIsIdentityHomomorphicImage (synthesizePartialSpec Z) Z_impl) :=
+  ⟨compileObservablesPartial_schema hComplete s0 f,
+    by simp [synthesizePartialSpec, partialDynamicsCompiled_iff_hom hComplete]⟩
 
 theorem wymore_verification_extensional_cross {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     {Z : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}

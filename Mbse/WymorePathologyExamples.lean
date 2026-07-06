@@ -378,6 +378,14 @@ theorem counterClosedReadout_satisfiesPartialAssertionalFO_refl :
     (readoutSpecCompleteOpen_of counterClosedReadout) 0 counterClosedReadoutInput).2
     counterClosedReadout_satisfiesOpen_refl
 
+theorem counterClosedReadout_satisfiesCompiled_iff_partialAssertionalFO :
+    SystemSatisfiesPartialDynamicsCompiled counterClosedReadout counterClosedReadout
+      (compileObservablesPartialOpen counterClosedReadout) ↔
+      SystemSatisfiesSpecPartialAssertionalFOAt counterClosedReadout counterClosedReadout 0
+        counterClosedReadoutInput :=
+  compileObservablesPartial_schema (readoutSpecCompleteOpen_of counterClosedReadout) 0
+    counterClosedReadoutInput
+
 theorem counterClosedReadout_resolved :
     ¬ AlwaysOutputs counterClosedReadout ∧
       SystemSatisfiesPartialDynamicsOpen counterClosedReadout counterClosedReadout ∧
