@@ -31,6 +31,7 @@ import Mbse.WymorePathologyExamples
 import Mbse.WymoreCharacterization
 import Mbse.FragmentPathologyRegistry
 import Mbse.ExtensionalDynamicsFragment
+import Mbse.PartialDynamicsHomFragment
 import Mbse.HimsySynthesis
 import Mbse.BlockerAudit
 import Mbse.SynthesisPipeline

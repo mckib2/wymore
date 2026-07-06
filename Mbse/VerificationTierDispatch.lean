@@ -11,6 +11,7 @@ import Mbse.PathologyExamples
 import Mbse.FiniteWymore
 import Mbse.CounterSystemVerification
 import Mbse.ExtensionalDynamicsFragment
+import Mbse.PartialDynamicsHomFragment
 import Mbse.SpecFromProperties
 import Mbse.GeneralProperties
 import Mbse.PropertyFragmentSpec
@@ -26,7 +27,7 @@ namespace VerificationTierDispatch
 
 open BlockerAudit WymoreCharacterization PropertyFragmentSpec FragmentPathologyRegistry
   BiImplicationFailures CounterSystemVerification ExtensionalDynamicsFragment
-  WymorePropertyFragment WymorePathologyExamples HimsySynthesis PropertySemantics
+  PartialDynamicsHomFragment WymorePropertyFragment WymorePathologyExamples HimsySynthesis PropertySemantics
   SpecFromProperties GeneralProperties PropertyFragment.General PathologyExamples FSM
   HomSoundness
 
@@ -34,6 +35,7 @@ inductive VerificationTier
   | pinnedFinite
   | partialFinite
   | partialOpen
+  | partialHom
   | extensionalOpen
   | extensionalCross
   | himsy
@@ -42,6 +44,7 @@ def tierRequiresFiniteEnum : VerificationTier → Bool
   | .pinnedFinite => true
   | .partialFinite => true
   | .partialOpen => false
+  | .partialHom => false
   | .extensionalOpen => false
   | .extensionalCross => false
   | .himsy => false
@@ -50,6 +53,7 @@ def tierRequiresAlwaysOutputs : VerificationTier → Bool
   | .pinnedFinite => true
   | .partialFinite => false
   | .partialOpen => false
+  | .partialHom => false
   | .extensionalOpen => true
   | .extensionalCross => false
   | .himsy => false
@@ -58,6 +62,7 @@ def tierRequiresReadoutComplete : VerificationTier → Bool
   | .pinnedFinite => false
   | .partialFinite => true
   | .partialOpen => false
+  | .partialHom => false
   | .extensionalOpen => false
   | .extensionalCross => false
   | .himsy => false
@@ -68,10 +73,13 @@ def tierApplicable (t : VerificationTier) {SZ IZ OZ : Type}
   | .pinnedFinite => RequiresFiniteStateEnumeration SZ ∧ AlwaysOutputs Z
   | .partialFinite => RequiresFiniteStateEnumeration SZ
   | .partialOpen => True
+  | .partialHom => True
   | .extensionalOpen => AlwaysOutputs Z
   | .extensionalCross => True
   | .himsy => True
 
+/-- Heuristic tier recommendation. Default infinite-state closed-readout systems to hom
+headline (`.partialHom`); finite same-type closed-readout to shared fixed-table (`.partialOpen`). -/
 noncomputable def recommendedTier (Z : DiscreteSystem SZ IZ OZ) : VerificationTier := by
   classical
   by_cases hFin : RequiresFiniteStateEnumeration SZ
@@ -80,7 +88,7 @@ noncomputable def recommendedTier (Z : DiscreteSystem SZ IZ OZ) : VerificationTi
     · exact .partialOpen
   · by_cases hOut : AlwaysOutputs Z
     · exact .extensionalOpen
-    · exact .extensionalCross
+    · exact .partialHom
 
 theorem recommendedTier_counterSystem :
     recommendedTier counterSystem = .extensionalOpen := by
@@ -149,20 +157,24 @@ theorem dispatch_partial_readoutComplete {SZ IZ OZ : Type} [Fintype SZ] [Fintype
 
 theorem dispatch_partial_open {SZ IZ OZ : Type} [DecidableEq IZ]
     {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
-    (hComplete : ReadoutSpecCompleteOpen Z_spec)
     (_hTier : tierApplicable (.partialOpen : VerificationTier) Z_spec) :
     SystemSatisfiesPartialDynamicsOpen Z_spec Z_impl ↔
       PartialIsIdentityHomomorphicImage Z_spec Z_impl :=
-  wymore_verification_partial_open hComplete
+  wymore_verification_partial_open
+
+theorem dispatch_partial_hom {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z_spec : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}
+    (_hTier : tierApplicable (.partialHom : VerificationTier) Z_spec) :
+    SystemSatisfiesPartialDynamicsHom Z_spec Z_impl ↔
+      IsHomomorphicImage Z_spec Z_impl :=
+  wymore_verification_partial_hom
 
 theorem dispatch_partial_compiled {SZ IZ OZ : Type} [DecidableEq IZ]
     {Z Z_impl : DiscreteSystem SZ IZ OZ}
-    (hComplete : ReadoutSpecCompleteOpen Z)
-    (_hTier : tierApplicable (.partialOpen : VerificationTier) Z)
-    (hAdeq : PhiAdequatePartialOpenPred Z) :
+    (_hTier : tierApplicable (.partialOpen : VerificationTier) Z) :
     SystemSatisfiesPartialDynamicsCompiled Z Z_impl (compileObservablesPartialOpen Z) ↔
       PartialIsIdentityHomomorphicImage (synthesizePartialSpec Z) Z_impl :=
-  wymore_verification_partial_compiled hComplete hAdeq
+  wymore_verification_partial_compiled
 
 theorem dispatch_extensional_open {SZ IZ OZ : Type}
     {Z Z_impl : DiscreteSystem SZ IZ OZ}
@@ -201,7 +213,7 @@ theorem dispatch_counterSystem
 
 theorem recommendedTier_correct_counterSystem :
     tierApplicable (recommendedTier counterSystem) counterSystem ∧
-      tierApplicable (.extensionalCross : VerificationTier) counterSystem := by
+      tierApplicable (.partialHom : VerificationTier) counterSystem := by
   constructor
   · simp [recommendedTier_counterSystem, tierApplicable, counterSystem_alwaysOutputs]
   · simp [tierApplicable]

@@ -94,12 +94,13 @@ def partialOpenFragment : FragmentSpec where
   dynamicsComplete := true
   homomorphismVisibleAtoms := [.stateAtom, .inputAtom, .outputAtom]
 
-/-- Partial open (predicate-indexed): infinite-capable assertional laws without `Fintype`.
+/-- Partial open (predicate-indexed): shared fixed-table specialization when spec and impl
+share `(S,I,O)` with literal impl-state atoms.
 
 Paired compile objects: LTL [`compileObservablesPartialOpen`] and FO
 [`compileObservablesPartialAssertionalFO`] with proved satisfaction equivalence
-(`compileObservablesPartial_schema`). FO laws use four guarded `stateLaw` bundles
-mirroring the LTL clause shapes. -/
+(`compileObservablesPartial_schema`). Collapses to the hom headline tier under partial
+identity hom (`PartialDynamicsHomFragment.partialDynamicsHom_iff_open_of_identityHom`). -/
 def partialOpenPredicateFragment : FragmentSpec where
   allowedConnectives := [.imp, .GConn, .XConn]
   disjunctionPolicy := .canonicalCommitment
@@ -113,6 +114,27 @@ theorem partialOpenPredicate_no_finite_enum :
 
 theorem partialOpenPredicate_dynamicsComplete :
     partialOpenPredicateFragment.dynamicsComplete = true := rfl
+
+/-- Hom-relative partial dynamics (headline tier): surjective Def 4.3 hom, predicate-indexed
+spec clauses.
+
+Semantic satisfaction coincides with [`SystemSatisfiesExtensionalCross`]
+(`PartialDynamicsHomFragment.partialDynamicsHom_eq_extensionalCross`). Primary Wymore FC
+hom↔Φ bi-implication. The shared fixed-table tier (`partialOpenPredicateFragment`) is the
+same-type identity specialization. -/
+def partialHomPredicateFragment : FragmentSpec where
+  allowedConnectives := [.imp, .GConn, .XConn]
+  disjunctionPolicy := .canonicalCommitment
+  eventuallyPolicy := .excluded
+  finiteClauseEnumeration := false
+  dynamicsComplete := true
+  homomorphismVisibleAtoms := [.stateAtom, .inputAtom, .outputAtom]
+
+theorem partialHomPredicate_no_finite_enum :
+    partialHomPredicateFragment.finiteClauseEnumeration = false := rfl
+
+theorem partialHomPredicate_dynamicsComplete :
+    partialHomPredicateFragment.dynamicsComplete = true := rfl
 
 /-- FO assertional formulas (`FOLTL` + `stateLaw` extensional invariants); no finite enumeration. -/
 def foAssertionalFragment : FragmentSpec where
@@ -164,8 +186,11 @@ structure PinnedFiniteSideConditions (SZ IZ OZ : Type) (Z : DiscreteSystem SZ IZ
 
 Readout-completeness (`ReadoutSpecComplete`) and dynamics-completeness (`DynamicsSpecComplete`
 in `WymorePropertyFragment`) replace `AlwaysOutputs` when closed readout or autonomous-input
-states need explicit clauses. On arbitrary `SZ`, use `ReadoutSpecCompleteOpen` /
-`DynamicsSpecCompleteOpen` with `SystemSatisfiesPartialDynamicsOpen`. -/
+states need explicit clauses on the **finite-table projection**. On arbitrary `SZ`, the
+shared fixed-table tier uses `SystemSatisfiesPartialDynamicsOpen` (ungated iff via
+`partialDynamicsOpen_iff_hom`); the hom headline uses `SystemSatisfiesPartialDynamicsHom`
+(`partialDynamicsHom_iff_hom`). `ReadoutSpecCompleteOpen` is vacuous (`True` for all `Z`);
+do not treat it as a gate on either ungated iff. -/
 structure PartialOpenSideConditions (SZ IZ OZ : Type) (Z : DiscreteSystem SZ IZ OZ) : Prop where
   sz_finite : Nonempty (Fintype SZ)
   iz_finite : Nonempty (Fintype IZ)

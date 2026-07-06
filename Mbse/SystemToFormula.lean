@@ -1,4 +1,5 @@
 import Mbse.FOLTL
+import Mbse.Homomorphism
 
 /-!
 # Compiling Wymore `DiscreteSystem` to FO-LTL
@@ -16,7 +17,7 @@ The compiler and `SatisfiesFO` interpreter are **separate**; equivalence is prov
 
 namespace SystemToFormula
 
-open FOLTL
+open FOLTL Homomorphism
 
 /-- Parametric Wymore execution: initial state, valid recurrence, valid readout. -/
 def IsWymoreExecution {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ)
@@ -110,6 +111,175 @@ noncomputable def compilePartialAssertionalLaws {SZ IZ OZ : Type}
 noncomputable def compilePartialAssertionalFO {SZ IZ OZ : Type}
     (Z_spec Z_impl : DiscreteSystem SZ IZ OZ) (s0 : SZ) : FOLFormula SZ IZ OZ :=
   .and (compileSystemFO Z_spec s0) (compilePartialAssertionalLaws Z_spec Z_impl)
+
+/-! ## Hom-relative partial assertional FO (spec-indexed `stateLaw` bundles) -/
+
+/-- Spec-indexed open readout under hom projection. -/
+def compilePartialHomReadoutOpenLaw {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    (Z_spec : DiscreteSystem SZ1 IZ1 OZ1) (Z_impl : DiscreteSystem SZ2 IZ2 OZ2)
+    (w : HomomorphicImageWitness Z_spec Z_impl) : FOLFormula SZ1 IZ1 OZ1 :=
+  .stateLaw fun s => ∀ o, Z_spec.RZ s = some o →
+    ∀ x, w.HS x = s → (Z_impl.RZ x).map w.HO = some o
+
+/-- Spec-indexed closed readout under hom projection. -/
+def compilePartialHomReadoutClosedLaw {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    (Z_spec : DiscreteSystem SZ1 IZ1 OZ1) (Z_impl : DiscreteSystem SZ2 IZ2 OZ2)
+    (w : HomomorphicImageWitness Z_spec Z_impl) : FOLFormula SZ1 IZ1 OZ1 :=
+  .stateLaw fun s => Z_spec.RZ s = none →
+    ∀ x, w.HS x = s → (Z_impl.RZ x).map w.HO = none
+
+/-- Spec-indexed autonomous transition under hom projection. -/
+def compilePartialHomAutonomousLaw {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    (Z_spec : DiscreteSystem SZ1 IZ1 OZ1) (Z_impl : DiscreteSystem SZ2 IZ2 OZ2)
+    (w : HomomorphicImageWitness Z_spec Z_impl) : FOLFormula SZ1 IZ1 OZ1 :=
+  .stateLaw fun s => ∀ x, w.HS x = s →
+    w.HS (Z_impl.NZ x none) = Z_spec.NZ s none
+
+/-- Spec-indexed guided transition under hom projection. -/
+def compilePartialHomTransitionLaw {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    (Z_spec : DiscreteSystem SZ1 IZ1 OZ1) (Z_impl : DiscreteSystem SZ2 IZ2 OZ2)
+    (w : HomomorphicImageWitness Z_spec Z_impl) : FOLFormula SZ1 IZ1 OZ1 :=
+  .stateLaw fun s => ∀ i x, w.HS x = s → ∀ i2, w.HI i2 = i →
+    w.HS (Z_impl.NZ x (some i2)) = Z_spec.NZ s (some i)
+
+def compilePartialHomAssertionalLawsCore {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    (Z_spec : DiscreteSystem SZ1 IZ1 OZ1) (Z_impl : DiscreteSystem SZ2 IZ2 OZ2)
+    (w : HomomorphicImageWitness Z_spec Z_impl) : FOLFormula SZ1 IZ1 OZ1 :=
+  .and (compilePartialHomReadoutOpenLaw Z_spec Z_impl w)
+    (.and (compilePartialHomReadoutClosedLaw Z_spec Z_impl w)
+      (.and (compilePartialHomAutonomousLaw Z_spec Z_impl w)
+        (compilePartialHomTransitionLaw Z_spec Z_impl w)))
+
+def compilePartialHomAssertionalLawsNoTransition {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    (Z_spec : DiscreteSystem SZ1 IZ1 OZ1) (Z_impl : DiscreteSystem SZ2 IZ2 OZ2)
+    (w : HomomorphicImageWitness Z_spec Z_impl) : FOLFormula SZ1 IZ1 OZ1 :=
+  .and (compilePartialHomReadoutOpenLaw Z_spec Z_impl w)
+    (.and (compilePartialHomReadoutClosedLaw Z_spec Z_impl w)
+      (compilePartialHomAutonomousLaw Z_spec Z_impl w))
+
+/-- Hom-relative partial assertional laws indexed by spec states. -/
+noncomputable def compilePartialHomAssertionalLaws {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    (Z_spec : DiscreteSystem SZ1 IZ1 OZ1) (Z_impl : DiscreteSystem SZ2 IZ2 OZ2)
+    (w : HomomorphicImageWitness Z_spec Z_impl) : FOLFormula SZ1 IZ1 OZ1 := by
+  classical
+  by_cases _h : Nonempty IZ1
+  · exact compilePartialHomAssertionalLawsCore Z_spec Z_impl w
+  · exact compilePartialHomAssertionalLawsNoTransition Z_spec Z_impl w
+
+/-- Hom-relative partial assertional FO at impl initial state `s0`. -/
+noncomputable def compilePartialHomAssertionalFO {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    (Z_spec : DiscreteSystem SZ1 IZ1 OZ1) (Z_impl : DiscreteSystem SZ2 IZ2 OZ2)
+    (w : HomomorphicImageWitness Z_spec Z_impl) (s0 : SZ2) : FOLFormula SZ1 IZ1 OZ1 :=
+  .and (compileSystemFO Z_spec (w.HS s0)) (compilePartialHomAssertionalLaws Z_spec Z_impl w)
+
+/-- Prop-level hom-relative partial assertional laws (mirror of `stateLaw` bundles). -/
+def partialHomAssertionalLawsCoreProp {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    (Z_spec : DiscreteSystem SZ1 IZ1 OZ1) (Z_impl : DiscreteSystem SZ2 IZ2 OZ2)
+    (w : HomomorphicImageWitness Z_spec Z_impl) : Prop :=
+  (∀ s o, Z_spec.RZ s = some o → ∀ x, w.HS x = s → (Z_impl.RZ x).map w.HO = some o) ∧
+    (∀ s, Z_spec.RZ s = none → ∀ x, w.HS x = s → (Z_impl.RZ x).map w.HO = none) ∧
+      (∀ s x, w.HS x = s → w.HS (Z_impl.NZ x none) = Z_spec.NZ s none) ∧
+        (∀ s i x, w.HS x = s → ∀ i2, w.HI i2 = i →
+          w.HS (Z_impl.NZ x (some i2)) = Z_spec.NZ s (some i))
+
+def partialHomAssertionalLawsNoTransitionProp {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    (Z_spec : DiscreteSystem SZ1 IZ1 OZ1) (Z_impl : DiscreteSystem SZ2 IZ2 OZ2)
+    (w : HomomorphicImageWitness Z_spec Z_impl) : Prop :=
+  (∀ s o, Z_spec.RZ s = some o → ∀ x, w.HS x = s → (Z_impl.RZ x).map w.HO = some o) ∧
+    (∀ s, Z_spec.RZ s = none → ∀ x, w.HS x = s → (Z_impl.RZ x).map w.HO = none) ∧
+      (∀ s x, w.HS x = s → w.HS (Z_impl.NZ x none) = Z_spec.NZ s none)
+
+noncomputable def partialHomAssertionalLawsProp {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    (Z_spec : DiscreteSystem SZ1 IZ1 OZ1) (Z_impl : DiscreteSystem SZ2 IZ2 OZ2)
+    (w : HomomorphicImageWitness Z_spec Z_impl) : Prop := by
+  classical
+  by_cases _h : Nonempty IZ1
+  · exact partialHomAssertionalLawsCoreProp Z_spec Z_impl w
+  · exact partialHomAssertionalLawsNoTransitionProp Z_spec Z_impl w
+
+theorem partialHomAssertionalLawsCoreProp_iff_witness {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z_spec : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}
+    (w : HomomorphicImageWitness Z_spec Z_impl) :
+    partialHomAssertionalLawsCoreProp Z_spec Z_impl w ↔
+      (∀ x, (Z_impl.RZ x).map w.HO = Z_spec.RZ (w.HS x)) ∧
+        (∀ x oi, w.HS (Z_impl.NZ x oi) = Z_spec.NZ (w.HS x) (oi.map w.HI)) := by
+  constructor
+  · intro ⟨hOpen, hClosed, hAuto, hTrans⟩
+    refine ⟨fun x => ?_, fun x oi => ?_⟩
+    · cases eq : Z_spec.RZ (w.HS x) with
+      | none => exact hClosed (w.HS x) eq x rfl
+      | some o => exact hOpen (w.HS x) o eq x rfl
+    · cases oi with
+      | none => exact hAuto (w.HS x) x rfl
+      | some i2 =>
+        let i := w.HI i2
+        exact hTrans (w.HS x) i x rfl i2 rfl
+  · intro ⟨hR, hN⟩
+    refine ⟨?_, ?_, ?_, ?_⟩
+    · intro s o heq x hs
+      exact (hR x).trans (hs ▸ heq)
+    · intro s heq x hs
+      exact (hR x).trans (hs ▸ heq)
+    · intro s x hs
+      rw [← hs]
+      exact hN x none
+    · intro s i x hs i2 hi
+      rw [← hs]
+      simpa [hi] using hN x (some i2)
+
+theorem partialHomAssertionalLawsNoTransitionProp_iff_witness {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    [IsEmpty IZ1]
+    {Z_spec : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}
+    (w : HomomorphicImageWitness Z_spec Z_impl) :
+    partialHomAssertionalLawsNoTransitionProp Z_spec Z_impl w ↔
+      (∀ x, (Z_impl.RZ x).map w.HO = Z_spec.RZ (w.HS x)) ∧
+        (∀ x oi, w.HS (Z_impl.NZ x oi) = Z_spec.NZ (w.HS x) (oi.map w.HI)) := by
+  constructor
+  · intro ⟨hOpen, hClosed, hAuto⟩
+    refine ⟨fun x => ?_, fun x oi => ?_⟩
+    · cases eq : Z_spec.RZ (w.HS x) with
+      | none => exact hClosed (w.HS x) eq x rfl
+      | some o => exact hOpen (w.HS x) o eq x rfl
+    · cases oi with
+      | none => exact hAuto (w.HS x) x rfl
+      | some i2 => exact False.elim (IsEmpty.false (w.HI i2))
+  · intro ⟨hR, hN⟩
+    refine ⟨?_, ?_, ?_⟩
+    · intro s o heq x hs
+      exact (hR x).trans (hs ▸ heq)
+    · intro s heq x hs
+      exact (hR x).trans (hs ▸ heq)
+    · intro s x hs
+      rw [← hs]
+      exact hN x none
+
+theorem partialHomAssertionalLawsProp_iff_witness {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z_spec : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}
+    (w : HomomorphicImageWitness Z_spec Z_impl) :
+    partialHomAssertionalLawsProp Z_spec Z_impl w ↔
+      (∀ x, (Z_impl.RZ x).map w.HO = Z_spec.RZ (w.HS x)) ∧
+        (∀ x oi, w.HS (Z_impl.NZ x oi) = Z_spec.NZ (w.HS x) (oi.map w.HI)) := by
+  classical
+  unfold partialHomAssertionalLawsProp
+  split_ifs with hne
+  · exact partialHomAssertionalLawsCoreProp_iff_witness w
+  · haveI : IsEmpty IZ1 := ⟨fun x => hne ⟨x⟩⟩
+    exact partialHomAssertionalLawsNoTransitionProp_iff_witness w
+
+theorem satisfiesFO_partialHomAssertionalLaws {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z_spec : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}
+    (w : HomomorphicImageWitness Z_spec Z_impl) (s0 : SZ1) (f : ITZW IZ1) (g : STZ SZ1) (y : OTZ OZ1) :
+    SatisfiesFO (compilePartialHomAssertionalLaws Z_spec Z_impl w) Z_spec s0 f g y ↔
+      partialHomAssertionalLawsProp Z_spec Z_impl w := by
+  classical
+  unfold compilePartialHomAssertionalLaws partialHomAssertionalLawsProp
+  split_ifs with hne
+  · simp only [compilePartialHomAssertionalLawsCore, compilePartialHomReadoutOpenLaw,
+      compilePartialHomReadoutClosedLaw, compilePartialHomAutonomousLaw,
+      compilePartialHomTransitionLaw, SatisfiesFO, partialHomAssertionalLawsCoreProp]
+  · simp only [compilePartialHomAssertionalLawsNoTransition, compilePartialHomReadoutOpenLaw,
+      compilePartialHomReadoutClosedLaw, compilePartialHomAutonomousLaw, SatisfiesFO,
+      partialHomAssertionalLawsNoTransitionProp]
 
 /-- Impl satisfies spec-side partial assertional FO at `(s0, f)`. -/
 def SystemSatisfiesSpecPartialAssertionalFOAt {SZ IZ OZ : Type}

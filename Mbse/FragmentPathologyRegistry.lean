@@ -3,6 +3,7 @@ import Mbse.PathologyExamples
 import Mbse.PropertyFragmentSpec
 import Mbse.WymorePropertyFragment
 import Mbse.ExtensionalDynamicsFragment
+import Mbse.PartialDynamicsHomFragment
 import Mbse.FSMProperties
 import Mbse.Homomorphism
 import Mbse.HomomorphismProperties
@@ -18,7 +19,7 @@ Cited by the comparative report §5 and §9.
 namespace FragmentPathologyRegistry
 
 open PropertyFragmentSpec PathologyExamples WymorePathologyExamples WymorePropertyFragment
-  ExtensionalDynamicsFragment PropertyFragment.FSM PropertyFragment.General FSMProperties
+  ExtensionalDynamicsFragment PartialDynamicsHomFragment PropertyFragment.FSM PropertyFragment.General FSMProperties
   TemporalLogic SpecFromProperties HimsySynthesis FSM Homomorphism SystemToFormula
   Combinational CombinationalProperties HomomorphismProperties
 
@@ -138,7 +139,7 @@ theorem resolved_infinitePartialDynamicsOpen :
       SystemSatisfiesPartialDynamicsOpen counterClosedReadout counterClosedReadout ∧
         PartialIsIdentityHomomorphicImage counterClosedReadout counterClosedReadout :=
   ⟨counterClosedReadout_not_alwaysOutputs, counterClosedReadout_satisfiesOpen_refl,
-    (partialDynamicsOpen_iff_hom (readoutSpecCompleteOpen_of counterClosedReadout)).1
+    partialDynamicsOpen_iff_hom.1
       counterClosedReadout_satisfiesOpen_refl⟩
 
 /-- Predicate-indexed partial compile object on infinite `Nat`. -/
@@ -147,7 +148,7 @@ theorem resolved_predicateIndexedPartialCompile :
       (compileObservablesPartialOpen counterClosedReadout) ∧
       PartialIsIdentityHomomorphicImage counterClosedReadout counterClosedReadout :=
   ⟨counterClosedReadout_satisfiesCompiled_refl,
-    (partialDynamicsCompiled_iff_hom (readoutSpecCompleteOpen_of counterClosedReadout)).1
+    partialDynamicsCompiled_iff_hom.1
       counterClosedReadout_satisfiesCompiled_refl⟩
 
 theorem resolved_foAssertionalEncoding :
@@ -160,7 +161,7 @@ theorem resolved_partialAssertionalFO :
       counterClosedReadoutInput ∧
       PartialIsIdentityHomomorphicImage counterClosedReadout counterClosedReadout :=
   ⟨counterClosedReadout_satisfiesPartialAssertionalFO_refl,
-    (partialDynamicsOpen_iff_hom (readoutSpecCompleteOpen_of counterClosedReadout)).1
+    partialDynamicsOpen_iff_hom.1
       counterClosedReadout_satisfiesOpen_refl⟩
 
 theorem resolved_partialCompileUnification :
@@ -174,7 +175,7 @@ theorem resolved_partialCompileUnification :
           SystemSatisfiesSpecPartialAssertionalFOAt counterClosedReadout counterClosedReadout s0 f) :=
   ⟨counterClosedReadout_satisfiesCompiled_refl, counterClosedReadout_satisfiesPartialAssertionalFO_refl,
     fun s0 f =>
-      compileObservablesPartial_schema (readoutSpecCompleteOpen_of counterClosedReadout) s0 f⟩
+      compileObservablesPartial_schema s0 f⟩
 
 /-- Same-type surjective non-identity hom satisfies Cross, not pointwise Extensional. -/
 theorem resolved_sameTypeSurjectiveHomSeparation :
@@ -184,6 +185,22 @@ theorem resolved_sameTypeSurjectiveHomSeparation :
           ¬ SystemSatisfiesExtensional swapSpecSys swapImplSys
             swapSpecSys_alwaysOutputs swapImplSys_alwaysOutputs :=
   sameType_surjectiveHom_separation
+
+/-- Hom projection tier: cross-type and surjective hom (counterElab witness). -/
+theorem resolved_partialDynamicsHom :
+    SystemSatisfiesPartialDynamicsHom counterSystem counterElab ∧
+      IsHomomorphicImage counterSystem counterElab :=
+  ⟨counterElab_satisfies_partialDynamicsHom, partialDynamicsHom_iff_hom.1
+    counterElab_satisfies_partialDynamicsHom⟩
+
+/-- Same-type surjective hom satisfies hom headline, not shared fixed-table literal satisfaction. -/
+theorem resolved_sameTypeHomNotHeadline :
+    IsHomomorphicImage swapSpecSys swapImplSys ∧
+      SystemSatisfiesPartialDynamicsHom swapSpecSys swapImplSys ∧
+        IsNonIdentityWitness swapHomWitness ∧
+          ¬ SystemSatisfiesPartialDynamicsOpen swapSpecSys swapImplSys :=
+  ⟨swapHom_sameType_image, swapHom_satisfies_partialDynamicsHom, swapHom_isNonIdentity,
+    swapHom_not_partialDynamicsOpen⟩
 
 /-- Execution FO at a fixed witness does not imply extensional/hom agreement (`foUnreachable`). -/
 theorem blocked_executionFOHomCompleteness :

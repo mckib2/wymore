@@ -81,18 +81,16 @@ theorem extensional_partial_iff_hom {SZ IZ OZ : Type}
   partial_extEqual_iff_identityHom
 
 theorem extensionalPartial_iff_partialDynamicsOpen {SZ IZ OZ : Type} [DecidableEq IZ]
-    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
-    (hComplete : ReadoutSpecCompleteOpen Z_spec) :
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ} :
     SystemSatisfiesExtensionalPartial Z_spec Z_impl ↔
       SystemSatisfiesPartialDynamicsOpen Z_spec Z_impl := by
   simp [SystemSatisfiesExtensionalPartial]
-  exact (partialDynamicsOpen_iff_extEqual (Z_impl := Z_impl) hComplete).symm
+  exact partialDynamicsOpen_iff_extEqual.symm
 
 theorem partialExtEqual_iff_partialDynamicsOpen {SZ IZ OZ : Type} [DecidableEq IZ]
-    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
-    (hComplete : ReadoutSpecCompleteOpen Z_spec) :
+    {Z_spec Z_impl : DiscreteSystem SZ IZ OZ} :
     PartialExtEqual Z_spec Z_impl ↔ SystemSatisfiesPartialDynamicsOpen Z_spec Z_impl :=
-  (partialDynamicsOpen_iff_extEqual (Z_impl := Z_impl) hComplete).symm
+  partialDynamicsOpen_iff_extEqual.symm
 
 theorem partialExtEqual_of_extensional {SZ IZ OZ : Type}
     {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}

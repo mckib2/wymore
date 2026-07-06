@@ -478,42 +478,68 @@ Classical FC seeks a system homomorphism $h : Z_{\text{impl}} \rightarrow Z_{\te
 \endgroup
 \vspace{6pt}
 
-\subsection{The dynamics-encoding fragment and verification side conditions}
+\subsection{The dynamics-encoding fragment: A Systems-Engineering Perspective}
 \label{sec:dynamics-encoding-fragment}
 
-When assertional verification is used \emph{together with} classical T3SD---to relate a reference system $Z_{\text{spec}}$ and implementation $Z_{\text{impl}}$ via homomorphism---the temporal properties $\Phi$ cannot be arbitrary FO-LTL. We use a \emph{dynamics-encoding} fragment: start from the safety LTL operators familiar in model checking ($G$, $X$, and implication), then restrict formulas to \emph{clauses} over tick-local data visible to a Wymore homomorphism (current state, current input, next state, current output). Each clause corresponds to a row in a transition or readout table, not to a black-box mission requirement over ports alone.
+When assertional verification is used \emph{together with} classical T3SD---to relate a reference system $Z_{\text{spec}}$ and implementation $Z_{\text{impl}}$ via homomorphism---the temporal properties $\Phi$ cannot be arbitrary FO-LTL. We use a \emph{dynamics-encoding} fragment. 
 
-Relative to textbook propositional LTL on a finite Kripke structure, we move in two directions. \emph{Richer:} Wymore DSYSTEMs allow partial or closed readout ($\rho$ may be undefined at some states), autonomous ticks ($\delta$ with no external input), and infinite state spaces; these cases use \emph{partial-open} or \emph{extensional} verification tiers rather than a finite enumerated table alone. \emph{Stricter:} arbitrary disjunction in $\Phi$ is excluded---branching must follow \emph{canonical synthesis} of the reference system, or satisfaction can hold without a homomorphic image. Progress properties ($F$, ``eventually'') are \emph{not} part of this dynamics-encoding fragment; they belong to a separate trace-property layer checked on execution traces (Section~\ref{sec:discussion}).
+For a systems engineer, this fragment is best understood as a direct logical translation of a state-transition and readout table. Instead of black-box mission requirements, we write tick-local temporal logic clauses $\Phi_Z$ over a discrete system $Z = (S, I, O, \delta, \rho)$ using safety operators ($G$, $X$, and implication). The atomic propositions in the logic assert the system state ($state(s)$), the input at the current tick ($input(i)$), and the output at the current tick ($output(o)$). We define a general \emph{predicate-indexed} dynamics-encoding fragment consisting of four types of rules:
+\begin{enumerate}
+    \item \textbf{Open Readout Rules:} For every state $s \in S$ where the system defines an output $o = \rho(s)$:
+    \[ G(state(s) \implies output(o)) \]
+    \item \textbf{Closed Readout Rules:} For every state $s \in S$ where the system has no output ($\rho(s) = \text{none}$):
+    \[ G(state(s) \implies output(\text{none})) \]
+    \item \textbf{Autonomous Transition Rules:} For every state $s \in S$ when no external input is received ($input(\text{none})$):
+    \[ G((state(s) \wedge input(\text{none})) \implies X(state(\delta(s, \text{none})))) \]
+    \item \textbf{Guided Transition Rules:} For every state $s \in S$ and every input $i \in I$ ($input(i)$):
+    \[ G((state(s) \wedge input(i)) \implies X(state(\delta(s, i)))) \]
+\end{enumerate}
 
-The core bi-implication used in the companion formalization is gated. Let $\Phi$ be the dynamics-encoding property set compiled from $Z_{\text{spec}}$. Write $Z_{\text{impl}} \models_{\mathrm{dyn}} \Phi$ when the implementation satisfies that compiled table under the tier-appropriate predicate (pinned dynamics, partial dynamics, or extensional laws). When $Z_{\text{spec}}$ is \emph{$\Phi$-adequate}---it satisfies its own compiled $\Phi$ and canonical synthesis recovers $Z_{\text{spec}}$---and both systems meet the side conditions of the chosen tier, then
+By structuring the requirement set $\Phi_Z$ using this predicate-indexed schema, we achieve several critical goals:
+\begin{itemize}
+    \item \textbf{Infinite State-Spaces:} Because the property set is indexed using functions/predicates over states and inputs rather than compiled into a flat propositional table, the system spaces $S$, $I$, and $O$ can be infinitely large (e.g., modeling real-valued variables, unbounded queues, or coordinate spaces).
+    \item \textbf{Moore Readout Unification:} The logic explicitly models states with no output using the $output(\text{none})$ literal (closed readouts), preventing implementations from outputting arbitrary values on states where the specification is silent.
+    \item \textbf{Autonomous Step Completeness:} Wymore's autonomous step $\delta(s, \text{none})$ is fully encoded via transition rules, ensuring that implementations cannot diverge on unguided ticks.
+\end{itemize}
+
+\paragraph{Headline theorem (Wymore FC hom projection).}
+The companion formalization's primary dynamics-encoding bi-implication aligns assertional FC with classical T3SD constructive verification: a buildable $Z_{\text{impl}}$ satisfies the hom-relative property set compiled from reference $Z_{\text{spec}}$ if and only if $Z_{\text{impl}}$ is a Wymore Def.~4.3 homomorphic image of $Z_{\text{spec}}$---existence of surjective maps $HS, HI, HO$ with partial readout and full transition laws under Option projection (`SystemSatisfiesPartialDynamicsHom`; machine-checked anchor \texttt{partialDynamicsHom\_iff\_hom}). This is the native elaboration$\to$spec verification question: cross-type refinement (witness \texttt{counterElab}), same-type rename (witness \texttt{swapSpecSys}/\texttt{swapImplSys}), and identity specialization all factor through the same tier. The bi-implication is \emph{ungated}---no finiteness, total readout (\texttt{AlwaysOutputs}), or readout-enumeration preconditions on the reference.
+
+\paragraph{Shared fixed table specialization.}
+When $Z_{\text{spec}}$ and $Z_{\text{impl}}$ share $(S, I, O)$ and the engineer treats the spec table as the \emph{canonical labeling} of states and IO, a narrower encoding applies: predicate-indexed satisfaction with \emph{literal} impl-state atoms (`SystemSatisfiesPartialDynamicsOpen`; compiled LTL or partial assertional FO). On this tier,
 \[
-  Z_{\text{impl}} \models_{\mathrm{dyn}} \Phi
+  Z_{\text{impl}} \models_{\mathrm{dyn}}^{\mathrm{lit}} \Phi_{Z_{\text{spec}}}
   \;\;\Longleftrightarrow\;\;
-  \exists h.\; h : Z_{\text{impl}} \to Z_{\text{spec}} \text{ is a Wymore homomorphic image.}
+  Z_{\text{impl}} \text{ is a partial identity homomorphic image of } Z_{\text{spec}},
 \]
-This is equivalence under explicit side conditions, not bare ``property checking implies simulation.'' Table~\ref{tab:side-conditions} summarizes those conditions in engineering terms; a machine-checked tier index appears in the companion report.
+where $\models_{\mathrm{dyn}}^{\mathrm{lit}}$ requires pointwise $\delta$/$\rho$ agreement at shared labels (identity witness), not a surjective rename. Anchor: \texttt{partialDynamicsOpen\_iff\_hom}. Witness \texttt{counterClosedReadout} shows infinite $|S|$ and closed readouts on this path. When a supplied hom is non-identity or cross-type, hom projection holds but literal-table satisfaction may fail (`swapHom\_hom\_separation`); under partial identity hom the two tiers coincide (`partialDynamicsHom\_iff\_open\_of\_identityHom`).
+
+\paragraph{Hom-relative trace and FO encoding.}
+Hom-relative $\Phi_{Z_{\text{spec}}}$ indexes the four clause families by \emph{spec} states and evaluates satisfaction on implementation trajectories in the hom fibre ($\mathit{HS}(g(t))=s$). Hom-relative trace atoms (\texttt{HomRelativeAtom.specState}) and trajectory laws (\texttt{homTrace\_readoutOpen}, etc.) package open/closed readout and autonomous/guided transitions under projected readout. The equivalence chain \texttt{partialDynamicsHomTrace\_iff\_partialDynamicsHom} $\Leftrightarrow$ \texttt{partialDynamicsHom\_iff\_hom} pairs this encoding with Def.~4.3 hom; FO mirror \texttt{compileObservablesPartialHomFO} and \texttt{partialDynamicsHomTrace\_iff\_partialAssertionalHomFO} tie the tier to spec-indexed \texttt{stateLaw} bundles. The shared fixed-table tier uses literal impl atoms instead; under identity hom the encodings collapse.
+
+The dynamics-encoding schema is required throughout: output-table-only encodings, bare $\Phi$ without a reference system, execution FO alone, and mission-level $F$ formulas conflated with dynamics tables are blocked in the companion library. Further projections---finite propositional tables, pinned Moore FSMs, extensional synthesis---add side conditions for decidable checking and classical alignment; they do not weaken the headline hom iff. Table~\ref{tab:verification-tiers} summarizes these tiers.
 
 \begingroup
 \renewcommand{\arraystretch}{1.35}
 \footnotesize
-\begin{tabularx}{\textwidth}{@{}A{0.24\textwidth} A{0.70\textwidth}@{}}
+\begin{tabularx}{\textwidth}{@{}A{0.25\textwidth} A{0.20\textwidth} A{0.51\textwidth}@{}}
     \rowcolor{tableheader}
-    \headingfont\bfseries Side condition & \headingfont\bfseries Meaning for the systems engineer \\
+    \headingfont\bfseries Verification Tier & \headingfont\bfseries System Constraints & \headingfont\bfseries Meaning for the Systems Engineer \\
     \addlinespace[2pt]
-    AlwaysOutputs & Every state exposes a defined output port value (Moore-style total readout). If not (e.g.\ silent/closed readout), use the partial tier with explicit ``no output'' clauses. \\
+    Partial dynamics hom (headline) & Surjective Def.~4.3 $h$; ungated & Primary FC fragment: Wymore elaboration$\to$spec hom$\leftrightarrow\Phi$ (`partialDynamicsHom\_iff\_hom`; \texttt{counterElab}, \texttt{swapHom}). \\
     \addlinespace[2pt]
-    Finite enumeration & $|S|$, $|I|$, $|O|$ small enough to list all dynamics clauses in a table (Stages~1--3 FSM embed). Infinite state (e.g.\ a counter) uses the extensional cross-type tier with a witness system. \\
+    Shared fixed table & Same $(S,I,O)$; literal impl-state atoms & Specialization when spec labels are canonical: partial identity hom (`partialDynamicsOpen\_iff\_hom`; \texttt{counterClosedReadout}). \\
     \addlinespace[2pt]
-    ReadoutSpecComplete & Every state's readout behavior, including ``no output,'' appears in $\Phi$; blocks spurious implementations that match an incomplete table. \\
+    Extensional cross-type (alias) & Surjective $h$; $\Phi$-adequacy for synthesis & Same semantic content as hom headline; retained for synthesis templates (`extensional\_cross\_property\_iff\_hom`). \\
     \addlinespace[2pt]
-    Dynamics-complete $\Phi$ & $\Phi$ includes transition, readout, and autonomous clauses---not output-table-only encodings. \\
+    Finite open table & Finite $S, I$; readout enumeration & Propositional MC projection: flat LTL formula list from finite enumeration. \\
     \addlinespace[2pt]
-    $\Phi$-adequacy on $Z_{\text{spec}}$ & $Z_{\text{spec}}$ satisfies its own compiled $\Phi$ and canonical synthesis returns $Z_{\text{spec}}$ (``the spec matches its encoding''). \\
+    Pinned finite FSM & Finite $S, I$; total readout & Classical Moore alignment; autonomous transitions ($\text{none}$) dropped. \\
     \addlinespace[2pt]
-    Trace properties ($F$) separate & Mission/liveness formulas are checked on traces \emph{outside} this hom$\leftrightarrow\Phi$ ladder; conflating them with dynamics encoding breaks equivalence. \\
+    Trace properties ($F$) separate & Excludes eventually ($F$) & Mission/liveness checked on traces \emph{outside} this hom$\leftrightarrow\Phi$ ladder. \\
 \end{tabularx}
-\captionof{table}{Side conditions for the gated hom$\leftrightarrow\Phi$ bi-implication (dynamics-encoding fragment).}
-\label{tab:side-conditions}
+\captionof{table}{Projections of the dynamics-encoding fragment for decidable checking and classical alignment. The hom projection row (first) carries the primary Wymore FC hom$\leftrightarrow\Phi$ bi-implication; the shared fixed-table row is its same-type identity specialization.}
+\label{tab:verification-tiers}
 \endgroup
 \vspace{6pt}
 
@@ -530,11 +556,16 @@ T3SD pedagogy traditionally introduces constructive FC first: students formalize
 \subsection{Relationship to Classical Functionality Cotyledon}
 \label{sec:classical-fc}
 
-Classical T3SD defines functional designs constructively while assertional FC defines them by temporal properties in dialect $\mathcal{L}$. Existence of a Wymore system homomorphism $h$ implies trajectory simulation: every implementation trace maps under $h$ to a valid specification trace. Conversely, $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$ does not imply existence of $h$ to a given $Z_{\text{spec}}$ (Section~\ref{sec:trace-observability}).
+Classical T3SD defines functional designs constructively while assertional FC defines them by temporal properties in dialect $\mathcal{L}$. Existence of a Wymore system homomorphism $h$ implies trajectory simulation: every implementation trace maps under $h$ to a valid specification trace. Conversely, $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$ does not imply existence of $h$ to a given $Z_{\text{spec}}$ when $\Phi$ is mis-encoded or not reference-relative (Section~\ref{sec:trace-observability}).
 
-Under the dynamics-encoding fragment and side conditions in Section~\ref{sec:dynamics-encoding-fragment}, the companion formalization proves a \emph{qualified} bridge: when $Z_{\text{spec}}$ is $\Phi$-adequate and both systems meet the tier gates, verifying against compiled dynamics-encoding $\Phi$ is equivalent to exhibiting a homomorphic-image witness---not merely sound in one direction. We do \emph{not} claim this for bare $\Phi$ without a reference system, output-table-only encodings, execution FO alone, or for mission-level $F$ properties conflated with dynamics tables. Full cotyledon-level set equality $\mathrm{FC}_{\text{constructive}}(Z_{\text{spec}}) = \mathrm{FC}_{\text{assertional}}(\Phi)$ without these side conditions remains open (machine-checked inventory: `ClassicalAssertionalBridge.audit_classicalAssertional_open`).
+\paragraph{Headline bridge.}
+Under the predicate-indexed dynamics-encoding fragment (Section~\ref{sec:dynamics-encoding-fragment}), the primary link to classical T3SD is the hom projection bi-implication: $Z_{\text{impl}} \models_{\mathrm{dyn}} \Phi_{Z_{\text{spec}}}$ (hom-relative encoding) iff $Z_{\text{impl}}$ is a Wymore homomorphic image of $Z_{\text{spec}}$ (`partialDynamicsHom\_iff\_hom`). This matches constructive FC's elaboration-to-spec verification story. When spec and impl share $(S,I,O)$ and the reference table fixes state/IO labels, the \emph{shared fixed-table} specialization recovers partial identity hom (`partialDynamicsOpen\_iff\_hom`; Table~\ref{tab:verification-tiers}, second row)---the common internal-refinement workflow, not the finite pinned Moore projection.
 
-We also note that constructive verification may still be preferable when $|S|$ is small, $Z_{\text{spec}}$ already exists, and changes are internal refinements with fixed observable behavior.
+\paragraph{Larger functionality cotyledon.}
+Classical constructive FC fixes a reference $Z_{\text{spec}}$ and accepts implementations with a Wymore homomorphic image $h : Z_{\text{impl}} \to Z_{\text{spec}}$. Assertional FC defines $\mathcal{FC}_{\mathcal{L}}(\Phi_{Z_{\text{spec}}}) = \{ Z \mid Z \models_{\mathrm{dyn}} \Phi_{Z_{\text{spec}}} \}$ where $\Phi_{Z_{\text{spec}}}$ is compiled hom-relatively from $Z_{\text{spec}}$. On the hom headline tier, membership coincides with Def.~4.3 hom for cross-type and rename witnesses; on the shared fixed-table tier it coincides with partial identity hom when labels align. The \emph{native system class} is richer than finite total Moore: infinite $|S|$, closed readout ($\rho=\text{none}$), and autonomous $\delta(s,\text{none})$ ticks are first-class. Witnesses \texttt{counterClosedReadout} and \texttt{closedSystem} satisfy the fixed-table specialization while failing pinned/\texttt{AlwaysOutputs} side conditions. Other TL projections (finite table, pinned FSM, extensional synthesis) recover decidable fragments; $\Phi$-adequacy gates \emph{synthesis} on those projections, not the ungated hom headline iff.
+
+\paragraph{Honest limits.}
+We do \emph{not} claim equivalence for bare $\Phi$ without a reference system, output-table-only encodings, execution FO alone, or mission-level $F$ properties conflated with dynamics tables. Global cotyledon-level set equality $\mathrm{FC}_{\text{constructive}}(Z_{\text{spec}}) = \mathrm{FC}_{\text{assertional}}(\Phi)$ without side conditions remains open (\texttt{ClassicalAssertionalBridge.audit\_classicalAssertional\_open}). Constructive verification may still be preferable when $|S|$ is small, $Z_{\text{spec}}$ already exists, and changes are internal refinements with fixed observable behavior.
 
 \subsection{Expressivity and Tooling}
 \label{sec:expressivity}

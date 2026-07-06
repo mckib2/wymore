@@ -374,8 +374,7 @@ def counterClosedReadoutInput : ITZW Bool := fun _ => none
 theorem counterClosedReadout_satisfiesPartialAssertionalFO_refl :
     SystemSatisfiesSpecPartialAssertionalFOAt counterClosedReadout counterClosedReadout 0
       counterClosedReadoutInput :=
-  (partialAssertionalFO_at_iff_partialDynamicsOpen
-    (readoutSpecCompleteOpen_of counterClosedReadout) 0 counterClosedReadoutInput).2
+  (partialAssertionalFO_at_iff_partialDynamicsOpen 0 counterClosedReadoutInput).2
     counterClosedReadout_satisfiesOpen_refl
 
 theorem counterClosedReadout_satisfiesCompiled_iff_partialAssertionalFO :
@@ -383,7 +382,7 @@ theorem counterClosedReadout_satisfiesCompiled_iff_partialAssertionalFO :
       (compileObservablesPartialOpen counterClosedReadout) ↔
       SystemSatisfiesSpecPartialAssertionalFOAt counterClosedReadout counterClosedReadout 0
         counterClosedReadoutInput :=
-  compileObservablesPartial_schema (readoutSpecCompleteOpen_of counterClosedReadout) 0
+  compileObservablesPartial_schema 0
     counterClosedReadoutInput
 
 theorem counterClosedReadout_resolved :
@@ -474,6 +473,13 @@ theorem swapHom_sameType_image : SameTypeHomomorphicImage swapSpecSys swapImplSy
 theorem swapHom_satisfies_cross :
     SystemSatisfiesExtensionalCross swapSpecSys swapImplSys :=
   extensional_cross_of_hom ⟨swapHomWitness⟩
+
+theorem swapHom_not_partialDynamicsOpen :
+    ¬ SystemSatisfiesPartialDynamicsOpen swapSpecSys swapImplSys := by
+  intro h
+  have hExt := (partialDynamicsOpen_iff_extEqual (SZ := swapHomStates) (IZ := Unit) (OZ := Bool)).1 h
+  have hR := hExt.1 ⟨0, by decide⟩
+  simp [swapSpecSys, swapImplSys, swapSpecRZ, swapImplRZ, DiscreteSystem.ofTotal] at hR
 
 theorem swapHom_not_extensional :
     ¬ SystemSatisfiesExtensional swapSpecSys swapImplSys
