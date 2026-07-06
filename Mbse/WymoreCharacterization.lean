@@ -8,6 +8,7 @@ import Mbse.GeneralProperties
 import Mbse.GeneralPropertyFragment
 import Mbse.ExtensionalDynamicsFragment
 import Mbse.TemporalLogic
+import Mbse.SpecFromProperties
 
 /-!
 # General Wymore property characterization (Tracks A, B, D)
@@ -21,7 +22,7 @@ namespace WymoreCharacterization
 open WymorePropertyFragment WymorePathologyExamples FragmentPathologyRegistry
   PropertyFragmentSpec PropertySemantics HomSoundness GeneralProperties
   SystemToFormula PropertyFragment.General PropertyFragment.FSM FSMProperties PathologyExamples
-  TemporalLogic ExtensionalDynamicsFragment FOLTL
+  TemporalLogic ExtensionalDynamicsFragment FOLTL SpecFromProperties
 
 /-! ## Track B: FO assertional -/
 
@@ -149,6 +150,64 @@ theorem stageWymore_extensional_sameType_collapse {SZ IZ OZ : Type}
       (SystemSatisfiesExtensionalCross Z_spec Z_impl ∧
         SystemIsIdentityHomomorphicImageOpen Z_spec Z_impl hSpec hImpl) :=
   extensional_sameType_collapse_iff_hom hSpec hImpl
+
+/-! ## Track D: extensional synthesis + PhiAdequate -/
+
+theorem stageWymore_extensional_synthesize_eq {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
+    synthesizeExtensionalSpec Z = Z :=
+  synthesizeExtensionalSpec_eq Z
+
+theorem stageWymore_extensional_link_b {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
+    compileObservablesExt (synthesizeExtensionalSpec Z) = compileObservablesExt Z :=
+  compileObservablesExt_synthesize Z
+
+theorem stageWymore_extensional_phi_adequate_cross {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
+    PhiAdequateExtensionalCross Z :=
+  extensional_phi_adequate_cross Z
+
+theorem stageWymore_extensional_phi_adequate_open {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ)
+    (hOut : AlwaysOutputs Z) :
+    PhiAdequateExtensionalOpen Z hOut :=
+  extensional_phi_adequate_open Z hOut
+
+theorem stageWymore_extensional_verification {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}
+    (_hAdeq : PhiAdequateExtensionalCross Z) :
+    SystemSatisfiesExtensionalCross (synthesizeExtensionalSpec Z) Z_impl ↔
+      IsHomomorphicImage (synthesizeExtensionalSpec Z) Z_impl :=
+  extensional_synthesized_verification_cross _hAdeq
+
+theorem stageWymore_extensional_verification_open {SZ IZ OZ : Type}
+    {Z Z_impl : DiscreteSystem SZ IZ OZ}
+    (hZ : AlwaysOutputs Z) (hImpl : AlwaysOutputs Z_impl)
+    (_hAdeq : PhiAdequateExtensionalOpen Z hZ) :
+    SystemSatisfiesExtensional Z Z_impl hZ hImpl ↔
+      SystemIsIdentityHomomorphicImageOpen (synthesizeExtensionalSpec Z) Z_impl hZ hImpl :=
+  extensional_synthesized_verification_open hZ hImpl _hAdeq
+
+theorem stageWymore_extensional_verification_equivalence {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2} :
+    VerificationEquivalence
+      (SystemSatisfiesExtensionalCross (synthesizeExtensionalSpec Z) Z_impl)
+      (IsHomomorphicImage (synthesizeExtensionalSpec Z) Z_impl)
+      (PhiAdequateExtensionalCross Z) :=
+  extensional_cross_verification_equivalence
+
+theorem stageWymore_extensional_verification_equivalence_open {SZ IZ OZ : Type}
+    {Z Z_impl : DiscreteSystem SZ IZ OZ}
+    (hZ : AlwaysOutputs Z) (hImpl : AlwaysOutputs Z_impl) :
+    VerificationEquivalence
+      (SystemSatisfiesExtensional Z Z_impl hZ hImpl)
+      (SystemIsIdentityHomomorphicImageOpen (synthesizeExtensionalSpec Z) Z_impl hZ hImpl)
+      (PhiAdequateExtensionalOpen Z hZ) :=
+  extensional_open_verification_equivalence hZ hImpl
+
+theorem stageWymore_counterSystem_synthesis :
+    PhiAdequateExtensionalCross counterSystem ∧
+      SystemSatisfiesExtensionalCross (synthesizeExtensionalSpec counterSystem) counterElab ∧
+        IsHomomorphicImage (synthesizeExtensionalSpec counterSystem) counterElab :=
+  ⟨counterSystem_phi_adequate_cross, counterElab_satisfies_extensional_cross,
+    counterElab_synthesized_hom⟩
 
 /-! ## Track B/D: infinite state impossibility (finite enumeration) -/
 

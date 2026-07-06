@@ -5,6 +5,7 @@ import Mbse.CombinationalProperties
 import Mbse.FSMProperties
 import Mbse.PropertyFragmentSpec
 import Mbse.SpecFromProperties
+import Mbse.ExtensionalDynamicsFragment
 
 /-!
 # Cross-cutting hom soundness and Link C templates
@@ -18,7 +19,7 @@ namespace HomSoundness
 open PropertySemantics PropertySemanticsBridge PropertyFragment PropertyFragment.FSM
   PropertyFragment.General HomomorphismProperties CombinationalProperties FSMProperties
   SpecFromProperties GeneralProperties PropertyFragmentSpec Homomorphism
-  Combinational FSM
+  Combinational FSM ExtensionalDynamicsFragment
 
 /-! ## Combinational templates -/
 
@@ -61,6 +62,25 @@ theorem stage3_verification_equivalence {SZ IZ OZ : Type} [Fintype SZ] [Fintype 
       (PhiAdequateSpec (SystemSatisfiesDynamics Z Z hZ hZ)
         (synthesizeSpec Z hZ = synthesizeSpec Z hZ)) :=
   verificationEquivalence_of_adequate (system_synthesized_property_iff_hom hZ hImpl)
+
+/-! ## Track D extensional templates -/
+
+theorem extensional_cross_verification_equivalence {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2} :
+    VerificationEquivalence
+      (SystemSatisfiesExtensionalCross (synthesizeExtensionalSpec Z) Z_impl)
+      (IsHomomorphicImage (synthesizeExtensionalSpec Z) Z_impl)
+      (PhiAdequateExtensionalCross Z) :=
+  verificationEquivalence_of_adequate extensional_synthesized_cross_iff_hom
+
+theorem extensional_open_verification_equivalence {SZ IZ OZ : Type}
+    {Z Z_impl : DiscreteSystem SZ IZ OZ}
+    (hZ : AlwaysOutputs Z) (hImpl : AlwaysOutputs Z_impl) :
+    VerificationEquivalence
+      (SystemSatisfiesExtensional Z Z_impl hZ hImpl)
+      (SystemIsIdentityHomomorphicImageOpen (synthesizeExtensionalSpec Z) Z_impl hZ hImpl)
+      (PhiAdequateExtensionalOpen Z hZ) :=
+  verificationEquivalence_of_adequate (extensional_synthesized_sameType_iff_hom hZ hImpl)
 
 /-! ## One-way hom → Φ (soundness) -/
 

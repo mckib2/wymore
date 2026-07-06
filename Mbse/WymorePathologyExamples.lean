@@ -7,6 +7,7 @@ import Mbse.SystemToFormula
 import Mbse.GeneralPropertyFragment
 import Mbse.ExtensionalDynamicsFragment
 import Mbse.Homomorphism
+import Mbse.SpecFromProperties
 
 /-!
 # Pathology examples for the general Wymore property track
@@ -18,6 +19,7 @@ namespace WymorePathologyExamples
 
 open WymorePropertyFragment PropertyFragmentSpec PathologyExamples GeneralProperties FSM
   SystemToFormula PropertyFragment.General ExtensionalDynamicsFragment Homomorphism
+  SpecFromProperties
 
 /-! ## Infinite state (`counterSystem`) -/
 
@@ -88,6 +90,30 @@ theorem counterElab_cross_iff_hom :
     SystemSatisfiesExtensionalCross counterSystem counterElab ↔
       IsHomomorphicImage counterSystem counterElab :=
   extensional_cross_property_iff_hom
+
+/-! ## Extensional synthesis + PhiAdequate witnesses -/
+
+theorem counterSystem_phi_adequate_cross :
+    PhiAdequateExtensionalCross counterSystem :=
+  extensional_phi_adequate_cross counterSystem
+
+theorem counterSystem_phi_adequate_open :
+    PhiAdequateExtensionalOpen counterSystem counterSystem_alwaysOutputs :=
+  extensional_phi_adequate_open counterSystem counterSystem_alwaysOutputs
+
+theorem counterSystem_synthesized_cross_iff_hom :
+    SystemSatisfiesExtensionalCross (synthesizeExtensionalSpec counterSystem) counterElab ↔
+      IsHomomorphicImage (synthesizeExtensionalSpec counterSystem) counterElab :=
+  extensional_synthesized_cross_iff_hom
+
+theorem counterElab_synthesized_hom :
+    IsHomomorphicImage (synthesizeExtensionalSpec counterSystem) counterElab :=
+  (extensional_synthesized_cross_iff_hom (Z := counterSystem) (Z_impl := counterElab)).mp
+    counterElab_satisfies_extensional_cross
+
+theorem counterSystem_self_synthesizable :
+    IsSynthesizableExtensional counterSystem counterSystem_alwaysOutputs :=
+  extensional_self_synthesizable counterSystem counterSystem_alwaysOutputs
 
 /-! ## Partial readout (`closedSystem`) -/
 

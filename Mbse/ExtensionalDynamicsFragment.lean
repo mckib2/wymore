@@ -6,6 +6,8 @@ import Mbse.FSMProperties
 import Mbse.Homomorphism
 import Mbse.SystemToFormula
 import Mbse.WymorePropertyFragment
+import Mbse.SpecFromProperties
+import Mbse.PropertySemantics
 
 /-!
 # Extensional dynamics fragment (infinite-state assertional Φ)
@@ -32,6 +34,7 @@ namespace ExtensionalDynamicsFragment
 
 open PropertyFragmentSpec PropertyFragment.General GeneralFSMBridge GeneralProperties
   FSM FSMProperties Homomorphism SystemToFormula WymorePropertyFragment FOLTL
+  SpecFromProperties PropertySemantics
 
 /-! ## Resolved total maps under `AlwaysOutputs` -/
 
@@ -355,5 +358,99 @@ theorem extensional_subsumes_executionFO {SZ IZ OZ : Type}
   intro _
   rw [systemSatisfiesFO_iff_execution]
   exact canonical_is_wymore_execution Z s0 f
+
+/-! ## Extensional synthesis + PhiAdequate (Track D verification template)
+
+Synthesis is identity today; adequacy gate is structurally required for the paper template.
+Cross-type `SystemSatisfiesExtensionalCross` is the general hom↔Φ result; same-type pointwise
+ext requires `AlwaysOutputs`. `compileObservablesExt` is predicate-indexed, not a finite `PropertySet`.
+-/
+
+/-- Link B: synthesized spec compiles to the same extensional Φ as the reference. -/
+theorem compileObservablesExt_synthesize {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
+    compileObservablesExt (synthesizeExtensionalSpec Z) = compileObservablesExt Z := rfl
+
+theorem extensional_cross_satisfies_reflexive {SZ IZ OZ : Type}
+    (Z : DiscreteSystem SZ IZ OZ) :
+    SystemSatisfiesExtensionalCross Z Z := by
+  refine ⟨id, id, id, Function.surjective_id, Function.surjective_id, Function.surjective_id, ?_, ?_⟩
+  · intro s oi; simp
+  · intro s; simp
+
+def PhiAdequateExtensionalCross {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) : Prop :=
+  PhiAdequateSpec (SystemSatisfiesExtensionalCross Z Z) (synthesizeExtensionalSpec Z = Z)
+
+def PhiAdequateExtensionalOpen {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ)
+    (hOut : AlwaysOutputs Z) : Prop :=
+  PhiAdequateSpec (SystemSatisfiesExtensional Z Z hOut hOut) (synthesizeExtensionalSpec Z = Z)
+
+structure ExtensionalDynamicsAdequate {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) : Prop where
+  selfSatisfiesCross : SystemSatisfiesExtensionalCross Z Z
+  canonical : synthesizeExtensionalSpec Z = Z
+
+theorem extensional_phi_adequate_cross {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
+    PhiAdequateExtensionalCross Z := by
+  constructor
+  · exact extensional_cross_satisfies_reflexive Z
+  · exact synthesizeExtensionalSpec_eq Z
+
+theorem extensional_phi_adequate_open {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ)
+    (hOut : AlwaysOutputs Z) :
+    PhiAdequateExtensionalOpen Z hOut := by
+  constructor
+  · exact extensional_satisfies_reflexive Z hOut
+  · exact synthesizeExtensionalSpec_eq Z
+
+theorem extensionalDynamicsAdequate_iff {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
+    ExtensionalDynamicsAdequate Z ↔ PhiAdequateExtensionalCross Z := by
+  constructor
+  · intro h
+    exact ⟨h.selfSatisfiesCross, h.canonical⟩
+  · intro h
+    exact ⟨h.1, h.2⟩
+
+/-- Reference is synthesizable from its own extensional Φ when self-satisfies under `AlwaysOutputs`. -/
+def IsSynthesizableExtensional {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ)
+    (hOut : AlwaysOutputs Z) : Prop :=
+  SystemSatisfiesExtensional Z Z hOut hOut ∧ synthesizeExtensionalSpec Z = Z
+
+theorem extensional_self_synthesizable {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ)
+    (hOut : AlwaysOutputs Z) :
+    IsSynthesizableExtensional Z hOut :=
+  ⟨extensional_satisfies_reflexive Z hOut, synthesizeExtensionalSpec_eq Z⟩
+
+theorem extensional_synthesized_cross_iff_hom {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2} :
+    SystemSatisfiesExtensionalCross (synthesizeExtensionalSpec Z) Z_impl ↔
+      IsHomomorphicImage (synthesizeExtensionalSpec Z) Z_impl := by
+  simp [synthesizeExtensionalSpec, extensional_cross_property_iff_hom]
+
+theorem extensional_synthesized_sameType_iff_hom {SZ IZ OZ : Type}
+    {Z Z_impl : DiscreteSystem SZ IZ OZ}
+    (hZ : AlwaysOutputs Z) (hImpl : AlwaysOutputs Z_impl) :
+    SystemSatisfiesExtensional Z Z_impl hZ hImpl ↔
+      SystemIsIdentityHomomorphicImageOpen (synthesizeExtensionalSpec Z) Z_impl hZ hImpl := by
+  simp [synthesizeExtensionalSpec, extensional_property_iff_hom hZ hImpl]
+
+theorem extensional_synthesized_verification_cross {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}
+    (_hAdeq : PhiAdequateExtensionalCross Z) :
+    SystemSatisfiesExtensionalCross (synthesizeExtensionalSpec Z) Z_impl ↔
+      IsHomomorphicImage (synthesizeExtensionalSpec Z) Z_impl :=
+  extensional_synthesized_cross_iff_hom
+
+theorem extensional_synthesized_verification_open {SZ IZ OZ : Type}
+    {Z Z_impl : DiscreteSystem SZ IZ OZ}
+    (hZ : AlwaysOutputs Z) (hImpl : AlwaysOutputs Z_impl)
+    (_hAdeq : PhiAdequateExtensionalOpen Z hZ) :
+    SystemSatisfiesExtensional Z Z_impl hZ hImpl ↔
+      SystemIsIdentityHomomorphicImageOpen (synthesizeExtensionalSpec Z) Z_impl hZ hImpl :=
+  extensional_synthesized_sameType_iff_hom hZ hImpl
+
+theorem extensional_synthesized_compiled_iff_hom {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2} :
+    SystemSatisfiesCompiledExtensional (synthesizeExtensionalSpec Z) Z_impl ↔
+      IsHomomorphicImage (synthesizeExtensionalSpec Z) Z_impl :=
+  extensional_synthesized_cross_iff_hom
 
 end ExtensionalDynamicsFragment

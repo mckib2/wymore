@@ -15,7 +15,7 @@ Cited by the comparative report §5 and §9.
 namespace FragmentPathologyRegistry
 
 open PropertyFragmentSpec PathologyExamples WymorePathologyExamples WymorePropertyFragment
-  ExtensionalDynamicsFragment PropertyFragment.FSM FSMProperties TemporalLogic
+  ExtensionalDynamicsFragment PropertyFragment.FSM FSMProperties TemporalLogic SpecFromProperties
 
 /-- Failure modes blocking assertional Φ ↔ hom completeness outside pinned finite tier. -/
 inductive BlockerTag where
@@ -54,6 +54,13 @@ theorem resolved_crossTypeExtensional :
     SystemSatisfiesExtensionalCross counterSystem counterElab ∧
       IsHomomorphicImage counterSystem counterElab :=
   ⟨counterElab_satisfies_extensional_cross, counterElab_hom_to_counterSystem⟩
+
+/-- Gated extensional verification equivalence via `synthesizeExtensionalSpec` + `PhiAdequateExtensionalCross`. -/
+theorem resolved_extensionalSynthesis :
+    PhiAdequateExtensionalCross counterSystem ∧
+      (SystemSatisfiesExtensionalCross (synthesizeExtensionalSpec counterSystem) counterElab ↔
+        IsHomomorphicImage (synthesizeExtensionalSpec counterSystem) counterElab) :=
+  ⟨counterSystem_phi_adequate_cross, counterSystem_synthesized_cross_iff_hom⟩
 
 theorem blocked_partialRZ :
     pinnedFragment.dynamicsComplete = true ∧ ¬ AlwaysOutputs closedSystem :=
