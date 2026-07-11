@@ -25,6 +25,14 @@ import Mbse.HomWitnessConstruction
 Consolidates FO assertional soundness, impossibility results, partial-open fragment,
 extensional dynamics, and predicate-indexed alternatives. LTS refinement lives in
 [`LTSCharacterization`](LTSCharacterization.lean).
+
+**Workflow honesty.** Theorems here are semantic characterizations and verification
+*templates* (`wymore_verification_*`). They do not perform model checking or
+homomorphism search. Finite executable checking / search is in
+[`HomSearch`](HomSearch.lean) and [`PhiChecker`](PhiChecker.lean); infinite/real
+automatic discovery remains blocked (`synthesis_automaticHomDiscovery_blocked`).
+Global classical≡assertional FC without side conditions remains open
+(`audit_classicalAssertional_open`).
 -/
 
 namespace WymoreCharacterization

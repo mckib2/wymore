@@ -1,1 +1,2 @@
 import Mbse.LTSCharacterization
+import Mbse.LTSTemporalBridge

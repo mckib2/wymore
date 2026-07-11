@@ -10,11 +10,18 @@ import Mbse.SpecFromProperties
 /-!
 # Homomorphism witness construction (finite tiers)
 
-Tier A: decide extensional equality on finite FSMs and build identity witness.
-Tier B: verify supplied maps satisfy homomorphic-image axioms.
+**Workflow honesty.** The headline bi-implication
+(`partialDynamicsHom_iff_hom`) is a *semantic* equivalence: it does not by itself
+decide satisfaction or discover maps. This module provides finite constructive
+support only:
 
-General automatic discovery on infinite state is not provided; see
-`synthesis_automaticHomDiscovery_blocked`.
+* Tier A: decide extensional equality on finite FSMs and build identity witness.
+* Tier B: verify supplied maps satisfy homomorphic-image axioms.
+* Tier C: decide extEqual → verify bi-implication packaging.
+
+Algorithmic search over candidate maps lives in [`HomSearch`](HomSearch.lean)
+(finite `Fintype` alphabets). General automatic discovery on infinite or real
+state is not provided; see `synthesis_automaticHomDiscovery_blocked`.
 -/
 
 namespace HomWitnessConstruction

@@ -8,6 +8,9 @@ import Mbse.PhiDecode
 import Mbse.WymorePropertyFragment
 import Mbse.ExtensionalDynamicsFragment
 import Mbse.ClassicalAssertionalBridge
+import Mbse.WymoreExercises
+import Mbse.PartialDynamicsHomFragment
+import Mbse.Homomorphism
 
 /-!
 # Paper claim linkage
@@ -20,7 +23,7 @@ namespace BlockerAudit
 
 open BiImplicationFailures PathologyExamples WymorePathologyExamples
   PropertyFragment.FSM FSMProperties PhiDecode ExtensionalDynamicsFragment
-  ClassicalAssertionalBridge
+  ClassicalAssertionalBridge WymoreExercises PartialDynamicsHomFragment Homomorphism
 
 theorem paperClaim_outputTableOnly_blocked
     (_h : SatisfactionWithoutHom (FSMSatisfiesOutputTable fsmStay fsmJump)
@@ -63,5 +66,29 @@ theorem audit_homProjection_equivalence :
   refine ⟨paperClaim_homProjection_safe, ?_⟩
   intro _ _ _ _ _ _ Z_spec Z_impl
   exact qualified_equivalence_homProjection Z_spec Z_impl
+
+/-- Paper case-study elaborations satisfy the headline bi-implication (playbook). -/
+theorem audit_caseStudyPlaybook :
+    paperClaimStatus .caseStudyPlaybook = .safe ∧
+      (SystemSatisfiesPartialDynamicsHom onesCounter onesCounterRich ↔
+        IsHomomorphicImage onesCounter onesCounterRich) ∧
+      (SystemSatisfiesPartialDynamicsHom pattern01110 pattern01110Rich ↔
+        IsHomomorphicImage pattern01110 pattern01110Rich) ∧
+      (SystemSatisfiesPartialDynamicsHom realAccumulator realAccumulatorRich ↔
+        IsHomomorphicImage realAccumulator realAccumulatorRich) :=
+  ⟨paperClaim_caseStudyPlaybook_safe, onesCounterRich_iff_hom, pattern01110Rich_iff_hom,
+    realAccumulatorRich_iff_hom⟩
+
+/-- Dual-port pattern select is mechanized in Lean (paper §4.3 remains a sketch). -/
+theorem audit_dualPortMechanized :
+    paperClaimStatus .dualPortMechanized = .safe ∧
+      (SystemSatisfiesPartialDynamicsHom dualPatternSpec dualPatternElab ↔
+        IsHomomorphicImage dualPatternSpec dualPatternElab) :=
+  ⟨paperClaim_dualPort_safe, dualPatternElab_iff_hom⟩
+
+/-- Restricted `F`/`U` inside dynamics-encoding Φ remains an open exploration. -/
+theorem audit_restrictedFU_open :
+    paperClaimStatus .restrictedFUInDynamicsEncoding = .openQuestion :=
+  paperClaim_restrictedFU_open
 
 end BlockerAudit

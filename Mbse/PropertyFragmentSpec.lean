@@ -24,9 +24,14 @@ inductive DisjunctionPolicy where
   | excluded
   | canonicalCommitment
 
-/-- Eventually (`F`) policy — excluded from assertional fragment (Example 3). -/
+/-- Eventually (`F`) policy for assertional fragments.
+`excluded` — production Φ_dyn (paper default).
+`entailedOnly` — optional conjuncts proved redundant given Φ_dyn (safe extension).
+`restrictedBounded` — bounded `F≤k` / compiled progress schemas under exploration. -/
 inductive EventuallyPolicy where
   | excluded
+  | entailedOnly
+  | restrictedBounded
 
 /-- Homomorphism-visible atom kinds for finite dynamics tables. -/
 inductive DynamicsAtomKind where

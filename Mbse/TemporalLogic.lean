@@ -24,6 +24,8 @@ inductive LTL (AP : Type) where
   | X (φ : LTL AP)
   | F (φ : LTL AP)
   | G (φ : LTL AP)
+  | U (φ ψ : LTL AP)
+  | R (φ ψ : LTL AP)
 
 /-- An infinite trace: which atomic propositions hold at each tick. -/
 structure Trace (AP : Type) where
@@ -50,6 +52,10 @@ def satisfiesAt {AP : Type} : LTL AP → Trace AP → Time → Prop
   | .X φ, σ, t => satisfiesAt φ σ (t + 1)
   | .F φ, σ, t => ∃ t', t ≤ t' ∧ satisfiesAt φ σ t'
   | .G φ, σ, t => ∀ t', t ≤ t' → satisfiesAt φ σ t'
+  | .U φ ψ, σ, t => ∃ t', t ≤ t' ∧ satisfiesAt ψ σ t' ∧
+      ∀ t'', t ≤ t'' → t'' < t' → satisfiesAt φ σ t''
+  | .R φ ψ, σ, t => ∀ t', t ≤ t' →
+      satisfiesAt ψ σ t' ∨ ∃ t'', t ≤ t'' ∧ t'' < t' ∧ satisfiesAt φ σ t''
 
 /-- `σ` models `φ` from time zero (standard LTL semantics). -/
 def Trace.models {AP : Type} (σ : Trace AP) (φ : LTL AP) : Prop :=

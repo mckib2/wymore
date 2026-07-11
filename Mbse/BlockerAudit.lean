@@ -50,6 +50,9 @@ inductive PaperClaimTag where
   | assertionalFOWithoutBridge
   | homProjectionEquivalence
   | classicalAssertionalEquivalence
+  | caseStudyPlaybook
+  | dualPortMechanized
+  | restrictedFUInDynamicsEncoding
 
 /-- Workaround tags paired with blockers. -/
 inductive ResolvedTag where
@@ -212,6 +215,9 @@ def paperClaimStatus : PaperClaimTag → PaperClaimStatus
   | .assertionalFOWithoutBridge => .blocked
   | .homProjectionEquivalence => .safe
   | .classicalAssertionalEquivalence => .openQuestion
+  | .caseStudyPlaybook => .safe
+  | .dualPortMechanized => .safe
+  | .restrictedFUInDynamicsEncoding => .openQuestion
 
 theorem paperClaim_executionEncoding_safe :
     paperClaimStatus .executionEncoding = .safe := rfl
@@ -250,9 +256,21 @@ def paperClaimTheorem : PaperClaimTag → Option String
   | .barePhiUniqueSpec => some "paperClaim_barePhi_blocked"
   | .homProjectionEquivalence => some "audit_homProjection_equivalence"
   | .classicalAssertionalEquivalence => some "audit_classicalAssertional_open"
+  | .caseStudyPlaybook => some "audit_caseStudyPlaybook"
+  | .dualPortMechanized => some "audit_dualPortMechanized"
+  | .restrictedFUInDynamicsEncoding => some "audit_restrictedFU_open"
   | _ => none
 
 theorem paperClaim_classicalEquiv_open :
     paperClaimStatus .classicalAssertionalEquivalence = .openQuestion := rfl
+
+theorem paperClaim_caseStudyPlaybook_safe :
+    paperClaimStatus .caseStudyPlaybook = .safe := rfl
+
+theorem paperClaim_dualPort_safe :
+    paperClaimStatus .dualPortMechanized = .safe := rfl
+
+theorem paperClaim_restrictedFU_open :
+    paperClaimStatus .restrictedFUInDynamicsEncoding = .openQuestion := rfl
 
 end BlockerAudit
