@@ -40,8 +40,9 @@ export PhiChecker (checkPartialDynamicsOpen checkPartialDynamicsHom verifyAssert
   checkPartialDynamicsOpen_iff_hom checkPartialDynamicsHom_iff)
 
 export WymoreExercises (onesCounter pattern01110 realAccumulator dualPatternSpec
-  caseStudy_playbook onesCounterRich_iff_hom pattern01110Rich_iff_hom
-  realAccumulatorRich_iff_hom dualPatternElab_iff_hom)
+  caseStudy_playbook onesCounterRich_iff_hom pattern01110Shift_iff_hom
+  realAccumulatorRich_iff_hom dualPatternElab_iff_hom
+  pattern01110Shift onesCounterV1 pattern01110V3)
 
 /-- Headline fragment used by the paper. -/
 abbrev headlineFragment := partialHomPredicateFragment

@@ -72,11 +72,11 @@ theorem audit_caseStudyPlaybook :
     paperClaimStatus .caseStudyPlaybook = .safe ∧
       (SystemSatisfiesPartialDynamicsHom onesCounter onesCounterRich ↔
         IsHomomorphicImage onesCounter onesCounterRich) ∧
-      (SystemSatisfiesPartialDynamicsHom pattern01110 pattern01110Rich ↔
-        IsHomomorphicImage pattern01110 pattern01110Rich) ∧
+      (SystemSatisfiesPartialDynamicsHom pattern01110 pattern01110Shift ↔
+        IsHomomorphicImage pattern01110 pattern01110Shift) ∧
       (SystemSatisfiesPartialDynamicsHom realAccumulator realAccumulatorRich ↔
         IsHomomorphicImage realAccumulator realAccumulatorRich) :=
-  ⟨paperClaim_caseStudyPlaybook_safe, onesCounterRich_iff_hom, pattern01110Rich_iff_hom,
+  ⟨paperClaim_caseStudyPlaybook_safe, onesCounterRich_iff_hom, pattern01110Shift_iff_hom,
     realAccumulatorRich_iff_hom⟩
 
 /-- Dual-port pattern select is mechanized in Lean (paper §4.3 remains a sketch). -/

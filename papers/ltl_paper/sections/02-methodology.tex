@@ -80,7 +80,7 @@ Assertional checking admits two modeling strategies: systems modelers may write 
 
 When assertional checking is used to answer the classical implementability question---whether a buildable system is a Wymore homomorphic image of a reference system---$\Phi$ cannot be an arbitrary temporal formula. We use a \emph{dynamics-encoding} fragment $\Phi_{\mathrm{dyn}}$: a direct logical reading of the state-transition and readout table of $Z_{\text{spec}}$.
 
-Table~\ref{tab:phi-dyn-fragment} states the fragment that carries the bi-implication. Clauses are compiled from $Z_{\text{spec}}$ and checked on $Z_{\text{impl}}$ (hom-relative atoms use the projected specification state $\mathit{specState}(s)$ when maps $h_S,h_I,h_O$ are in play; the shared-label specialization replaces $\mathit{specState}(s)$ by $\mathit{state}(s)$ on the buildable run).
+Table~\ref{tab:phi-dyn-fragment} states the fragment that makes the bi-implication hold. Clauses are compiled from $Z_{\text{spec}}$ and checked on $Z_{\text{impl}}$ under surjective maps $h_S,h_I,h_O$, or under identity when labels are shared. Computationally: at each tick of a buildable system's run, $\mathit{state}(s)$ means the buildable system's own state component equals $s$; $\mathit{specState}(s)$ means the projected specification state equals $s$, i.e., $h_S$ of the current buildable system's state is $s$. Inputs and outputs are read the same way on the buildable system's trace (with $h_I$/$h_O$ when checking under a homomorphism).
 
 \begingroup
 \renewcommand{\arraystretch}{1.35}
@@ -123,7 +123,7 @@ Table~\ref{tab:fragment-compare} contrasts $\Phi_{\mathrm{dyn}}$ with propositio
     \addlinespace[2pt]
     Typical use & Finite-state MC of liveness/safety specs & Infinite/real state; quantified tick laws & Compile $Z_{\text{spec}}$ table; check implementability \\
     \addlinespace[2pt]
-    Temporal ops & Full LTL ($G,F,X,U,\ldots$) & Same, plus FO & $G,X,\rightarrow,\wedge$ only; no $F$/$U$ \\
+    Logic / operators & Full LTL ($G,F,X,U,\ldots$) & Same, plus FO & $G,X,\rightarrow,\wedge$ only; no $F$/$U$ \\
     \addlinespace[2pt]
     Atoms & Propositional labels & FO atoms over values & $\mathit{state}$/$\mathit{specState}$, $\mathit{input}$, $\mathit{output}$ \\
     \addlinespace[2pt]

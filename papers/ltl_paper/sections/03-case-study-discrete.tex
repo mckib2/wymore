@@ -1,7 +1,7 @@
 \subsection{Ones-Counter System}
 \label{sec:case-ones}
 
-For readers less familiar with T3SD: a \emph{reference system} $Z_{\text{spec}}$ is a complete discrete-system table (states, inputs, outputs, next-state, readout) that expresses required behavior. A \emph{buildable system} $Z_{\text{impl}}$ is another such table---often with richer internal state---that is intended to realize the same behavior. Classical checking asks for a homomorphism (projection maps) from $Z_{\text{impl}}$ onto $Z_{\text{spec}}$. Here we instead compile $\Phi_{\mathrm{dyn}}$ from $Z_{\text{spec}}$ and check that property set on each $Z_{\text{impl}}$.
+For readers less familiar with T3SD: a \emph{reference system} $Z_{\text{spec}}$ is a complete discrete-system table (states, inputs, outputs, next-state, readout) that expresses required behavior. A \emph{buildable system} $Z_{\text{impl}}$ is another such table---often with richer internal state---that is intended to realize the same behavior. Classical checking asks for a homomorphism (projection maps) from $Z_{\text{impl}}$ onto $Z_{\text{spec}}$. Here we instead compile $\Phi_{\mathrm{dyn}}$ from $Z_{\text{spec}}$ and check that property set on each lifecycle iteration of $Z_{\text{impl}}$.
 
 \paragraph{Reference system $Z_{\mathrm{ones}}$.}
 Behavior in plain language: start at count $0$; on input $1$ increment the count; on input $0$ leave it unchanged; the output at every tick is the current count.
@@ -42,13 +42,13 @@ For every $n\in\mathbb{N}$:
 \end{align*}
 Denote this family by $\Phi_{Z_{\mathrm{ones}}}$. Hom-relative checking uses $\mathit{specState}(n)$ meaning ``the buildable's projected count equals $n$.''
 
-\paragraph{Three buildable systems (shown explicitly).}
-All three share inputs $\{0,1\}$ and output the ones-count. They differ in how much internal bookkeeping they keep. Each is checked against the \emph{same} $\Phi_{Z_{\mathrm{ones}}}$.
+\paragraph{Lifecycle iterations.}
+All three share inputs $\{0,1\}$ and output the ones-count. They differ in internal bookkeeping. Each is checked against the \emph{same} $\Phi_{Z_{\mathrm{ones}}}$. This ladder is pedagogical: elaborations remain mild, and $h_S$ stays a projection onto the ones component.
 
-\textit{Simple --- $Z_{\mathrm{ones}}^{\mathrm{S}}$.}
+\textit{v1 --- prototype $Z_{\mathrm{ones}}^{\mathrm{v1}}$.}
 Identical to Table~\ref{tab:z-ones}. The homomorphism is the identity: $h_S=h_I=h_O=\mathrm{id}$.
 
-\textit{Medium --- $Z_{\mathrm{ones}}^{\mathrm{M}}$.}
+\textit{v2 --- instrumented $Z_{\mathrm{ones}}^{\mathrm{v2}}$.}
 State is a pair $(\mathrm{ones},\mathrm{zeros})$. On input $1$ increment ones; on input $0$ increment zeros; output is ones only.
 
 \begingroup
@@ -57,7 +57,7 @@ State is a pair $(\mathrm{ones},\mathrm{zeros})$. On input $1$ increment ones; o
 \begin{center}
 \begin{tabularx}{0.78\linewidth}{@{}>{\raggedright\arraybackslash}p{2.8cm}Y@{}}
     \rowcolor{tableheader}
-    \headingfont\bfseries Component & \headingfont\bfseries $Z_{\mathrm{ones}}^{\mathrm{M}}$ \\
+    \headingfont\bfseries Component & \headingfont\bfseries $Z_{\mathrm{ones}}^{\mathrm{v2}}$ \\
     \addlinespace[2pt]
     $S$ & $\mathbb{N}\times\mathbb{N}$ (ones, zeros) \\
     \addlinespace[2pt]
@@ -72,12 +72,12 @@ State is a pair $(\mathrm{ones},\mathrm{zeros})$. On input $1$ increment ones; o
     Maps to $Z_{\mathrm{ones}}$ & $h_S(o,z)=o$,\ $h_I=\mathrm{id}$,\ $h_O=\mathrm{id}$ \\
 \end{tabularx}
 \end{center}
-\captionof{table}{Medium ones-counter buildable: tracks zeros as well, but only ones are required by $\Phi_{Z_{\mathrm{ones}}}$.}
+\captionof{table}{Instrumented ones-counter (v2): tracks zeros as well, but only ones are required by $\Phi_{Z_{\mathrm{ones}}}$.}
 \label{tab:z-ones-med}
 \endgroup
 \vspace{4pt}
 
-\textit{Complex --- $Z_{\mathrm{ones}}^{\mathrm{C}}$.}
+\textit{v3 --- richer logging $Z_{\mathrm{ones}}^{\mathrm{v3}}$.}
 State is a 4-tuple $(\mathrm{ones},\mathrm{ticks},\mathrm{lastBit},\mathrm{shadow})$. Ticks always advance; lastBit stores the previous input; shadow is free instrumentation (here updated by adding the current ones-count). Output remains ones.
 
 \begingroup
@@ -86,7 +86,7 @@ State is a 4-tuple $(\mathrm{ones},\mathrm{ticks},\mathrm{lastBit},\mathrm{shado
 \begin{center}
 \begin{tabularx}{0.78\linewidth}{@{}>{\raggedright\arraybackslash}p{2.8cm}Y@{}}
     \rowcolor{tableheader}
-    \headingfont\bfseries Component & \headingfont\bfseries $Z_{\mathrm{ones}}^{\mathrm{C}}$ \\
+    \headingfont\bfseries Component & \headingfont\bfseries $Z_{\mathrm{ones}}^{\mathrm{v3}}$ \\
     \addlinespace[2pt]
     $S$ & $\mathbb{N}\times\mathbb{N}\times\{0,1\}\times\mathbb{N}$ \\
     \addlinespace[2pt]
@@ -101,30 +101,29 @@ State is a 4-tuple $(\mathrm{ones},\mathrm{ticks},\mathrm{lastBit},\mathrm{shado
     Maps to $Z_{\mathrm{ones}}$ & $h_S(o,t,\ell,s)=o$,\ $h_I=\mathrm{id}$,\ $h_O=\mathrm{id}$ \\
 \end{tabularx}
 \end{center}
-\captionof{table}{Complex ones-counter buildable: rich instrumentation; only the ones component is constrained by $\Phi_{Z_{\mathrm{ones}}}$.}
+\captionof{table}{Richer ones-counter (v3): instrumentation; only the ones component is constrained by $\Phi_{Z_{\mathrm{ones}}}$.}
 \label{tab:z-ones-cplx}
 \endgroup
 \vspace{4pt}
 
-\paragraph{Classical homomorphism check for $Z_{\mathrm{ones}}^{\mathrm{C}}$.}
-Take $h_S(o,t,\ell,s)=o$, $h_I=\mathrm{id}$, and $h_O=\mathrm{id}$. Surjectivity of $h_S$ is immediate: every count $n$ is hit by $(n,0,0,0)$. Transition preservation: for input $1$,
+\paragraph{Workflow contrast (after v3).}
+\textit{Assertional:} $\Phi_{Z_{\mathrm{ones}}}$ is unchanged from v1; verifying v2 or v3 means re-checking that same fragment on the new tables (no new derivation of maps to answer the implementability question).
+\textit{Classical:} for $Z_{\mathrm{ones}}^{\mathrm{v3}}$, take $h_S(o,t,\ell,s)=o$, $h_I=\mathrm{id}$, $h_O=\mathrm{id}$. Surjectivity is immediate. Transition preservation for input $1$:
 \[
-  h_S\bigl(\delta_{\mathrm{C}}((o,t,\ell,s),1)\bigr)
-  = h_S(o{+}1,\,t{+}1,\,1,\,s{+}o)
+  h_S\bigl(\delta_{\mathrm{v3}}((o,t,\ell,s),1)\bigr)
   = o{+}1
-  = \delta_{\mathrm{ones}}(o,1)
   = \delta_{\mathrm{ones}}\bigl(h_S(o,t,\ell,s),\,h_I(1)\bigr),
 \]
-and likewise for input $0$ (ones-count unchanged) and for $\mathrm{none}$. Readout preservation: $\rho_{\mathrm{C}}(o,t,\ell,s)=o=\rho_{\mathrm{ones}}(h_S(o,t,\ell,s))$. Hence $h$ is a Wymore system homomorphism $Z_{\mathrm{ones}}^{\mathrm{C}}\to Z_{\mathrm{ones}}$. By the bi-implication of Section~\ref{sec:dynamics-encoding-fragment}, $Z_{\mathrm{ones}}^{\mathrm{C}}\models_{\mathrm{dyn}}\Phi_{Z_{\mathrm{ones}}}$.
+and likewise for $0$ and $\mathrm{none}$; readout $\rho_{\mathrm{v3}}=o=\rho_{\mathrm{ones}}\circ h_S$. The witness remains a projection---honest that this pedagogical ladder does not yet force a hard $h_S$---but each elaboration still requires a human to confirm that the chosen projection still preserves $\delta$ and $\rho$. By the bi-implication, $Z_{\mathrm{ones}}^{\mathrm{v3}}\models_{\mathrm{dyn}}\Phi_{Z_{\mathrm{ones}}}$.
 
 \paragraph{What checking means.}
-For $Z_{\mathrm{ones}}^{\mathrm{M}}$ and $Z_{\mathrm{ones}}^{\mathrm{C}}$, $\mathit{specState}(n)$ holds when $h_S$ of the current buildable state equals $n$. The clauses of $\Phi_{Z_{\mathrm{ones}}}$ then require that the \emph{projected} count behaves exactly as $Z_{\mathrm{ones}}$---extra components may evolve freely so long as they do not disturb that projection. Revising the shadow update in $Z_{\mathrm{ones}}^{\mathrm{C}}$ does not change $\Phi_{Z_{\mathrm{ones}}}$; one re-checks the same property set (equivalently, re-checks that the same $h_S$ still preserves transitions and readout).
+For $Z_{\mathrm{ones}}^{\mathrm{v2}}$ and $Z_{\mathrm{ones}}^{\mathrm{v3}}$, $\mathit{specState}(n)$ holds when $h_S$ of the current buildable state equals $n$. Extra components may evolve freely so long as they do not disturb that projection. Revising the shadow update does not change $\Phi_{Z_{\mathrm{ones}}}$; one re-checks the same property set.
 
 \subsection{String Recognizer for \texorpdfstring{$01110$}{01110}}
 \label{sec:case-pattern}
 
 \paragraph{Reference system $Z_{01110}$.}
-Behavior: walk a small automaton that tracks how much of the bit-string $01110$ has been matched so far. Output $1$ only in the ``just matched'' state; otherwise output $0$.
+Behavior: walk a small overlap-aware automaton that tracks how much of the bit-string $01110$ has been matched so far. Output $1$ only in the ``just matched'' state; otherwise output $0$. After a match, input $1$ leaves progress $2$ (prefix $01$), not a full reset---so the automaton agrees with longest-prefix-suffix progress on the recent window.
 
 \begin{figure}[t]
 \centering
@@ -150,7 +149,7 @@ Behavior: walk a small automaton that tracks how much of the bit-string $01110$ 
     (q0) edge[loop above] node {$1$} (q0)
     (q1) edge[loop below] node {$0$} (q1)
     (q5) edge[bend left=25] node[above] {$0$} (q1)
-    (q5) edge[bend right=35] node[below] {$1$} (q0);
+    (q5) edge[bend right=35] node[below] {$1$} (q2);
   \node[anchor=west, align=left, font=\scriptsize] at ($(q0.west)+(-0.15,-1.55)$) {
     Output: $\rho(5)=1$; $\rho(q)=0$ for $q\neq 5$.\\
     (Other mismatch edges omitted for clarity; full table used in $\Phi$.)
@@ -191,14 +190,15 @@ Readouts in full:
 \end{align*}
 Plus a guided/autonomous clause for every state and bit from the next-state table, e.g.\
 $G\bigl((\mathit{state}(4)\wedge\mathit{input}(0)) \rightarrow X(\mathit{state}(5))\bigr)$.
+Denote the compiled set by $\Phi_{Z_{01110}}$; it is fixed for the rest of this subsection.
 
-\paragraph{Three buildable systems (shown explicitly).}
+\paragraph{Lifecycle iterations.}
 
-\textit{Simple --- $Z_{01110}^{\mathrm{S}}$.}
+\textit{v1 --- prototype $Z_{01110}^{\mathrm{v1}}$.}
 Same automaton as Figure~\ref{fig:z-pattern}; identity maps.
 
-\textit{Medium --- $Z_{01110}^{\mathrm{M}}$.}
-State $(q,c)$ with $q\in\{0,\ldots,5\}$ the recognizer progress and $c\in\{0,\ldots,5\}$ a parallel ones-counter modulo $6$. On each bit, $q$ updates by the reference $\delta$; $c$ increments on input $1$. Output depends only on $q$.
+\textit{v2 --- instrumented $Z_{01110}^{\mathrm{v2}}$.}
+State $(q,c)$ with $q\in\{0,\ldots,5\}$ the recognizer progress and $c\in\{0,\ldots,5\}$ a parallel ones-counter modulo $6$. On each bit, $q$ updates by the reference $\delta$; $c$ increments on input $1$. Output depends only on $q$. Classical $h_S$ remains the trivial projection $(q,c)\mapsto q$.
 
 \begingroup
 \renewcommand{\arraystretch}{1.2}
@@ -206,7 +206,7 @@ State $(q,c)$ with $q\in\{0,\ldots,5\}$ the recognizer progress and $c\in\{0,\ld
 \begin{center}
 \begin{tabularx}{0.78\linewidth}{@{}>{\raggedright\arraybackslash}p{2.8cm}Y@{}}
     \rowcolor{tableheader}
-    \headingfont\bfseries Component & \headingfont\bfseries $Z_{01110}^{\mathrm{M}}$ \\
+    \headingfont\bfseries Component & \headingfont\bfseries $Z_{01110}^{\mathrm{v2}}$ \\
     \addlinespace[2pt]
     $S$ & $\{0,\ldots,5\}\times\{0,\ldots,5\}$ \\
     \addlinespace[2pt]
@@ -219,13 +219,13 @@ State $(q,c)$ with $q\in\{0,\ldots,5\}$ the recognizer progress and $c\in\{0,\ld
     Maps & $h_S(q,c)=q$,\ $h_I=\mathrm{id}$,\ $h_O=\mathrm{id}$ \\
 \end{tabularx}
 \end{center}
-\captionof{table}{Medium recognizer buildable: parallel mod-$6$ counter is invisible to $\Phi_{Z_{01110}}$.}
+\captionof{table}{Instrumented recognizer (v2): parallel mod-$6$ counter is invisible to $\Phi_{Z_{01110}}$.}
 \label{tab:z-pattern-med}
 \endgroup
 \vspace{4pt}
 
-\textit{Complex --- $Z_{01110}^{\mathrm{C}}$.}
-State $(q,\mathrm{last},\mathrm{ticks},\mathrm{logLen})$: progress, last input bit, tick count, and a log-length counter. Output still depends only on $q$.
+\textit{v3 --- shift-register refactor $Z_{01110}^{\mathrm{v3}}$.}
+Here the implementation drops the explicit progress component. State is a filling-then-sliding history of the last at most five input bits (empty at start; once length $5$, each new bit drops the oldest). Output is $1$ iff the buffer equals $01110$, else $0$. There is no stored $q\in\{0,\ldots,5\}$.
 
 \begingroup
 \renewcommand{\arraystretch}{1.2}
@@ -233,35 +233,29 @@ State $(q,\mathrm{last},\mathrm{ticks},\mathrm{logLen})$: progress, last input b
 \begin{center}
 \begin{tabularx}{0.78\linewidth}{@{}>{\raggedright\arraybackslash}p{2.8cm}Y@{}}
     \rowcolor{tableheader}
-    \headingfont\bfseries Component & \headingfont\bfseries $Z_{01110}^{\mathrm{C}}$ \\
+    \headingfont\bfseries Component & \headingfont\bfseries $Z_{01110}^{\mathrm{v3}}$ \\
     \addlinespace[2pt]
-    $S$ & $\{0,\ldots,5\}\times\{0,1\}\times\mathbb{N}\times\mathbb{N}$ \\
+    $S$ & $\{ w\in\{0,1\}^{\le 5}\}$ (histories of length at most $5$) \\
     \addlinespace[2pt]
-    $s_0$ & $(0,0,0,0)$ \\
+    $s_0$ & $\varepsilon$ (empty) \\
     \addlinespace[2pt]
-    $\delta((q,\ell,t,L),b)$ & $(\delta_{01110}(q,b),\,b,\,t{+}1,\,L{+}1)$ \\
+    $\delta(w,b)$ & $wb$ if $|w|<5$; else $\mathrm{tail}(w)\,b$ \\
     \addlinespace[2pt]
-    $\rho(q,\ell,t,L)$ & $\rho_{01110}(q)$ \\
+    $\rho(w)$ & $1$ iff $w=01110$; else $0$ \\
     \addlinespace[2pt]
-    Maps & $h_S(q,\ell,t,L)=q$ (exhibit/verify on finite spaces) \\
+    Maps & $h_S(w)=\delta^{*}_{01110}(0,w)$ (fold the reference table over $w$) \\
 \end{tabularx}
 \end{center}
-\captionof{table}{Complex recognizer buildable: logging and timing; progress alone must match $Z_{01110}$.}
+\captionof{table}{Shift-register recognizer (v3): no explicit progress state; $h_S$ is non-trivial.}
 \label{tab:z-pattern-cplx}
 \endgroup
 \vspace{4pt}
 
-\paragraph{Classical homomorphism check for $Z_{01110}^{\mathrm{C}}$.}
-Take $h_S(q,\ell,t,L)=q$, $h_I=\mathrm{id}$, and $h_O=\mathrm{id}$. Every progress state $q$ is hit by $(q,0,0,0)$, so $h_S$ is surjective. Transition preservation: for any bit $b$,
-\[
-  h_S\bigl(\delta_{\mathrm{C}}((q,\ell,t,L),b)\bigr)
-  = h_S\bigl(\delta_{01110}(q,b),\,b,\,t{+}1,\,L{+}1\bigr)
-  = \delta_{01110}(q,b)
-  = \delta_{01110}\bigl(h_S(q,\ell,t,L),\,h_I(b)\bigr).
-\]
-Readout preservation: $\rho_{\mathrm{C}}(q,\ell,t,L)=\rho_{01110}(q)=\rho_{01110}(h_S(q,\ell,t,L))$. Thus $h$ is a Wymore system homomorphism into $Z_{01110}$, and again $Z_{01110}^{\mathrm{C}}\models_{\mathrm{dyn}}\Phi_{Z_{01110}}$. Because the progress component ranges over a finite set, the same maps may also be exhibited and verified by exhaustive checking of the finite transition table.
+\paragraph{Workflow contrast at v3.}
+\textit{Assertional:} $\Phi_{Z_{01110}}$ is still the fragment compiled at the reference; verifying the refactor means re-checking that same clause set on the shift-register tables (on these finite spaces, equivalently searching or verifying a Def.~4.3 witness). No new property derivation is required from the engineer.
+\textit{Classical:} the engineer must construct and prove a map $h_S$ from every history $w$ to a progress state in $\{0,\ldots,5\}$. The correct choice is to run the reference transition table from $0$ along $w$ (equivalently, longest-prefix-suffix progress of $01110$ on $w$). Surjectivity holds because each progress $q$ is realized by the length-$q$ prefix of $01110$. Transition preservation is the statement that sliding the window agrees with one reference step---true for this overlap-aware table, but not obvious a priori and not a component projection. Readout preservation is $\rho_{\mathrm{v3}}(w)=1$ iff $h_S(w)=5$. Every subsequent architectural change of this kind again forces a human to rebuild and re-prove such an $h_S$, whereas the assertional side reuses $\Phi_{Z_{01110}}$.
 
-Graphically, Figure~\ref{fig:z-pattern} is still the \emph{required} behavior. Medium and complex buildables are larger machines whose first component follows that figure; the extra components are implementation detail. Checking $\Phi_{Z_{01110}}$ asks whether that projected component obeys the reference table---equivalently, whether the projection $h_S$ is a homomorphism.
+Instrumentation at v2 keeps a trivial projection; the v3 shift register is where classical maintenance becomes laborious while the assertional artifact stays fixed. Graphically, Figure~\ref{fig:z-pattern} remains the required behavior; checking $\Phi_{Z_{01110}}$ asks whether the buildable's projected progress obeys that table.
 
 \subsection{Dual-Port Pattern Select}
 \label{sec:case-dual}

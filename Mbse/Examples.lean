@@ -23,7 +23,7 @@ open WymoreExercises DynamicsLivenessExplore DynamicsLivenessUResponse
   PartialDynamicsHomFragment Homomorphism
 
 export WymoreExercises (caseStudy_playbook onesCounter pattern01110 realAccumulator
-  dualPatternSpec)
+  dualPatternSpec pattern01110Shift pattern01110V1 pattern01110V2 pattern01110V3)
 
 export DynamicsLivenessExplore (exploration_summary candidateVerdict)
 

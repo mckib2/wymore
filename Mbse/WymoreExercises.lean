@@ -188,7 +188,7 @@ def pattern01110Next (q : MatchState) (b : Bit) : MatchState :=
   | 4, false => 5
   | 4, true  => 0
   | 5, false => 1
-  | 5, true  => 0
+  | 5, true  => 2  -- overlap: `01110`++`1` leaves prefix `01`
   | _, _ => 0
 
 def pattern01110Out (q : MatchState) : Bit :=
@@ -388,9 +388,214 @@ theorem pattern01110Rich_iff_hom :
       IsHomomorphicImage pattern01110 pattern01110Rich :=
   partialDynamicsHom_iff_hom
 
-/-! ## Light extension: dual-port pattern select -/
+/-! ## Lifecycle v3: shift-register refactor (no explicit progress component) -/
 
-/-- `(mode, data)`: `mode = true` tracks `01110`; `mode = false` tracks short pattern `01`. -/
+/-- Filling-then-sliding bit history of length at most 5. -/
+structure Shift5State where
+  bits : List Bit
+  length_le : bits.length ≤ 5
+  deriving DecidableEq
+
+/-- All bit-lists of a fixed length (newest-last / chronological order). -/
+def bitLists : (n : Nat) → List (List Bit)
+  | 0 => [[]]
+  | n + 1 => (bitLists n).flatMap fun t => [false :: t, true :: t]
+
+theorem bitLists_length (n : Nat) : ∀ l ∈ bitLists n, l.length = n := by
+  induction n with
+  | zero => intro l hl; simp [bitLists] at hl ⊢; simp [hl]
+  | succ n ih =>
+    intro l hl
+    simp only [bitLists, List.mem_flatMap] at hl
+    obtain ⟨t, ht, hmem⟩ := hl
+    have htlen := ih t ht
+    simp only [List.mem_cons, List.not_mem_nil, or_false] at hmem
+    rcases hmem with h | h <;> simp [h, htlen]
+
+theorem bitLists_complete (n : Nat) :
+    ∀ l : List Bit, l.length = n → l ∈ bitLists n := by
+  induction n with
+  | zero =>
+    intro l hl
+    simp [bitLists, List.length_eq_zero_iff.mp hl]
+  | succ n ih =>
+    intro l hl
+    match l with
+    | [] => simp at hl
+    | b :: t =>
+      have ht : t.length = n := by
+        simp only [List.length_cons] at hl
+        exact Nat.succ.inj hl
+      simp only [bitLists, List.mem_flatMap]
+      refine ⟨t, ih t ht, ?_⟩
+      cases b <;> simp
+
+def Shift5State.empty : Shift5State := ⟨[], by decide⟩
+
+/-- Append `b`; once full (length 5), drop the oldest bit. -/
+def Shift5State.shiftIn (s : Shift5State) (b : Bit) : Shift5State :=
+  if _h : s.bits.length < 5 then
+    ⟨s.bits ++ [b], by
+      have := s.length_le
+      simp only [List.length_append, List.length_singleton]
+      omega⟩
+  else
+    ⟨s.bits.tail ++ [b], by
+      have hlen : s.bits.length = 5 := by
+        have := s.length_le
+        omega
+      simp [List.length_append, List.length_tail, hlen]⟩
+
+/-- Progress = run the reference matcher on the buffered history from state 0. -/
+def Shift5State.progress (s : Shift5State) : MatchState :=
+  s.bits.foldl pattern01110Next (0 : MatchState)
+
+def Shift5State.out (s : Shift5State) : Bit :=
+  decide (s.bits = [false, true, true, true, false])
+
+/-- Flagship v3 buildable: state is only the recent input window. -/
+def pattern01110Shift : DiscreteSystem Shift5State Bit Bit :=
+  DiscreteSystem.ofTotal Shift5State.shiftIn Shift5State.out ⟨Shift5State.empty⟩
+
+private def slideOk (l : List Bit) (b : Bit) : Bool :=
+  decide
+    ((l.tail ++ [b]).foldl pattern01110Next (0 : MatchState) =
+      pattern01110Next (l.foldl pattern01110Next (0 : MatchState)) b)
+
+private theorem slideOk_all :
+    (bitLists 5).all (fun l => [false, true].all (fun b => slideOk l b)) = true := by
+  native_decide
+
+private theorem fold_slide (l : List Bit) (b : Bit) (hl : l.length = 5) :
+    (l.tail ++ [b]).foldl pattern01110Next (0 : MatchState) =
+      pattern01110Next (l.foldl pattern01110Next (0 : MatchState)) b := by
+  have hmem := bitLists_complete 5 l hl
+  have hall := List.all_eq_true.mp slideOk_all l hmem
+  have hb : b ∈ ([false, true] : List Bit) := by cases b <;> simp
+  have hbok := List.all_eq_true.mp hall b hb
+  simpa [slideOk, decide_eq_true_eq] using hbok
+
+private def acceptOk (l : List Bit) : Bool :=
+  decide
+    ((l = [false, true, true, true, false]) ↔
+      l.foldl pattern01110Next (0 : MatchState) = (5 : MatchState))
+
+private theorem acceptOk_all :
+    (List.range 6).all (fun n => (bitLists n).all acceptOk) = true := by
+  native_decide
+
+private theorem accept_iff_progress5 (l : List Bit) (hle : l.length ≤ 5) :
+    (l = [false, true, true, true, false]) ↔
+      l.foldl pattern01110Next (0 : MatchState) = (5 : MatchState) := by
+  have hn : l.length ∈ List.range 6 := by
+    simp [List.mem_range]; omega
+  have halln := List.all_eq_true.mp acceptOk_all l.length hn
+  have hmem := bitLists_complete l.length l rfl
+  -- wait, bitLists_complete needs length = n, we have length ≤ 5
+  have hmem' : l ∈ bitLists l.length := bitLists_complete l.length l rfl
+  have hok := List.all_eq_true.mp halln l hmem'
+  simpa [acceptOk, decide_eq_true_eq] using hok
+
+private theorem shift5_progress_shiftIn (s : Shift5State) (b : Bit) :
+    Shift5State.progress (Shift5State.shiftIn s b) =
+      pattern01110Next (Shift5State.progress s) b := by
+  simp only [Shift5State.progress, Shift5State.shiftIn]
+  by_cases h : s.bits.length < 5
+  · simp only [dif_pos h, List.foldl_append, List.foldl_cons, List.foldl_nil]
+  · simp only [dif_neg h]
+    have hlen : s.bits.length = 5 := by
+      have := s.length_le
+      omega
+    exact fold_slide s.bits b hlen
+
+private theorem shift5_out_eq_patternOut (s : Shift5State) :
+    Shift5State.out s = pattern01110Out (Shift5State.progress s) := by
+  simp only [Shift5State.out, Shift5State.progress, pattern01110Out]
+  have h := accept_iff_progress5 s.bits s.length_le
+  cases hdec : decide (s.bits = [false, true, true, true, false]) with
+  | false =>
+    have hne : s.bits ≠ [false, true, true, true, false] := by
+      simpa using hdec
+    have hp : s.bits.foldl pattern01110Next (0 : MatchState) ≠ 5 := by
+      intro hp; exact hne (h.mpr hp)
+    have : ¬ ((s.bits.foldl pattern01110Next (0 : MatchState)).val = 5) := by
+      intro hv; exact hp (Fin.eq_of_val_eq hv)
+    simp [this]
+  | true =>
+    have heq : s.bits = [false, true, true, true, false] := by
+      simpa using hdec
+    have hp : s.bits.foldl pattern01110Next (0 : MatchState) = 5 := h.mp heq
+    simp [hp]
+
+def pattern01110Shift_witness :
+    HomomorphicImageWitness pattern01110 pattern01110Shift where
+  HS := Shift5State.progress
+  HI := id
+  HO := id
+  HS_surjective := by
+    intro q
+    match q with
+    | ⟨0, _⟩ => exact ⟨Shift5State.empty, by simp [Shift5State.progress, Shift5State.empty]⟩
+    | ⟨1, _⟩ =>
+      refine ⟨⟨[false], by decide⟩, ?_⟩
+      simp [Shift5State.progress, pattern01110Next]
+    | ⟨2, _⟩ =>
+      refine ⟨⟨[false, true], by decide⟩, ?_⟩
+      simp [Shift5State.progress, pattern01110Next]
+    | ⟨3, _⟩ =>
+      refine ⟨⟨[false, true, true], by decide⟩, ?_⟩
+      simp [Shift5State.progress, pattern01110Next]
+    | ⟨4, _⟩ =>
+      refine ⟨⟨[false, true, true, true], by decide⟩, ?_⟩
+      simp [Shift5State.progress, pattern01110Next]
+    | ⟨5, _⟩ =>
+      refine ⟨⟨[false, true, true, true, false], by decide⟩, ?_⟩
+      simp [Shift5State.progress, pattern01110Next]
+  HI_surjective := Function.surjective_id
+  HO_surjective := Function.surjective_id
+  preserves_transition := fun s oi => by
+    cases oi with
+    | none =>
+      simp [pattern01110Shift, pattern01110, FSMSystem.toDiscreteSystem, DiscreteSystem.ofTotal]
+    | some b =>
+      simp [pattern01110Shift, pattern01110, pattern01110FSM, FSMSystem.toDiscreteSystem,
+        DiscreteSystem.ofTotal, shift5_progress_shiftIn]
+  preserves_readout := fun s => by
+    simp [pattern01110Shift, pattern01110, pattern01110FSM, FSMSystem.toDiscreteSystem,
+      DiscreteSystem.ofTotal, Option.map_some, shift5_out_eq_patternOut]
+
+theorem pattern01110Shift_hom :
+    IsHomomorphicImage pattern01110 pattern01110Shift :=
+  ⟨pattern01110Shift_witness⟩
+
+theorem pattern01110Shift_satisfies :
+    SystemSatisfiesPartialDynamicsHom pattern01110 pattern01110Shift :=
+  partialDynamicsHom_of_hom pattern01110Shift_hom
+
+theorem pattern01110Shift_iff_hom :
+    SystemSatisfiesPartialDynamicsHom pattern01110 pattern01110Shift ↔
+      IsHomomorphicImage pattern01110 pattern01110Shift :=
+  partialDynamicsHom_iff_hom
+
+theorem pattern01110Shift_maps_verified :
+    IsHomomorphicImage pattern01110 pattern01110Shift :=
+  tryConstructHomWitness_is_hom
+    Shift5State.progress id id
+    (fun s oi => by
+      cases oi with
+      | none =>
+        simp [pattern01110Shift, pattern01110, FSMSystem.toDiscreteSystem, DiscreteSystem.ofTotal]
+      | some b =>
+        simp [pattern01110Shift, pattern01110, pattern01110FSM, FSMSystem.toDiscreteSystem,
+          DiscreteSystem.ofTotal, shift5_progress_shiftIn])
+    (fun s => by
+      simp [pattern01110Shift, pattern01110, pattern01110FSM, FSMSystem.toDiscreteSystem,
+        DiscreteSystem.ofTotal, Option.map_some, shift5_out_eq_patternOut])
+    pattern01110Shift_witness.HS_surjective
+    Function.surjective_id
+    Function.surjective_id
+
+/-! ## Light extension: dual-port pattern select -/
 abbrev SelectInput := Bit × Bit
 
 def dualPatternNext (q : MatchState) (inp : SelectInput) : MatchState :=
@@ -568,7 +773,8 @@ theorem realAccumulatorRich_iff_hom :
       IsHomomorphicImage realAccumulator realAccumulatorRich :=
   partialDynamicsHom_iff_hom
 
-/-- Playbook: discrete and real elaborations satisfy Φ_dyn iff implementability. -/
+/-- Playbook: lifecycle iterations satisfy Φ_dyn iff implementability.
+    Pattern v3 is the shift-register refactor (Rich retained in-library). -/
 theorem caseStudy_playbook :
     (SystemSatisfiesPartialDynamicsHom onesCounter onesCounterDirect ↔
       IsHomomorphicImage onesCounter onesCounterDirect) ∧
@@ -580,14 +786,28 @@ theorem caseStudy_playbook :
       IsHomomorphicImage pattern01110 pattern01110Direct) ∧
     (SystemSatisfiesPartialDynamicsHom pattern01110 pattern01110Shadow ↔
       IsHomomorphicImage pattern01110 pattern01110Shadow) ∧
-    (SystemSatisfiesPartialDynamicsHom pattern01110 pattern01110Rich ↔
-      IsHomomorphicImage pattern01110 pattern01110Rich) ∧
+    (SystemSatisfiesPartialDynamicsHom pattern01110 pattern01110Shift ↔
+      IsHomomorphicImage pattern01110 pattern01110Shift) ∧
     (SystemSatisfiesPartialDynamicsHom realAccumulator realAccumulatorElab ↔
       IsHomomorphicImage realAccumulator realAccumulatorElab) ∧
     (SystemSatisfiesPartialDynamicsHom realAccumulator realAccumulatorRich ↔
       IsHomomorphicImage realAccumulator realAccumulatorRich) :=
   ⟨onesCounter_reflexive_iff_hom, onesCounterBoth_iff_hom, onesCounterRich_iff_hom,
-    pattern01110_direct_iff_hom, pattern01110Shadow_iff_hom, pattern01110Rich_iff_hom,
+    pattern01110_direct_iff_hom, pattern01110Shadow_iff_hom, pattern01110Shift_iff_hom,
     realAccumulatorElab_iff_hom, realAccumulatorRich_iff_hom⟩
+
+/-! ## Paper-facing lifecycle aliases (v1 prototype / v2 instrumented / v3 refactor) -/
+
+abbrev onesCounterV1 := onesCounterDirect
+abbrev onesCounterV2 := onesCounterBoth
+abbrev onesCounterV3 := onesCounterRich
+
+abbrev pattern01110V1 := pattern01110Direct
+abbrev pattern01110V2 := pattern01110Shadow
+abbrev pattern01110V3 := pattern01110Shift
+
+noncomputable abbrev realAccumulatorV1 := realAccumulatorDirect
+noncomputable abbrev realAccumulatorV2 := realAccumulatorElab
+noncomputable abbrev realAccumulatorV3 := realAccumulatorRich
 
 end WymoreExercises

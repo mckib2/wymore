@@ -217,6 +217,10 @@ theorem pattern01110Rich_via_tryConstruct :
     IsHomomorphicImage pattern01110 pattern01110Rich :=
   pattern01110Rich_maps_verified
 
+theorem pattern01110Shift_via_tryConstruct :
+    IsHomomorphicImage pattern01110 pattern01110Shift :=
+  pattern01110Shift_maps_verified
+
 theorem dualPatternElab_search_ok :
     IsHomomorphicImage dualPatternSpec dualPatternElab :=
   dualPatternElab_hom
