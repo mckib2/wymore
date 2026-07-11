@@ -10,14 +10,14 @@ FLAGS := -pdf -outdir=$(BUILD_DIR) -auxdir=$(BUILD_DIR) -interaction=nonstopmode
 TEX_SOURCES := \
 	main.tex \
 	preamble.tex \
-	sections/introduction.tex \
-	sections/background.tex \
-	sections/methodology.tex \
-	sections/case-study.tex \
-	sections/case-study-discrete.tex \
-	sections/case-study-real.tex \
-	sections/discussion.tex \
-	sections/conclusions.tex \
+	sections/00-introduction.tex \
+	sections/01-background.tex \
+	sections/02-methodology.tex \
+	sections/03-case-study.tex \
+	sections/03-case-study-discrete.tex \
+	sections/03-case-study-real.tex \
+	sections/04-discussion.tex \
+	sections/05-conclusions.tex \
 	appendix/hom-biimp.tex \
 	appendix/encoding.tex
 
