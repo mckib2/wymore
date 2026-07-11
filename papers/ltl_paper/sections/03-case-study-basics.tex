@@ -1,0 +1,127 @@
+\subsection{Basic Kit: Counter, Subtracter, Adder, and Zero-Test}
+\label{sec:case-basics}
+
+\paragraph{Counter $Z_{\mathrm{inc}}$.}
+Behavior in plain language: start at count $0$; on enable $1$ increment; on enable $0$ hold; the output at every tick is the current count.
+
+\begingroup
+\renewcommand{\arraystretch}{1.25}
+\footnotesize
+\begin{center}
+\begin{tabularx}{0.78\linewidth}{@{}>{\raggedright\arraybackslash}p{2.8cm}Y@{}}
+    \rowcolor{tableheader}
+    \headingfont\bfseries Component & \headingfont\bfseries $Z_{\mathrm{inc}}$ \\
+    \addlinespace[2pt]
+    $S,I,O$ & $\mathbb{N}$, $\{0,1\}$, $\mathbb{N}$ \\
+    \addlinespace[2pt]
+    $s_0$ & $0$ \\
+    \addlinespace[2pt]
+    $\delta(n,1)$ & $n+1$ \\
+    \addlinespace[2pt]
+    $\delta(n,0)$ & $n$ \\
+    \addlinespace[2pt]
+    $\delta(n,\mathrm{none})$ & $n$ \\
+    \addlinespace[2pt]
+    $\rho(n)$ & $n$ \\
+\end{tabularx}
+\end{center}
+\captionof{table}{Incrementing counter reference system $Z_{\mathrm{inc}}$.}
+\label{tab:z-inc}
+\endgroup
+\vspace{4pt}
+
+\paragraph{Compiled $\Phi_{\mathrm{dyn}}$.}
+For every $n\in\mathbb{N}$:
+\begin{align*}
+  &\text{(readout)} && G\bigl(\mathit{state}(n) \rightarrow \mathit{output}(n)\bigr), \\
+  &\text{(guided $1$)} && G\bigl((\mathit{state}(n)\wedge\mathit{input}(1)) \rightarrow X(\mathit{state}(n{+}1))\bigr), \\
+  &\text{(guided $0$)} && G\bigl((\mathit{state}(n)\wedge\mathit{input}(0)) \rightarrow X(\mathit{state}(n))\bigr), \\
+  &\text{(autonomous)} && G\bigl((\mathit{state}(n)\wedge\mathit{input}(\mathrm{none})) \rightarrow X(\mathit{state}(n))\bigr).
+\end{align*}
+Denote this family by $\Phi_{Z_{\mathrm{inc}}}$. Hom-relative checking uses $\mathit{specState}(n)$ meaning ``the buildable's projected count equals $n$.''
+
+\paragraph{Direct buildable.}
+$Z_{\mathrm{inc}}^{\mathrm{dir}}$ is identical to Table~\ref{tab:z-inc}. The homomorphism is the identity: $h_S=h_I=h_O=\mathrm{id}$. By the bi-implication, $Z_{\mathrm{inc}}^{\mathrm{dir}}\models_{\mathrm{dyn}}\Phi_{Z_{\mathrm{inc}}}$.
+
+\paragraph{Subtracter $Z_{\mathrm{dec}}$.}
+Behavior: start at $0$; on enable $1$ apply saturating decrement $n\mapsto n\dot{-}1$; on enable $0$ hold; readout is the current value.
+
+\begingroup
+\renewcommand{\arraystretch}{1.25}
+\footnotesize
+\begin{center}
+\begin{tabularx}{0.78\linewidth}{@{}>{\raggedright\arraybackslash}p{2.8cm}Y@{}}
+    \rowcolor{tableheader}
+    \headingfont\bfseries Component & \headingfont\bfseries $Z_{\mathrm{dec}}$ \\
+    \addlinespace[2pt]
+    $S,I,O$ & $\mathbb{N}$, $\{0,1\}$, $\mathbb{N}$ \\
+    \addlinespace[2pt]
+    $\delta(n,1)$ & $n\dot{-}1$ \\
+    \addlinespace[2pt]
+    $\delta(n,0)$ & $n$ \\
+    \addlinespace[2pt]
+    $\rho(n)$ & $n$ \\
+\end{tabularx}
+\end{center}
+\captionof{table}{Saturating decrement reference system $Z_{\mathrm{dec}}$.}
+\label{tab:z-dec}
+\endgroup
+\vspace{4pt}
+
+Compiled $\Phi_{Z_{\mathrm{dec}}}$ is the same clause shape as $\Phi_{Z_{\mathrm{inc}}}$, with guided-$1$ targeting $n\dot{-}1$. The direct buildable $Z_{\mathrm{dec}}^{\mathrm{dir}}$ coincides with the reference table; $h=\mathrm{id}$.
+
+\paragraph{Adder $Z_{\mathrm{add}}$.}
+Behavior: Nat accumulator with commands $\mathit{hold}$, $\mathit{clear}$, and $\mathit{add}(u)$. Clear resets to $0$; add accumulates; readout is the running sum.
+
+\begingroup
+\renewcommand{\arraystretch}{1.25}
+\footnotesize
+\begin{center}
+\begin{tabularx}{0.85\linewidth}{@{}>{\raggedright\arraybackslash}p{2.8cm}Y@{}}
+    \rowcolor{tableheader}
+    \headingfont\bfseries Component & \headingfont\bfseries $Z_{\mathrm{add}}$ \\
+    \addlinespace[2pt]
+    $S,I,O$ & $\mathbb{N}$, $\{\mathit{hold},\mathit{clear},\mathit{add}(u)\}$, $\mathbb{N}$ \\
+    \addlinespace[2pt]
+    $\delta(s,\mathit{hold})$ & $s$ \\
+    \addlinespace[2pt]
+    $\delta(s,\mathit{clear})$ & $0$ \\
+    \addlinespace[2pt]
+    $\delta(s,\mathit{add}(u))$ & $s+u$ \\
+    \addlinespace[2pt]
+    $\rho(s)$ & $s$ \\
+\end{tabularx}
+\end{center}
+\captionof{table}{Nat accumulator reference system $Z_{\mathrm{add}}$.}
+\label{tab:z-add}
+\endgroup
+\vspace{4pt}
+
+Compiled $\Phi_{Z_{\mathrm{add}}}$ indexes guided steps by command. The direct buildable is again the identity table.
+
+\paragraph{Zero-test $Z_{\mathrm{jz}}$.}
+Behavior: Moore latch whose next state (and readout) is whether the sampled Nat equals $0$. Plain-language intent: \emph{branch on zero}.
+
+\begingroup
+\renewcommand{\arraystretch}{1.25}
+\footnotesize
+\begin{center}
+\begin{tabularx}{0.78\linewidth}{@{}>{\raggedright\arraybackslash}p{2.8cm}Y@{}}
+    \rowcolor{tableheader}
+    \headingfont\bfseries Component & \headingfont\bfseries $Z_{\mathrm{jz}}$ \\
+    \addlinespace[2pt]
+    $S,I,O$ & $\{0,1\}$, $\mathbb{N}$, $\{0,1\}$ \\
+    \addlinespace[2pt]
+    $\delta(\_,n)$ & $[n{=}0]$ \\
+    \addlinespace[2pt]
+    $\rho(z)$ & $z$ \\
+\end{tabularx}
+\end{center}
+\captionof{table}{Zero-test reference system $Z_{\mathrm{jz}}$.}
+\label{tab:z-jz}
+\endgroup
+\vspace{4pt}
+
+Compiled $\Phi_{Z_{\mathrm{jz}}}$ constrains the latch update and readout. The direct buildable coincides with the reference.
+
+Together these four zones are the shelf kit used below: increment, decrement, accumulate-with-clear, and zero-test. Each has a compiled $\Phi_{\mathrm{dyn}}$ and a verified identity buildable.

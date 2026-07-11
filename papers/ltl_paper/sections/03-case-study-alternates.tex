@@ -1,0 +1,47 @@
+\subsection{Alternate Buildables: Same Specs, Changing Encodings}
+\label{sec:case-alternates}
+
+The preceding directs treat each reference in isolation with an identity buildable. The value of a compiled $\Phi_{\mathrm{dyn}}$ appears when the \emph{same} reference is held fixed while buildable structure evolves. Three alternates illustrate the pattern; the binary-shift counter is the structural-divergence exhibit.
+
+\paragraph{Binary-shift counter for $Z_{\mathrm{inc}}$.}
+\label{sec:case-shift-counter}
+State is a little-endian bit list; enable $1$ performs binary increment with carry; enable $0$ holds; readout is the Nat value of the bits. There is no explicit count component---only the bit window.
+
+\begingroup
+\renewcommand{\arraystretch}{1.2}
+\footnotesize
+\begin{center}
+\begin{tabularx}{0.92\linewidth}{@{}>{\raggedright\arraybackslash}p{2.8cm}Y@{}}
+    \rowcolor{tableheader}
+    \headingfont\bfseries Component & \headingfont\bfseries $Z_{\mathrm{inc}}^{\mathrm{shift}}$ \\
+    \addlinespace[2pt]
+    $S$ & finite bit lists (little-endian) \\
+    \addlinespace[2pt]
+    $I,O$ & $\{0,1\}$, $\mathbb{N}$ \\
+    \addlinespace[2pt]
+    $\delta(\mathit{bits},1)$ & binary increment with carry \\
+    \addlinespace[2pt]
+    $\delta(\mathit{bits},0)$ & $\mathit{bits}$ \\
+    \addlinespace[2pt]
+    $\rho(\mathit{bits})$ & Nat value of $\mathit{bits}$ \\
+    \addlinespace[2pt]
+    Maps to $Z_{\mathrm{inc}}$ & $h_S=\mathrm{value}$,\ $h_I=\mathrm{id}$,\ $h_O=\mathrm{id}$ \\
+\end{tabularx}
+\end{center}
+\captionof{table}{Binary-shift counter: no explicit count field; $h_S$ interprets the bit list.}
+\label{tab:z-inc-shift}
+\endgroup
+\vspace{4pt}
+
+\paragraph{Workflow contrast.}
+\textit{Assertional:} $\Phi_{Z_{\mathrm{inc}}}$ is unchanged from the direct buildable; verifying the shift encoding means re-checking that same fragment (equivalently, exhibiting/verifying a Def.~4.3 witness on finite abstractions, or checking the exhibited maps on $\mathbb{N}$).
+\textit{Classical:} $h_S$ is the bit-list valuation---not a component projection. Transition preservation requires proving that binary increment raises the valuation by one; each structural change to the bit encoding forces that argument to be revisited.
+
+\paragraph{Instrumented decrement for $Z_{\mathrm{dec}}$.}
+State $(n,k)$ tracks the current value and a pulse count of enable-$1$ steps; readout is $n$. Classical $h_S$ is the projection $(n,k)\mapsto n$. Assertional checking reuses $\Phi_{Z_{\mathrm{dec}}}$; the extra counter is invisible to the fragment so long as the projection is preserved.
+
+\paragraph{Two zero-test encodings for $Z_{\mathrm{jz}}$.}
+An elaborated latch stores $(\mathit{flag},\mathit{lastSample})$ and projects to the flag; a dual encoding stores the flag twice and projects to the first copy. Both are checked against the same $\Phi_{Z_{\mathrm{jz}}}$. Classical witnesses remain projections; the point is that instrumentation does not force a new property set.
+
+\paragraph{What checking means.}
+Across these alternates, $\mathit{specState}$ atoms are interpreted relative to the chosen $h_S$. Revising an elaboration does not change the compiled fragment indexed by $Z_{\text{spec}}$; one re-checks the same property set. The binary-shift counter is the case where that re-check is paired with a non-trivial classical $h_S$.

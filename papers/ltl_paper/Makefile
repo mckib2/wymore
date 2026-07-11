@@ -14,8 +14,9 @@ TEX_SOURCES := \
 	sections/01-background.tex \
 	sections/02-methodology.tex \
 	sections/03-case-study.tex \
-	sections/03-case-study-discrete.tex \
-	sections/03-case-study-real.tex \
+	sections/03-case-study-basics.tex \
+	sections/03-case-study-alternates.tex \
+	sections/03-case-study-fibonacci.tex \
 	sections/04-discussion.tex \
 	sections/05-conclusions.tex \
 	appendix/hom-biimp.tex

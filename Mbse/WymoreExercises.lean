@@ -7,7 +7,7 @@ import Mbse.Homomorphism
 import Mathlib.Data.Real.Basic
 
 /-!
-# Wymore textbook exercises and paper case-study systems
+# Wymore textbook exercises and gallery systems
 
 Faithful encodings for:
 * Exercise 2.128 — count of 1-inputs (`onesCounter`)
@@ -15,7 +15,9 @@ Faithful encodings for:
 * Light extension — dual-port pattern select among two fixed strings
 * Real accumulator — discrete-time running sum over `ℝ`
 
-These support the paper case studies. Main-text prose must not name Lean.
+These remain available as a gallery. The paper case-study spine is
+[`MinskyKit`](MinskyKit.lean) / [`FibCaseStudy`](FibCaseStudy.lean).
+Main-text prose must not name Lean.
 -/
 
 namespace WymoreExercises
@@ -496,7 +498,7 @@ private theorem accept_iff_progress5 (l : List Bit) (hle : l.length ≤ 5) :
   have hok := List.all_eq_true.mp halln l hmem'
   simpa [acceptOk, decide_eq_true_eq] using hok
 
-private theorem shift5_progress_shiftIn (s : Shift5State) (b : Bit) :
+theorem shift5_progress_shiftIn (s : Shift5State) (b : Bit) :
     Shift5State.progress (Shift5State.shiftIn s b) =
       pattern01110Next (Shift5State.progress s) b := by
   simp only [Shift5State.progress, Shift5State.shiftIn]
@@ -508,7 +510,7 @@ private theorem shift5_progress_shiftIn (s : Shift5State) (b : Bit) :
       omega
     exact fold_slide s.bits b hlen
 
-private theorem shift5_out_eq_patternOut (s : Shift5State) :
+theorem shift5_out_eq_patternOut (s : Shift5State) :
     Shift5State.out s = pattern01110Out (Shift5State.progress s) := by
   simp only [Shift5State.out, Shift5State.progress, pattern01110Out]
   have h := accept_iff_progress5 s.bits s.length_le

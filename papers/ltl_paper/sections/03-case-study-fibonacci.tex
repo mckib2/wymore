@@ -1,0 +1,104 @@
+\subsection{Fibonacci Composition: Kit Zones as a Register Machine}
+\label{sec:case-fib}
+
+The preceding sections treat each reference in isolation, then vary buildables against a fixed $\Phi_{\mathrm{dyn}}$. T3SD buildability is often about the opposite situation: a restricted kit of available subsystems must be wired so that their interaction realizes a coupled functional intent. The kit already developed is: $Z_{\mathrm{inc}}$, $Z_{\mathrm{dec}}$, $Z_{\mathrm{add}}$, and $Z_{\mathrm{jz}}$. That kit has no shelf zone whose plain-language intent is ``on receipt of $n$, output the $n$th Fibonacci number.'' The composition below assembles exactly that behavior from the shelf buildables. Implementability is established by an explicit Wymore homomorphism (equivalently, by satisfaction of the compiled dynamics-encoding fragment). The reference also computes $F_n$ in the usual sense: after load $n$ and enough micro-steps, readout equals the $n$th Fibonacci number.
+
+\paragraph{Zones and recipe.}
+Let $Z_{\mathrm{Fib}}$ be a monolithic reference with control phases
+\[
+  \{\mathit{idle},\mathit{check},\mathit{summing},\mathit{moveA},\mathit{moveB},\mathit{decr},\mathit{done}\}
+\]
+and registers $(a,b,t,\mathit{countdown})$. Commands are $\mathit{load}(n)$ and $\mathit{step}$. Plain-language intent: \emph{on $\mathit{load}(n)$, set $a{=}0$, $b{=}1$, $\mathit{countdown}{=}n$; while $\mathit{countdown}\neq 0$, set $t{=}a{+}b$, move $b$ into $a$ and $t$ into $b$, decrement the countdown; when the countdown is zero, halt with readout $a$}. After $n$ iterations, $a=F_n$.
+
+\begingroup
+\renewcommand{\arraystretch}{1.2}
+\footnotesize
+\begin{center}
+\begin{tabularx}{0.92\linewidth}{@{}>{\raggedright\arraybackslash}p{2.6cm}Y@{}}
+    \rowcolor{tableheader}
+    \headingfont\bfseries Component & \headingfont\bfseries $Z_{\mathrm{Fib}}$ \\
+    \addlinespace[2pt]
+    External $I$ & $\{\mathit{load}(n),\mathit{step}\}$ \\
+    \addlinespace[2pt]
+    $S$ & phase $\times$ $(a,b,t,\mathit{countdown})$ \\
+    \addlinespace[2pt]
+    Kit roles & $a,b,t$ via $Z_{\mathrm{add}}$;\ countdown via $Z_{\mathrm{dec}}$;\ branch via $Z_{\mathrm{jz}}$;\ iteration pulses via $Z_{\mathrm{inc}}$ \\
+    \addlinespace[2pt]
+    $\rho$ & $a$ \\
+\end{tabularx}
+\end{center}
+\captionof{table}{Fibonacci reference $Z_{\mathrm{Fib}}$: load $n$, iterate until countdown zero, readout $F_n$.}
+\label{tab:z-fib}
+\endgroup
+\vspace{4pt}
+
+\begin{figure}[!ht]
+  \centering
+  \resizebox{0.98\textwidth}{!}{%
+  \begin{tikzpicture}[
+    >=Stealth,
+    font=\scriptsize,
+    zone/.style={draw=blue!65!black, fill=blue!6, rounded corners=2pt,
+      align=center, minimum height=0.95cm, minimum width=2.4cm, thick},
+    wire/.style={->, thick, draw=black!70},
+    port/.style={font=\scriptsize, align=center}
+  ]
+    \node[port] (inA) {$\mathit{load}/\mathit{step}$};
+    \node[zone, right=0.55cm of inA] (ctl)
+      {$Z_{\mathrm{Fib}}$\\[-1pt]
+       {\tiny phase$\,\times\,$registers}};
+    \node[port, right=1.1cm of ctl] (outA) {$\rho=a$};
+    \draw[wire] (inA) -- (ctl);
+    \draw[wire] (ctl) -- (outA);
+    \node[below=0.35cm of ctl, font=\tiny, align=center, text width=9cm]
+      {Monolithic table: check zero $\rightarrow$ sum $a{+}b$ $\rightarrow$ move registers $\rightarrow$ DEC countdown.};
+  \end{tikzpicture}}
+  \caption{Reference Fibonacci system $Z_{\mathrm{Fib}}$: load index $n$, micro-step to $F_n$.}
+  \label{fig:fib-spec}
+\end{figure}
+
+Compiled $\Phi_{Z_{\mathrm{Fib}}}$ is the dynamics-encoding fragment of this monolithic table: guided steps of each phase together with readout $a$. Checking uses the usual hom-relative atoms on the projected phase and registers.
+
+\paragraph{Kit-assembled buildable.}
+Neither the Fibonacci recurrence nor the control program is a single shelf zone. Assemble $Z_{\mathrm{Fib}}^{\mathrm{impl}}$ as a product of shelf states: three $Z_{\mathrm{add}}$ registers $(a,b,t)$, one $Z_{\mathrm{dec}}$ countdown, one $Z_{\mathrm{jz}}$ latch, and one $Z_{\mathrm{inc}}$ iteration-pulse counter, plus a shared phase latch. The resulting state is richer than the monolithic reference, but each coupled update applies the corresponding shelf next-state (or readout) function---clear/add for register moves and sums, enable-gated decrement for the countdown, zero-test sampling for the branch, enable-gated increment for completed iterations. Load injects $n$ into the countdown and initializes the adder registers via clear/add.
+
+\begin{figure}[!ht]
+  \centering
+  \resizebox{0.98\textwidth}{!}{%
+  \begin{tikzpicture}[
+    >=Stealth,
+    font=\scriptsize,
+    zone/.style={draw=blue!65!black, fill=blue!6, rounded corners=2pt,
+      align=center, minimum height=0.85cm, minimum width=1.85cm, thick},
+    wire/.style={->, thick, draw=black!70},
+    port/.style={font=\scriptsize, align=center}
+  ]
+    \node[port] (inB) {cmd};
+    \node[zone, right=0.4cm of inB] (phase) {phase};
+    \node[zone, right=0.35cm of phase] (addA) {$Z_{\mathrm{add}}$\\[-1pt]{\tiny $a$}};
+    \node[zone, right=0.25cm of addA] (addB) {$Z_{\mathrm{add}}$\\[-1pt]{\tiny $b$}};
+    \node[zone, right=0.25cm of addB] (addT) {$Z_{\mathrm{add}}$\\[-1pt]{\tiny $t$}};
+    \node[zone, below=0.55cm of addA] (dec) {$Z_{\mathrm{dec}}$\\[-1pt]{\tiny cd}};
+    \node[zone, right=0.25cm of dec] (jz) {$Z_{\mathrm{jz}}$};
+    \node[zone, right=0.25cm of jz] (inc) {$Z_{\mathrm{inc}}$\\[-1pt]{\tiny pulses}};
+    \node[port, right=0.45cm of addT] (outB) {$\rho{=}a$};
+    \draw[wire] (inB) -- (phase);
+    \draw[wire] (phase) -- (addA);
+    \draw[wire] (addA) -- (addB);
+    \draw[wire] (addB) -- (addT);
+    \draw[wire] (addT) -- (outB);
+    \draw[wire] (phase.south) |- (dec.west);
+    \draw[wire] (dec) -- (jz);
+    \draw[wire] (jz) -- (inc);
+    \node[below=1.55cm of addB, font=\tiny, align=center, text width=11cm]
+      {Kit assembly: shelf $NZ$/$RZ$ at every wired step; $h_S$ forgets the pulse counter.};
+  \end{tikzpicture}}
+  \caption{Buildable $Z_{\mathrm{Fib}}^{\mathrm{impl}}$: Fibonacci control wired from kit INC/DEC/ADD/JZ zones.}
+  \label{fig:fib-impl}
+\end{figure}
+
+\paragraph{Workflow contrast.}
+\textit{Assertional:} $\Phi_{Z_{\mathrm{Fib}}}$ is compiled once from the monolithic table. Verifying $Z_{\mathrm{Fib}}^{\mathrm{impl}}$ means re-checking that fragment (equivalently, exhibiting/verifying a Def.~4.3 witness). Changing a shelf encoding re-runs the composed check against the same $\Phi_{Z_{\mathrm{Fib}}}$.
+\textit{Classical:} a human must construct $h_S$ mapping the product of shelf states onto phase$\times$registers and re-prove transition and readout preservation. Replacing either assembly forces that coupled witness to be rebuilt.
+
+The point is qualitative T3SD buildability under an honest technology bound: the missing Fibonacci zone is assembled from kit parts already verified in isolation---so assertional satisfaction of $\Phi_{Z_{\mathrm{Fib}}}$ holds---while classical maintenance tracks the new wiring inside the coupled witness. The composition claim is not merely prose: each wired step is required to apply a shelf next-state or readout function, and the reference is required to compute $F_n$ after load and sufficiently many steps.

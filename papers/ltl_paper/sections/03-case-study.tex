@@ -1,25 +1,18 @@
 \section{Case Study}
 \label{sec:case-study}
 
-This section walks through concrete reference systems and buildable implementations for a systems engineering audience. Each example follows the same \emph{lifecycle} shape:
+This section walks through concrete reference systems and buildable implementations for a systems engineering audience. The narrative has three parts:
 \begin{enumerate}
-    \item State the required behavior in plain language and as a discrete-system table $Z_{\text{spec}}$.
-    \item Compile the dynamics-encoding property set $\Phi_{\mathrm{dyn}}$ from that table once (Section~\ref{sec:dynamics-encoding-fragment}).
-    \item Treat successive buildables as iterations of the system-as-built:
-    \begin{itemize}
-        \item \textbf{v1 --- prototype:} a near-direct realization of $Z_{\text{spec}}$ (baseline).
-        \item \textbf{v2 --- instrumented build:} richer internal state (logging, parallel counters) that still projects cleanly onto $Z_{\text{spec}}$.
-        \item \textbf{v3 --- structural refactor:} a more substantial change to the state encoding; for the string recognizer this is a shift-register redesign with no explicit progress component.
-    \end{itemize}
-    \item At each iteration, contrast two verification workflows against the \emph{same} $\Phi_{\mathrm{dyn}}$:
-    \begin{itemize}
-        \item \textbf{Assertional:} re-check the compiled fragment on the new transition and readout tables (on finite spaces, equivalently search/verify a Def.~4.3 witness).
-        \item \textbf{Classical:} re-derive and prove a structure-specific Wymore homomorphism $h=(h_S,h_I,h_O)$.
-    \end{itemize}
+    \item \textbf{Basic kit.} Four Nat-valued shelf zones---an incrementing counter, a saturating subtracter, a clear/add accumulator, and a zero-test branch---each presented as a reference table $Z_{\text{spec}}$, a compiled dynamics-encoding fragment $\Phi_{\mathrm{dyn}}$, and one direct buildable $Z_{\text{impl}}$.
+    \item \textbf{Alternate buildables.} The same reference tables are held fixed while buildable encodings change (binary-shift counter; instrumented decrement; two zero-test latches). At each change we contrast assertional re-checking of the compiled fragment against classical reconstruction of a Wymore system homomorphism $h=(h_S,h_I,h_O)$.
+    \item \textbf{Composition surprise.} The kit already contains the ingredients of a register machine. Wiring those shelf buildables yields a Fibonacci system: on receipt of $n\in\mathbb{N}$, output the $n$th Fibonacci number.
 \end{enumerate}
-Examples are adapted from Wymore's discrete-system illustrations \citep{Wymore1993}. The ones-counter is pedagogical (mild elaborations, projections remain obvious). The string recognizer is the flagship value demonstration: instrumentation at v2 keeps a trivial projection, while the v3 shift register forces a non-trivial $h_S$. The real accumulator shows that the same maintenance pattern extends to real-valued state under a discrete clock. The case studies are qualitative on verification effort---they exhibit a stable fragment beside evolving buildables; they do not measure wall-clock cost.
+For readers less familiar with T3SD: a \emph{reference system} $Z_{\text{spec}}$ is a complete discrete-system table (states, inputs, outputs, next-state, readout) that expresses required behavior. A \emph{buildable system} $Z_{\text{impl}}$ is another such table---often with richer internal state---that is intended to realize the same behavior. Classical checking asks for a homomorphism from $Z_{\text{impl}}$ onto $Z_{\text{spec}}$. Here we instead compile $\Phi_{\mathrm{dyn}}$ from $Z_{\text{spec}}$ and check that property set on each buildable.
 
-\input{sections/03-case-study-discrete}
-\input{sections/03-case-study-real}
+The case studies are qualitative on verification effort---they exhibit a stable fragment beside evolving buildables and an honest kit-bound composition; they do not measure wall-clock cost. State spaces are infinite discrete ($\mathbb{N}$); maps are exhibited and verified by hand rather than discovered by search.
 
-Taken together, the examples compile $\Phi_{\mathrm{dyn}}$ once per reference table, re-check that fragment across lifecycle iterations, and---especially for the recognizer's shift-register refactor---contrast that re-check with the classical obligation to rebuild $h_S$. The real accumulator extends the pattern to real-valued state under a discrete clock.
+\input{sections/03-case-study-basics}
+\input{sections/03-case-study-alternates}
+\input{sections/03-case-study-fibonacci}
+
+Taken together, the examples compile $\Phi_{\mathrm{dyn}}$ once per reference table, re-check that fragment across alternate buildables---especially the binary-shift counter, where $h_S$ is no longer a component projection---and assemble a Fibonacci reference from the same shelf zones under an honest technology bound, contrasting assertional re-check of the composed fragment with classical rebuild of the coupled witness.

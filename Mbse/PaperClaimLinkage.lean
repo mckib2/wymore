@@ -9,6 +9,9 @@ import Mbse.WymorePropertyFragment
 import Mbse.ExtensionalDynamicsFragment
 import Mbse.ClassicalAssertionalBridge
 import Mbse.WymoreExercises
+import Mbse.ComposedCaseStudy
+import Mbse.MinskyKit
+import Mbse.FibCaseStudy
 import Mbse.PartialDynamicsHomFragment
 import Mbse.Homomorphism
 
@@ -23,7 +26,8 @@ namespace BlockerAudit
 
 open BiImplicationFailures PathologyExamples WymorePathologyExamples
   PropertyFragment.FSM FSMProperties PhiDecode ExtensionalDynamicsFragment
-  ClassicalAssertionalBridge WymoreExercises PartialDynamicsHomFragment Homomorphism
+  ClassicalAssertionalBridge WymoreExercises ComposedCaseStudy MinskyKit FibCaseStudy
+  PartialDynamicsHomFragment Homomorphism
 
 theorem paperClaim_outputTableOnly_blocked
     (_h : SatisfactionWithoutHom (FSMSatisfiesOutputTable fsmStay fsmJump)
@@ -67,19 +71,36 @@ theorem audit_homProjection_equivalence :
   intro _ _ _ _ _ _ Z_spec Z_impl
   exact qualified_equivalence_homProjection Z_spec Z_impl
 
-/-- Paper case-study elaborations satisfy the headline bi-implication (playbook). -/
+/-- Paper case-study kit: Part 1 directs + Part 2 alternates satisfy the headline bi-implication. -/
 theorem audit_caseStudyPlaybook :
     paperClaimStatus .caseStudyPlaybook = .safe ∧
-      (SystemSatisfiesPartialDynamicsHom onesCounter onesCounterRich ↔
-        IsHomomorphicImage onesCounter onesCounterRich) ∧
-      (SystemSatisfiesPartialDynamicsHom pattern01110 pattern01110Shift ↔
-        IsHomomorphicImage pattern01110 pattern01110Shift) ∧
-      (SystemSatisfiesPartialDynamicsHom realAccumulator realAccumulatorRich ↔
-        IsHomomorphicImage realAccumulator realAccumulatorRich) :=
-  ⟨paperClaim_caseStudyPlaybook_safe, onesCounterRich_iff_hom, pattern01110Shift_iff_hom,
-    realAccumulatorRich_iff_hom⟩
+      (SystemSatisfiesPartialDynamicsHom counterInc counterIncShift ↔
+        IsHomomorphicImage counterInc counterIncShift) ∧
+      (SystemSatisfiesPartialDynamicsHom counterDec counterDecElab ↔
+        IsHomomorphicImage counterDec counterDecElab) ∧
+      (SystemSatisfiesPartialDynamicsHom zeroTest zeroTestElab ↔
+        IsHomomorphicImage zeroTest zeroTestElab) ∧
+      (SystemSatisfiesPartialDynamicsHom zeroTest zeroTestDual ↔
+        IsHomomorphicImage zeroTest zeroTestDual) :=
+  ⟨paperClaim_caseStudyPlaybook_safe, counterIncShift_iff_hom, counterDecElab_iff_hom,
+    zeroTestElab_iff_hom, zeroTestDual_iff_hom⟩
 
-/-- Dual-port pattern select is mechanized in Lean (paper §4.3 remains a sketch). -/
+/-- Fibonacci composition: Φ↔hom, shelf NZ/RZ wiring, and `Nat.fib` functional correctness. -/
+theorem audit_fibCaseStudy :
+    (SystemSatisfiesPartialDynamicsHom fibSpec fibAwkwardImpl ↔
+      IsHomomorphicImage fibSpec fibAwkwardImpl) ∧
+    (∀ n, fibSpecOut (fibSpecNext (fibRun n) .step) = Nat.fib n) ∧
+    (∀ s n, (fibAwkwardNext s (.load n)).a = kitAssign 0) :=
+  ⟨fibAwkward_iff_hom, fibSpec_computes_fib, fun s n =>
+    (fibAwkward_uses_shelf_components).1 s n⟩
+
+/-- Gallery cascade (not the paper spine): composed shift→counter buildable implements $Z_{12}$. -/
+theorem audit_cascadeCaseStudy :
+    SystemSatisfiesPartialDynamicsHom cascadeSpec cascadeAwkwardImpl ↔
+      IsHomomorphicImage cascadeSpec cascadeAwkwardImpl :=
+  cascadeAwkward_iff_hom
+
+/-- Dual-port pattern select remains mechanized in the gallery. -/
 theorem audit_dualPortMechanized :
     paperClaimStatus .dualPortMechanized = .safe ∧
       (SystemSatisfiesPartialDynamicsHom dualPatternSpec dualPatternElab ↔
