@@ -1,18 +1,82 @@
 % =================================================================
-% INCOSE Conference LaTeX Template V1.2 (Release Date: November 4th, 2025)
-% Copyright (c) 2025 INCOSE
+% Systems Engineering (Wiley) article driver.
+% Template: wiley-article.cls / ama.bst (from Wiley / Authorea pilot).
 %
-% Driver file: preamble + section includes. Edit content in:
-%   preamble.tex, frontmatter.tex, sections/*.tex, appendix/*.tex
+% TERMINOLOGY (vocabulary contract — use these terms consistently)
+% ----------------------------------------------------------------
+% Story: Functional intent in the Functionality Cotyledon may be expressed as a
+%   dynamics-encoding temporal fragment compiled from a Wymore DSYSTEM; on that
+%   fragment, assertional satisfaction is equivalent to classical implementability
+%   via Wymore system homomorphism, so engineers need not maintain an explicit
+%   homomorphism as the primary verification artifact.
+%
+% Preferred terms:
+%   DSYSTEM / discrete system — Wymore 5-tuple (S,I,O,δ,ρ); discrete clock;
+%     state/IO may be infinite or real-valued.
+%   Reference system Z_spec — specification-system for constructive / bridge verification.
+%   Buildable system / implementation system Z_impl — candidate under verification
+%     (prefer "buildable system" for BC→IC; "implementation system" once defined).
+%   Wymore system homomorphism / homomorphic image — surjective
+%     h_S,h_I,h_O preserving transitions and readout (textbook Def. 4.3 only in appendix).
+%   Property set Φ — temporal formulas in dialect L.
+%   Dynamics-encoding fragment Φ_dyn — G/X/implication table-as-clauses fragment
+%     used for the hom↔Φ bi-implication (not arbitrary mission LTL).
+%   Mission assertional FC — engineer-authored Φ without requiring Z_spec (outside bi-imp).
+%   Dynamics-encoding bridge FC — Φ compiled hom-relatively from Z_spec (carries bi-imp).
+%   Assertional satisfaction — Z ⊨_L Φ / Z ⊨_dyn Φ_dyn.
+%   Implementability (classical) — existence of a Wymore system homomorphism into Z_spec.
+%   Execution encoding ψ_Z — FO-LTL compile of trajectory dynamics (tooling support;
+%     not a substitute for the bi-implication alone).
+%   Exhibit / verify maps — finite-tier recovery or checking of h_S,h_I,h_O
+%     (not "synthesize/discover" on infinite or real state).
+%
+% Avoid / restrict:
+%   Do not use Def./Exercise numbers in main text; appendix may retain them.
+%   Do not alternate morphism/mapping/refinement for Wymore hom — use homomorphism.
+%   Reserve "model checking" for automated finite-state LTL procedures; otherwise
+%     "property checking".
+%   Do not call the fragment "decidable" when meaning the bi-implication holds —
+%     separate semantic equivalence from algorithmic checking.
+%   Do not name Lean in main text; appendices may say "machine-checked formalization".
+%   Avoid "headline / ungated / companion library" in reader-facing prose.
 % =================================================================
+
+\documentclass[num-refs]{wiley-article}
 
 \input{preamble}
 
+\iflatexml
+\else
+\paperfield{Systems Engineering}
+\abbrevs{T3SD, Tricotyledon Theory of System Design; MBSE, Model-Based Systems Engineering; LTL, Linear Temporal Logic; FO-LTL, First-Order Linear Temporal Logic; FC, Functionality Cotyledon; DSYSTEM, Discrete System.}
+\corraddress{Nicholas McKibben, Department of Systems and Industrial Engineering, University of Arizona, Tucson, AZ 85721, USA}
+\corremail{mckib2@arizona.edu}
+\fundinginfo{None}
+\fi
+
+\papertype{Original Article}
+
 \title{Reinterpreting the Functionality Cotyledon: Temporal Logic for T3SD}
+
+\author[1]{Nicholas McKibben}
+\author[1]{Paul Wach}
+\author[1]{Larry Head}
+\author[1]{Alejandro Salado}
+
+\affil[1]{Department of Systems and Industrial Engineering, University of Arizona, Tucson, AZ}
+
+\runningauthor{McKibben et al.}
 
 \begin{document}
 
-\input{frontmatter}
+\maketitle
+\selectlanguage{english}
+\begin{abstract}
+\sloppy
+Adequately verifying that a buildable system realizes stated functional intent is a core concern of systems engineering. In A.\ Wayne Wymore's Tricotyledon Theory of System Design (T3SD), classical implementability is established constructively by exhibiting a system homomorphism from a buildable system to a reference system in the Functionality Cotyledon. We contend that the same functional intent can be expressed as a dynamics-encoding temporal fragment compiled from a Wymore discrete system, and that---on that fragment---assertional satisfaction is equivalent to classical implementability. Engineers may therefore treat property checking of the compiled fragment as the primary verification artifact rather than constructing and maintaining an explicit homomorphism. We give a canonical first-order LTL encoding of discrete-system execution, prove the fragment bi-implication, and illustrate the methodology on a ones-counter system, a finite string recognizer, and a real-valued accumulator under a discrete clock. Checking remains decidable on finite projections and, more generally, requires bounded or theory-restricted queries; we do not claim a decision procedure for arbitrary infinite or real FO-LTL.
+
+\keywords{Tricotyledon Theory of System Design (T3SD), temporal logic, formal verification, Model-Based Systems Engineering (MBSE), system homomorphism.}
+\end{abstract}
 
 % ----- Main body (in order) -----
 \input{sections/introduction}
@@ -21,8 +85,12 @@
 \input{sections/case-study}
 \input{sections/discussion}
 \input{sections/conclusions}
-\input{sections/references}
-\input{sections/biography}
+
+\selectlanguage{english}
+\bibliographystyle{ama}
+\bibliography{refs}
+
+% \input{sections/biography}
 
 % ----- Appendices -----
 \appendix

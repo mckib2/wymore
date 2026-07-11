@@ -3,8 +3,7 @@ $out_dir = 'build';
 $aux_dir = 'build';
 $pdf_mode = 1;
 
-# main.tex uses biblatex; route bibliography through biber.
-$bibtex_use = 2;
+# wiley-article uses natbib + BibTeX (ama.bst), not biblatex/biber.
+$bibtex_use = 1;
 
-# Fail the build on undefined citations/references.
 $latexmk_force = 0;

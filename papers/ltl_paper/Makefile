@@ -1,40 +1,36 @@
-# Makefile for compiling the INCOSE LaTeX paper
+# Makefile for the Wiley Systems Engineering article
 
-LATEXMK  ?= latexmk
-MAIN     := main
+LATEXMK   ?= latexmk
+MAIN      := main
 BUILD_DIR := build
-PDF      := $(BUILD_DIR)/$(MAIN).pdf
+PDF       := $(BUILD_DIR)/$(MAIN).pdf
 
 FLAGS := -pdf -outdir=$(BUILD_DIR) -auxdir=$(BUILD_DIR) -interaction=nonstopmode
 
-# Driver and every \input{} target listed in main.tex
 TEX_SOURCES := \
 	main.tex \
 	preamble.tex \
-	frontmatter.tex \
 	sections/introduction.tex \
 	sections/background.tex \
 	sections/methodology.tex \
 	sections/case-study.tex \
+	sections/case-study-discrete.tex \
+	sections/case-study-real.tex \
 	sections/discussion.tex \
 	sections/conclusions.tex \
-	sections/references.tex \
-	sections/biography.tex \
 	appendix/hom-biimp.tex \
 	appendix/encoding.tex
 
-# Optional appendix (commented out in main.tex); rebuild if enabled later
 TEX_OPTIONAL := appendix/pathology-sketches.tex
 
-ASSETS := refs.bib \
+ASSETS := refs.bib ama.bst wiley-article.cls \
 	$(wildcard template-images/*) \
 	$(wildcard figures/*)
 
-# Root-level artifacts from older in-tree builds (removed by distclean)
 ROOT_ARTIFACTS := \
-	$(MAIN).aux $(MAIN).bbl $(MAIN).bcf $(MAIN).blg \
+	$(MAIN).aux $(MAIN).bbl $(MAIN).blg \
 	$(MAIN).fdb_latexmk $(MAIN).fls $(MAIN).log $(MAIN).out \
-	$(MAIN).pdf $(MAIN).run.xml $(MAIN).synctex.gz
+	$(MAIN).pdf $(MAIN).synctex.gz
 
 .PHONY: all clean distclean
 

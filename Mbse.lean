@@ -47,3 +47,4 @@ import Mbse.VerificationTierDispatch
 import Mbse.InverseSynthesis
 import Mbse.PaperClaimLinkage
 import Mbse.ClassicalAssertionalBridge
+import Mbse.WymoreExercises

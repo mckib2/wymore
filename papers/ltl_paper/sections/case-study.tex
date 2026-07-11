@@ -1,3 +1,16 @@
 \section{Case Study}
 \label{sec:case-study}
 
+This section walks through concrete reference systems and buildable implementations for a systems engineering audience. Each example has the same shape:
+\begin{enumerate}
+    \item State the required behavior in plain language and as a discrete-system table $Z_{\text{spec}}$.
+    \item Compile the dynamics-encoding property set $\Phi_{\mathrm{dyn}}$ from that table (Section~\ref{sec:dynamics-encoding-fragment}).
+    \item Define three buildable systems $Z_{\text{impl}}$ of increasing internal complexity---with full next-state and readout definitions, not merely names---and show the projection maps into $Z_{\text{spec}}$.
+    \item Check each buildable against the \emph{same} $\Phi_{\mathrm{dyn}}$; for the complex buildables, also verify the classical homomorphism by hand.
+\end{enumerate}
+Examples are adapted from Wymore's discrete-system illustrations \citep{Wymore1993}. For each complex buildable we also give an explicit classical homomorphism check (maps plus transition and readout preservation). On the finite recognizer the same maps admit exhibit/verify. The point of the simple/medium/complex ladders is \emph{maintenance across elaborations}: each ladder shares one compiled $\Phi_{\mathrm{dyn}}$, while the classical witness maps change with internal structure. The case studies are qualitative on that point---they exhibit the stable fragment beside evolving buildables; they do not measure verification effort.
+
+\input{sections/case-study-discrete}
+\input{sections/case-study-real}
+
+Taken together, the examples compile $\Phi_{\mathrm{dyn}}$ from each reference table, re-check that same fragment on elaborating buildables, and---for the complex cases---exhibit the corresponding classical homomorphism by hand (with finite exhibit/verify on the recognizer). The real accumulator extends the pattern to real-valued state under a discrete clock.

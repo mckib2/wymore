@@ -1,0 +1,109 @@
+\subsection{Real-Valued Accumulator}
+\label{sec:case-real}
+
+\paragraph{Reference system $Z_{\mathbb{R}}$.}
+Behavior: discrete-time running sum. Start at $0$; on real input $u$ replace the state by $s+u$; output the current sum. (The clock is discrete; values are real.)
+
+\begingroup
+\renewcommand{\arraystretch}{1.25}
+\footnotesize
+\begin{center}
+\begin{tabularx}{0.78\linewidth}{@{}>{\raggedright\arraybackslash}p{2.8cm}Y@{}}
+    \rowcolor{tableheader}
+    \headingfont\bfseries Component & \headingfont\bfseries $Z_{\mathbb{R}}$ \\
+    \addlinespace[2pt]
+    $S,I,O$ & $\mathbb{R}$, $\mathbb{R}$, $\mathbb{R}$ \\
+    \addlinespace[2pt]
+    $s_0$ & $0$ \\
+    \addlinespace[2pt]
+    $\delta(s,u)$ & $s+u$ \\
+    \addlinespace[2pt]
+    $\delta(s,\mathrm{none})$ & $s$ \\
+    \addlinespace[2pt]
+    $\rho(s)$ & $s$ \\
+\end{tabularx}
+\end{center}
+\captionof{table}{Real accumulator reference system $Z_{\mathbb{R}}$.}
+\label{tab:z-real}
+\endgroup
+\vspace{4pt}
+
+\paragraph{Compiled $\Phi_{\mathrm{dyn}}$.}
+For every $s,u\in\mathbb{R}$:
+\begin{align*}
+  &\text{(readout)} && G\bigl(\mathit{state}(s) \rightarrow \mathit{output}(s)\bigr), \\
+  &\text{(guided)} && G\bigl((\mathit{state}(s)\wedge\mathit{input}(u)) \rightarrow X(\mathit{state}(s{+}u))\bigr), \\
+  &\text{(autonomous)} && G\bigl((\mathit{state}(s)\wedge\mathit{input}(\mathrm{none})) \rightarrow X(\mathit{state}(s))\bigr).
+\end{align*}
+
+\paragraph{Three buildable systems (shown explicitly).}
+
+\textit{Simple --- $Z_{\mathbb{R}}^{\mathrm{S}}$.}
+Identical to Table~\ref{tab:z-real}; identity maps.
+
+\textit{Medium --- $Z_{\mathbb{R}}^{\mathrm{M}}$ (last-input elaboration).}
+State $(s,\mathrm{last})$; transition $(s,\mathrm{last},u)\mapsto(s{+}u,\,u)$; readout $s$.
+
+\begingroup
+\renewcommand{\arraystretch}{1.2}
+\footnotesize
+\begin{center}
+\begin{tabularx}{0.78\linewidth}{@{}>{\raggedright\arraybackslash}p{2.8cm}Y@{}}
+    \rowcolor{tableheader}
+    \headingfont\bfseries Component & \headingfont\bfseries $Z_{\mathbb{R}}^{\mathrm{M}}$ \\
+    \addlinespace[2pt]
+    $S$ & $\mathbb{R}\times\mathbb{R}$ \\
+    \addlinespace[2pt]
+    $s_0$ & $(0,0)$ \\
+    \addlinespace[2pt]
+    $\delta((s,\ell),u)$ & $(s{+}u,\,u)$ \\
+    \addlinespace[2pt]
+    $\rho(s,\ell)$ & $s$ \\
+    \addlinespace[2pt]
+    Maps & $h_S(s,\ell)=s$ \\
+\end{tabularx}
+\end{center}
+\captionof{table}{Medium real buildable: remembers last input; sum alone is required.}
+\label{tab:z-real-med}
+\endgroup
+\vspace{4pt}
+
+A second medium variant enriches the \emph{output} to $(s,\mathrm{alarm})$ with $\mathrm{alarm}=1$ when $|s|\ge\theta$, using $h_O=\pi_1$ so the reference still sees only the sum.
+
+\textit{Complex --- $Z_{\mathbb{R}}^{\mathrm{C}}$.}
+State $(s,\mathrm{last},\mathrm{ticks},\mathrm{energy})$ with energy accumulating $u^2$ (a free instrumentation channel).
+
+\begingroup
+\renewcommand{\arraystretch}{1.2}
+\footnotesize
+\begin{center}
+\begin{tabularx}{0.78\linewidth}{@{}>{\raggedright\arraybackslash}p{2.8cm}Y@{}}
+    \rowcolor{tableheader}
+    \headingfont\bfseries Component & \headingfont\bfseries $Z_{\mathbb{R}}^{\mathrm{C}}$ \\
+    \addlinespace[2pt]
+    $S$ & $\mathbb{R}\times\mathbb{R}\times\mathbb{N}\times\mathbb{R}$ \\
+    \addlinespace[2pt]
+    $s_0$ & $(0,0,0,0)$ \\
+    \addlinespace[2pt]
+    $\delta((s,\ell,t,e),u)$ & $(s{+}u,\,u,\,t{+}1,\,e{+}u^{2})$ \\
+    \addlinespace[2pt]
+    $\rho(s,\ell,t,e)$ & $s$ \\
+    \addlinespace[2pt]
+    Maps & $h_S(s,\ell,t,e)=s$ \\
+\end{tabularx}
+\end{center}
+\captionof{table}{Complex real buildable: ticks and energy logging; only the sum must satisfy $\Phi_{Z_{\mathbb{R}}}$.}
+\label{tab:z-real-cplx}
+\endgroup
+\vspace{4pt}
+
+\paragraph{Classical homomorphism check for $Z_{\mathbb{R}}^{\mathrm{C}}$.}
+Take $h_S(s,\ell,t,e)=s$, $h_I=\mathrm{id}$, and $h_O=\mathrm{id}$. Surjectivity: every sum $s$ is realized by $(s,0,0,0)$. Transition preservation: for real input $u$,
+\[
+  h_S\bigl(\delta_{\mathrm{C}}((s,\ell,t,e),u)\bigr)
+  = h_S(s{+}u,\,u,\,t{+}1,\,e{+}u^{2})
+  = s{+}u
+  = \delta_{\mathbb{R}}(s,u)
+  = \delta_{\mathbb{R}}\bigl(h_S(s,\ell,t,e),\,h_I(u)\bigr),
+\]
+and likewise for $\mathrm{none}$ (state unchanged). Readout: $\rho_{\mathrm{C}}(s,\ell,t,e)=s=\rho_{\mathbb{R}}(h_S(s,\ell,t,e))$. Hence $h$ is a Wymore system homomorphism $Z_{\mathbb{R}}^{\mathrm{C}}\to Z_{\mathbb{R}}$, so $Z_{\mathbb{R}}^{\mathrm{C}}\models_{\mathrm{dyn}}\Phi_{Z_{\mathbb{R}}}$ by the bi-implication. As in the discrete examples, $\Phi_{Z_{\mathbb{R}}}$ does not mention ticks or energy: those channels may change freely provided the projected sum obeys the accumulator table. Exact real arithmetic is used in the formalization; floating-point is not identified with $\mathbb{R}$, and unbounded real FO-LTL checking is not claimed to be decidable.
