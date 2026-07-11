@@ -36,7 +36,7 @@ Figure~\ref{fig:comparison} contrasts classical constructive verification with a
     \end{scope}
   \end{tikzpicture}%
   }
-  \caption{Classical constructive verification (A) versus assertional property checking (B). Panel~B may encode requirements directly as $\Phi$ (dashed) or compile $\Phi$ from $Z_{\text{spec}}$; $Z_{\text{spec}}$ is not required for mission assertional checking.}
+  \caption{Classical constructive verification (A) versus assertional property checking (B). Panel~B may encode requirements as authored $\Phi$ (dashed) or compile $\Phi$ from $Z_{\text{spec}}$.}
   \label{fig:comparison}
 \end{figure}
 
@@ -53,11 +53,7 @@ with execution trace $\sigma = (f, g, y)$. Properties may refer to external port
 We write $Z \models_{\mathcal{L}} \Phi$ when every admissible input trajectory and initial state in a stated class induces a trace satisfying $\Phi$ \citep{Pnueli1977,BaierKatoen2008}. The assertional Functionality Cotyledon is $\mathcal{FC}_{\mathcal{L}}(\Phi) = \{ Z \mid Z \models_{\mathcal{L}} \Phi \}$. Verification of a buildable system is the membership test $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$. Admissible inputs are those consistent with boundary assumptions, not necessarily all of $I^T$ \citep{salado2019mbse}.
 
 \label{sec:assertional-modes}
-Two assertional modes are distinguished:
-\begin{itemize}
-    \item \textbf{Mission assertional FC:} engineers author boundary $\Phi$ directly. No reference system is required for checking. This mode lies outside the hom$\leftrightarrow\Phi$ bi-implication of Section~\ref{sec:dynamics-encoding-fragment}.
-    \item \textbf{Dynamics-encoding bridge FC:} $\Phi_{Z_{\text{spec}}}$ is compiled from a reference table $Z_{\text{spec}}$ in the dynamics-encoding fragment. This mode aligns with classical implementability and carries the proved bi-implication.
-\end{itemize}
+Assertional checking admits two modeling strategies: systems modelers may write $\Phi$ directly, or compile $\Phi_{\mathrm{dyn}}$ from an explicit reference $Z_{\text{spec}}$. The property set/homomoprhism bi-implication depends on \emph{fragment shape}, not on the modeling strategy. A complete dynamics-encoding property set (whether compiled from $Z_{\text{spec}}$ or authored in the same clause schemas) is equivalent to implementability relative to the (possibly implied) reference system. Temporal formulas outside that fragment, such as bare liveness $F$, are however not.
 
 \begingroup
 \renewcommand{\arraystretch}{1.5}
@@ -108,8 +104,8 @@ Table~\ref{tab:phi-dyn-fragment} states the fragment that carries the bi-implica
     Compiled from & Reference system $Z_{\text{spec}}$ (transition and readout table) \\
     \addlinespace[2pt]
     Checked on & Buildable system $Z_{\text{impl}}$ under surjective $h_S,h_I,h_O$ (or identity on shared labels) \\
-    \addlinespace[2pt]
-    Outside fragment & Mission $F$; bare mission $\Phi$ without $Z_{\text{spec}}$; output-table-only; execution encoding $\psi_Z$ alone \\
+    % \addlinespace[2pt]
+    % Outside fragment & $F$; incomplete $\Phi_{\mathrm{dyn}}$; output-table-only; arbitrary FO-LTL outside the clause schemas \\
 \end{tabularx}
 \captionof{table}{Dynamics-encoding fragment $\Phi_{\mathrm{dyn}}$ for which assertional satisfaction is equivalent to existence of a Wymore system homomorphism.}
 \label{tab:phi-dyn-fragment}
@@ -125,7 +121,7 @@ Table~\ref{tab:fragment-compare} contrasts $\Phi_{\mathrm{dyn}}$ with propositio
     \rowcolor{tableheader}
     \headingfont\bfseries Dimension & \headingfont\bfseries Prop.\ LTL & \headingfont\bfseries FO-LTL & \headingfont\bfseries $\Phi_{\mathrm{dyn}}$ \\
     \addlinespace[2pt]
-    Typical use & Finite-state MC of mission/safety specs & Infinite/real state; quantified tick laws & Compile $Z_{\text{spec}}$ table; check implementability \\
+    Typical use & Finite-state MC of liveness/safety specs & Infinite/real state; quantified tick laws & Compile $Z_{\text{spec}}$ table; check implementability \\
     \addlinespace[2pt]
     Temporal ops & Full LTL ($G,F,X,U,\ldots$) & Same, plus FO & $G,X,\rightarrow,\wedge$ only; no $F$/$U$ \\
     \addlinespace[2pt]
@@ -133,7 +129,7 @@ Table~\ref{tab:fragment-compare} contrasts $\Phi_{\mathrm{dyn}}$ with propositio
     \addlinespace[2pt]
     Formula shape & Arbitrary (within LTL) & Arbitrary (within FO-LTL) & Four fixed clause schemas (Table~\ref{tab:phi-dyn-fragment}) \\
     \addlinespace[2pt]
-    Spec source & Engineer-authored $\Phi$ & Engineer-authored or compiled $\psi_Z$ & Compiled from $Z_{\text{spec}}$ only \\
+    Spec source & Engineer-authored $\Phi$ & Engineer-authored $\Phi$ & Compiled from $Z_{\text{spec}}$ (or authored as $\Phi_{\mathrm{dyn}}$) \\
     \addlinespace[2pt]
     Hom equivalence & Not in general & Not in general & Yes (bi-implication) \\
     \addlinespace[2pt]
@@ -159,17 +155,8 @@ Here $\models_{\mathrm{dyn}}$ means every admissible run of $Z_{\text{impl}}$ ob
 When $Z_{\text{spec}}$ and $Z_{\text{impl}}$ share $(S,I,O)$ and labels are treated as canonical, literal satisfaction is equivalent to pointwise agreement of $\delta$ and $\rho$. Cross-type elaborations require the full hom-relative reading above. Finite propositional projections support automated model checking when spaces are small; they specialize the same semantic content and do not weaken the bi-implication.
 
 
-\subsection{Execution Encoding and Property Checking}
-\label{sec:dsystem-encoding}
+\subsection{Property Checking}
 \label{sec:automated-checking}
-
-Equations~\eqref{eq:trace-init}--\eqref{eq:trace-readout} define valid execution of a DSYSTEM. Separately from $\Phi_{\mathrm{dyn}}$, an \emph{execution encoding} $\psi_Z$ states that trajectories obey $Z$:
-\begin{align}
-    \text{init}(s_0) &\Leftrightarrow g(0) = s_0 \label{eq:fo-init}\\
-    \text{step}(Z) &\Leftrightarrow \forall t \in T,\; g(t{+}1) = \delta(g(t), f(t)) \label{eq:fo-step}\\
-    \text{readout}(Z) &\Leftrightarrow \forall t \in T,\; y(t) = \rho(g(t)) \label{eq:fo-readout}
-\end{align}
-with $\psi_Z(s_0) := \text{init}(s_0) \wedge \text{step}(Z) \wedge \text{readout}(Z)$. Appendix~\ref{app:encoding} proves that $(f,g,y)$ is a valid Wymore execution from $s_0$ if and only if it satisfies $\psi_Z(s_0)$. This encoding places dynamics and requirements in one tick-indexed vocabulary for tooling; it does not by itself replace the dynamics-encoding bi-implication of Section~\ref{sec:dynamics-encoding-fragment}.
 
 Property checking of $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$ may proceed by finite-horizon unrolling, finite-state abstraction, or theory-specific solvers on bounded queries \citep{BaierKatoen2008,deMouraZ32008}. Satisfaction of $\Phi$ guarantees only what $\Phi$ states. Unbounded FO-LTL over infinite or real-valued coordinates is not decidable in general; practitioners rely on finite projections, bounded horizons, or restricted input classes. Propositional LTL on finite abstractions remains a mature automated path when those abstractions are adequate for the claim at hand.
 

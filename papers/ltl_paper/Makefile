@@ -18,8 +18,7 @@ TEX_SOURCES := \
 	sections/03-case-study-real.tex \
 	sections/04-discussion.tex \
 	sections/05-conclusions.tex \
-	appendix/hom-biimp.tex \
-	appendix/encoding.tex
+	appendix/hom-biimp.tex
 
 TEX_OPTIONAL := appendix/pathology-sketches.tex
 

@@ -74,10 +74,10 @@ Table~\ref{tab:notation} maps Wymore textbook notation \citep{Wymore1993} to the
 \endgroup
 \vspace{4pt}
 
-Conventions: $Z_{\text{spec}}$ is the reference system; $Z_{\text{impl}}$ is the buildable (implementation) system under verification; $h$ denotes a Wymore system homomorphism; $\Phi$ is a property set in dialect $\mathcal{L}$; $\Phi_{\mathrm{dyn}}$ is reserved for the dynamics-encoding fragment; $\psi_Z$ is the execution encoding of Section~\ref{sec:dsystem-encoding}.
+Conventions: $Z_{\text{spec}}$ is the reference system; $Z_{\text{impl}}$ is the buildable (potentially implementable) system under verification; $h$ denotes a Wymore system homomorphism; $\Phi$ is a property set in dialect $\mathcal{L}$; $\Phi_{\mathrm{dyn}}$ is reserved for the dynamics-encoding fragment.
 
 \subsection{Temporal Logics}
-Temporal logics state requirements over time-indexed traces \citep{BaierKatoen2008,Pnueli1977}. Table~\ref{tab:ltl-operators} lists the operators that appear in this paper, aligned with the dynamics-encoding fragment of Section~\ref{sec:dynamics-encoding-fragment}. First-order LTL (FO-LTL) admits quantifiers over state, input, or output at each tick and is used for the execution encoding $\psi_Z$ and for predicate-indexed $\Phi_{\mathrm{dyn}}$. A comparison of $\Phi_{\mathrm{dyn}}$ with propositional LTL and FO-LTL appears in Table~\ref{tab:fragment-compare}.
+Temporal logics state requirements over time-indexed traces \citep{BaierKatoen2008,Pnueli1977}. Table~\ref{tab:ltl-operators} lists the operators that appear in this paper, aligned with the dynamics-encoding fragment of Section~\ref{sec:dynamics-encoding-fragment}. First-order LTL (FO-LTL) admits quantifiers over state, input, or output at each tick: it supplies the ambient dialect for predicate-indexed $\Phi_{\mathrm{dyn}}$ atoms and for formulas outside the fragment. A comparison of $\Phi_{\mathrm{dyn}}$ with propositional LTL and FO-LTL appears in Table~\ref{tab:fragment-compare}.
 
 \begingroup
 \renewcommand{\arraystretch}{1.35}
@@ -94,7 +94,7 @@ Temporal logics state requirements over time-indexed traces \citep{BaierKatoen20
     \addlinespace[2pt]
     $\varphi \wedge \psi$ & conjunction & Required (joint guards) & both hold at the tick \\
     \addlinespace[2pt]
-    $F\,\varphi$ & eventually & \textbf{Excluded} from $\Phi_{\mathrm{dyn}}$ & some future tick (mission only) \\
+    $F\,\varphi$ & eventually & \textbf{Excluded} from $\Phi_{\mathrm{dyn}}$ & some future tick (outside fragment) \\
 \end{tabularx}
 \captionof{table}{Temporal operators aligned with the dynamics-encoding fragment.}
 \label{tab:ltl-operators}
@@ -111,7 +111,7 @@ This section positions the dynamics-encoding bridge relative to neighboring fram
 Wymore's T3SD remains the host theory for this paper \citep{Wymore1993}. Recent work reconnects that framework to SysML state machines and to DEVS as a path toward scientific foundations for MBSE \citep{salado2019wymore,wach2021devs,salado2019mbse}. We do not replace the cotyledon structure. We reinterpret Functionality Cotyledon verification so that a compiled temporal fragment can stand in for maintaining an explicit homomorphism as the primary artifact.
 
 \paragraph{Temporal logic and model checking.}
-Linear temporal logic and model checking provide mature machinery for assertional properties over traces \citep{Pnueli1977,BaierKatoen2008}. Our contribution is not a new model-checking algorithm. It is a restricted dynamics-encoding fragment whose satisfaction, for a fixed reference system, is equivalent to classical Wymore implementability. General LTL model checking of arbitrary mission formulas does not by itself supply that equivalence.
+Linear temporal logic and model checking provide mature machinery for assertional properties over traces \citep{Pnueli1977,BaierKatoen2008}. Our contribution is not a new model-checking algorithm. It is a restricted dynamics-encoding fragment whose satisfaction, for a fixed reference system, is equivalent to classical Wymore implementability. General LTL model checking of arbitrary formulas outside that fragment does not by itself supply that equivalence.
 
 \paragraph{Refinement, simulation, and bisimulation.}
 Process-algebraic and automata-theoretic refinement notions---including simulation and bisimulation---are the closest cousins of constructive morphisms in concurrent systems \citep{Milner1989,LynchTuttle1987}. Wymore system homomorphism is a surjective projection of transition and readout tables between discrete systems. It is related in spirit to refinement but is not identified here with observational equivalence or weak bisimulation; the bi-implication we prove is stated for the dynamics-encoding fragment and Wymore's homomorphic-image relation.

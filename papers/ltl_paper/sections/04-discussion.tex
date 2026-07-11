@@ -13,17 +13,17 @@ On the dynamics-encoding bridge fragment, for fixed $Z_{\text{spec}}$,
 \]
 where $\mathrm{FC}_{\text{constructive}}(Z_{\text{spec}})$ is the set of buildable systems that admit a Wymore system homomorphism into $Z_{\text{spec}}$ (Appendix~\ref{app:hom-biimp}; Section~\ref{sec:case-study}). The property sets exhibited for the ones-counter, string recognizer, and real accumulator are instances of Table~\ref{tab:phi-dyn-fragment}.
 
-Mission assertional FC does not, in general, imply existence of such an $h$. As a concrete contrast: a mission formula $F(\mathit{output}(1))$ may hold of a buildable system that eventually pulses an accept bit without agreeing with a given reference transition table, and a bare input/output safety property may be shared by systems with different next-state functions. Those cases lie outside the bi-implication; the bridge requires the dynamics-encoding fragment compiled from $Z_{\text{spec}}$.
+Formulas outside the dynamics-encoding fragment do not, in general, imply existence of such an $h$. As a concrete contrast: $F(\mathit{output}(1))$ may hold of a buildable system that eventually pulses an accept bit without agreeing with a given reference transition table, and a bare input/output safety property may be shared by systems with different next-state functions. Those cases lie outside the bi-implication; the bridge requires a complete $\Phi_{\mathrm{dyn}}$ (compiled from $Z_{\text{spec}}$, or authored in the same schemas).
 
-Global set equality between constructive FC and assertional FC for bare mission $\Phi$ without side conditions remains open. Output-table-only encodings, execution encodings alone, and mission-level $F$ formulas conflated with dynamics tables are outside the bi-implication.
+Global set equality between constructive FC and assertional FC for arbitrary $\Phi$ outside the fragment remains open. Output-table-only encodings and $F$ formulas conflated with dynamics tables are outside the bi-implication.
 
 \subsection{Expressivity, Checking, and Decidability}
 \label{sec:expressivity}
 \label{sec:limitations}
 
-Restricting to $\Phi_{\mathrm{dyn}}$ buys the homomorphism bi-implication; it also limits what engineers can \emph{say}. The fragment admits only table-shaped $G$/$X$ clauses compiled from a reference $\delta$ and $\rho$ (Table~\ref{tab:phi-dyn-fragment}): no $F$, no $U$, and no free-form quantification over values beyond indexing those clauses. Richer dialects---propositional LTL with the full operator set, or FO-LTL over infinite or real coordinates---let engineers describe desired behavior more directly as mission intent, at the cost of leaving the strict T3SD implementability bridge.
+Restricting to $\Phi_{\mathrm{dyn}}$ buys the homomorphism bi-implication; it also limits what engineers can \emph{say}. The fragment admits only table-shaped $G$/$X$ clauses compiled from a reference $\delta$ and $\rho$ (Table~\ref{tab:phi-dyn-fragment}): no $F$, no $U$, and no free-form quantification over values beyond indexing those clauses. Richer dialects---propositional LTL with the full operator set, or FO-LTL over infinite or real coordinates---let engineers author desired behavior beyond that fragment, at the cost of leaving the strict T3SD implementability bridge.
 
-Two concrete contrasts from the case studies make the gap vivid. For the string recognizer, $\Phi_{Z_{01110}}$ requires every guided step of the reference automaton. In FO-LTL one can instead write the mission property
+Two concrete contrasts from the case studies make the gap vivid. For the string recognizer, $\Phi_{Z_{01110}}$ requires every guided step of the reference automaton. In FO-LTL one can instead write
 \[
   F\bigl(\mathit{output}(1)\bigr)
 \]
@@ -31,7 +31,7 @@ Two concrete contrasts from the case studies make the gap vivid. For the string 
 \[
   F\bigl(\exists\, s\in\mathbb{R}.\; \mathit{state}(s)\wedge |s|\ge\theta\bigr)
 \]
-(``the running sum eventually reaches mission threshold $\theta$''). The dynamics-encoding fragment has no $F$ and only next-state/readout schemas; ``eventually exceed $\theta$'' is not a row of any fixed transition table. Response patterns such as $G\bigl(\mathit{cmd}\rightarrow F(\mathit{done})\bigr)$ and until-formulas such as $(\neg\mathrm{alarm})\,U\,(|s|\ge\theta)$ likewise sit in the mission dialect, not in $\Phi_{\mathrm{dyn}}$.
+(``the running sum eventually reaches threshold $\theta$''). The dynamics-encoding fragment has no $F$ and only next-state/readout schemas; ``eventually exceed $\theta$'' is not a row of any fixed transition table. Response patterns such as $G\bigl(\mathit{cmd}\rightarrow F(\mathit{done})\bigr)$ and until-formulas such as $(\neg\mathrm{alarm})\,U\,(|s|\ge\theta)$ likewise lie outside $\Phi_{\mathrm{dyn}}$.
 
 The engineering tradeoff is therefore deliberate. Use $\Phi_{\mathrm{dyn}}$ when the question is classical implementability of a stated $Z_{\text{spec}}$. Use a more expressive fragment when the question is whether a buildable meets authored boundary intent---accepting that the answer no longer coincides with existence of a homomorphism.
 
@@ -40,7 +40,7 @@ The bi-implication itself is a \emph{semantic} equivalence. It does not imply th
 Relative to classical hand-maintained homomorphisms, the case studies illustrate \emph{maintenance across elaborations}: a single compiled $\Phi_{\mathrm{dyn}}$ is re-checked against simple, medium, and complex buildables whose internal state grows (instrumentation, logging, real-valued channels), while the classical side requires a structure-specific witness for each elaboration (Section~\ref{sec:case-study}). That is a workflow contrast under the bi-implication, not a claim that map discovery is automatic or that property checking is always cheaper. The evidence is qualitative, not a timed benchmark.
 
 \begin{itemize}
-    \item \textbf{Open:} global FC equality for bare mission $\Phi$.
+    \item \textbf{Open:} global FC equality for arbitrary $\Phi$ outside the fragment.
     \item \textbf{Not claimed:} automatic homomorphism search on infinite or real state; continuous-time hybrid verification; identification of floating-point with $\mathbb{R}$.
     \item \textbf{Future work:} SysML tooling integration; broader empirical comparison of verification effort; deeper related-work engagement with runtime verification and supervisory control.
 \end{itemize}

@@ -20,13 +20,13 @@
 %     h_S,h_I,h_O preserving transitions and readout (textbook Def. 4.3 only in appendix).
 %   Property set Φ — temporal formulas in dialect L.
 %   Dynamics-encoding fragment Φ_dyn — G/X/implication table-as-clauses fragment
-%     used for the hom↔Φ bi-implication (not arbitrary mission LTL).
-%   Mission assertional FC — engineer-authored Φ without requiring Z_spec (outside bi-imp).
-%   Dynamics-encoding bridge FC — Φ compiled hom-relatively from Z_spec (carries bi-imp).
+%     used for the hom↔Φ bi-implication (complete Φ_dyn, whether compiled or authored).
+%   Direct authorship — engineer writes Φ without first exhibiting Z_spec (workflow);
+%     bi-implication holds iff that Φ is a complete Φ_dyn (implied Z_spec).
+%   Outside bi-implication — Φ not in the fragment (F, U, arbitrary LTL) or incomplete.
+%   Dynamics-encoding bridge — Φ_dyn compiled from an explicit Z_spec (carries bi-imp).
 %   Assertional satisfaction — Z ⊨_L Φ / Z ⊨_dyn Φ_dyn.
 %   Implementability (classical) — existence of a Wymore system homomorphism into Z_spec.
-%   Execution encoding ψ_Z — FO-LTL compile of trajectory dynamics (tooling support;
-%     not a substitute for the bi-implication alone).
 %   Exhibit / verify maps — finite-tier recovery or checking of h_S,h_I,h_O
 %     (not "synthesize/discover" on infinite or real state).
 %
@@ -73,7 +73,7 @@
 \selectlanguage{english}
 \begin{abstract}
 \sloppy
-Adequately verifying that a buildable system realizes stated functional intent is a core concern of systems engineering. In A.\ Wayne Wymore's Tricotyledon Theory of System Design (T3SD), classical implementability is established constructively by exhibiting a system homomorphism from a buildable system to a reference system in the Functionality Cotyledon. We contend that the same functional intent can be expressed as a dynamics-encoding temporal fragment compiled from a Wymore discrete system, and that---on that fragment---assertional satisfaction is equivalent to classical implementability. Engineers may therefore treat property checking of the compiled fragment as the primary verification artifact rather than constructing and maintaining an explicit homomorphism. We give a canonical first-order LTL encoding of discrete-system execution, prove the fragment bi-implication, and illustrate the methodology on a ones-counter system, a finite string recognizer, and a real-valued accumulator under a discrete clock. Checking remains decidable on finite projections and, more generally, requires bounded or theory-restricted queries; we do not claim a decision procedure for arbitrary infinite or real FO-LTL.
+Adequately verifying that a buildable system realizes stated functional intent is a core concern of systems engineering. In the Tricotyledon Theory of System Design (T3SD), classical implementability is established constructively as a system homomorphism from a buildable system to a reference system in the Functionality Cotyledon.  We show that the same functional intent can be expressed as an assertional dynamics-encoding temporal fragment compiled from a Wymore discrete system, and that satisfaction over the fragment is equivalent to T3SD implementability. System modelers may therefore treat property checking of the compiled fragment as the primary verification artifact rather than constructing and maintaining explicit homomorphisms. We give a canonical first-order LTL encoding of discrete-system execution, prove that the fragment satisfaction over a buildable system iff there exists a Wymorean homomorphism, and illustrate the methodology on a several case studies over families of systems with discrete and continuous states.
 
 \keywords{Tricotyledon Theory of System Design (T3SD), temporal logic, formal verification, Model-Based Systems Engineering (MBSE), system homomorphism.}
 \end{abstract}
@@ -96,6 +96,5 @@ Adequately verifying that a buildable system realizes stated functional intent i
 \appendix
 % \input{appendix/pathology-sketches}  % optional commented sketches
 \input{appendix/hom-biimp}
-\input{appendix/encoding}
 
 \end{document}
