@@ -1,0 +1,14 @@
+{
+  "id": "3.113",
+  "kind": "theorem_proof",
+  "name": "Port count sum equals union cardinality",
+  "chapter": 3,
+  "description": "Exercise 3.113: total input and output port counts equal the sum of per-component port counts (Fintype on ports).",
+  "elements": [
+    {
+      "id": "3.113/theorem/port_count_sum_eq_union",
+      "type": "theorem",
+      "text": "scr_input_port_count and scr_output_port_count equal the Fin n sums of component port cardinalities."
+    }
+  ]
+}

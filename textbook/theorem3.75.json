@@ -1,0 +1,12 @@
+{
+  "id": "3.75",
+  "name": "Coupling Function Translation",
+  "description": "Translation commutes with CFSCR.",
+  "elements": [
+    {
+      "id": "3.75/theorem/cfscr_translate",
+      "type": "implication",
+      "text": "`cfscr` commutes with time translation."
+    }
+  ]
+}

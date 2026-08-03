@@ -1,0 +1,12 @@
+{
+  "id": "3.92",
+  "name": "Order-Zero Component Exists",
+  "description": "Every coupling recipe has a component of order 0 that is not of null order.",
+  "elements": [
+    {
+      "id": "3.92/theorem/order_zero_component",
+      "type": "theorem",
+      "text": "There exists a component with an unconnected port and hence not of null order."
+    }
+  ]
+}

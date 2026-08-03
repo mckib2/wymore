@@ -1,0 +1,19 @@
+{
+  "id": "3.114",
+  "kind": "theorem_proof",
+  "name": "Unconnected ports and CSCR domain-range equality",
+  "chapter": 3,
+  "description": "Exercise 3.114: unconnected input and output ports exist; CSCR domain and range have equal cardinality.",
+  "elements": [
+    {
+      "id": "3.114/theorem/unconnected_ports_exist",
+      "type": "theorem",
+      "text": "There exist unconnected input and output ports in every coupling recipe."
+    },
+    {
+      "id": "3.114/theorem/cscr_domain_range_eq",
+      "type": "theorem",
+      "text": "Domain and range of CSCR have equal cardinality."
+    }
+  ]
+}

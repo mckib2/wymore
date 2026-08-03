@@ -1,0 +1,17 @@
+{
+  "id": "3.73",
+  "name": "Coupling Function Characterization",
+  "description": "Scholium characterizing and uniquely determining the coupling function.",
+  "elements": [
+    {
+      "id": "3.73/theorem/characterization",
+      "type": "implication",
+      "text": "`cfscr` satisfies the coupling-function equations."
+    },
+    {
+      "id": "3.73/theorem/uniqueness",
+      "type": "implication",
+      "text": "Any solution `g` equals `cfscr`."
+    }
+  ]
+}

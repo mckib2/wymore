@@ -1,0 +1,17 @@
+{
+  "id": "3.68",
+  "name": "Coupling Function CFSCR",
+  "description": "Coupling function CFSCR maps closed-loop input/state pairs to open-loop input trajectories satisfying portwise feedback equations.",
+  "elements": [
+    {
+      "id": "3.68/definition/coupling_function",
+      "type": "definition",
+      "text": "Constructive coupling function `cfscr` on closed-loop experiments."
+    },
+    {
+      "id": "3.68/definition/coupling_function_scr",
+      "type": "definition",
+      "text": "Relational coupling-function specification `CouplingFunctionSCR`."
+    }
+  ]
+}

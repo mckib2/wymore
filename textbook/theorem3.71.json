@@ -1,0 +1,17 @@
+{
+  "id": "3.71",
+  "name": "Coupling Function Existence",
+  "description": "Existence and FNS properties of the coupling function.",
+  "elements": [
+    {
+      "id": "3.71/theorem/coupling_function_exists",
+      "type": "implication",
+      "text": "A coupling function exists for each closed-loop experiment."
+    },
+    {
+      "id": "3.71/theorem/coupling_function_in_FNS",
+      "type": "implication",
+      "text": "The coupling-function map is total and single-valued (FNS)."
+    }
+  ]
+}

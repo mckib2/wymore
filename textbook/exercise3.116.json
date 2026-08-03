@@ -1,0 +1,14 @@
+{
+  "id": "3.116",
+  "kind": "theorem_proof",
+  "name": "Cascade requires at least two components",
+  "chapter": 3,
+  "description": "Exercise 3.116: a nonempty cascade coupling recipe requires n > 1.",
+  "elements": [
+    {
+      "id": "3.116/theorem/cascade_min_two_components",
+      "type": "theorem",
+      "text": "IsCascade SCR with nonempty CSCR implies n > 1."
+    }
+  ]
+}

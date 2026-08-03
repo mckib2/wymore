@@ -1,0 +1,12 @@
+{
+  "id": "3.78",
+  "name": "Second Open-Loop Closed-Loop Theorem",
+  "description": "Dynamic open-loop/closed-loop coincidence under `cfscr`.",
+  "elements": [
+    {
+      "id": "3.78/theorem/second_open_loop_closed_loop",
+      "type": "implication",
+      "text": "State and output trajectories match for `cfscr`."
+    }
+  ]
+}

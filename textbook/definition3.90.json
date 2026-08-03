@@ -1,0 +1,22 @@
+{
+  "id": "3.90",
+  "name": "Component Order",
+  "description": "Order of components in a coupling recipe: order 0 (external interface), positive order via SCR connections, and null order.",
+  "elements": [
+    {
+      "id": "3.90/definition/order_zero",
+      "type": "definition",
+      "text": "Component i is of order 0 when it has an unconnected input or output port."
+    },
+    {
+      "id": "3.90/definition/order",
+      "type": "definition",
+      "text": "Component i is of order m + 1 when coupled to some component of order m."
+    },
+    {
+      "id": "3.90/definition/null_order",
+      "type": "definition",
+      "text": "Null order: not of positive order (no external interface)."
+    }
+  ]
+}

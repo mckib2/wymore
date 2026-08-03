@@ -1,0 +1,17 @@
+{
+  "id": "3.85",
+  "name": "Nonsingular Conjunctive Uniqueness",
+  "description": "A nonsingular conjunctive coupling recipe is uniquely determined by its connectable vector VSCR.",
+  "elements": [
+    {
+      "id": "3.85/definition/nonsingular_conjunctive",
+      "type": "definition",
+      "text": "Conjunctive coupling recipe with more than one component (CSCR = ∅, n > 1)."
+    },
+    {
+      "id": "3.85/theorem/nonsingular_conjunctive_scr_unique",
+      "type": "theorem",
+      "text": "Equal VSCR on nonsingular conjunctive recipes determines the coupling recipe."
+    }
+  ]
+}

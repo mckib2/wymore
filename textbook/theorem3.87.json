@@ -1,0 +1,12 @@
+{
+  "id": "3.87",
+  "name": "Non-Product State Cannot Be Multi-Component Resultant",
+  "description": "If n > 1, rsy_SZ is a Cartesian product; a non-product state space cannot be the resultant of a multi-component recipe.",
+  "elements": [
+    {
+      "id": "3.87/theorem/non_product_state_not_multi_component",
+      "type": "theorem",
+      "text": "Contrapositive: StateIsNotCartesianProduct n with n > 1 is impossible for a resultant system."
+    }
+  ]
+}

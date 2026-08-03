@@ -1,0 +1,14 @@
+{
+  "id": "3.118",
+  "kind": "witness",
+  "name": "Simple two-component conjunction",
+  "chapter": 3,
+  "description": "Exercise 3.118: witness of a nonsingular conjunctive coupling recipe with two distinct components.",
+  "elements": [
+    {
+      "id": "3.118/witness/simple_conjunction",
+      "type": "witness",
+      "text": "ex3_118_scr is conjunctive and nonsingular conjunctive."
+    }
+  ]
+}

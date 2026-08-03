@@ -1,0 +1,14 @@
+{
+  "id": "3.119",
+  "kind": "theorem_proof",
+  "name": "Conjunctive port identification",
+  "chapter": 3,
+  "description": "Exercise 3.119: on conjunctive recipes, resultant port maps agree with component-system maps on unconnected ports.",
+  "elements": [
+    {
+      "id": "3.119/theorem/conjunctive_port_identification",
+      "type": "theorem",
+      "text": "rsy_IS_map, rsy_OS_map, rsy_IP_map, rsy_OP_map identify with csy maps on unconnected ports."
+    }
+  ]
+}

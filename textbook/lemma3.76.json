@@ -1,0 +1,12 @@
+{
+  "id": "3.76",
+  "name": "Coupling Function Projections",
+  "description": "Projection identities for `cfscr` inputs and state trajectories.",
+  "elements": [
+    {
+      "id": "3.76/lemma/coupling_function_projection",
+      "type": "implication",
+      "text": "Component inputs and open/closed state trajectories align under `cfscr`."
+    }
+  ]
+}

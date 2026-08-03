@@ -1,0 +1,12 @@
+{
+  "id": "3.95",
+  "name": "Component Relation",
+  "description": "Z1 is a component of Z2 when Z2 is a resultant and Z1 appears as a component in its VSCR.",
+  "elements": [
+    {
+      "id": "3.95/definition/is_component_of",
+      "type": "definition",
+      "text": "Z1 is a component of Z2 when Z2 = RSY(SCR) and Z1 appears in VSCR."
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "3.97",
+  "name": "Subsystem Relation",
+  "description": "Z1 is a subsystem of Z2 when both are resultants with nested component vectors and restricted connections.",
+  "elements": [
+    {
+      "id": "3.97/definition/is_subsystem_of",
+      "type": "definition",
+      "text": "Z1 is a subsystem of Z2 via injective embedding of component vectors and interface restriction."
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "3.115",
+  "kind": "theorem_proof",
+  "name": "Port counts exceed connections",
+  "chapter": 3,
+  "description": "Exercise 3.115: total port counts strictly exceed the number of connections in CSCR.",
+  "elements": [
+    {
+      "id": "3.115/theorem/port_counts_gt_connections",
+      "type": "theorem",
+      "text": "scr_input_port_count and scr_output_port_count are strictly greater than scr_cscr_card."
+    }
+  ]
+}

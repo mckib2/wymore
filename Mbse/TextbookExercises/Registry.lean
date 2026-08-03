@@ -1,4 +1,5 @@
 import Mbse.TextbookExercises.Ch02
+import Mbse.TextbookExercises.Ch03
 
 /-!
 # Textbook exercise registry
@@ -35,6 +36,13 @@ def registry : List ExerciseEntry :=
   , ⟨"2.146", 2, .theoremProof, "solved", "projective_readout_osz_eq_fsz"⟩
   , ⟨"2.149", 2, .theoremProof, "solved", "properly_aligned_non_product_has_state_readout"⟩
   , ⟨"2.150", 2, .theoremProof, "solved", "properly_aligned_non_product_output_readout_dichotomy"⟩
+  , ⟨"3.113", 3, .theoremProof, "solved", "Ch03.scr_port_count_sum_eq_union"⟩
+  , ⟨"3.114", 3, .theoremProof, "solved", "Ch03.scr_unconnected_ports_exist"⟩
+  , ⟨"3.115", 3, .theoremProof, "solved", "Ch03.scr_port_counts_gt_connections"⟩
+  , ⟨"3.116", 3, .theoremProof, "solved", "Ch03.cascade_scr_min_two_components"⟩
+  , ⟨"3.117", 3, .theoremProof, "solved", "Ch03.pure_feedback_min_ports"⟩
+  , ⟨"3.118", 3, .witness, "solved", "Ch03.ex3_118_scr"⟩
+  , ⟨"3.119", 3, .theoremProof, "solved", "Ch03.ex3_119_conjunctive_port_identification"⟩
   ]
 
 def solvedCount : Nat :=

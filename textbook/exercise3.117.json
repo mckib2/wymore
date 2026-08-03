@@ -1,0 +1,14 @@
+{
+  "id": "3.117",
+  "kind": "theorem_proof",
+  "name": "Pure feedback minimum ports",
+  "chapter": 3,
+  "description": "Exercise 3.117: a pure feedback coupling recipe has at least two ports on each side.",
+  "elements": [
+    {
+      "id": "3.117/theorem/pure_feedback_min_ports",
+      "type": "theorem",
+      "text": "min(scr_input_port_count, scr_output_port_count) ≥ 2 for pure feedback SCR."
+    }
+  ]
+}

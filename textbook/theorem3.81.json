@@ -1,0 +1,12 @@
+{
+  "id": "3.81",
+  "name": "Output Component Decomposition",
+  "description": "Closed-loop output trajectories factor through components.",
+  "elements": [
+    {
+      "id": "3.81/theorem/resultant_output_component_decomposition",
+      "type": "implication",
+      "text": "Unconnected output ports follow component output trajectories."
+    }
+  ]
+}

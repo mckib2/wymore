@@ -1,0 +1,12 @@
+{
+  "id": "3.80",
+  "name": "Resultant Behavior from Open Loop",
+  "description": "Closed-loop behavior realized by an open-loop run.",
+  "elements": [
+    {
+      "id": "3.80/theorem/resultant_behavior_from_open_loop",
+      "type": "implication",
+      "text": "Existence of open-loop `g` reproducing closed-loop state trajectories."
+    }
+  ]
+}
