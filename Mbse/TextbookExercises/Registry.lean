@@ -43,6 +43,10 @@ def registry : List ExerciseEntry :=
   , ⟨"3.117", 3, .theoremProof, "solved", "Ch03.pure_feedback_min_ports"⟩
   , ⟨"3.118", 3, .witness, "solved", "Ch03.ex3_118_scr"⟩
   , ⟨"3.119", 3, .theoremProof, "solved", "Ch03.ex3_119_conjunctive_port_identification"⟩
+  , ⟨"3.120", 3, .theoremProof, "solved", "Ch03.ex3_120_conjunctive_port_functions"⟩
+  , ⟨"3.121", 3, .theoremProof, "solved", "Ch03.ex3_121_resultant_port_functions"⟩
+  , ⟨"3.122", 3, .theoremProof, "solved", "Ch03.ex3_122_every_system_is_resultant"⟩
+  , ⟨"3.123", 3, .theoremProof, "solved", "Ch03.ex3_123_conjunctive_rsy_eq_csy"⟩
   ]
 
 def solvedCount : Nat :=

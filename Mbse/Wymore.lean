@@ -831,6 +831,46 @@ def csy_INOP_map {n : Nat} (_VSCR : PortSystemVector n) :
 def csy_OS_map {n : Nat} (VSCR : PortSystemVector n) (op : Σ (i : Fin n), VSCR.OutPort i) : Type :=
   VSCR.OutPortVal op.1 op.2
 
+/--
+  [textbook/exercise3.120/theorem/conjunctive_input_port_map]
+  `IP&(V,Z) ∈ FNS(IPZ, 1TO1, ONTO, ⋃{IPZi})`.
+-/
+theorem csy_IP_map_inFNS1TO1Onto {n : Nat} (VSCR : PortSystemVector n) :
+    InFNS1TO1Onto (csy_IP_map VSCR) :=
+  inFNS1TO1Onto_id
+
+/--
+  [textbook/exercise3.120/theorem/conjunctive_inverse_input_port_map]
+  `INIP&(V,Z) ∈ FNS(⋃{IPZi}, 1TO1, ONTO, IPZ)`.
+-/
+theorem csy_INIP_map_inFNS1TO1Onto {n : Nat} (VSCR : PortSystemVector n) :
+    InFNS1TO1Onto (csy_INIP_map VSCR) :=
+  inFNS1TO1Onto_id
+
+/--
+  [textbook/exercise3.120/theorem/conjunctive_input_port_structure]
+  `IS&(V,Z) = ISZ` on conjunctive input ports.
+-/
+theorem csy_IS_map_eq {n : Nat} (VSCR : PortSystemVector n)
+    (ip : Σ (i : Fin n), VSCR.Port i) :
+    csy_IS_map VSCR ip = VSCR.PortVal ip.1 ip.2 := rfl
+
+/--
+  [textbook/exercise3.120/theorem/conjunctive_output_port_map]
+  `OP&(V,Z) ∈ FNS(OPZ, 1TO1, ONTO, ⋃{OPZi})`.
+-/
+theorem csy_OP_map_inFNS1TO1Onto {n : Nat} (VSCR : PortSystemVector n) :
+    InFNS1TO1Onto (csy_OP_map VSCR) :=
+  inFNS1TO1Onto_id
+
+/--
+  [textbook/exercise3.120/theorem/conjunctive_output_port_structure]
+  `OS&(V,Z) = OSZ` on conjunctive output ports.
+-/
+theorem csy_OS_map_eq {n : Nat} (VSCR : PortSystemVector n)
+    (op : Σ (i : Fin n), VSCR.OutPort i) :
+    csy_OS_map VSCR op = VSCR.OutPortVal op.1 op.2 := rfl
+
 def product_fun {I : Type} {A B : I → Type} (f : (i : I) → A i → B i) :
     ((i : I) → A i) → ((i : I) → B i) :=
   fun x i => f i (x i)
@@ -1067,6 +1107,52 @@ def rsy_OS_map {n : Nat} (SCR : SystemCouplingRecipe n) (op : UnconnOutPort SCR)
   SCR.VSCR.OutPortVal op.val.1 op.val.2
 
 /--
+  [textbook/exercise3.121/theorem/resultant_input_port_map]
+  `IP@(SCR,Z) ∈ FNS(IPZ, 1TO1, ONTO, UISCR)`.
+-/
+theorem rsy_IP_map_inFNS1TO1Onto {n : Nat} (SCR : SystemCouplingRecipe n) :
+    InFNS1TO1Onto (rsy_IP_map SCR) :=
+  inFNS1TO1Onto_id
+
+/--
+  [textbook/exercise3.121/theorem/resultant_inverse_input_port_map]
+  `INIP@(SCR,Z) ∈ FNS(UISCR, 1TO1, ONTO, IPZ)`.
+-/
+theorem rsy_INIP_map_inFNS1TO1Onto {n : Nat} (SCR : SystemCouplingRecipe n) :
+    InFNS1TO1Onto (rsy_INIP_map SCR) :=
+  inFNS1TO1Onto_id
+
+/--
+  [textbook/exercise3.121/theorem/resultant_input_port_structure]
+  `IS@(SCR,Z) = ISZ` on resultant input ports.
+-/
+theorem rsy_IS_map_eq {n : Nat} (SCR : SystemCouplingRecipe n) (ip : UnconnInPort SCR) :
+    rsy_IS_map SCR ip = SCR.VSCR.PortVal ip.val.1 ip.val.2 := rfl
+
+/--
+  [textbook/exercise3.121/theorem/resultant_output_port_map]
+  `OP@(SCR,Z) ∈ FNS(OPZ, 1TO1, ONTO, UOSCR)`.
+-/
+theorem rsy_OP_map_inFNS1TO1Onto {n : Nat} (SCR : SystemCouplingRecipe n) :
+    InFNS1TO1Onto (rsy_OP_map SCR) :=
+  inFNS1TO1Onto_id
+
+/--
+  [textbook/exercise3.121/theorem/resultant_inverse_output_port_map]
+  `INOP@(SCR,Z) ∈ FNS(UOSCR, 1TO1, ONTO, OPZ)`.
+-/
+theorem rsy_INOP_map_inFNS1TO1Onto {n : Nat} (SCR : SystemCouplingRecipe n) :
+    InFNS1TO1Onto (rsy_INOP_map SCR) :=
+  inFNS1TO1Onto_id
+
+/--
+  [textbook/exercise3.121/theorem/resultant_output_port_structure]
+  `OS@(SCR,Z) = OSZ` on resultant output ports.
+-/
+theorem rsy_OS_map_eq {n : Nat} (SCR : SystemCouplingRecipe n) (op : UnconnOutPort SCR) :
+    rsy_OS_map SCR op = SCR.VSCR.OutPortVal op.val.1 op.val.2 := rfl
+
+/--
   [textbook/definition3.47/definition/open_loop]
   Open-loop system `Z& = CSY(VSCR)` determined by a coupling recipe.
 -/
@@ -1224,6 +1310,220 @@ lemma mem_uoscr_conjunctive {n : Nat} (SCR : SystemCouplingRecipe n) (h : IsConj
   rintro ⟨ip, hop⟩
   rw [h] at hop
   cases hop
+
+/--
+  [textbook/exercise3.123/definition/unconn_input_equiv]
+  On conjunctive recipes, unconnected input ports are the full tagged union.
+-/
+noncomputable def unconnInPortEquiv {n : Nat} (SCR : SystemCouplingRecipe n)
+    (h : IsConjunctive SCR) : UnconnInPort SCR ≃ Σ (i : Fin n), SCR.VSCR.Port i where
+  toFun ip := ip.val
+  invFun ip := ⟨ip, mem_uiscr_conjunctive SCR h ip⟩
+  left_inv _ := rfl
+  right_inv _ := rfl
+
+/--
+  [textbook/exercise3.123/definition/unconn_output_equiv]
+  On conjunctive recipes, unconnected output ports are the full tagged union.
+-/
+noncomputable def unconnOutPortEquiv {n : Nat} (SCR : SystemCouplingRecipe n)
+    (h : IsConjunctive SCR) : UnconnOutPort SCR ≃ Σ (i : Fin n), SCR.VSCR.OutPort i where
+  toFun op := op.val
+  invFun op := ⟨op, mem_uoscr_conjunctive SCR h op⟩
+  left_inv _ := rfl
+  right_inv _ := rfl
+
+lemma sigmaPort_nonempty_vscr {n : Nat} (VSCR : PortSystemVector n) (i : Fin n)
+    (h : Nonempty (VSCR.Port i)) : Nonempty (Σ (j : Fin n), VSCR.Port j) :=
+  ⟨⟨i, Classical.choice h⟩⟩
+
+lemma sigmaOutPort_nonempty_vscr {n : Nat} (VSCR : PortSystemVector n) (i : Fin n)
+    (h : Nonempty (VSCR.OutPort i)) : Nonempty (Σ (j : Fin n), VSCR.OutPort j) :=
+  ⟨⟨i, Classical.choice h⟩⟩
+
+/--
+  [textbook/exercise3.122/definition/singular_scr]
+  Singular coupling recipe `(V, ∅)` for a one-component connectable vector.
+-/
+def singularSCR (V : PortSystemVector 1)
+    (hOutNE : Nonempty (Σ (i : Fin 1), V.OutPort i))
+    (hInNE : Nonempty (Σ (i : Fin 1), V.Port i)) : SystemCouplingRecipe 1 where
+  VSCR := V
+  CSCR := ∅
+  connectivity := empty_scr_connectivity V hOutNE hInNE
+
+theorem singularSCR_is_singular (V : PortSystemVector 1)
+    (hOutNE : Nonempty (Σ (i : Fin 1), V.OutPort i))
+    (hInNE : Nonempty (Σ (i : Fin 1), V.Port i)) :
+    IsSingular (singularSCR V hOutNE hInNE) :=
+  ⟨rfl, rfl⟩
+
+theorem singular_scr_inRSY (V : PortSystemVector 1)
+    (hOut : ∀ i, AlwaysOutputs (V.Z i))
+    (hOutNE : Nonempty (Σ (i : Fin 1), V.OutPort i))
+    (hInNE : Nonempty (Σ (i : Fin 1), V.Port i)) :
+    InRSY 1 ⟨singularSCR V hOutNE hInNE, hOut⟩ (rsy (singularSCR V hOutNE hInNE) hOut) :=
+  rfl
+
+/--
+  [textbook/exercise3.122/definition/port_vector_of_system]
+  Embed a port-encoded discrete system as a one-component connectable vector.
+-/
+def portVectorOfSystem {SZ Port OutPort : Type}
+    (PortVal : Port → Type) (OutPortVal : OutPort → Type)
+    (Z : DiscreteSystem SZ ((p : Port) → PortVal p) ((op : OutPort) → OutPortVal op)) :
+    PortSystemVector 1 where
+  SZ := fun _ => SZ
+  Port := fun _ => Port
+  PortVal := fun _ p => PortVal p
+  OutPort := fun _ => OutPort
+  OutPortVal := fun _ op => OutPortVal op
+  Z := fun _ => Z
+  distinct := fun i j hne => absurd (Trajectory.fin_one_eq i j) hne
+
+noncomputable def finArrowOneEquiv (A : Type) : (Fin 1 → A) ≃ A where
+  toFun f := f 0
+  invFun a := fun _ => a
+  left_inv f := funext (fun i => by have hi := Trajectory.fin_one_eq i 0; subst hi; rfl)
+  right_inv _ := rfl
+
+noncomputable def singularStateEquiv {SZ Port OutPort : Type}
+    (PortVal : Port → Type) (OutPortVal : OutPort → Type)
+    (Z : DiscreteSystem SZ ((p : Port) → PortVal p) ((op : OutPort) → OutPortVal op))
+    (hOutNE : Nonempty (Σ (i : Fin 1), (portVectorOfSystem PortVal OutPortVal Z).OutPort i))
+    (hInNE : Nonempty (Σ (i : Fin 1), (portVectorOfSystem PortVal OutPortVal Z).Port i)) :
+    SZ ≃ rsy_SZ (singularSCR (portVectorOfSystem PortVal OutPortVal Z) hOutNE hInNE) :=
+  (finArrowOneEquiv SZ).symm
+
+theorem singularSCR_is_conjunctive (V : PortSystemVector 1)
+    (hOutNE : Nonempty (Σ (i : Fin 1), V.OutPort i))
+    (hInNE : Nonempty (Σ (i : Fin 1), V.Port i)) :
+    IsConjunctive (singularSCR V hOutNE hInNE) :=
+  rfl
+
+noncomputable def rsyIzFromPortInput {n : Nat} (SCR : SystemCouplingRecipe n)
+    (_h : IsConjunctive SCR)
+    (g : (i : Fin n) → (p : SCR.VSCR.Port i) → SCR.VSCR.PortVal i p) :
+    rsy_IZ SCR :=
+  fun ip => g ip.val.1 ip.val.2
+
+noncomputable def portInputToRsyTrajectory {n : Nat} (SCR : SystemCouplingRecipe n)
+    (h : IsConjunctive SCR)
+    (f : ITZW ((ip : Σ (i : Fin n), SCR.VSCR.Port i) → SCR.VSCR.PortVal ip.1 ip.2)) :
+    ITZW (rsy_IZ SCR) :=
+  fun τ => (f τ).map (fun full => rsyIzFromPortInput SCR h (fun i p => full ⟨i, p⟩))
+
+noncomputable def singularPortTrajectory {Port : Type} (PortVal : Port → Type)
+    (f : ITZW ((p : Port) → PortVal p)) :
+    ITZW ((ip : Σ (_ : Fin 1), Port) → PortVal ip.2) :=
+  fun τ => (f τ).map (fun g ip => g ip.2)
+
+noncomputable def singularRsyInputTrajectory (SCR : SystemCouplingRecipe 1)
+    (h : IsConjunctive SCR)
+    (f : ITZW ((p : SCR.VSCR.Port 0) → SCR.VSCR.PortVal 0 p)) :
+    ITZW (rsy_IZ SCR) :=
+  portInputToRsyTrajectory SCR h (fun τ => (f τ).map (fun g ip =>
+    match ip with
+    | ⟨0, p⟩ => g p))
+
+noncomputable def singularRsyIzFromPortInput (SCR : SystemCouplingRecipe 1) (_h : IsConjunctive SCR)
+    (g : (p : SCR.VSCR.Port 0) → SCR.VSCR.PortVal 0 p) : rsy_IZ SCR :=
+  fun ip => match ip.val with | ⟨0, p⟩ => g p
+
+noncomputable def rsyExtInOfCsy {n : Nat} (SCR : SystemCouplingRecipe n)
+    (h : IsConjunctive SCR) (extIn : rsy_IZ SCR) :
+    (ip : Σ (i : Fin n), SCR.VSCR.Port i) → SCR.VSCR.PortVal ip.1 ip.2 :=
+  fun ip => extIn ⟨ip, mem_uiscr_conjunctive SCR h ip⟩
+
+noncomputable def csyExtInFromRsy {n : Nat} (SCR : SystemCouplingRecipe n)
+    (_h : IsConjunctive SCR)
+    (fullIn : (ip : Σ (i : Fin n), SCR.VSCR.Port i) → SCR.VSCR.PortVal ip.1 ip.2) :
+    rsy_IZ SCR :=
+  fun ip => fullIn ip.val
+
+theorem rsy_conjunctive_scr_NZ_eq {n : Nat} (SCR : SystemCouplingRecipe n)
+    (h : IsConjunctive SCR) (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i))
+    (x : rsy_SZ SCR) (extIn : rsy_IZ SCR) (i : Fin n) :
+    rsy_NZ SCR hOut x (some extIn) i =
+      (csy SCR.VSCR hOut).NZ x (some (rsyExtInOfCsy SCR h extIn)) i := by
+  simp only [csy, rsy_NZ]
+  congr 1
+  apply congr_arg some
+  funext port
+  dsimp [rsy_component_input_fun, rsyExtInOfCsy]
+  have hU := mem_uiscr_conjunctive SCR h ⟨i, port⟩
+  simp [hU]
+
+theorem rsy_conjunctive_scr_RZ_eq {n : Nat} (SCR : SystemCouplingRecipe n)
+    (_h : IsConjunctive SCR) (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i))
+    (x : rsy_SZ SCR) (op : Σ (i : Fin n), SCR.VSCR.OutPort i) :
+    rsyOutAt SCR hOut x op = csyOut SCR.VSCR hOut x op := by
+  dsimp [rsyOutAt, csyOut]
+
+lemma singular_scr_NZ_eq {SCR : SystemCouplingRecipe 1} (h : IsConjunctive SCR)
+    (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i)) (x : rsy_SZ SCR)
+    (g : (p : SCR.VSCR.Port 0) → SCR.VSCR.PortVal 0 p) :
+    rsy_NZ SCR hOut x (some (singularRsyIzFromPortInput SCR h g)) 0 =
+      (csy SCR.VSCR hOut).NZ x (some (fun ip => match ip with | ⟨0, p⟩ => g p)) 0 :=
+  rsy_conjunctive_scr_NZ_eq SCR h hOut x (singularRsyIzFromPortInput SCR h g) 0
+
+lemma singular_scr_RZ_eq {SCR : SystemCouplingRecipe 1} (h : IsConjunctive SCR)
+    (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i)) (x : rsy_SZ SCR) (p : SCR.VSCR.OutPort 0) :
+    rsyOutAt SCR hOut x ⟨0, p⟩ = csyOut SCR.VSCR hOut x ⟨0, p⟩ :=
+  rsy_conjunctive_scr_RZ_eq SCR h hOut x ⟨0, p⟩
+
+/--
+  [textbook/exercise3.123/theorem/conjunctive_rsy_eq_csy]
+  On conjunctive recipes, `RSY(SCR)` and `CSY(VSCR)` agree on next-state and readout.
+-/
+theorem conjunctive_rsy_eq_csy {n : Nat} (SCR : SystemCouplingRecipe n)
+    (h : IsConjunctive SCR) (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i)) :
+    InRSY n ⟨SCR, hOut⟩ (rsy SCR hOut) ∧
+      (∀ (x : rsy_SZ SCR) (extIn : rsy_IZ SCR) (i : Fin n),
+        rsy_NZ SCR hOut x (some extIn) i =
+          (csy SCR.VSCR hOut).NZ x (some (rsyExtInOfCsy SCR h extIn)) i) ∧
+      (∀ (x : rsy_SZ SCR) (op : Σ (i : Fin n), SCR.VSCR.OutPort i),
+        rsyOutAt SCR hOut x op = csyOut SCR.VSCR hOut x op) := by
+  refine ⟨rfl, ?_, ?_⟩
+  · intro x extIn i
+    exact rsy_conjunctive_scr_NZ_eq SCR h hOut x extIn i
+  · intro x op
+    exact rsy_conjunctive_scr_RZ_eq SCR h hOut x op
+
+/--
+  [textbook/exercise3.122/theorem/every_system_is_resultant]
+  Every port-encoded discrete system is the resultant of its singular recipe `(Z, ∅)`.
+-/
+theorem every_port_system_is_resultant {SZ Port OutPort : Type}
+    (PortVal : Port → Type) (OutPortVal : OutPort → Type)
+    (Z : DiscreteSystem SZ ((p : Port) → PortVal p) ((op : OutPort) → OutPortVal op))
+    (hOut : AlwaysOutputs Z)
+    (hPort : Nonempty Port) (hOutPort : Nonempty OutPort) :
+    let V := portVectorOfSystem PortVal OutPortVal Z
+    let hOutNE := sigmaOutPort_nonempty_vscr V 0 ⟨Classical.choice hOutPort⟩
+    let hInNE := sigmaPort_nonempty_vscr V 0 ⟨Classical.choice hPort⟩
+    let SCR := singularSCR V hOutNE hInNE
+    let hConj := singularSCR_is_conjunctive V hOutNE hInNE
+    IsSingular SCR ∧
+      InRSY 1 ⟨SCR, fun _ => hOut⟩ (rsy SCR (fun _ => hOut)) ∧
+      (∀ (x : SZ) (g : (p : Port) → PortVal p),
+        rsy_NZ SCR (fun _ => hOut) (fun _ => x)
+          (some (singularRsyIzFromPortInput SCR hConj g)) 0 =
+          Z.NZ x (some g)) ∧
+      (∀ (x : SZ) (p : OutPort),
+        rsyOutAt SCR (fun _ => hOut) (fun _ => x) ⟨0, p⟩ =
+          csyOut V (fun _ => hOut) (fun _ => x) ⟨0, p⟩) := by
+  let V := portVectorOfSystem PortVal OutPortVal Z
+  let hOutNE := sigmaOutPort_nonempty_vscr V 0 ⟨Classical.choice hOutPort⟩
+  let hInNE := sigmaPort_nonempty_vscr V 0 ⟨Classical.choice hPort⟩
+  let SCR := singularSCR V hOutNE hInNE
+  let hConj := singularSCR_is_conjunctive V hOutNE hInNE
+  refine ⟨singularSCR_is_singular V hOutNE hInNE, ?_, ?_, ?_⟩
+  · rfl
+  · intro x g
+    simpa using singular_scr_NZ_eq hConj (fun _ => hOut) (fun _ => x) g
+  · intro x p
+    simpa using singular_scr_RZ_eq hConj (fun _ => hOut) (fun _ => x) p
 
 theorem csy_alwaysOutputs {n : Nat} (VSCR : PortSystemVector n)
     (hOut : ∀ i, AlwaysOutputs (VSCR.Z i)) : AlwaysOutputs (csy VSCR hOut) := by

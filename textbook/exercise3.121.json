@@ -1,0 +1,44 @@
+{
+  "id": "3.121",
+  "kind": "theorem_proof",
+  "name": "Resultant port functions",
+  "chapter": 3,
+  "description": "Exercise 3.121: RSY port maps IP@, INIP@, OP@, INOP@ are FNS + 1TO1 + ONTO on unconnected ports; IS@ and OS@ agree with components.",
+  "elements": [
+    {
+      "id": "3.121/theorem/resultant_input_port_map",
+      "type": "theorem",
+      "text": "IP@(SCR,Z) ∈ FNS(IPZ, 1TO1, ONTO, UISCR)."
+    },
+    {
+      "id": "3.121/theorem/resultant_inverse_input_port_map",
+      "type": "theorem",
+      "text": "INIP@(SCR,Z) ∈ FNS(UISCR, 1TO1, ONTO, IPZ)."
+    },
+    {
+      "id": "3.121/theorem/resultant_input_port_structure",
+      "type": "theorem",
+      "text": "IS@(SCR,Z) = ISZ on resultant input ports."
+    },
+    {
+      "id": "3.121/theorem/resultant_output_port_map",
+      "type": "theorem",
+      "text": "OP@(SCR,Z) ∈ FNS(OPZ, 1TO1, ONTO, UOSCR)."
+    },
+    {
+      "id": "3.121/theorem/resultant_inverse_output_port_map",
+      "type": "theorem",
+      "text": "INOP@(SCR,Z) ∈ FNS(UOSCR, 1TO1, ONTO, OPZ)."
+    },
+    {
+      "id": "3.121/theorem/resultant_output_port_structure",
+      "type": "theorem",
+      "text": "OS@(SCR,Z) = OSZ on resultant output ports."
+    },
+    {
+      "id": "3.121/theorem/resultant_port_functions",
+      "type": "theorem",
+      "text": "Aggregate RSY port-map FNS and structure equalities."
+    }
+  ]
+}

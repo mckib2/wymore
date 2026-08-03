@@ -4,7 +4,7 @@ import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Data.Fin.Basic
 
 /-!
-# Chapter 3 — coupling recipe exercises (3.113–3.119)
+# Chapter 3 — coupling recipe exercises (3.113–3.123)
 -/
 
 namespace Mbse.TextbookExercises.Ch03
@@ -289,5 +289,60 @@ theorem ex3_119_conjunctive_port_identification {n : Nat} (SCR : SystemCouplingR
   refine ⟨rfl, rfl, ?_, ?_⟩
   · rfl
   · rfl
+
+/-! ## Exercise 3.120: conjunctive port functions -/
+
+/--
+  [textbook/exercise3.120/theorem/conjunctive_port_functions]
+  CSY port maps are FNS + 1TO1 + ONTO; structure maps agree with component port types.
+-/
+theorem ex3_120_conjunctive_port_functions {n : Nat} (VSCR : PortSystemVector n) :
+    InFNS1TO1Onto (csy_IP_map VSCR) ∧
+      InFNS1TO1Onto (csy_INIP_map VSCR) ∧
+      (∀ ip, csy_IS_map VSCR ip = VSCR.PortVal ip.1 ip.2) ∧
+      InFNS1TO1Onto (csy_OP_map VSCR) ∧
+      (∀ op, csy_OS_map VSCR op = VSCR.OutPortVal op.1 op.2) :=
+  ⟨csy_IP_map_inFNS1TO1Onto VSCR, csy_INIP_map_inFNS1TO1Onto VSCR,
+    fun ip => csy_IS_map_eq VSCR ip, csy_OP_map_inFNS1TO1Onto VSCR,
+    fun op => csy_OS_map_eq VSCR op⟩
+
+/-! ## Exercise 3.121: resultant port functions -/
+
+/--
+  [textbook/exercise3.121/theorem/resultant_port_functions]
+  RSY port maps are FNS + 1TO1 + ONTO on unconnected ports; structure maps agree with components.
+-/
+theorem ex3_121_resultant_port_functions {n : Nat} (SCR : SystemCouplingRecipe n)
+    (ip : UnconnInPort SCR) (op : UnconnOutPort SCR) :
+    InFNS1TO1Onto (rsy_IP_map SCR) ∧
+      InFNS1TO1Onto (rsy_INIP_map SCR) ∧
+      rsy_IS_map SCR ip = SCR.VSCR.PortVal ip.val.1 ip.val.2 ∧
+      InFNS1TO1Onto (rsy_OP_map SCR) ∧
+      InFNS1TO1Onto (rsy_INOP_map SCR) ∧
+      rsy_OS_map SCR op = SCR.VSCR.OutPortVal op.val.1 op.val.2 :=
+  ⟨rsy_IP_map_inFNS1TO1Onto SCR, rsy_INIP_map_inFNS1TO1Onto SCR, rsy_IS_map_eq SCR ip,
+    rsy_OP_map_inFNS1TO1Onto SCR, rsy_INOP_map_inFNS1TO1Onto SCR, rsy_OS_map_eq SCR op⟩
+
+/-! ## Exercise 3.122: every system is a resultant -/
+
+/--
+  [textbook/exercise3.122/theorem/every_system_is_resultant]
+  Every port-encoded discrete system equals the resultant of its singular recipe `(Z, ∅)`.
+-/
+abbrev ex3_122_every_system_is_resultant {SZ Port OutPort : Type}
+    (PortVal : Port → Type) (OutPortVal : OutPort → Type)
+    (Z : DiscreteSystem SZ ((p : Port) → PortVal p) ((op : OutPort) → OutPortVal op))
+    (hOut : AlwaysOutputs Z) (hPort : Nonempty Port) (hOutPort : Nonempty OutPort) :=
+  every_port_system_is_resultant PortVal OutPortVal Z hOut hPort hOutPort
+
+/-! ## Exercise 3.123: conjunctive RSY = CSY -/
+
+/--
+  [textbook/exercise3.123/theorem/conjunctive_rsy_eq_csy]
+  On conjunctive recipes, `RSY(SCR)` and `CSY(VSCR)` agree on membership and dynamics.
+-/
+abbrev ex3_123_conjunctive_rsy_eq_csy {n : Nat} (SCR : SystemCouplingRecipe n)
+    (h : IsConjunctive SCR) (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i)) :=
+  conjunctive_rsy_eq_csy SCR h hOut
 
 end Mbse.TextbookExercises.Ch03

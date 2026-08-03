@@ -1,0 +1,39 @@
+{
+  "id": "3.120",
+  "kind": "theorem_proof",
+  "name": "Conjunctive port functions",
+  "chapter": 3,
+  "description": "Exercise 3.120: CSY port maps IP&, INIP&, OP& are FNS + 1TO1 + ONTO; IS& and OS& agree with component port structure.",
+  "elements": [
+    {
+      "id": "3.120/theorem/conjunctive_input_port_map",
+      "type": "theorem",
+      "text": "IP&(V,Z) ∈ FNS(IPZ, 1TO1, ONTO, ⋃{IPZi})."
+    },
+    {
+      "id": "3.120/theorem/conjunctive_inverse_input_port_map",
+      "type": "theorem",
+      "text": "INIP&(V,Z) ∈ FNS(⋃{IPZi}, 1TO1, ONTO, IPZ)."
+    },
+    {
+      "id": "3.120/theorem/conjunctive_input_port_structure",
+      "type": "theorem",
+      "text": "IS&(V,Z) = ISZ on conjunctive input ports."
+    },
+    {
+      "id": "3.120/theorem/conjunctive_output_port_map",
+      "type": "theorem",
+      "text": "OP&(V,Z) ∈ FNS(OPZ, 1TO1, ONTO, ⋃{OPZi})."
+    },
+    {
+      "id": "3.120/theorem/conjunctive_output_port_structure",
+      "type": "theorem",
+      "text": "OS&(V,Z) = OSZ on conjunctive output ports."
+    },
+    {
+      "id": "3.120/theorem/conjunctive_port_functions",
+      "type": "theorem",
+      "text": "Aggregate CSY port-map FNS and structure equalities."
+    }
+  ]
+}

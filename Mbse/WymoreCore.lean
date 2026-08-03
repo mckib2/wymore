@@ -80,6 +80,23 @@ theorem satisfiesFNS_of_function {A B : Type} (f : A → B) : SatisfiesFNS f := 
     simp only [FunctionGraph, Set.mem_setOf_eq] at h₁ h₂
     rw [h₁, h₂]
 
+/--
+  [textbook/definition_a1.155] [textbook/definition3.19]
+  Textbook `f ∈ FNS(A, 1TO1, ONTO, B)`: total single-valued function that is injective and surjective.
+-/
+def InFNS1TO1Onto {A B : Type} (f : A → B) : Prop :=
+  SatisfiesFNS f ∧ Function.Injective f ∧ Function.Surjective f
+
+/-- Every equivalence induces a function in `FNS(A, 1TO1, ONTO, B)`. -/
+theorem inFNS1TO1Onto_of_equiv {A B : Type} (e : A ≃ B) : InFNS1TO1Onto e.toFun := by
+  refine ⟨satisfiesFNS_of_function e.toFun, ?_, ?_⟩
+  · exact e.injective
+  · exact e.surjective
+
+/-- The identity function is in `FNS(A, 1TO1, ONTO, A)`. -/
+theorem inFNS1TO1Onto_id {A : Type} : InFNS1TO1Onto (fun x : A => x) :=
+  ⟨satisfiesFNS_of_function (fun x : A => x), Function.injective_id, Function.surjective_id⟩
+
 /-- [textbook/definition2.4/implication/closed_system] A system is closed if both its input and output spaces are empty. -/
 def IsClosed {SZ IZ OZ : Type} (_Z : DiscreteSystem SZ IZ OZ) : Prop :=
   IsEmpty IZ ∧ IsEmpty OZ

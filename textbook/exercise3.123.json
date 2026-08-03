@@ -1,0 +1,24 @@
+{
+  "id": "3.123",
+  "kind": "theorem_proof",
+  "name": "Conjunctive RSY equals CSY",
+  "chapter": 3,
+  "description": "Exercise 3.123: on conjunctive recipes, RSY(SCR) and CSY(VSCR) agree on InRSY membership and next-state/readout dynamics.",
+  "elements": [
+    {
+      "id": "3.123/definition/unconn_input_equiv",
+      "type": "definition",
+      "text": "UnconnInPort ≃ tagged input port union on conjunctive recipes."
+    },
+    {
+      "id": "3.123/definition/unconn_output_equiv",
+      "type": "definition",
+      "text": "UnconnOutPort ≃ tagged output port union on conjunctive recipes."
+    },
+    {
+      "id": "3.123/theorem/conjunctive_rsy_eq_csy",
+      "type": "theorem",
+      "text": "InRSY plus pointwise NZ and readout agreement between RSY(SCR) and CSY(VSCR)."
+    }
+  ]
+}
