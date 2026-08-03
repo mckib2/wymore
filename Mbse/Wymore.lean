@@ -874,6 +874,814 @@ theorem csy_output_trajectory {n : Nat} (VSCR : PortSystemVector n)
   rw [ho]
   exact congrArg some hmain
 
+/-! ## Chapter 3: Resultant Systems (RSY) -/
+
+/--
+  [textbook/definition3.47/definition/unconnected_input_port]
+  An unconnected input port of a coupling recipe (element of `UISCR`).
+-/
+def UnconnInPort {n : Nat} (SCR : SystemCouplingRecipe n) : Type :=
+  { ip : Σ (i : Fin n), SCR.VSCR.Port i // ip ∈ UISCR SCR }
+
+/--
+  [textbook/definition3.47/definition/unconnected_output_port]
+  An unconnected output port of a coupling recipe (element of `UOSCR`).
+-/
+def UnconnOutPort {n : Nat} (SCR : SystemCouplingRecipe n) : Type :=
+  { op : Σ (i : Fin n), SCR.VSCR.OutPort i // op ∈ UOSCR SCR }
+
+/--
+  [textbook/definition3.47/definition/iz]
+  External input space: values on unconnected input ports (`UISCR`).
+-/
+def rsy_IZ {n : Nat} (SCR : SystemCouplingRecipe n) : Type :=
+  (ip : UnconnInPort SCR) → SCR.VSCR.PortVal ip.val.1 ip.val.2
+
+/--
+  [textbook/definition3.47/definition/oz]
+  External output space: values on unconnected output ports (`UOSCR`).
+-/
+def rsy_OZ {n : Nat} (SCR : SystemCouplingRecipe n) : Type :=
+  (op : UnconnOutPort SCR) → SCR.VSCR.OutPortVal op.val.1 op.val.2
+
+/--
+  [textbook/definition3.47/definition/sz]
+  State space of the resultant: product of component state spaces.
+-/
+def rsy_SZ {n : Nat} (SCR : SystemCouplingRecipe n) : Type :=
+  (i : Fin n) → SCR.VSCR.SZ i
+
+lemma mem_ciscr_iff {n : Nat} (SCR : SystemCouplingRecipe n)
+    (ip : Σ (i : Fin n), SCR.VSCR.Port i) :
+    ip ∈ CISCR SCR ↔ ∃ op, (op, ip) ∈ SCR.CSCR := Iff.rfl
+
+lemma mem_uiscr_iff {n : Nat} (SCR : SystemCouplingRecipe n)
+    (ip : Σ (i : Fin n), SCR.VSCR.Port i) :
+    ip ∈ UISCR SCR ↔ ip ∉ CISCR SCR := by
+  simp [UISCR]
+
+/--
+  [textbook/definition3.47/definition/connected_output]
+  The output port feeding a connected input port `ip` via `CSCR`.
+-/
+noncomputable def connectedOutput {n : Nat} (SCR : SystemCouplingRecipe n)
+    (ip : Σ (i : Fin n), SCR.VSCR.Port i) (h : ip ∈ CISCR SCR) :
+    Σ (i : Fin n), SCR.VSCR.OutPort i :=
+  Classical.choose (mem_ciscr_iff SCR ip |>.mp h)
+
+lemma connectedOutput_spec {n : Nat} (SCR : SystemCouplingRecipe n)
+    (ip : Σ (i : Fin n), SCR.VSCR.Port i) (h : ip ∈ CISCR SCR) :
+    (connectedOutput SCR ip h, ip) ∈ SCR.CSCR :=
+  Classical.choose_spec (mem_ciscr_iff SCR ip |>.mp h)
+
+noncomputable def rsyOutAt {n : Nat} (SCR : SystemCouplingRecipe n)
+    (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i)) (x : rsy_SZ SCR)
+    (op : Σ (i : Fin n), SCR.VSCR.OutPort i) : SCR.VSCR.OutPortVal op.1 op.2 :=
+  csyOut SCR.VSCR hOut x op
+
+/--
+  [textbook/definition3.47/definition/component_input]
+  Resolve the input function for component `i` from external inputs and feedback wiring.
+-/
+noncomputable def rsy_component_input_fun {n : Nat} (SCR : SystemCouplingRecipe n)
+    (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k)) (i : Fin n) (extIn : rsy_IZ SCR)
+    (x : rsy_SZ SCR) : (p : SCR.VSCR.Port i) → SCR.VSCR.PortVal i p := by
+  classical
+  intro port
+  let ip : Σ (j : Fin n), SCR.VSCR.Port j := ⟨i, port⟩
+  by_cases hU : ip ∈ UISCR SCR
+  · exact extIn ⟨ip, hU⟩
+  · have hC : ip ∈ CISCR SCR := by simpa [UISCR, Set.mem_compl_iff] using hU
+    let op := connectedOutput SCR ip hC
+    have hop : (op, ip) ∈ SCR.CSCR := connectedOutput_spec SCR ip hC
+    have hcomp := SCR.connectivity.2.2.2 op ip hop
+    exact hcomp ▸ rsyOutAt SCR hOut x op
+
+lemma rsy_component_input_uiscr {n : Nat} (SCR : SystemCouplingRecipe n)
+    (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k)) (i : Fin n) (extIn : rsy_IZ SCR)
+    (x : rsy_SZ SCR) (port : SCR.VSCR.Port i) (hU : ⟨i, port⟩ ∈ UISCR SCR) :
+    rsy_component_input_fun SCR hOut i extIn x port = extIn ⟨⟨i, port⟩, hU⟩ := by
+  classical
+  dsimp [rsy_component_input_fun]
+  simp [hU]
+
+lemma rsy_component_input_ciscr {n : Nat} (SCR : SystemCouplingRecipe n)
+    (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k)) (i : Fin n) (extIn : rsy_IZ SCR)
+    (x : rsy_SZ SCR) (port : SCR.VSCR.Port i) (hC : ⟨i, port⟩ ∈ CISCR SCR) :
+    rsy_component_input_fun SCR hOut i extIn x port =
+      let op := connectedOutput SCR ⟨i, port⟩ hC
+      have hop : (op, ⟨i, port⟩) ∈ SCR.CSCR := connectedOutput_spec SCR ⟨i, port⟩ hC
+      SCR.connectivity.2.2.2 op ⟨i, port⟩ hop ▸ rsyOutAt SCR hOut x op := by
+  classical
+  dsimp [rsy_component_input_fun]
+  have hU : ⟨i, port⟩ ∉ UISCR SCR := by simpa [UISCR, CISCR] using hC
+  simp [hU]
+
+/--
+  [textbook/definition3.47/definition/nz]
+  Next-state: each component updates via `NZi` on resolved inputs.
+-/
+noncomputable def rsy_NZ {n : Nat} (SCR : SystemCouplingRecipe n)
+    (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k)) (x : rsy_SZ SCR) (po : Option (rsy_IZ SCR))
+    (i : Fin n) : SCR.VSCR.SZ i :=
+  (SCR.VSCR.Z i).NZ (x i) (po.map (fun extIn => rsy_component_input_fun SCR hOut i extIn x))
+
+/--
+  [textbook/definition3.47/definition/rz]
+  Readout: projections of component readouts on unconnected output ports.
+-/
+noncomputable def rsy_RZ {n : Nat} (SCR : SystemCouplingRecipe n)
+    (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k)) (x : rsy_SZ SCR) : Option (rsy_OZ SCR) :=
+  some (fun op : UnconnOutPort SCR => rsyOutAt SCR hOut x op.val)
+
+/--
+  [textbook/definition3.47/definition/rsy]
+  Resultant system `RSY(SCR)` with external I/O on unconnected ports and feedback via `CSCR`.
+  When `CSCR = ∅`, this coincides with `csy SCR.VSCR` on isomorphic I/O spaces.
+-/
+noncomputable def rsy {n : Nat} (SCR : SystemCouplingRecipe n)
+    (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i)) :
+    DiscreteSystem (rsy_SZ SCR) (rsy_IZ SCR) (rsy_OZ SCR) where
+  sz_nonempty := by
+    have h_non : ∀ i, Nonempty (SCR.VSCR.SZ i) := fun i => (SCR.VSCR.Z i).sz_nonempty
+    exact ⟨fun i => Classical.choice (h_non i)⟩
+  NZ := rsy_NZ SCR hOut
+  RZ := rsy_RZ SCR hOut
+
+/--
+  [textbook/definition3.47/definition/rsy_param]
+  Parameter bundle for `RSY`: coupling recipe plus total component readouts (needed for feedback).
+-/
+structure RSYParam (n : Nat) where
+  SCR : SystemCouplingRecipe n
+  hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i)
+
+/--
+  [textbook/definition3.47/definition/rsy_relation]
+  Relational membership `(SCR, Z) ∈ RSY` for the fundamental parameterization theorem.
+-/
+def InRSY (n : Nat) (p : RSYParam n)
+    (Z : DiscreteSystem (rsy_SZ p.SCR) (rsy_IZ p.SCR) (rsy_OZ p.SCR)) : Prop :=
+  Z = rsy p.SCR p.hOut
+
+/--
+  [textbook/definition3.47/definition/ip_map]
+  Input port map `IP@(SCR, Z)`: external input ports index unconnected component ports.
+-/
+def rsy_IP_map {n : Nat} (SCR : SystemCouplingRecipe n) (ip : UnconnInPort SCR) : UnconnInPort SCR :=
+  ip
+
+/--
+  [textbook/definition3.47/definition/inip_map]
+  Inverse input port map `INIP@(SCR, Z) = IP@(SCR, Z)⁻¹`.
+-/
+def rsy_INIP_map {n : Nat} (SCR : SystemCouplingRecipe n) (ip : UnconnInPort SCR) : UnconnInPort SCR :=
+  ip
+
+/--
+  [textbook/definition3.47/definition/is_map]
+  Input port structure `IS@(SCR, Z)` on resultant input ports.
+-/
+def rsy_IS_map {n : Nat} (SCR : SystemCouplingRecipe n) (ip : UnconnInPort SCR) : Type :=
+  SCR.VSCR.PortVal ip.val.1 ip.val.2
+
+/--
+  [textbook/definition3.47/definition/op_map]
+  Output port map `OP@(SCR, Z)`: external output ports index unconnected component ports.
+-/
+def rsy_OP_map {n : Nat} (SCR : SystemCouplingRecipe n) (op : UnconnOutPort SCR) : UnconnOutPort SCR :=
+  op
+
+/--
+  [textbook/definition3.47/definition/inop_map]
+  Inverse output port map `INOP@(SCR, Z) = OP@(SCR, Z)⁻¹`.
+-/
+def rsy_INOP_map {n : Nat} (SCR : SystemCouplingRecipe n) (op : UnconnOutPort SCR) : UnconnOutPort SCR :=
+  op
+
+/--
+  [textbook/definition3.47/definition/os_map]
+  Output port structure `OS@(SCR, Z)` on resultant output ports.
+-/
+def rsy_OS_map {n : Nat} (SCR : SystemCouplingRecipe n) (op : UnconnOutPort SCR) : Type :=
+  SCR.VSCR.OutPortVal op.val.1 op.val.2
+
+/--
+  [textbook/definition3.47/definition/open_loop]
+  Open-loop system `Z& = CSY(VSCR)` determined by a coupling recipe.
+-/
+noncomputable def rsy_open_loop_system {n : Nat} (SCR : SystemCouplingRecipe n)
+    (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i)) :
+    DiscreteSystem
+      ((i : Fin n) → SCR.VSCR.SZ i)
+      ((ip : Σ (i : Fin n), SCR.VSCR.Port i) → SCR.VSCR.PortVal ip.1 ip.2)
+      ((op : Σ (i : Fin n), SCR.VSCR.OutPort i) → SCR.VSCR.OutPortVal op.1 op.2) :=
+  csy SCR.VSCR hOut
+
+/--
+  [textbook/definition3.47/definition/closed_loop]
+  Closed-loop system `Z@ = RSY(SCR)` determined by a coupling recipe.
+-/
+noncomputable def rsy_closed_loop_system {n : Nat} (p : RSYParam n) :
+    DiscreteSystem (rsy_SZ p.SCR) (rsy_IZ p.SCR) (rsy_OZ p.SCR) :=
+  rsy p.SCR p.hOut
+
+/--
+  [textbook/theorem3.62/theorem/rsy_parameterization]
+  [textbook/theorem3.62/proof/dsystems]
+  [textbook/theorem3.62/proof/existence]
+  [textbook/theorem3.62/proof/uniqueness]
+  Resultant systems `RSY` form a system parameterization.
+-/
+noncomputable def rsy_parameterization (n : Nat) :
+    DiscreteSystemParameterization (RSYParam n)
+      (fun p => rsy_SZ p.SCR)
+      (fun p => rsy_IZ p.SCR)
+      (fun p => rsy_OZ p.SCR) :=
+  fun p => rsy p.SCR p.hOut
+
+/--
+  [textbook/theorem3.62/proof/dsystems]
+  Every parameter instance lies in `RSY` (is a valid discrete system).
+-/
+theorem rsy_parameterization_membership (n : Nat) (p : RSYParam n) :
+    InRSY n p (rsy_parameterization n p) :=
+  rfl
+
+/--
+  [textbook/theorem3.62/proof/existence]
+  For every coupling-recipe parameter, a resultant system exists.
+-/
+theorem rsy_parameterization_exists (n : Nat) (p : RSYParam n) :
+    ∃ Z, InRSY n p Z :=
+  ⟨rsy p.SCR p.hOut, rfl⟩
+
+/--
+  [textbook/theorem3.62/proof/uniqueness]
+  The resultant is unique for a given coupling recipe.
+-/
+theorem rsy_parameterization_unique (n : Nat) (p : RSYParam n)
+    (Z : DiscreteSystem (rsy_SZ p.SCR) (rsy_IZ p.SCR) (rsy_OZ p.SCR)) (h : InRSY n p Z) :
+    Z = rsy_parameterization n p :=
+  h
+
+theorem rsy_parameter_instance (n : Nat) (p : RSYParam n) :
+    rsy_parameterization n p = rsy p.SCR p.hOut :=
+  rfl
+
+theorem rsy_closed_loop_is_rsy {n : Nat} (p : RSYParam n) :
+    rsy_closed_loop_system p = rsy p.SCR p.hOut :=
+  rfl
+
+theorem rsy_closed_loop_is_parameter_instance (n : Nat) (p : RSYParam n) :
+    rsy_closed_loop_system p = rsy_parameterization n p :=
+  rfl
+
+theorem rsy_open_loop_is_csy {n : Nat} (SCR : SystemCouplingRecipe n)
+    (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i)) :
+    rsy_open_loop_system SCR hOut = csy SCR.VSCR hOut :=
+  rfl
+
+/-! ## Theorem 3.64: open-loop / closed-loop feedback reclosure -/
+
+/--
+  [textbook/theorem3.64/definition/open_loop_ports]
+  Open-loop `Z&` port types (tagged union of component ports).
+-/
+def openLoopInputPort {n : Nat} (SCR : SystemCouplingRecipe n) :=
+  Σ (i : Fin n), SCR.VSCR.Port i
+
+def openLoopOutputPort {n : Nat} (SCR : SystemCouplingRecipe n) :=
+  Σ (i : Fin n), SCR.VSCR.OutPort i
+
+lemma sigmaOutPort_nonempty {n : Nat} (SCR : SystemCouplingRecipe n) :
+    Nonempty (Σ (i : Fin n), SCR.VSCR.OutPort i) := by
+  by_contra hne
+  have hall : ∀ op, op ∈ {x | ∃ y, (x, y) ∈ SCR.CSCR} := by
+    intro op
+    exact absurd ⟨op⟩ hne
+  exact SCR.connectivity.2.1 (Set.eq_univ_of_forall hall)
+
+lemma sigmaPort_nonempty {n : Nat} (SCR : SystemCouplingRecipe n) :
+    Nonempty (Σ (i : Fin n), SCR.VSCR.Port i) := by
+  by_contra hne
+  have hall : ∀ ip, ip ∈ {y | ∃ x, (x, y) ∈ SCR.CSCR} := by
+    intro ip
+    exact absurd ⟨ip⟩ hne
+  exact SCR.connectivity.2.2.1 (Set.eq_univ_of_forall hall)
+
+private theorem isProperDomain_empty {α β : Type} (hα : Nonempty α) :
+    IsProperDomain (∅ : Set (α × β)) := by
+  intro h
+  obtain ⟨x⟩ := hα
+  simp [Set.eq_univ_iff_forall] at h
+  exact h x
+
+private theorem isProperRange_empty {α β : Type} (hβ : Nonempty β) :
+    IsProperRange (∅ : Set (α × β)) := by
+  intro h
+  obtain ⟨y⟩ := hβ
+  simp [Set.eq_univ_iff_forall] at h
+  cases (h y)
+
+theorem empty_scr_connectivity {n : Nat} (VSCR : PortSystemVector n)
+    (hOut : Nonempty (Σ (i : Fin n), VSCR.OutPort i))
+    (hIn : Nonempty (Σ (i : Fin n), VSCR.Port i)) :
+    IsSystemConnectivity VSCR (∅ : Set ((Σ (i : Fin n), VSCR.OutPort i) ×
+      (Σ (i : Fin n), VSCR.Port i))) := by
+  refine ⟨ ?_, ?_, ?_, ?_ ⟩
+  · refine ⟨ ?_, ?_ ⟩
+    · intro _ _ _ h; cases h
+    · intro _ _ _ h; cases h
+  · exact isProperDomain_empty hOut
+  · exact isProperRange_empty hIn
+  · intro _ _ h
+    cases h
+
+/--
+  [textbook/theorem3.64/definition/conjunctive_scr]
+  Conjunctive coupling recipe `(VSCR, ∅)` for the same component vector.
+-/
+def conjunctiveSCR {n : Nat} (SCR : SystemCouplingRecipe n) : SystemCouplingRecipe n where
+  VSCR := SCR.VSCR
+  CSCR := ∅
+  connectivity := empty_scr_connectivity SCR.VSCR (sigmaOutPort_nonempty SCR) (sigmaPort_nonempty SCR)
+
+theorem conjunctiveSCR_is_conjunctive {n : Nat} (SCR : SystemCouplingRecipe n) :
+    IsConjunctive (conjunctiveSCR SCR) := by
+  dsimp [conjunctiveSCR, IsConjunctive]
+
+lemma mem_uiscr_conjunctive {n : Nat} (SCR : SystemCouplingRecipe n) (h : IsConjunctive SCR)
+    (ip : Σ (i : Fin n), SCR.VSCR.Port i) : ip ∈ UISCR SCR := by
+  rw [UISCR, Set.mem_compl_iff, CISCR, Set.mem_setOf_eq]
+  rintro ⟨op, hop⟩
+  rw [h] at hop
+  cases hop
+
+lemma mem_uoscr_conjunctive {n : Nat} (SCR : SystemCouplingRecipe n) (h : IsConjunctive SCR)
+    (op : Σ (i : Fin n), SCR.VSCR.OutPort i) : op ∈ UOSCR SCR := by
+  rw [UOSCR, Set.mem_compl_iff, COSCR, Set.mem_setOf_eq]
+  rintro ⟨ip, hop⟩
+  rw [h] at hop
+  cases hop
+
+theorem csy_alwaysOutputs {n : Nat} (VSCR : PortSystemVector n)
+    (hOut : ∀ i, AlwaysOutputs (VSCR.Z i)) : AlwaysOutputs (csy VSCR hOut) := by
+  intro x
+  dsimp [csy]
+  exact ⟨fun op => csyOut VSCR hOut x op, rfl⟩
+
+/--
+  [textbook/theorem3.64/definition/open_loop_port_vector]
+  `VSCR$ = Z&`: singleton connectable vector whose component is the open-loop system.
+-/
+noncomputable def openLoopPortVector {n : Nat} (p : RSYParam n) : PortSystemVector 1 where
+  SZ := fun _ => (i : Fin n) → p.SCR.VSCR.SZ i
+  Port := fun _ => openLoopInputPort p.SCR
+  PortVal := fun _ ip => p.SCR.VSCR.PortVal ip.1 ip.2
+  OutPort := fun _ => openLoopOutputPort p.SCR
+  OutPortVal := fun _ op => p.SCR.VSCR.OutPortVal op.1 op.2
+  Z := fun _ => rsy_open_loop_system p.SCR p.hOut
+  distinct := fun i j hne => absurd (Trajectory.fin_one_eq i j) hne
+
+/--
+  [textbook/theorem3.64/definition/feedback_cscr]
+  `CSCR$`: relabel original connections onto open-loop ports via `IP&` / `OP&`.
+-/
+def feedbackSCR_CSCR {n : Nat} (SCR : SystemCouplingRecipe n) :
+    Set ((Σ (_ : Fin 1), openLoopOutputPort SCR) × (Σ (_ : Fin 1), openLoopInputPort SCR)) :=
+  { p | ∃ op ip, (op, ip) ∈ SCR.CSCR ∧ p = (⟨0, op⟩, ⟨0, ip⟩) }
+
+theorem feedbackSCR_portCompatibility {n : Nat} (p : RSYParam n) :
+    PortCompatibility (openLoopPortVector p) (feedbackSCR_CSCR p.SCR) := by
+  intro op ip h
+  rcases Set.mem_setOf.mp h with ⟨scrOp, scrIp, hpair, heq⟩
+  dsimp [PortCompatibility, openLoopPortVector, openLoopInputPort, openLoopOutputPort]
+  have hop : op.2 = scrOp := congr_arg Sigma.snd (congr_arg Prod.fst heq)
+  have hip : ip.2 = scrIp := congr_arg Sigma.snd (congr_arg Prod.snd heq)
+  rw [hop, hip]
+  exact p.SCR.connectivity.2.2.2 scrOp scrIp hpair
+
+theorem feedbackSCR_connectivity {n : Nat} (p : RSYParam n) :
+    IsSystemConnectivity (openLoopPortVector p) (feedbackSCR_CSCR p.SCR) := by
+  refine ⟨ ⟨ ?_, ?_ ⟩, ⟨ ?_, ⟨ ?_, ?_ ⟩ ⟩⟩
+  · intro x y1 y2 h1 h2
+    rcases Set.mem_setOf.mp h1 with ⟨op1, ip1, hpair1, heq1⟩
+    rcases Set.mem_setOf.mp h2 with ⟨op2, ip2, hpair2, heq2⟩
+    have hop : op1 = op2 := by
+      have h1x := (congr_arg Prod.fst heq1).symm
+      have h2x := congr_arg Prod.fst heq2
+      exact congr_arg Sigma.snd (h1x.trans h2x)
+    have hip : ip1 = ip2 := p.SCR.connectivity.1.1 op1 ip1 ip2 hpair1 (hop ▸ hpair2)
+    have hy1 : y1 = ⟨0, ip1⟩ := congr_arg Prod.snd heq1
+    have hy2 : y2 = ⟨0, ip2⟩ := congr_arg Prod.snd heq2
+    rw [hy1, hy2]
+    exact congrArg (Sigma.mk 0) hip
+  · intro x1 x2 y h1 h2
+    rcases Set.mem_setOf.mp h1 with ⟨op1, ip1, hpair1, heq1⟩
+    rcases Set.mem_setOf.mp h2 with ⟨op2, ip2, hpair2, heq2⟩
+    have hip : ip1 = ip2 := by
+      have h1y := (congr_arg Prod.snd heq1).symm
+      have h2y := congr_arg Prod.snd heq2
+      exact congr_arg Sigma.snd (h1y.trans h2y)
+    have hop : op1 = op2 := p.SCR.connectivity.1.2 op1 op2 ip1 hpair1 (hip ▸ hpair2)
+    have hx1 : x1 = ⟨0, op1⟩ := congr_arg Prod.fst heq1
+    have hx2 : x2 = ⟨0, op2⟩ := congr_arg Prod.fst heq2
+    rw [hx1, hx2]
+    exact congrArg (Sigma.mk 0) hop
+  · intro heq
+    obtain ⟨op, hopdom⟩ := show ∃ op, op ∉ {x | ∃ y, (x, y) ∈ p.SCR.CSCR} from by
+      by_contra hall
+      push Not at hall
+      exact p.SCR.connectivity.2.1 (Set.eq_univ_of_forall hall)
+    have hnot : (⟨0, op⟩ : Σ (_ : Fin 1), openLoopOutputPort p.SCR) ∉
+        {x | ∃ y, (x, y) ∈ feedbackSCR_CSCR p.SCR} := by
+      intro hmem
+      obtain ⟨ip, hpair⟩ := hmem
+      rcases Set.mem_setOf.mp hpair with ⟨scrOp, scrIp, hp, heq'⟩
+      have hop' : op = scrOp := congr_arg Sigma.snd (congr_arg Prod.fst heq')
+      subst hop'
+      exact hopdom (Set.mem_setOf.mpr ⟨scrIp, hp⟩)
+    exact hnot (heq ▸ Set.mem_univ (⟨0, op⟩ : Σ (_ : Fin 1), openLoopOutputPort p.SCR))
+  · intro heq
+    obtain ⟨ip, hipdom⟩ := show ∃ ip, ip ∉ {y | ∃ x, (x, y) ∈ p.SCR.CSCR} from by
+      by_contra hall
+      push Not at hall
+      exact p.SCR.connectivity.2.2.1 (Set.eq_univ_of_forall hall)
+    have hnot : (⟨0, ip⟩ : Σ (_ : Fin 1), openLoopInputPort p.SCR) ∉
+        {y | ∃ x, (x, y) ∈ feedbackSCR_CSCR p.SCR} := by
+      intro hmem
+      obtain ⟨op, hpair⟩ := hmem
+      rcases Set.mem_setOf.mp hpair with ⟨scrOp, scrIp, hp, heq'⟩
+      have hip' : ip = scrIp := congr_arg Sigma.snd (congr_arg Prod.snd heq')
+      subst hip'
+      exact hipdom (Set.mem_setOf.mpr ⟨scrOp, hp⟩)
+    exact hnot (heq ▸ Set.mem_univ (⟨0, ip⟩ : Σ (_ : Fin 1), openLoopInputPort p.SCR))
+  · exact feedbackSCR_portCompatibility p
+
+/--
+  [textbook/theorem3.64/definition/feedback_scr]
+  Pure-feedback coupling recipe `SCR$ = (VSCR$, CSCR$)`.
+-/
+noncomputable def feedbackSCR {n : Nat} (p : RSYParam n) : SystemCouplingRecipe 1 where
+  VSCR := openLoopPortVector p
+  CSCR := feedbackSCR_CSCR p.SCR
+  connectivity := feedbackSCR_connectivity p
+
+lemma mem_feedbackSCR_CSCR_iff {n : Nat} (SCR : SystemCouplingRecipe n)
+    (op : Σ (i : Fin n), SCR.VSCR.OutPort i) (ip : Σ (i : Fin n), SCR.VSCR.Port i) :
+    (⟨0, op⟩, ⟨0, ip⟩) ∈ feedbackSCR_CSCR SCR ↔ (op, ip) ∈ SCR.CSCR := by
+  constructor
+  · intro h
+    rcases Set.mem_setOf.mp h with ⟨scrOp, scrIp, hp, heq⟩
+    have hop : op = scrOp := congr_arg Sigma.snd (congr_arg Prod.fst heq)
+    have hip : ip = scrIp := congr_arg Sigma.snd (congr_arg Prod.snd heq)
+    simpa [hop, hip] using hp
+  · intro hp
+    exact Set.mem_setOf.mpr ⟨op, ip, hp, rfl⟩
+
+lemma mem_ciscr_feedbackSCR_iff {n : Nat} (p : RSYParam n) (ip : openLoopInputPort p.SCR) :
+    (⟨0, ip⟩ : Σ (_ : Fin 1), openLoopInputPort p.SCR) ∈ CISCR (feedbackSCR p) ↔
+      ip ∈ CISCR p.SCR := by
+  dsimp [CISCR, feedbackSCR, feedbackSCR_CSCR, Set.mem_setOf_eq]
+  constructor
+  · rintro ⟨op, hmem⟩
+    rcases Set.mem_setOf.mp hmem with ⟨scrOp, scrIp, hp, heq⟩
+    have hip : ip = scrIp := congr_arg Sigma.snd (congr_arg Prod.snd heq)
+    subst hip
+    exact ⟨scrOp, hp⟩
+  · rintro ⟨scrOp, hp⟩
+    exact ⟨⟨0, scrOp⟩, Set.mem_setOf.mpr ⟨scrOp, ip, hp, rfl⟩⟩
+
+lemma mem_coscr_feedbackSCR_iff {n : Nat} (p : RSYParam n) (op : openLoopOutputPort p.SCR) :
+    (⟨0, op⟩ : Σ (_ : Fin 1), openLoopOutputPort p.SCR) ∈ COSCR (feedbackSCR p) ↔
+      op ∈ COSCR p.SCR := by
+  dsimp [COSCR, feedbackSCR, feedbackSCR_CSCR, Set.mem_setOf_eq]
+  constructor
+  · rintro ⟨ip, hmem⟩
+    rcases Set.mem_setOf.mp hmem with ⟨scrOp, scrIp, hp, heq⟩
+    have hop : op = scrOp := congr_arg Sigma.snd (congr_arg Prod.fst heq)
+    subst hop
+    exact ⟨scrIp, hp⟩
+  · rintro ⟨scrIp, hp⟩
+    exact ⟨⟨0, scrIp⟩, Set.mem_setOf.mpr ⟨op, scrIp, hp, rfl⟩⟩
+
+lemma mem_uiscr_feedbackSCR {n : Nat} (p : RSYParam n) (ip : openLoopInputPort p.SCR) :
+    (⟨0, ip⟩ : Σ (_ : Fin 1), openLoopInputPort p.SCR) ∈ UISCR (feedbackSCR p) ↔
+      ip ∈ UISCR p.SCR :=
+  Iff.not (mem_ciscr_feedbackSCR_iff p ip)
+
+lemma mem_uoscr_feedbackSCR {n : Nat} (p : RSYParam n) (op : openLoopOutputPort p.SCR) :
+    (⟨0, op⟩ : Σ (_ : Fin 1), openLoopOutputPort p.SCR) ∈ UOSCR (feedbackSCR p) ↔
+      op ∈ UOSCR p.SCR :=
+  Iff.not (mem_coscr_feedbackSCR_iff p op)
+
+/--
+  [textbook/theorem3.64/definition/feedback_rsy_param]
+  Parameter bundle for `Z@$ = RSY(SCR$)`.
+-/
+noncomputable def feedbackRSYParam {n : Nat} (p : RSYParam n) : RSYParam 1 where
+  SCR := feedbackSCR p
+  hOut := fun i =>
+    Trajectory.fin_one_eq i 0 ▸ csy_alwaysOutputs p.SCR.VSCR p.hOut
+
+theorem feedbackSCR_CSCR_nonempty {n : Nat} (p : RSYParam n) (h : ¬ IsConjunctive p.SCR) :
+    feedbackSCR_CSCR p.SCR ≠ ∅ := by
+  dsimp [IsConjunctive] at h
+  intro hempty
+  rcases Set.nonempty_iff_ne_empty.mpr h with ⟨pair, hp⟩
+  rcases pair with ⟨op, ip⟩
+  have hnem : (feedbackSCR_CSCR p.SCR).Nonempty :=
+    ⟨(⟨0, op⟩, ⟨0, ip⟩), (mem_feedbackSCR_CSCR_iff p.SCR op ip).mpr hp⟩
+  exact (Set.nonempty_iff_ne_empty.mp hnem) hempty
+
+/--
+  [textbook/theorem3.64/theorem/feedback_scr_pure]
+  `SCR$` is a pure feedback coupling recipe.
+-/
+theorem feedbackSCR_is_pure_feedback {n : Nat} (p : RSYParam n) (h : ¬ IsConjunctive p.SCR) :
+    IsPureFeedback (feedbackSCR p) :=
+  ⟨rfl, feedbackSCR_CSCR_nonempty p h⟩
+
+/--
+  Embed product state into the singleton-vector state for `SCR$`.
+-/
+def feedbackStateEmb {n : Nat} (p : RSYParam n) (x : rsy_SZ p.SCR) : rsy_SZ (feedbackSCR p) :=
+  fun _ => x
+
+/--
+  Project singleton-vector state to the product state of the original recipe.
+-/
+def feedbackStateVal {n : Nat} (p : RSYParam n) (x : rsy_SZ (feedbackSCR p)) : rsy_SZ p.SCR :=
+  x 0
+
+noncomputable def rsyExtIn_to_openLoopInput {n : Nat} (SCR : SystemCouplingRecipe n)
+    (h : IsConjunctive SCR) (extIn : rsy_IZ SCR) :
+    (ip : Σ (i : Fin n), SCR.VSCR.Port i) → SCR.VSCR.PortVal ip.1 ip.2 :=
+  fun ip => extIn ⟨ip, mem_uiscr_conjunctive SCR h ip⟩
+
+noncomputable def rsyOut_to_openLoopOutput {n : Nat} (SCR : SystemCouplingRecipe n)
+    (h : IsConjunctive SCR) (out : rsy_OZ SCR) :
+    (op : Σ (i : Fin n), SCR.VSCR.OutPort i) → SCR.VSCR.OutPortVal op.1 op.2 :=
+  fun op => out ⟨op, mem_uoscr_conjunctive SCR h op⟩
+
+noncomputable def rsyIZ_to_feedbackIZ {n : Nat} (p : RSYParam n) (extIn : rsy_IZ p.SCR) :
+    rsy_IZ (feedbackSCR p) :=
+  fun ip =>
+    extIn ⟨ip.val.2, by
+      rcases ip with ⟨val, prop⟩
+      rcases val with ⟨i, port⟩
+      have hi : i = 0 := Trajectory.fin_one_eq i 0
+      have hfb0 : ⟨0, port⟩ ∈ UISCR (feedbackSCR p) := hi ▸ prop
+      exact (mem_uiscr_feedbackSCR p port).mp hfb0⟩
+
+noncomputable def conjunctiveRsyExtIn {n : Nat} (SCR : SystemCouplingRecipe n)
+    (extIn : rsy_IZ (conjunctiveSCR SCR)) :
+    (ip : Σ (i : Fin n), SCR.VSCR.Port i) → SCR.VSCR.PortVal ip.1 ip.2 :=
+  fun ip =>
+    extIn ⟨ip, mem_uiscr_conjunctive (conjunctiveSCR SCR) (conjunctiveSCR_is_conjunctive SCR) ip⟩
+
+noncomputable def conjunctiveRsyOut {n : Nat} (SCR : SystemCouplingRecipe n)
+    (out : rsy_OZ (conjunctiveSCR SCR)) :
+    (op : Σ (i : Fin n), SCR.VSCR.OutPort i) → SCR.VSCR.OutPortVal op.1 op.2 :=
+  fun op =>
+    out ⟨op, mem_uoscr_conjunctive (conjunctiveSCR SCR) (conjunctiveSCR_is_conjunctive SCR) op⟩
+
+theorem rsy_conjunctive_NZ_eq {n : Nat} (p : RSYParam n) (x : rsy_SZ p.SCR)
+    (extIn : rsy_IZ (conjunctiveSCR p.SCR)) (i : Fin n) :
+    (rsy (conjunctiveSCR p.SCR) p.hOut).NZ x (some extIn) i =
+      (csy p.SCR.VSCR p.hOut).NZ x (some (conjunctiveRsyExtIn p.SCR extIn)) i := by
+  simp only [conjunctiveSCR, csy]
+  congr 1
+  apply congr_arg some
+  funext port
+  have hU := mem_uiscr_conjunctive (conjunctiveSCR p.SCR) (conjunctiveSCR_is_conjunctive p.SCR) ⟨i, port⟩
+  dsimp [rsy_component_input_fun, conjunctiveSCR, conjunctiveRsyExtIn]
+  simp [UISCR, CISCR]
+  rfl
+
+theorem rsy_conjunctive_RZ_eq {n : Nat} (p : RSYParam n) (x : rsy_SZ p.SCR)
+    (op : Σ (i : Fin n), p.SCR.VSCR.OutPort i) :
+    rsyOutAt (conjunctiveSCR p.SCR) p.hOut x op = csyOut p.SCR.VSCR p.hOut x op := by
+  dsimp [rsyOutAt, csyOut, conjunctiveSCR]
+
+theorem rsy_conjunctive_readout_eq {n : Nat} (p : RSYParam n) (_ : rsy_SZ p.SCR)
+    (out : rsy_OZ (conjunctiveSCR p.SCR)) (op : Σ (i : Fin n), p.SCR.VSCR.OutPort i) :
+    out ⟨op, mem_uoscr_conjunctive (conjunctiveSCR p.SCR)
+      (conjunctiveSCR_is_conjunctive p.SCR) op⟩ = conjunctiveRsyOut p.SCR out op := rfl
+
+/--
+  [textbook/theorem3.64/theorem/open_loop_conjunctive_rsy]
+  `Z&` is the resultant of the conjunctive recipe `(VSCR, ∅)`.
+-/
+theorem open_loop_is_conjunctive_rsy (p : RSYParam n) :
+    InRSY n ⟨conjunctiveSCR p.SCR, p.hOut⟩ (rsy (conjunctiveSCR p.SCR) p.hOut) :=
+  rfl
+
+theorem open_loop_eq_conjunctive_rsy_NZ (p : RSYParam n) (x : rsy_SZ p.SCR)
+    (extIn : rsy_IZ (conjunctiveSCR p.SCR)) (i : Fin n) :
+    (rsy (conjunctiveSCR p.SCR) p.hOut).NZ x (some extIn) i =
+      (rsy_open_loop_system p.SCR p.hOut).NZ x (some (conjunctiveRsyExtIn p.SCR extIn)) i :=
+  rsy_conjunctive_NZ_eq p x extIn i
+
+theorem open_loop_eq_conjunctive_rsy_readout (p : RSYParam n) (x : rsy_SZ p.SCR)
+    (op : Σ (i : Fin n), p.SCR.VSCR.OutPort i) :
+    rsyOutAt (conjunctiveSCR p.SCR) p.hOut x op = csyOut p.SCR.VSCR p.hOut x op :=
+  rsy_conjunctive_RZ_eq p x op
+
+lemma feedbackSCR_OutPortVal_eq {n : Nat} (p : RSYParam n)
+    (op : Σ (i : Fin n), p.SCR.VSCR.OutPort i) :
+    (feedbackSCR p).VSCR.OutPortVal 0 op = p.SCR.VSCR.OutPortVal op.1 op.2 := rfl
+
+lemma rsyOutAt_op_transport {n : Nat} (SCR : SystemCouplingRecipe n)
+    (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i)) (x : rsy_SZ SCR)
+    {op₁ op₂ : Σ (i : Fin n), SCR.VSCR.OutPort i} (h : op₁ = op₂) :
+    h ▸ rsyOutAt SCR hOut x op₁ = rsyOutAt SCR hOut x op₂ := by
+  cases op₁
+  cases op₂
+  cases h
+  rfl
+
+lemma rsyOutAt_feedback_op_transport {n : Nat} (p : RSYParam n) (x : rsy_SZ p.SCR)
+    {op₁ op₂ : Σ (i : Fin 1), (openLoopPortVector p).OutPort i} (h : op₁ = op₂) :
+    h ▸ rsyOutAt (feedbackSCR p) (feedbackRSYParam p).hOut (feedbackStateEmb p x) op₁ =
+      rsyOutAt (feedbackSCR p) (feedbackRSYParam p).hOut (feedbackStateEmb p x) op₂ := by
+  cases op₁
+  cases op₂
+  cases h
+  rfl
+
+noncomputable def scrRsyOutAtFeedback {n : Nat} (p : RSYParam n) (x : rsy_SZ p.SCR)
+    (op_scr : Σ (j : Fin n), p.SCR.VSCR.OutPort j) :
+    p.SCR.VSCR.OutPortVal op_scr.1 op_scr.2 :=
+  rsyOutAt (feedbackSCR p) (feedbackRSYParam p).hOut (feedbackStateEmb p x) ⟨0, op_scr⟩
+
+noncomputable def scrPortValFromOutReadout {n : Nat} (p : RSYParam n) (i : Fin n)
+    (port : p.SCR.VSCR.Port i) (op_scr : Σ (j : Fin n), p.SCR.VSCR.OutPort j)
+    (hcomp_scr : p.SCR.VSCR.OutPortVal op_scr.1 op_scr.2 = p.SCR.VSCR.PortVal i port)
+    (out : p.SCR.VSCR.OutPortVal op_scr.1 op_scr.2) : p.SCR.VSCR.PortVal i port :=
+  hcomp_scr ▸ out
+
+noncomputable def scrPortValFromFeedbackReadout {n : Nat} (p : RSYParam n) (x : rsy_SZ p.SCR)
+    (i : Fin n) (port : p.SCR.VSCR.Port i) (op_scr : Σ (j : Fin n), p.SCR.VSCR.OutPort j)
+    (hcomp_scr : p.SCR.VSCR.OutPortVal op_scr.1 op_scr.2 = p.SCR.VSCR.PortVal i port) :
+    p.SCR.VSCR.PortVal i port :=
+  scrPortValFromOutReadout p i port op_scr hcomp_scr (scrRsyOutAtFeedback p x op_scr)
+
+noncomputable def scrPortValFromFeedbackCiscrInput {n : Nat} (p : RSYParam n) (x : rsy_SZ p.SCR)
+    (i : Fin n) (port : p.SCR.VSCR.Port i) (op_scr : Σ (j : Fin n), p.SCR.VSCR.OutPort j)
+    (hcomp_scr : p.SCR.VSCR.OutPortVal op_scr.1 op_scr.2 = p.SCR.VSCR.PortVal i port) :
+    p.SCR.VSCR.PortVal i port :=
+  scrPortValFromFeedbackReadout p x i port op_scr hcomp_scr
+
+lemma rsy_feedback_connected_portVal_eq {n : Nat} (p : RSYParam n) (x : rsy_SZ p.SCR)
+    (i : Fin n) (port : p.SCR.VSCR.Port i) (op_scr : Σ (j : Fin n), p.SCR.VSCR.OutPort j)
+    (hcomp_scr : p.SCR.VSCR.OutPortVal op_scr.1 op_scr.2 = p.SCR.VSCR.PortVal i port)
+    (hout : rsyOutAt p.SCR p.hOut x op_scr = scrRsyOutAtFeedback p x op_scr) :
+    scrPortValFromOutReadout p i port op_scr hcomp_scr (rsyOutAt p.SCR p.hOut x op_scr) =
+      scrPortValFromFeedbackCiscrInput p x i port op_scr hcomp_scr := by
+  dsimp [scrPortValFromOutReadout, scrPortValFromFeedbackCiscrInput, scrPortValFromFeedbackReadout,
+    scrRsyOutAtFeedback]
+  rw [hout]
+  rfl
+
+theorem rsy_feedback_NZ_eq {n : Nat} (p : RSYParam n) (x : rsy_SZ p.SCR)
+    (po : Option (rsy_IZ p.SCR)) (i : Fin n) :
+    (rsy p.SCR p.hOut).NZ x po i =
+      (rsy (feedbackSCR p) (feedbackRSYParam p).hOut).NZ (feedbackStateEmb p x)
+        (po.map (rsyIZ_to_feedbackIZ p)) 0 i := by
+  cases po with
+  | none =>
+    rfl
+  | some extIn =>
+    simp only [Option.map_some]
+    congr 1
+    apply congr_arg some
+    funext port
+    dsimp only [rsyIZ_to_feedbackIZ, feedbackSCR]
+    by_cases hU : ⟨i, port⟩ ∈ UISCR p.SCR
+    · have hU_fb := (mem_uiscr_feedbackSCR p ⟨i, port⟩).mpr hU
+      rw [rsy_component_input_uiscr p.SCR p.hOut i extIn x port hU]
+      dsimp [rsy_component_input_fun, rsyIZ_to_feedbackIZ, feedbackSCR, openLoopInputPort]
+      split_ifs with hl
+      · rfl
+      · exact absurd hU_fb hl
+    · have hC : ⟨i, port⟩ ∈ CISCR p.SCR := by simpa [UISCR, Set.mem_compl_iff] using hU
+      have hC_fb := (mem_ciscr_feedbackSCR_iff p ⟨i, port⟩).mpr hC
+      have hnot_fb : ⟨0, ⟨i, port⟩⟩ ∉ UISCR (feedbackSCR p) := fun hmem =>
+        hU ((mem_uiscr_feedbackSCR p ⟨i, port⟩).mp hmem)
+      rw [rsy_component_input_ciscr p.SCR p.hOut i extIn x port hC]
+      dsimp [rsy_component_input_fun, rsyIZ_to_feedbackIZ, feedbackSCR, openLoopInputPort]
+      split_ifs with h
+      · exact absurd h hnot_fb
+      let op_scr := connectedOutput p.SCR ⟨i, port⟩ hC
+      let op_fb := connectedOutput (feedbackSCR p) ⟨0, ⟨i, port⟩⟩ hC_fb
+      have hop_scr := connectedOutput_spec p.SCR ⟨i, port⟩ hC
+      have hop_fb := connectedOutput_spec (feedbackSCR p) ⟨0, ⟨i, port⟩⟩ hC_fb
+      have hcomp_scr := p.SCR.connectivity.2.2.2 op_scr ⟨i, port⟩ hop_scr
+      have hcomp_fb := (feedbackSCR p).connectivity.2.2.2 op_fb ⟨0, ⟨i, port⟩⟩ hop_fb
+      have hop_eq : op_fb = ⟨0, op_scr⟩ :=
+        (feedbackSCR p).connectivity.1.2 op_fb ⟨0, op_scr⟩ ⟨0, ⟨i, port⟩⟩ hop_fb
+          ((mem_feedbackSCR_CSCR_iff p.SCR op_scr ⟨i, port⟩).mpr hop_scr)
+      have hop_fb_at : (⟨0, op_scr⟩, ⟨0, ⟨i, port⟩⟩) ∈ (feedbackSCR p).CSCR := hop_eq ▸ hop_fb
+      have hcomp_fb_at :=
+        (feedbackSCR p).connectivity.2.2.2 ⟨0, op_scr⟩ ⟨0, ⟨i, port⟩⟩ hop_fb_at
+      have hchoose := Trajectory.choose_alwaysOutputs ((openLoopPortVector p).Z 0)
+        ((feedbackRSYParam p).hOut 0) ((feedbackStateEmb p x) 0) rfl
+      have hout : rsyOutAt p.SCR p.hOut x op_scr = scrRsyOutAtFeedback p x op_scr := by
+        dsimp [rsyOutAt, scrRsyOutAtFeedback, csyOut, openLoopPortVector, feedbackStateEmb, feedbackSCR]
+        exact Eq.symm ((congrArg (fun f => f op_scr) hchoose).trans rfl)
+      have step_scr_conn :
+          hcomp_scr ▸ rsyOutAt p.SCR p.hOut x (connectedOutput p.SCR ⟨i, port⟩ hC) =
+            hcomp_scr ▸ rsyOutAt p.SCR p.hOut x op_scr :=
+        congrArg (fun v => hcomp_scr ▸ v) (rsyOutAt_op_transport p.SCR p.hOut x (by rfl :
+          connectedOutput p.SCR ⟨i, port⟩ hC = op_scr))
+      have step_scr_port :
+          hcomp_scr ▸ rsyOutAt p.SCR p.hOut x op_scr =
+            scrPortValFromFeedbackCiscrInput p x i port op_scr hcomp_scr :=
+        Eq.symm (by simpa [scrPortValFromOutReadout] using
+          (rsy_feedback_connected_portVal_eq p x i port op_scr hcomp_scr hout).symm)
+      have step_fb_port :
+          scrPortValFromFeedbackCiscrInput p x i port op_scr hcomp_scr =
+            hcomp_fb_at ▸ rsyOutAt (feedbackSCR p) (feedbackRSYParam p).hOut (feedbackStateEmb p x)
+              ⟨0, op_scr⟩ := by
+        simp [scrPortValFromFeedbackCiscrInput, scrPortValFromFeedbackReadout, scrRsyOutAtFeedback,
+          scrPortValFromOutReadout, openLoopPortVector, feedbackSCR, rsyOutAt, feedbackStateEmb, csyOut]
+      have step_fb_conn :
+          hcomp_fb_at ▸ rsyOutAt (feedbackSCR p) (feedbackRSYParam p).hOut (feedbackStateEmb p x)
+              ⟨0, op_scr⟩ =
+            hcomp_fb ▸ rsyOutAt (feedbackSCR p) (feedbackRSYParam p).hOut (feedbackStateEmb p x) op_fb := by
+        have hreadout :=
+          rsyOutAt_feedback_op_transport p x (op₁ := ⟨0, op_scr⟩) (op₂ := op_fb) hop_eq.symm
+        apply Eq.symm
+        trans hcomp_fb ▸ (hop_eq.symm ▸ rsyOutAt (feedbackSCR p) (feedbackRSYParam p).hOut
+            (feedbackStateEmb p x) ⟨0, op_scr⟩)
+        · exact congrArg (fun v => hcomp_fb ▸ v) (Eq.symm hreadout)
+        · dsimp [PortCompatibility, openLoopPortVector, rsyOutAt, feedbackSCR, feedbackStateEmb, csyOut,
+            hcomp_fb, hcomp_fb_at, hop_fb_at]
+          simp only [eqRec_eq_cast, cast_cast]
+      exact step_scr_conn.trans (step_scr_port.trans (step_fb_port.trans step_fb_conn))
+
+noncomputable def scrOutValOfFeedback {n : Nat} (p : RSYParam n) (op : UnconnOutPort p.SCR)
+    (out : rsy_OZ (feedbackSCR p)) : p.SCR.VSCR.OutPortVal op.val.1 op.val.2 :=
+  cast (feedbackSCR_OutPortVal_eq p op.val) <|
+    out ⟨⟨0, op.val⟩, (mem_uoscr_feedbackSCR p op.val).mpr op.prop⟩
+
+lemma feedbackSCR_readout_val {n : Nat} (p : RSYParam n) (x : rsy_SZ p.SCR)
+    (op : UnconnOutPort p.SCR) :
+    some (rsyOutAt p.SCR p.hOut x op.val) =
+      ((rsy (feedbackSCR p) (feedbackRSYParam p).hOut).RZ (feedbackStateEmb p x)).map
+        (fun out => scrOutValOfFeedback p op out) := by
+  have h_choose : Classical.choose ((feedbackRSYParam p).hOut 0 x) = fun op => csyOut p.SCR.VSCR p.hOut x op :=
+    Trajectory.choose_alwaysOutputs ((openLoopPortVector p).Z 0) ((feedbackRSYParam p).hOut 0) x rfl
+  change some (rsyOutAt p.SCR p.hOut x op.val) = some (Classical.choose ((feedbackRSYParam p).hOut 0 x) op.val)
+  rw [h_choose]
+  rfl
+
+theorem rsy_feedback_RZ_eq {n : Nat} (p : RSYParam n) (x : rsy_SZ p.SCR) (op : UnconnOutPort p.SCR) :
+    some (rsyOutAt p.SCR p.hOut x op.val) =
+      ((rsy (feedbackSCR p) (feedbackRSYParam p).hOut).RZ (feedbackStateEmb p x)).map
+        (fun out => scrOutValOfFeedback p op out) := by
+  exact feedbackSCR_readout_val p x op
+
+/--
+  Closed-loop equality `Z@ = Z@$` on shared product state and external I/O.
+-/
+def ClosedLoopEqFeedbackClosedLoop (p : RSYParam n) (x : rsy_SZ p.SCR)
+    (po : Option (rsy_IZ p.SCR)) : Prop :=
+  ((∀ i, (rsy p.SCR p.hOut).NZ x po i =
+      (rsy (feedbackSCR p) (feedbackRSYParam p).hOut).NZ (feedbackStateEmb p x)
+        (po.map (rsyIZ_to_feedbackIZ p)) 0 i) ∧
+    (∀ op : UnconnOutPort p.SCR,
+      some (rsyOutAt p.SCR p.hOut x op.val) =
+        ((rsy (feedbackSCR p) (feedbackRSYParam p).hOut).RZ (feedbackStateEmb p x)).map
+          (fun out => scrOutValOfFeedback p op out)))
+
+/--
+  [textbook/theorem3.64/theorem/closed_loop_eq_feedback]
+  Closed-loop equality on shared product state and external I/O.
+-/
+theorem closed_loop_eq_feedback_closed_loop (p : RSYParam n) (x : rsy_SZ p.SCR)
+    (po : Option (rsy_IZ p.SCR)) : ClosedLoopEqFeedbackClosedLoop p x po := by
+  constructor
+  · intro i
+    exact rsy_feedback_NZ_eq p x po i
+  · intro op
+    exact rsy_feedback_RZ_eq p x op
+
+/--
+  [textbook/theorem3.64/theorem/open_loop_closed_loop]
+  Theorem 3.64 for non-conjunctive recipes.
+-/
+theorem open_loop_closed_loop_theorem {n : Nat} (p : RSYParam n) (h : ¬ IsConjunctive p.SCR) :
+    InRSY n ⟨conjunctiveSCR p.SCR, p.hOut⟩ (rsy (conjunctiveSCR p.SCR) p.hOut) ∧
+    IsPureFeedback (feedbackSCR p) ∧
+    (∀ (x : rsy_SZ p.SCR) (po : Option (rsy_IZ p.SCR)),
+      ClosedLoopEqFeedbackClosedLoop p x po) := by
+  refine ⟨open_loop_is_conjunctive_rsy p, feedbackSCR_is_pure_feedback p h, ?_⟩
+  intro x po
+  exact closed_loop_eq_feedback_closed_loop p x po
+
 /-! ## Closed, autonomous, and infinite-state examples -/
 
 def closedSystem : DiscreteSystem Unit Empty Empty where

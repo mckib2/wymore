@@ -1,0 +1,107 @@
+{
+  "id": "3.47",
+  "name": "Resultant Systems (RSY)",
+  "description": "Definition and parameterization of resultant systems RSY(SCR), port maps IP@/OP@, and open-loop vs closed-loop systems.",
+  "elements": [
+    {
+      "id": "3.47/definition/rsy",
+      "type": "component",
+      "text": "RSY = {(SCR, Z): SCR is a system coupling recipe; Z is the resultant system with feedback wiring via CSCR and external I/O on UISCR/UOSCR.}"
+    },
+    {
+      "id": "3.47/definition/sz",
+      "type": "component",
+      "text": "SZ = ⅹ (SZ1, ..., SZn), the product of component state spaces."
+    },
+    {
+      "id": "3.47/definition/iz",
+      "type": "component",
+      "text": "IZ = ⅹ (A1, ..., Aa) where {A1, ..., Aa} = UISCR."
+    },
+    {
+      "id": "3.47/definition/oz",
+      "type": "component",
+      "text": "OZ = ⅹ (B1, ..., Bb) where {B1, ..., Bb} = UOSCR."
+    },
+    {
+      "id": "3.47/definition/nz",
+      "type": "component",
+      "text": "NZ applies each component next-state function on inputs resolved from external inputs and feedback connections in CSCR."
+    },
+    {
+      "id": "3.47/definition/rz",
+      "type": "component",
+      "text": "RZ projects component readouts onto unconnected output ports UOSCR."
+    },
+    {
+      "id": "3.47/definition/unconnected_input_port",
+      "type": "component",
+      "text": "Unconnected input ports are elements of UISCR."
+    },
+    {
+      "id": "3.47/definition/unconnected_output_port",
+      "type": "component",
+      "text": "Unconnected output ports are elements of UOSCR."
+    },
+    {
+      "id": "3.47/definition/connected_output",
+      "type": "component",
+      "text": "For a connected input port, the feeding output port is determined by CSCR."
+    },
+    {
+      "id": "3.47/definition/component_input",
+      "type": "component",
+      "text": "Component input functions combine external inputs on UISCR with feedback values from connected outputs."
+    },
+    {
+      "id": "3.47/definition/ip_map",
+      "type": "component",
+      "text": "IP@(SCR, Z) maps resultant input ports to unconnected component input ports."
+    },
+    {
+      "id": "3.47/definition/inip_map",
+      "type": "component",
+      "text": "INIP@(SCR, Z) is the inverse of IP@(SCR, Z)."
+    },
+    {
+      "id": "3.47/definition/is_map",
+      "type": "component",
+      "text": "IS@(SCR, Z) gives input port value types on resultant input ports."
+    },
+    {
+      "id": "3.47/definition/op_map",
+      "type": "component",
+      "text": "OP@(SCR, Z) maps resultant output ports to unconnected component output ports."
+    },
+    {
+      "id": "3.47/definition/inop_map",
+      "type": "component",
+      "text": "INOP@(SCR, Z) is the inverse of OP@(SCR, Z)."
+    },
+    {
+      "id": "3.47/definition/os_map",
+      "type": "component",
+      "text": "OS@(SCR, Z) gives output port value types on resultant output ports."
+    },
+    {
+      "id": "3.47/definition/open_loop",
+      "type": "component",
+      "text": "Open-loop system Z& = CSY(VSCR)."
+    },
+    {
+      "id": "3.47/definition/closed_loop",
+      "type": "component",
+      "text": "Closed-loop system Z@ = RSY(SCR)."
+    },
+    {
+      "id": "3.47/definition/rsy_param",
+      "type": "component",
+      "text": "Parameter bundle (SCR, total component readouts) for the RSY parameterization."
+    },
+    {
+      "id": "3.47/definition/rsy_relation",
+      "type": "component",
+      "text": "Relational membership (SCR, Z) ∈ RSY when Z is the resultant of SCR."
+    }
+  ]
+}

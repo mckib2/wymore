@@ -1,0 +1,27 @@
+{
+  "id": "3.62",
+  "name": "Fundamental Theorem of System Coupling",
+  "description": "Theorem establishing that the resultant system constructor RSY defines a valid system parameterization.",
+  "elements": [
+    {
+      "id": "3.62/theorem/rsy_parameterization",
+      "type": "implication",
+      "text": "RSY is a system parameterization."
+    },
+    {
+      "id": "3.62/proof/dsystems",
+      "type": "component",
+      "text": "The resultant system Z belongs to DSYSTEMS, verifying state, input, output, and transition/readout function conditions."
+    },
+    {
+      "id": "3.62/proof/existence",
+      "type": "component",
+      "text": "For every system coupling recipe SCR, there exists Z ∈ DSYSTEMS such that (SCR, Z) ∈ RSY."
+    },
+    {
+      "id": "3.62/proof/uniqueness",
+      "type": "component",
+      "text": "If (SCR, Z1) ∈ RSY and (SCR, Z2) ∈ RSY, then Z1 = Z2."
+    }
+  ]
+}

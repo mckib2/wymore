@@ -286,6 +286,34 @@
 | `3.40/definition/inop_map` | `component` | INOP& is the inverse function of OP&. | ✅ Faithful | `csy_INOP_map` ([Mbse/FiniteWymore.lean:614](Mbse/FiniteWymore.lean#L614)) |
 | `3.40/definition/os_map` | `component` | OS& is the output port structure function of the conjunctive system. | ✅ Faithful | `csy_OS_map` ([Mbse/FiniteWymore.lean:622](Mbse/FiniteWymore.lean#L622)) |
 
+### `textbook/definition3.47` — Resultant Systems (RSY)
+
+- Structured source file: [textbook/definition3.47.json](textbook/definition3.47.json)
+- Description: *Definition and parameterization of resultant systems RSY(SCR), port maps IP@/OP@, and open-loop vs closed-loop systems.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `3.47/definition/rsy` | `component` | RSY = {(SCR, Z): SCR is a system coupling recipe; Z is the resultant system with feedback wiring via CSCR and external I/O on UISCR/UOSCR.} | ✅ Faithful | `rsy` ([Mbse/Wymore.lean:997](Mbse/Wymore.lean#L997)) |
+| `3.47/definition/sz` | `component` | SZ = ⅹ (SZ1, ..., SZn), the product of component state spaces. | ✅ Faithful | `rsy_SZ` ([Mbse/Wymore.lean:907](Mbse/Wymore.lean#L907)) |
+| `3.47/definition/iz` | `component` | IZ = ⅹ (A1, ..., Aa) where {A1, ..., Aa} = UISCR. | ✅ Faithful | `rsy_IZ` ([Mbse/Wymore.lean:893](Mbse/Wymore.lean#L893)) |
+| `3.47/definition/oz` | `component` | OZ = ⅹ (B1, ..., Bb) where {B1, ..., Bb} = UOSCR. | ✅ Faithful | `rsy_OZ` ([Mbse/Wymore.lean:900](Mbse/Wymore.lean#L900)) |
+| `3.47/definition/nz` | `component` | NZ applies each component next-state function on inputs resolved from external inputs and feedback connections in CSCR. | ✅ Faithful | `rsy_NZ` ([Mbse/Wymore.lean:980](Mbse/Wymore.lean#L980)) |
+| `3.47/definition/rz` | `component` | RZ projects component readouts onto unconnected output ports UOSCR. | ✅ Faithful | `rsy_RZ` ([Mbse/Wymore.lean:989](Mbse/Wymore.lean#L989)) |
+| `3.47/definition/unconnected_input_port` | `component` | Unconnected input ports are elements of UISCR. | ✅ Faithful | `UnconnInPort` ([Mbse/Wymore.lean:879](Mbse/Wymore.lean#L879)) |
+| `3.47/definition/unconnected_output_port` | `component` | Unconnected output ports are elements of UOSCR. | ✅ Faithful | `UnconnOutPort` ([Mbse/Wymore.lean:886](Mbse/Wymore.lean#L886)) |
+| `3.47/definition/connected_output` | `component` | For a connected input port, the feeding output port is determined by CSCR. | ✅ Faithful | `connectedOutput` ([Mbse/Wymore.lean:923](Mbse/Wymore.lean#L923)) |
+| `3.47/definition/component_input` | `component` | Component input functions combine external inputs on UISCR with feedback values from connected outputs. | ✅ Faithful | `rsy_component_input_fun` ([Mbse/Wymore.lean:942](Mbse/Wymore.lean#L942)) |
+| `3.47/definition/ip_map` | `component` | IP@(SCR, Z) maps resultant input ports to unconnected component input ports. | ✅ Faithful | `rsy_IP_map` ([Mbse/Wymore.lean:1027](Mbse/Wymore.lean#L1027)) |
+| `3.47/definition/inip_map` | `component` | INIP@(SCR, Z) is the inverse of IP@(SCR, Z). | ✅ Faithful | `rsy_INIP_map` ([Mbse/Wymore.lean:1034](Mbse/Wymore.lean#L1034)) |
+| `3.47/definition/is_map` | `component` | IS@(SCR, Z) gives input port value types on resultant input ports. | ✅ Faithful | `rsy_IS_map` ([Mbse/Wymore.lean:1041](Mbse/Wymore.lean#L1041)) |
+| `3.47/definition/op_map` | `component` | OP@(SCR, Z) maps resultant output ports to unconnected component output ports. | ✅ Faithful | `rsy_OP_map` ([Mbse/Wymore.lean:1048](Mbse/Wymore.lean#L1048)) |
+| `3.47/definition/inop_map` | `component` | INOP@(SCR, Z) is the inverse of OP@(SCR, Z). | ✅ Faithful | `rsy_INOP_map` ([Mbse/Wymore.lean:1055](Mbse/Wymore.lean#L1055)) |
+| `3.47/definition/os_map` | `component` | OS@(SCR, Z) gives output port value types on resultant output ports. | ✅ Faithful | `rsy_OS_map` ([Mbse/Wymore.lean:1062](Mbse/Wymore.lean#L1062)) |
+| `3.47/definition/open_loop` | `component` | Open-loop system Z& = CSY(VSCR). | ✅ Faithful | `rsy_open_loop_system` ([Mbse/Wymore.lean:1069](Mbse/Wymore.lean#L1069)) |
+| `3.47/definition/closed_loop` | `component` | Closed-loop system Z@ = RSY(SCR). | ✅ Faithful | `rsy_closed_loop_system` ([Mbse/Wymore.lean:1081](Mbse/Wymore.lean#L1081)) |
+| `3.47/definition/rsy_param` | `component` | Parameter bundle (SCR, total component readouts) for the RSY parameterization. | ✅ Faithful | `RSYParam` ([Mbse/Wymore.lean:1011](Mbse/Wymore.lean#L1011)) |
+| `3.47/definition/rsy_relation` | `component` | Relational membership (SCR, Z) ∈ RSY when Z is the resultant of SCR. | ✅ Faithful | `InRSY` ([Mbse/Wymore.lean:1019](Mbse/Wymore.lean#L1019)) |
+
 ### `textbook/definition3.7` — System Connectivity
 
 - Structured source file: [textbook/definition3.7.json](textbook/definition3.7.json)
@@ -621,6 +649,30 @@
 | `3.45/proof/state_induction` | `component` | The state trajectory relation is verified for all t by induction. | ✅ Faithful | `csy_state_trajectory` ([Mbse/FiniteWymore.lean:652](Mbse/FiniteWymore.lean#L652)) |
 | `3.45/proof/output_relation` | `component` | The output trajectory relation is verified using the state trajectory relation. | ✅ Faithful | `csy_output_trajectory` ([Mbse/FiniteWymore.lean:670](Mbse/FiniteWymore.lean#L670)) |
 
+### `textbook/theorem3.62` — Fundamental Theorem of System Coupling
+
+- Structured source file: [textbook/theorem3.62.json](textbook/theorem3.62.json)
+- Description: *Theorem establishing that the resultant system constructor RSY defines a valid system parameterization.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `3.62/theorem/rsy_parameterization` | `implication` | RSY is a system parameterization. | ✅ Faithful | `rsy_parameterization` ([Mbse/Wymore.lean:1089](Mbse/Wymore.lean#L1089)) |
+| `3.62/proof/dsystems` | `component` | The resultant system Z belongs to DSYSTEMS, verifying state, input, output, and transition/readout function conditions. | ✅ Faithful | `rsy_parameterization` ([Mbse/Wymore.lean:1089](Mbse/Wymore.lean#L1089))<br>`rsy_parameterization_membership` ([Mbse/Wymore.lean:1103](Mbse/Wymore.lean#L1103)) |
+| `3.62/proof/existence` | `component` | For every system coupling recipe SCR, there exists Z ∈ DSYSTEMS such that (SCR, Z) ∈ RSY. | ✅ Faithful | `rsy_parameterization` ([Mbse/Wymore.lean:1089](Mbse/Wymore.lean#L1089))<br>`rsy_parameterization_exists` ([Mbse/Wymore.lean:1111](Mbse/Wymore.lean#L1111)) |
+| `3.62/proof/uniqueness` | `component` | If (SCR, Z1) ∈ RSY and (SCR, Z2) ∈ RSY, then Z1 = Z2. | ✅ Faithful | `rsy_parameterization` ([Mbse/Wymore.lean:1089](Mbse/Wymore.lean#L1089))<br>`rsy_parameterization_unique` ([Mbse/Wymore.lean:1119](Mbse/Wymore.lean#L1119)) |
+
+### `textbook/theorem3.64` — Open-Loop / Closed-Loop Feedback Reclosure
+
+- Structured source file: [textbook/theorem3.64.json](textbook/theorem3.64.json)
+- Description: *When SCR is not conjunctive, the open-loop system Z& is the resultant of (VSCR, ∅), the feedback recipe SCR$ is pure feedback, and the closed-loop systems Z@ and Z@$ agree on product state and external I/O.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `3.64/theorem/open_loop_conjunctive_rsy` | `implication` | Z& is the resultant of the conjunctive coupling recipe (VSCR, ∅). | ✅ Faithful | `open_loop_is_conjunctive_rsy` ([Mbse/Wymore.lean:1473](Mbse/Wymore.lean#L1473)) |
+| `3.64/theorem/feedback_scr_pure` | `implication` | SCR$ is a pure feedback coupling recipe. | ✅ Faithful | `feedbackSCR_is_pure_feedback` ([Mbse/Wymore.lean:1398](Mbse/Wymore.lean#L1398)) |
+| `3.64/theorem/closed_loop_eq_feedback` | `implication` | Closed-loop equality Z@ = Z@$ on shared product state and external I/O (next-state and readout on unconnected ports). | ✅ Faithful | `closed_loop_eq_feedback_closed_loop` ([Mbse/Wymore.lean:1662](Mbse/Wymore.lean#L1662)) |
+| `3.64/theorem/open_loop_closed_loop` | `implication` | Theorem 3.64 for non-conjunctive recipes: conjunctive open-loop membership, pure feedback SCR$, and closed-loop equality. | ✅ Faithful | `open_loop_closed_loop_theorem` ([Mbse/Wymore.lean:1674](Mbse/Wymore.lean#L1674)) |
+
 ### `textbook/theorem4.13` — HIMSY is a System Parameterization
 
 - Structured source file: [textbook/theorem4.13.json](textbook/theorem4.13.json)
@@ -855,15 +907,15 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 ## 3. Completeness & Quality Summary
 
-- **Total Structured JSON Entries**: 79 (68 definitions/theorems, 11 exercises)
-- **Definition/Theorem Elements**: 190 (188 faithful)
+- **Total Structured JSON Entries**: 82 (71 definitions/theorems, 11 exercises)
+- **Definition/Theorem Elements**: 218 (216 faithful)
 - **Exercise Task Elements**: 20 (20 faithful)
-- **Total Individual Requirements/Elements**: 210
-- **Linked Elements (any annotation)**: 208 (208/210)
-- **Faithful Elements (excludes stub/partial)**: 208 (208/210)
+- **Total Individual Requirements/Elements**: 238
+- **Linked Elements (any annotation)**: 236 (236/238)
+- **Faithful Elements (excludes stub/partial)**: 236 (236/238)
 - **Stub/Partial Elements**: 0
-- **Annotation Coverage Rate**: **99.0%**
-- **Faithful Coverage Rate**: **99.0%**
+- **Annotation Coverage Rate**: **99.2%**
+- **Faithful Coverage Rate**: **99.2%**
 
 > Note: *Annotation coverage* counts any tagged link, including placeholders. *Faithful coverage* is the trustworthy figure: it excludes links explicitly marked `|stub` or `|partial`, which indicate the Lean artifact only partially captures (or stands in for) the textbook requirement.
 

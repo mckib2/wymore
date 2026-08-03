@@ -1,0 +1,27 @@
+{
+  "id": "3.64",
+  "name": "Open-Loop / Closed-Loop Feedback Reclosure",
+  "description": "When SCR is not conjunctive, the open-loop system Z& is the resultant of (VSCR, ∅), the feedback recipe SCR$ is pure feedback, and the closed-loop systems Z@ and Z@$ agree on product state and external I/O.",
+  "elements": [
+    {
+      "id": "3.64/theorem/open_loop_conjunctive_rsy",
+      "type": "implication",
+      "text": "Z& is the resultant of the conjunctive coupling recipe (VSCR, ∅)."
+    },
+    {
+      "id": "3.64/theorem/feedback_scr_pure",
+      "type": "implication",
+      "text": "SCR$ is a pure feedback coupling recipe."
+    },
+    {
+      "id": "3.64/theorem/closed_loop_eq_feedback",
+      "type": "implication",
+      "text": "Closed-loop equality Z@ = Z@$ on shared product state and external I/O (next-state and readout on unconnected ports)."
+    },
+    {
+      "id": "3.64/theorem/open_loop_closed_loop",
+      "type": "implication",
+      "text": "Theorem 3.64 for non-conjunctive recipes: conjunctive open-loop membership, pure feedback SCR$, and closed-loop equality."
+    }
+  ]
+}
