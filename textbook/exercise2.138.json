@@ -1,0 +1,14 @@
+{
+  "id": "2.138",
+  "kind": "theorem_proof",
+  "name": "Time invariance via concatenation",
+  "chapter": 2,
+  "description": "Exercise 2.138: prove STZ(g, STZ(f,x)(s))(t) = STZ(CTN(f,s,g), x)(s+t). Canonical proof in Trajectory.lean; CTN is concatenate in WymoreCore.",
+  "elements": [
+    {
+      "id": "2.138/theorem/time_invariance_concatenation",
+      "type": "theorem",
+      "text": "STZ(g, STZ(f, x)(s))(t) = STZ(CTN(f, s, g), x)(s + t) for f, g in ITZ and s, t in TZ."
+    }
+  ]
+}

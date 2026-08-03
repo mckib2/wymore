@@ -1,0 +1,18 @@
+{
+  "id": "2.118",
+  "name": "Trivial infinite pairwise state-dependent system",
+  "chapter": 2,
+  "description": "Create an example Z of a trivial system model with an infinite number of states and outputs such that NZ(x1, p) ≠ NZ(x2, p) for every x1 ∈ SZ, x2 ∈ SZ, and p ∈ IZ. The intended reading requires x1 ≠ x2; the unpinned ∀ quantification is impossible when x1 = x2.",
+  "elements": [
+    {
+      "id": "2.118/task/trivial_infinite_pairwise_state_dependent",
+      "type": "task",
+      "text": "Z is trivial, SZ and OZ are infinite, and NZ(x1, p) ≠ NZ(x2, p) for every distinct x1, x2 ∈ SZ and every p ∈ IZ."
+    },
+    {
+      "id": "2.118/note/literal_quantification_impossible",
+      "type": "note",
+      "text": "Literal ∀x1,x2,p without x1 ≠ x2 forces NZ(x,p) ≠ NZ(x,p); no discrete system satisfies this."
+    }
+  ]
+}

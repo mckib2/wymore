@@ -1,0 +1,14 @@
+{
+  "id": "2.122",
+  "kind": "theorem_proof",
+  "name": "Finite trajectory loops",
+  "chapter": 2,
+  "description": "Exercise 2.122: prove every state trajectory of a finite system loops within TZ[0, #SZ]. Canonical proof lives in WymoreCore.",
+  "elements": [
+    {
+      "id": "2.122/theorem/state_trajectory_loops",
+      "type": "theorem",
+      "text": "If Z is finite, f in ITZ, and x in SZ, then there exist t1, t2 in TZ[0, #SZ] with t1 < t2 and STZ(f, x)(t1) = STZ(f, x)(t2)."
+    }
+  ]
+}

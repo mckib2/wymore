@@ -1,0 +1,12 @@
+{
+  "id": "2.146",
+  "name": "Projective Readout OSZ/FSZ Pairing",
+  "description": "Theorem: if RZ is projective and RiZ = PJN(SZ, SjZ), then OSZ(OiZ) = FSZ(SjZ).",
+  "elements": [
+    {
+      "id": "2.146/theorem/osz_eq_fsz",
+      "type": "theorem",
+      "text": "If RZ is projective and RiZ = PJN(SZ, SjZ), then OSZ(OiZ) = FSZ(SjZ)."
+    }
+  ]
+}

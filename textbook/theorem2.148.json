@@ -1,0 +1,17 @@
+{
+  "id": "2.148",
+  "name": "Properly Aligned Readout Structure",
+  "description": "Theorem: if RZ is properly aligned, then the number of state factors is at least the number of output ports and each output port's value set equals the paired state factor's value set.",
+  "elements": [
+    {
+      "id": "2.148/theorem/sfz_card_ge_opz",
+      "type": "theorem",
+      "text": "If RZ is properly aligned, then #SFZ >= #OPZ."
+    },
+    {
+      "id": "2.148/theorem/osz_eq_fsz",
+      "type": "theorem",
+      "text": "If RZ is properly aligned, then OSZ(OiZ) = FSZ(SiZ) for each output port i."
+    }
+  ]
+}

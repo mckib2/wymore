@@ -1,6 +1,12 @@
 import Mbse.WymoreCore
 import Mbse.Trajectory
 import Mbse.WymoreTactics
+import Mathlib.Data.Fintype.Card
+
+theorem fin_nat_card_le_of_le {m n : Nat} (h : n ≤ m) :
+    Fintype.card (Fin n) ≤ Fintype.card (Fin m) := by
+  rw [Fintype.card_fin n, Fintype.card_fin m]
+  exact h
 
 theorem varyingOutput_iff_card_rng {SZ OZ : Type} [Fintype SZ] [Fintype OZ] [DecidableEq OZ]
     (RZ : SZ → OZ) :
@@ -61,38 +67,12 @@ def complete_trajectories_closed_under_translation {A : Type} (f : Time → A) (
   translate f r
 
 /--
-  [textbook/theorem_a1.292/theorem/concatenation_fns]
-  Concatenation of two functions f and g at time r, denoted CTN(f, r, g).
-  Piecewise definition mapping to V[0, r) and W'.
--/
-def concatenate {A : Type} (f g : Time → A) (r : Time) : Time → A :=
-  fun t => if t < r then f t else g (t - r)
-
-/--
   [textbook/theorem2.25/theorem/concatenation_closed]
   The set of complete trajectories is closed under concatenation.
+  `concatenate` (CTN) is defined in `WymoreCore`.
 -/
 def complete_trajectories_closed_under_concatenation {A : Type} (f g : Time → A) (r : Time) : Time → A :=
   concatenate f g r
-
-/--
-  [textbook/theorem_a1.292/theorem/concatenation_value_left]
-  Values of concatenation for t < r.
--/
-theorem concatenation_value_left {A : Type} (f g : Time → A) (r : Time) (t : Time) (ht : t < r) :
-    concatenate f g r t = f t := by
-  unfold concatenate
-  simp only [ht, ↓reduceIte]
-
-/--
-  [textbook/theorem_a1.292/theorem/concatenation_value_right]
-  Values of concatenation for t ≥ r.
--/
-theorem concatenation_value_right {A : Type} (f g : Time → A) (r : Time) (t : Time) (ht : t ≥ r) :
-    concatenate f g r t = g (t - r) := by
-  unfold concatenate
-  have h_not : ¬(t < r) := Nat.not_lt_of_ge ht
-  simp only [h_not, ↓reduceIte]
 
 /-! ## General Set Theory and Function Composition -/
 
@@ -148,6 +128,26 @@ theorem outputTrajectory_time_invariance
     generateOutputTrajectory Z (generateStateTrajectory Z x f s) (translate f s) t =
     generateOutputTrajectory Z x f (s + t) :=
   Trajectory.outputTrajectory_time_invariance Z x f s t
+
+/--
+  [textbook/theorem2.138/theorem/time_invariance_concatenation]
+  Time invariance in terms of concatenation for total input trajectories.
+-/
+theorem stateTrajectory_time_invariance_concatenation
+    (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f g : ITZ IZ) (s t : Time) :
+    generateStateTrajectory Z (generateStateTrajectory Z x (liftInput f) s) (liftInput g) t =
+    generateStateTrajectory Z x (liftInput (concatenate f g s)) (s + t) :=
+  Trajectory.stateTrajectory_time_invariance_concatenation Z x f g s t
+
+/--
+  [textbook/theorem2.142/theorem/reachable_concatenation]
+  Reachability by means of `f` at `s` and `g` at `t` implies reachability by `CTN(f, s, g)` at `s + t`.
+-/
+theorem reachableBy_concatenate
+    (Z : DiscreteSystem SZ IZ OZ) (x y z : SZ) (f g : ITZ IZ) (s t : Time)
+    (hxy : ReachableBy Z x y (liftInput f) s) (hyz : ReachableBy Z y z (liftInput g) t) :
+    ReachableBy Z x z (liftInput (concatenate f g s)) (s + t) :=
+  Trajectory.reachableBy_concatenate Z x y z f g s t hxy hyz
 
 def EXZ (SZ IZ : Type) := ITZW IZ × SZ × Time
 
@@ -214,6 +214,8 @@ def portReadout {SZ IZ OutPort : Type} {OutPortVal : OutPort → Type}
 -/
 def OPZ (OutPort : Type) : Type := OutPort
 
+instance OPZ.fintype {T : Type} [Fintype T] : Fintype (OPZ T) := inferInstanceAs (Fintype T)
+
 /--
   [textbook/definition2.62/definition/port_output_trajectory]
   The output port trajectory is `PJN(op) ∘ OTZ(f, x)`.
@@ -235,6 +237,8 @@ def OSZ (OutPort : Type) (OutPortVal : OutPort → Type) : OutPort → Type := O
   If the state space is a product, SZ is `(sf : StateFactor) → StateFactorVal sf`.
 -/
 def SFZ (StateFactor : Type) : Type := StateFactor
+
+instance SFZ.fintype {T : Type} [Fintype T] : Fintype (SFZ T) := inferInstanceAs (Fintype T)
 
 /--
   [textbook/definition2.70/definition/state_factor_structure]
@@ -285,6 +289,29 @@ def IsProjectiveReadout {IZ OutPort StateFactor : Type} {OutPortVal : OutPort �
       portReadout Z op s = h ▸ PJN sf s
 
 /--
+  Output port `op` readout equals projection onto state factor `sf` (`RiZ = PJN(SZ, SjZ)`).
+-/
+def PortReadoutIsFactorProjection {IZ OutPort StateFactor : Type} {OutPortVal : OutPort → Type}
+    {StateFactorVal : StateFactor → Type}
+    (Z : DiscreteSystem ((sf : StateFactor) → StateFactorVal sf) IZ ((op : OutPort) → OutPortVal op))
+    (op : OutPort) (sf : StateFactor) (h : OutPortVal op = StateFactorVal sf) : Prop :=
+  ∀ s, portReadout Z op s = some (h ▸ PJN sf s)
+
+/--
+  [textbook/theorem2.146/theorem/osz_eq_fsz]
+  Projective readout with `RiZ = PJN(SZ, SjZ)` implies `OSZ(OiZ) = FSZ(SjZ)`.
+-/
+theorem projective_readout_osz_eq_fsz {IZ OutPort StateFactor : Type}
+    {OutPortVal : OutPort → Type} {StateFactorVal : StateFactor → Type}
+    (Z : DiscreteSystem ((sf : StateFactor) → StateFactorVal sf) IZ ((op : OutPort) → OutPortVal op))
+    (i : OutPort) (j : StateFactor)
+    (_hproj : IsProjectiveReadout Z)
+    (h : OutPortVal i = StateFactorVal j)
+    (_hread : PortReadoutIsFactorProjection Z i j h) :
+    OSZ (OPZ OutPort) OutPortVal i = FSZ (SFZ StateFactor) StateFactorVal j :=
+  h
+
+/--
   [textbook/definition2.73/definition/properly_aligned_readout]
   The projective readout function is properly aligned if each output port `i`
   reads out the corresponding state factor `i`.
@@ -293,6 +320,172 @@ def IsProperlyAlignedReadout {IZ I : Type} {Val : I → Type}
     (Z : DiscreteSystem ((i : I) → Val i) IZ ((i : I) → Val i)) : Prop :=
   ∀ (i : I), ∀ (s : (j : I) → Val j),
     portReadout Z i s = some (PJN i s)
+
+/--
+  Aligned product readout when `#OPZ ≤ #SFZ`: output port `j` reads state factor `j`
+  (`RiZ = PJN(SZ, SiZ)` for `i = j`).
+-/
+def IsProperlyAlignedProductReadout {Inp : Type} {m n : Nat} (hn : n ≤ m) (Val : Fin m → Type)
+    (Z : DiscreteSystem ((i : Fin m) → Val i) Inp ((j : Fin n) → Val (Fin.castLE hn j))) : Prop :=
+  ∀ (j : Fin n) (s : (i : Fin m) → Val i),
+    portReadout Z j s = some (PJN (Fin.castLE hn j) s)
+
+/--
+  [textbook/theorem2.148/theorem/sfz_card_ge_opz]
+  Properly aligned readout implies at least as many state factors as output ports.
+-/
+theorem properly_aligned_sfz_card_ge_opz {Inp : Type} {m n : Nat} (hn : n ≤ m) (Val : Fin m → Type)
+    (Z : DiscreteSystem ((i : Fin m) → Val i) Inp ((j : Fin n) → Val (Fin.castLE hn j)))
+    (_h : IsProperlyAlignedProductReadout hn Val Z) :
+    Fintype.card (SFZ (Fin m)) ≥ Fintype.card (OPZ (Fin n)) := by
+  dsimp [SFZ, OPZ]
+  exact fin_nat_card_le_of_le hn
+
+/--
+  [textbook/theorem2.148/theorem/osz_eq_fsz]
+  Under alignment, each output port's value set equals the paired state factor's value set.
+-/
+theorem properly_aligned_osz_eq_fsz {m n : Nat} (hn : n ≤ m) (Val : Fin m → Type) (j : Fin n) :
+    OSZ (OPZ (Fin n)) (fun k => Val (Fin.castLE hn k)) j =
+      FSZ (SFZ (Fin m)) Val (Fin.castLE hn j) :=
+  rfl
+
+/--
+  [textbook/theorem2.148/theorem/sfz_card_ge_opz]
+  Corollary for the same-index aligned encoding (`IsProperlyAlignedReadout`).
+-/
+theorem isProperlyAlignedReadout_sfz_card_ge_opz {Inp I : Type} {Val : I → Type} [Fintype I]
+    (Z : DiscreteSystem ((i : I) → Val i) Inp ((i : I) → Val i))
+    (_h : IsProperlyAlignedReadout Z) :
+    Fintype.card (SFZ I) ≥ Fintype.card (OPZ I) := by
+  dsimp [SFZ, OPZ]
+  exact Nat.le_refl (Fintype.card I)
+
+/--
+  [textbook/theorem2.148/theorem/osz_eq_fsz]
+  Corollary for the same-index aligned encoding.
+-/
+theorem isProperlyAlignedReadout_osz_eq_fsz {I : Type} {Val : I → Type} (i : I) :
+    OSZ (OPZ I) (fun k => Val k) i = FSZ (SFZ I) Val i :=
+  rfl
+
+/--
+  `#SFZ ≤ 1`: state is not a Cartesian product of two or more factor sets.
+-/
+def StateIsNotCartesianProduct (n : Nat) : Prop :=
+  n ≤ 1
+
+/--
+  `#OPZ ≤ 1`: output is not a Cartesian product of two or more port value sets.
+-/
+def OutputIsNotCartesianProduct (n : Nat) : Prop :=
+  n ≤ 1
+
+/--
+  [textbook/theorem2.150/theorem/state_readout]
+  Aligned single-output readout returning the state tuple (`SZ = OZ`, `RZ = ID(SZ)` when `m = 1`).
+-/
+def HasAlignedStateReadout {Inp : Type} {m : Nat} (hn : 1 ≤ m) (Val : Fin m → Type)
+    (Z : DiscreteSystem ((i : Fin m) → Val i) Inp ((j : Fin 1) → Val (Fin.castLE hn j))) : Prop :=
+  Z.RZ = fun s => some (fun (j : Fin 1) => s (Fin.castLE hn j))
+
+/--
+  [textbook/theorem2.150/theorem/first_factor_readout]
+  Bundled readout `RZ = PJN(SZ, S1Z)` when `OZ = S1Z` (single-port encoding).
+-/
+def HasFirstFactorBundledReadout {Inp : Type} {m : Nat} (hn : 1 ≤ m) (Val : Fin m → Type)
+    (Z : DiscreteSystem ((i : Fin m) → Val i) Inp ((j : Fin 1) → Val (Fin.castLE hn j))) : Prop :=
+  Z.RZ = fun s => some (fun (j : Fin 1) => PJN (Fin.castLE hn j) s)
+
+/--
+  [textbook/theorem2.149/theorem/sz_eq_oz]
+  In the aligned product encoding with one factor, `SZ` and `OZ` share the same type.
+-/
+theorem properly_aligned_non_product_sz_eq_oz {Val : Type} :
+    ((i : Fin 1) → Val) = ((i : Fin 1) → Val) :=
+  rfl
+
+/--
+  [textbook/theorem2.149/theorem/state_readout]
+  Non-product state with properly aligned projective readout yields state readout (`RZ = ID(SZ)`).
+-/
+theorem properly_aligned_non_product_has_state_readout {Inp : Type} {n : Nat}
+    (_hNotProd : StateIsNotCartesianProduct n) (hnpos : n ≠ 0) (Val : Fin n → Type)
+    (Z : DiscreteSystem ((i : Fin n) → Val i) Inp ((i : Fin n) → Val i))
+    (h : IsProperlyAlignedReadout Z) :
+    HasStateReadout Z := by
+  dsimp [StateIsNotCartesianProduct] at _hNotProd
+  have hn : n = 1 := by omega
+  subst hn
+  unfold HasStateReadout
+  funext s
+  match hz : Z.RZ s with
+  | none => exact absurd (h 0 s) (by simp [portReadout, hz])
+  | some o =>
+    have hproj := h 0 s
+    simp [portReadout, hz, PJN] at hproj
+    congr
+    ext j
+    rw [Trajectory.fin_one_eq j 0]
+    exact hproj
+
+/--
+  [textbook/definition2.73/definition/state_readout]
+  `HasStateReadout` is `RZ = ID(SZ)` on states (via `some` in the partial readout model).
+-/
+theorem hasStateReadout_iff_rz_id {SZ Inp : Type} (Z : DiscreteSystem SZ Inp SZ) :
+    HasStateReadout Z ↔ Z.RZ = fun s => some (ID SZ s) := by
+  unfold HasStateReadout ID
+  rfl
+
+/--
+  [textbook/theorem2.150/theorem/oz_eq_s1z]
+  Single aligned output port's value set is the first state factor `S1Z`.
+-/
+theorem properly_aligned_non_product_oz_eq_s1z {m : Nat} (hn : 1 ≤ m) (Val : Fin m → Type) :
+    OSZ (OPZ (Fin 1)) (fun k => Val (Fin.castLE hn k)) (0 : Fin 1) =
+      FSZ (SFZ (Fin m)) Val (⟨0, Nat.lt_of_lt_of_le Nat.zero_lt_one hn⟩ : Fin m) :=
+  rfl
+
+/--
+  [textbook/theorem2.150/theorem/readout_dichotomy]
+  Non-product output with properly aligned projective readout: state readout or first-factor projection.
+-/
+theorem properly_aligned_non_product_output_readout_dichotomy {Inp : Type} {m : Nat}
+    (_hNotProdOut : OutputIsNotCartesianProduct 1) (_hnpos : (1 : Nat) ≠ 0)
+    (hn : 1 ≤ m) (Val : Fin m → Type)
+    (Z : DiscreteSystem ((i : Fin m) → Val i) Inp ((j : Fin 1) → Val (Fin.castLE hn j)))
+    (h : IsProperlyAlignedProductReadout hn Val Z) :
+    (StateIsNotCartesianProduct m → HasAlignedStateReadout hn Val Z) ∨
+      (m > 1 ∧ HasFirstFactorBundledReadout hn Val Z) := by
+  dsimp [OutputIsNotCartesianProduct] at _hNotProdOut
+  by_cases hle : m ≤ 1
+  · left
+    intro _hstate
+    unfold HasAlignedStateReadout
+    funext s
+    match hz : Z.RZ s with
+    | none => exact absurd (h (0 : Fin 1) s) (by simp [portReadout, hz])
+    | some o =>
+      have hproj := h (0 : Fin 1) s
+      simp [portReadout, hz, PJN] at hproj
+      congr
+      ext j
+      rw [Trajectory.fin_one_eq j 0]
+      exact hproj
+  · right
+    refine ⟨Nat.lt_of_not_ge hle, ?_⟩
+    unfold HasFirstFactorBundledReadout
+    funext s
+    match hz : Z.RZ s with
+    | none => exact absurd (h (0 : Fin 1) s) (by simp [portReadout, hz])
+    | some o =>
+      have hproj := h (0 : Fin 1) s
+      simp [portReadout, hz] at hproj
+      congr
+      ext j
+      rw [Trajectory.fin_one_eq j 0]
+      exact hproj
 
 /--
   [textbook/theorem_a1.178/theorem/vector_projection_equality]

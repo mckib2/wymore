@@ -1,0 +1,27 @@
+{
+  "id": "2.150",
+  "name": "Non-Product Output Readout Dichotomy",
+  "description": "Theorem: if OZ is not a Cartesian product and RZ is properly aligned projective, then either SZ = OZ with RZ = ID(SZ), or OZ = S1Z with RZ = PJN(SZ, 1).",
+  "elements": [
+    {
+      "id": "2.150/theorem/oz_eq_s1z",
+      "type": "theorem",
+      "text": "In the first-factor branch, OZ(O1Z) = FSZ(S1Z)."
+    },
+    {
+      "id": "2.150/theorem/state_readout",
+      "type": "theorem",
+      "text": "Aligned single-output readout returning the state tuple (SZ = OZ, RZ = ID(SZ) when m = 1)."
+    },
+    {
+      "id": "2.150/theorem/first_factor_readout",
+      "type": "theorem",
+      "text": "Bundled readout RZ = PJN(SZ, S1Z) when OZ = S1Z."
+    },
+    {
+      "id": "2.150/theorem/readout_dichotomy",
+      "type": "theorem",
+      "text": "Either SZ = OZ and RZ = ID(SZ), or OZ = S1Z and RZ = PJN(SZ, 1)."
+    }
+  ]
+}

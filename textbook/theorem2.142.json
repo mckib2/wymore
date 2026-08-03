@@ -1,0 +1,12 @@
+{
+  "id": "2.142",
+  "name": "Reachability via Concatenation",
+  "description": "Theorem: reachability composes along concatenated input trajectories. If y is reachable from x by f at time s and z is reachable from y by g at time t, then z is reachable from x by CTN(f, s, g) at time s + t.",
+  "elements": [
+    {
+      "id": "2.142/theorem/reachable_concatenation",
+      "type": "theorem",
+      "text": "If y is reachable from x by means of f at time s and z is reachable from y by means of g at time t, then z is reachable from x by means of CTN(f, s, g) at time s + t."
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "2.122",
+  "name": "Finite Trajectory Loops",
+  "description": "Theorem: every state trajectory of a finite system loops back on itself. If Z is finite, f in ITZ, and x in SZ, then there exist t1, t2 in TZ[0, #SZ] with t1 < t2 and STZ(f, x)(t1) = STZ(f, x)(t2).",
+  "elements": [
+    {
+      "id": "2.122/theorem/state_trajectory_loops",
+      "type": "theorem",
+      "text": "If Z is finite, f in ITZ, and x in SZ, then there exist t1, t2 subset TZ[0, #SZ] such that t1 < t2 and STZ(f, x)(t1) = STZ(f, x)(t2)."
+    }
+  ]
+}

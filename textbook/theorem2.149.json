@@ -1,0 +1,17 @@
+{
+  "id": "2.149",
+  "name": "Non-Product State Implies State Readout",
+  "description": "Theorem: if SZ is not a Cartesian product and RZ is properly aligned projective, then SZ = OZ and RZ = ID(SZ).",
+  "elements": [
+    {
+      "id": "2.149/theorem/sz_eq_oz",
+      "type": "theorem",
+      "text": "If SZ is not a Cartesian product and RZ is properly aligned projective, then SZ = OZ."
+    },
+    {
+      "id": "2.149/theorem/state_readout",
+      "type": "theorem",
+      "text": "If SZ is not a Cartesian product and RZ is properly aligned projective, then Z has state readout (RZ = ID(SZ))."
+    }
+  ]
+}

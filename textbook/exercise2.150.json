@@ -1,0 +1,19 @@
+{
+  "id": "2.150",
+  "kind": "theorem_proof",
+  "name": "Non-product output readout dichotomy",
+  "chapter": 2,
+  "description": "Exercise 2.150: prove the readout dichotomy when OZ is not a Cartesian product and RZ is properly aligned projective. Canonical proof in Wymore.lean.",
+  "elements": [
+    {
+      "id": "2.150/theorem/oz_eq_s1z",
+      "type": "theorem",
+      "text": "OZ = S1Z in the first-factor branch."
+    },
+    {
+      "id": "2.150/theorem/readout_dichotomy",
+      "type": "theorem",
+      "text": "Either state readout or first-factor projection readout."
+    }
+  ]
+}

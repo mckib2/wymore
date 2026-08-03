@@ -54,6 +54,7 @@ import Mbse.InverseSynthesis
 import Mbse.PaperClaimLinkage
 import Mbse.ClassicalAssertionalBridge
 import Mbse.WymoreExercises
+import Mbse.TextbookExercises
 import Mbse.ComposedCaseStudy
 import Mbse.AssertionalFC
 import Mbse.Examples

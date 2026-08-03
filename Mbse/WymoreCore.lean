@@ -1,4 +1,5 @@
 import Mathlib.Data.Fintype.Basic
+import Mathlib.Data.Fintype.Pigeonhole
 import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Data.Finset.Basic
 
@@ -270,6 +271,98 @@ theorem generateOutputTrajectory_valid (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) (
     IsValidOutputTrajectory Z (generateStateTrajectory Z s0 f) (generateOutputTrajectory Z s0 f) := by
   intro t; rfl
 
+/-! ## Step functions and trajectory composition (Thm / Ex 2.121) -/
+
+/--
+  [textbook/theorem2.121/part/step_function]
+  Per-time step map `F(s)`: `y ↦ NZ(y, f(s))`.
+-/
+def stepAt (Z : DiscreteSystem SZ IZ OZ) (f : ITZW IZ) (s : Time) : SZ → SZ :=
+  fun y => Z.NZ y (f s)
+
+/--
+  [textbook/theorem2.121/part/step_function]
+  Total-input variant for `f ∈ ITZ`.
+-/
+def stepAtTotal (Z : DiscreteSystem SZ IZ OZ) (f : ITZ IZ) (s : Time) : SZ → SZ :=
+  stepAt Z (liftInput f) s
+
+/--
+  Compose step maps `F(t-1) ∘ ⋯ ∘ F(0)`; `composeStepsFrom Z f 0 = id`.
+-/
+def composeStepsFrom (Z : DiscreteSystem SZ IZ OZ) (f : ITZW IZ) : Time → SZ → SZ
+  | 0 => id
+  | n + 1 => stepAt Z f n ∘ composeStepsFrom Z f n
+
+@[simp]
+theorem composeStepsFrom_zero (Z : DiscreteSystem SZ IZ OZ) (f : ITZW IZ) :
+    composeStepsFrom Z f 0 = id := rfl
+
+@[simp]
+theorem composeStepsFrom_succ (Z : DiscreteSystem SZ IZ OZ) (f : ITZW IZ) (n : Time) :
+    composeStepsFrom Z f (n + 1) = stepAt Z f n ∘ composeStepsFrom Z f n := rfl
+
+/--
+  [textbook/theorem2.121/part/fns_membership]
+  Each step map `F(s)` satisfies the FNS properties on `SZ`.
+-/
+theorem stepAt_satisfiesFNS (Z : DiscreteSystem SZ IZ OZ) (f : ITZW IZ) (s : Time) :
+    SatisfiesFNS (stepAt Z f s) :=
+  satisfiesFNS_of_function _
+
+/--
+  [textbook/theorem2.121/part/fns_membership]
+  Total-input step map satisfies FNS.
+-/
+theorem stepAtTotal_satisfiesFNS (Z : DiscreteSystem SZ IZ OZ) (f : ITZ IZ) (s : Time) :
+    SatisfiesFNS (stepAtTotal Z f s) :=
+  stepAt_satisfiesFNS Z (liftInput f) s
+
+/--
+  [textbook/theorem2.121/theorem/composition_formula]
+  `STZ(f, x)(t) = (F(t-1) ∘ ⋯ ∘ F(0))(x)` for `f ∈ ITZW`.
+-/
+theorem generateStateTrajectory_eq_composeSteps
+    (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f : ITZW IZ) (t : Time) :
+    generateStateTrajectory Z x f t = composeStepsFrom Z f t x := by
+  induction t with
+  | zero => rfl
+  | succ n ih =>
+    simp only [generateStateTrajectory_succ, composeStepsFrom, stepAt, ih, Function.comp_apply]
+
+/--
+  [textbook/theorem2.121/theorem/composition_formula]
+  Composition formula for total input trajectories `f ∈ ITZ`.
+-/
+theorem generateStateTrajectory_total_eq_composeSteps
+    (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f : ITZ IZ) (t : Time) :
+    generateStateTrajectory Z x (liftInput f) t = composeStepsFrom Z (liftInput f) t x :=
+  generateStateTrajectory_eq_composeSteps Z x (liftInput f) t
+
+/--
+  [textbook/theorem2.122/theorem/state_trajectory_loops]
+  Every state trajectory of a finite system loops back on itself within `#SZ` steps:
+  for `f ∈ ITZ` and `x ∈ SZ`, some `t1 < t2 ≤ #SZ` repeat the trajectory state.
+-/
+theorem generateStateTrajectory_loops_within_card
+    (Z : DiscreteSystem SZ IZ OZ) [Fintype SZ] (_hFin : IsFinite Z) (x : SZ) (f : ITZ IZ) :
+    ∃ t1 t2 : Time, t1 < t2 ∧
+      t2 ≤ Fintype.card SZ ∧
+      generateStateTrajectory Z x (liftInput f) t1 =
+      generateStateTrajectory Z x (liftInput f) t2 := by
+  classical
+  let n := Fintype.card SZ
+  let trajAt (t : Fin (n + 1)) : SZ :=
+    generateStateTrajectory Z x (liftInput f) t.val
+  have hcard : Fintype.card SZ < Fintype.card (Fin (n + 1)) := by
+    dsimp [n]
+    simp
+  rcases Fintype.exists_ne_map_eq_of_card_lt trajAt hcard with
+    ⟨i, j, hij, heq⟩
+  rcases Nat.lt_or_gt_of_ne (Fin.val_ne_iff.mpr hij) with hlt | hgt
+  · exact ⟨i.val, j.val, hlt, Nat.le_of_lt_succ (Fin.is_lt j), heq⟩
+  · exact ⟨j.val, i.val, hgt, Nat.le_of_lt_succ (Fin.is_lt i), heq.symm⟩
+
 /--
   [textbook/theorem2.29/proof/single_valuedness]
   Given an initial state and input trajectory, the state trajectory is unique.
@@ -342,6 +435,32 @@ structure SystemMorphism
 
 def translate {A : Type} (f : Time → A) (r : Time) : Time → A :=
   fun t => f (t + r)
+
+/--
+  [textbook/theorem_a1.292/theorem/concatenation_fns]
+  Concatenation of two trajectories at split time `r`, denoted `CTN(f, r, g)`.
+-/
+def concatenate {A : Type} (f g : Time → A) (r : Time) : Time → A :=
+  fun t => if t < r then f t else g (t - r)
+
+/--
+  [textbook/theorem_a1.292/theorem/concatenation_value_left]
+  Values of concatenation for `t < r`.
+-/
+theorem concatenation_value_left {A : Type} (f g : Time → A) (r : Time) (t : Time) (ht : t < r) :
+    concatenate f g r t = f t := by
+  unfold concatenate
+  simp only [ht, ↓reduceIte]
+
+/--
+  [textbook/theorem_a1.292/theorem/concatenation_value_right]
+  Values of concatenation for `t ≥ r`.
+-/
+theorem concatenation_value_right {A : Type} (f g : Time → A) (r : Time) (t : Time) (ht : t ≥ r) :
+    concatenate f g r t = g (t - r) := by
+  unfold concatenate
+  have h_not : ¬(t < r) := Nat.not_lt_of_ge ht
+  simp only [h_not, ↓reduceIte]
 
 def RSN {A B : Type} (f : A → B) (S : Set A) : {a : A // a ∈ S} → B :=
   fun ⟨a, _⟩ => f a

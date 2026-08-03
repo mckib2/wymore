@@ -86,6 +86,80 @@ theorem outputTrajectory_time_invariance
   unfold generateOutputTrajectory
   rw [stateTrajectory_time_invariance Z x f s t]
 
+/-- Concatenated trajectories agree below the smaller split time. -/
+theorem generateStateTrajectory_concatenate_agree_split
+    (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f g : ITZ IZ) (r s t : Time)
+    (hr : r ≥ s) (ht : t ≤ s) :
+    generateStateTrajectory Z x (liftInput (concatenate f g r)) t =
+      generateStateTrajectory Z x (liftInput (concatenate f g s)) t := by
+  induction t generalizing r s with
+  | zero => rfl
+  | succ t ih =>
+    simp only [generateStateTrajectory_succ, liftInput, concatenate]
+    have ht' : t ≤ s := Nat.le_of_lt (Nat.lt_of_succ_le ht)
+    rw [ih r s hr ht']
+    have htlr : t < r := Nat.lt_of_lt_of_le (Nat.lt_succ_self t) (Nat.le_trans ht hr)
+    have htls : t < s := Nat.lt_of_succ_le ht
+    simp only [htlr, htls, ↓reduceIte]
+
+/-- Prefix of a concatenated trajectory matches `f` before the split time. -/
+theorem generateStateTrajectory_concatenate_prefix
+    (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f g : ITZ IZ) (s t : Time) (ht : t ≤ s) :
+    generateStateTrajectory Z x (liftInput (concatenate f g s)) t =
+      generateStateTrajectory Z x (liftInput f) t := by
+  induction s generalizing t with
+  | zero =>
+    have ht0 : t = 0 := Nat.eq_zero_of_le_zero ht
+    subst ht0
+    simp [generateStateTrajectory_zero]
+  | succ s ih =>
+    rcases Nat.eq_or_lt_of_le ht with ht_eq | ht_lt
+    · subst ht_eq
+      simp only [generateStateTrajectory_succ, liftInput, concatenate, Nat.lt_succ_self, ↓reduceIte]
+      rw [generateStateTrajectory_concatenate_agree_split Z x f g (s + 1) s s (Nat.le_succ s) (Nat.le_refl s),
+        ih s (Nat.le_refl s)]
+    · rw [generateStateTrajectory_concatenate_agree_split Z x f g (Nat.succ s) s t (Nat.le_succ s)
+        (Nat.lt_succ_iff.mp ht_lt),
+        ih t (Nat.lt_succ_iff.mp ht_lt)]
+
+/-- At split time `s`, concatenating `f` then `g` agrees with `f` alone on the prefix. -/
+theorem generateStateTrajectory_at_concatenate_split
+    (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f g : ITZ IZ) (s : Time) :
+    generateStateTrajectory Z x (liftInput (concatenate f g s)) s =
+      generateStateTrajectory Z x (liftInput f) s :=
+  generateStateTrajectory_concatenate_prefix Z x f g s s (Nat.le_refl s)
+
+/--
+  [textbook/theorem2.138/theorem/time_invariance_concatenation]
+  Time invariance via concatenation: continuing with `g` after `f` matches `CTN(f, s, g)`.
+-/
+theorem stateTrajectory_time_invariance_concatenation
+    (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f g : ITZ IZ) (s t : Time) :
+    generateStateTrajectory Z (generateStateTrajectory Z x (liftInput f) s) (liftInput g) t =
+      generateStateTrajectory Z x (liftInput (concatenate f g s)) (s + t) := by
+  induction t with
+  | zero =>
+    simp only [generateStateTrajectory_zero, Nat.add_zero]
+    exact (generateStateTrajectory_at_concatenate_split Z x f g s).symm
+  | succ t ih =>
+    simp only [generateStateTrajectory_succ]
+    rw [ih]
+    congr 1
+    simp only [liftInput]
+    rw [concatenation_value_right f g s (Nat.add s t) (Nat.le_add_right s t)]
+    simp
+
+/--
+  [textbook/theorem2.142/theorem/reachable_concatenation]
+  Reachability composes along concatenated input trajectories at `s + t`.
+-/
+theorem reachableBy_concatenate
+    (Z : DiscreteSystem SZ IZ OZ) (x y z : SZ) (f g : ITZ IZ) (s t : Time)
+    (hxy : ReachableBy Z x y (liftInput f) s) (hyz : ReachableBy Z y z (liftInput g) t) :
+    ReachableBy Z x z (liftInput (concatenate f g s)) (s + t) := by
+  dsimp [ReachableBy] at hxy hyz ⊢
+  rw [← stateTrajectory_time_invariance_concatenation Z x f g s t, hxy, hyz]
+
 theorem outputTrajectory_nonanticipatory
     (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f g : ITZW IZ) (t : Time)
     (hst : generateStateTrajectory Z x f t = generateStateTrajectory Z x g t) :

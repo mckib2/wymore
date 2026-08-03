@@ -1,0 +1,14 @@
+{
+  "id": "2.142",
+  "kind": "theorem_proof",
+  "name": "Reachability via concatenation",
+  "chapter": 2,
+  "description": "Exercise 2.142: prove reachability composes under CTN(f,s,g) at s+t. Canonical proof in Trajectory.lean (uses Thm 2.138).",
+  "elements": [
+    {
+      "id": "2.142/theorem/reachable_concatenation",
+      "type": "theorem",
+      "text": "ReachableBy(x,y,f,s) and ReachableBy(y,z,g,t) imply ReachableBy(x,z,CTN(f,s,g),s+t)."
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "2.138",
+  "name": "Time Invariance via Concatenation",
+  "description": "Theorem: time invariance expressed through trajectory concatenation. If Z is a discrete system, x in SZ, f and g are input trajectories, and s and t are times, then continuing with g after f matches running the concatenated trajectory.",
+  "elements": [
+    {
+      "id": "2.138/theorem/time_invariance_concatenation",
+      "type": "theorem",
+      "text": "If Z in DSYSTEMS, x in SZ, {f, g} subset ITZ, and {s, t} subset TZ, then STZ(g, STZ(f, x)(s))(t) = STZ(CTN(f, s, g), x)(s + t)."
+    }
+  ]
+}

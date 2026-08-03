@@ -1,0 +1,19 @@
+{
+  "id": "2.148",
+  "kind": "theorem_proof",
+  "name": "Properly aligned SFZ/OPZ structure",
+  "chapter": 2,
+  "description": "Exercise 2.148: prove #SFZ >= #OPZ and OSZ(OiZ) = FSZ(SiZ) when RZ is properly aligned. Canonical proofs in Wymore.lean.",
+  "elements": [
+    {
+      "id": "2.148/theorem/sfz_card_ge_opz",
+      "type": "theorem",
+      "text": "#SFZ >= #OPZ under properly aligned readout."
+    },
+    {
+      "id": "2.148/theorem/osz_eq_fsz",
+      "type": "theorem",
+      "text": "OSZ(OiZ) = FSZ(SiZ) under properly aligned readout."
+    }
+  ]
+}

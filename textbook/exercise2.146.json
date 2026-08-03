@@ -1,0 +1,14 @@
+{
+  "id": "2.146",
+  "kind": "theorem_proof",
+  "name": "Projective readout OSZ/FSZ pairing",
+  "chapter": 2,
+  "description": "Exercise 2.146: prove OSZ(OiZ) = FSZ(SjZ) when RZ is projective and RiZ = PJN(SZ, SjZ). Canonical proof in Wymore.lean.",
+  "elements": [
+    {
+      "id": "2.146/theorem/osz_eq_fsz",
+      "type": "theorem",
+      "text": "OSZ(OiZ) = FSZ(SjZ) under projective readout with RiZ = PJN(SZ, SjZ)."
+    }
+  ]
+}

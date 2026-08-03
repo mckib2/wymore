@@ -1,0 +1,13 @@
+{
+  "id": "2.117",
+  "name": "Trivial infinite always-active system",
+  "chapter": 2,
+  "description": "Create an example Z of a trivial system model with an infinite number of states and outputs such that NZ(x, p) ≠ x for every x ∈ SZ.",
+  "elements": [
+    {
+      "id": "2.117/task/trivial_infinite_always_active",
+      "type": "task",
+      "text": "Z is trivial, SZ and OZ are infinite, and NZ(x, p) ≠ x for every x ∈ SZ and p ∈ IZ."
+    }
+  ]
+}

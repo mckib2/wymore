@@ -1,0 +1,28 @@
+{
+  "id": "2.116",
+  "name": "Range of NZ and RZ",
+  "chapter": 2,
+  "description": "Create examples of systems such that (i)-(iv) hold.",
+  "elements": [
+    {
+      "id": "2.116/part/i_rng_nz_eq_sz",
+      "type": "task",
+      "text": "(i) RNG(NZ) = SZ"
+    },
+    {
+      "id": "2.116/part/ii_rng_nz_ne_sz",
+      "type": "task",
+      "text": "(ii) RNG(NZ) ≠ SZ"
+    },
+    {
+      "id": "2.116/part/iii_rng_rz_eq_oz",
+      "type": "task",
+      "text": "(iii) RNG(RZ) = OZ"
+    },
+    {
+      "id": "2.116/part/iv_rng_rz_ne_oz",
+      "type": "task",
+      "text": "(iv) RNG(RZ) ≠ OZ"
+    }
+  ]
+}

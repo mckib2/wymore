@@ -17,6 +17,8 @@ Faithful encodings for:
 
 These remain available as a gallery. The paper case-study spine is
 [`MinskyKit`](MinskyKit.lean) / [`FibCaseStudy`](FibCaseStudy.lean).
+For curated textbook exercise solutions with JSON traceability, see
+[`TextbookExercises`](TextbookExercises.lean).
 Main-text prose must not name Lean.
 -/
 

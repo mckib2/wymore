@@ -1,0 +1,19 @@
+{
+  "id": "2.149",
+  "kind": "theorem_proof",
+  "name": "Non-product state implies state readout",
+  "chapter": 2,
+  "description": "Exercise 2.149: prove SZ = OZ and RZ = ID(SZ) when SZ is not a Cartesian product and RZ is properly aligned projective. Canonical proof in Wymore.lean.",
+  "elements": [
+    {
+      "id": "2.149/theorem/sz_eq_oz",
+      "type": "theorem",
+      "text": "SZ = OZ under non-product state and properly aligned projective readout."
+    },
+    {
+      "id": "2.149/theorem/state_readout",
+      "type": "theorem",
+      "text": "RZ = ID(SZ) (state readout) under the same hypotheses."
+    }
+  ]
+}

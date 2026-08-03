@@ -1,0 +1,22 @@
+{
+  "id": "2.121",
+  "name": "State Trajectory as Composition",
+  "description": "Theorem: for Z in DSYSTEMS, f in ITZ, x in SZ, and t in TZ+, the state trajectory equals the composition of per-step maps F(s)(y) = NZ(y, f(s)).",
+  "elements": [
+    {
+      "id": "2.121/part/step_function",
+      "type": "definition",
+      "text": "F(s)(y) = NZ(y, f(s)) for s in IJS[0, t)."
+    },
+    {
+      "id": "2.121/part/fns_membership",
+      "type": "theorem",
+      "text": "F(s) in FNS(SZ, SZ) for every s in IJS[0, t)."
+    },
+    {
+      "id": "2.121/theorem/composition_formula",
+      "type": "theorem",
+      "text": "STZ(f, x)(t) = (F(t-1) o ... o F(0))(x) for t in TZ+ (with t = 0 base case id)."
+    }
+  ]
+}

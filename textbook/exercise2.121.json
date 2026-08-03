@@ -1,0 +1,24 @@
+{
+  "id": "2.121",
+  "kind": "theorem_proof",
+  "name": "State trajectory as composition",
+  "chapter": 2,
+  "description": "Exercise 2.121: prove F(s) in FNS(SZ,SZ), F(s)(y)=NZ(y,f(s)), and STZ(f,x)(t)=(F(t-1)o...oF(0))(x). Canonical proofs live in WymoreCore.",
+  "elements": [
+    {
+      "id": "2.121/part/step_function",
+      "type": "definition",
+      "text": "F(s)(y) = NZ(y, f(s))."
+    },
+    {
+      "id": "2.121/part/fns_membership",
+      "type": "theorem",
+      "text": "F(s) in FNS(SZ, SZ) for s in IJS[0, t)."
+    },
+    {
+      "id": "2.121/theorem/composition_formula",
+      "type": "theorem",
+      "text": "STZ(f, x)(t) = (F(t-1) o ... o F(0))(x)."
+    }
+  ]
+}
