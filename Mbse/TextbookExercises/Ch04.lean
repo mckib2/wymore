@@ -1,6 +1,7 @@
 import Mbse.Isomorphism
 import Mbse.IsomorphismConstructions
 import Mbse.CouplingIsomorphism
+import Mbse.NestedCoupling
 
 /-!
 # Chapter 4 — homomorphism algebra, isomorphisms and copies
@@ -401,5 +402,12 @@ abbrev ex4_85_rearrangement_isomorphic {n : Nat} (SCR : SystemCouplingRecipe n)
 abbrev ex4_66_null_order_elimination {n m : Nat} {SCR : SystemCouplingRecipe n}
     (E : NullOrderElimination SCR m) (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k)) :=
   Homomorphism.ex4_66_null_order_elimination E hOut
+
+/--
+  [textbook/exercise4.86/theorem/nested_coupling_isomorphic]
+  Exercise 4.86: coupling the components of the components yields an isomorphic resultant.
+-/
+abbrev ex4_86_nested_coupling_isomorphic {n : Nat} (N : NestedCoupling n) :=
+  Homomorphism.ex4_86_nested_coupling_isomorphic N
 
 end Mbse.TextbookExercises.Ch04

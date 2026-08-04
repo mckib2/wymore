@@ -1,0 +1,79 @@
+{
+  "id": "4.86",
+  "kind": "theorem_proof",
+  "name": "Coupling components of components yields an isomorphic resultant",
+  "chapter": 4,
+  "description": "Exercise 4.86: if Z@ = RSY(SCR), VSCR = (Z1,...,Zn), each Zi = RSY(SCRi) with VSCRi = (Zi1,...,Zimi), VSCR$ = (Z11,...,Z1m1,...,Zn1,...,Znmn) is a connectable vector and CSCR$ = {(OP@(SCRi, Zi)(OhZi), IP@(SCRk, Zk)(IjZk)) : (OhZi, IjZk) in CSCR} union {CSCRi : i in IJS[1, n]}, then Z@ = ISY(Z@$, HS, HI, HO) where Z@$ = RSY(SCR$), HS maps (x11,...,xnmn) to ((x11,...,x1m1),...,(xn1,...,xnmn)), HI = ID(IZ@$) and HO = ID(OZ@$).",
+  "elements": [
+    {
+      "id": "4.86/definition/nested_components",
+      "type": "definition",
+      "text": "For each i in IJS[1, n], Zi = RSY(SCRi) with VSCRi = (Zi1,...,Zimi) for mi in IJS+; VSCR and VSCR$ are connectable vectors."
+    },
+    {
+      "id": "4.86/definition/outer_vector",
+      "type": "definition",
+      "text": "VSCR = (Z1,...,Zn) with Zi = RSY(SCRi)."
+    },
+    {
+      "id": "4.86/definition/nested_recipe",
+      "type": "definition",
+      "text": "SCR = (VSCR, CSCR) and Z@ = RSY(SCR)."
+    },
+    {
+      "id": "4.86/definition/flat_vector",
+      "type": "definition",
+      "text": "VSCR$ = (Z11,...,Z1m1,...,Zn1,...,Znmn)."
+    },
+    {
+      "id": "4.86/definition/flat_connectivity",
+      "type": "definition",
+      "text": "CSCR$ = {(OP@(SCRi, Zi)(OhZi), IP@(SCRk, Zk)(IjZk)) : (OhZi, IjZk) in CSCR} union {CSCRi : i in IJS[1, n]}."
+    },
+    {
+      "id": "4.86/definition/flat_recipe",
+      "type": "definition",
+      "text": "SCR$ = (VSCR$, CSCR$) and Z@$ = RSY(SCR$)."
+    },
+    {
+      "id": "4.86/theorem/uiscr_preserved",
+      "type": "theorem",
+      "text": "IZ@$ = IZ@: an input port of VSCR$ is unconnected in SCR$ exactly when it is unconnected in its own SCRi and the corresponding external port of Zi is unconnected in SCR."
+    },
+    {
+      "id": "4.86/theorem/uoscr_preserved",
+      "type": "theorem",
+      "text": "OZ@$ = OZ@: an output port of VSCR$ is unconnected in SCR$ exactly when it is unconnected in its own SCRi and the corresponding external port of Zi is unconnected in SCR."
+    },
+    {
+      "id": "4.86/component/HS",
+      "type": "component",
+      "text": "HS = {(x$, x) : x$ in SZ@$, x in SZ@; if x$ = (x11,...,x1m1,...,xn1,...,xnmn), then x = ((x11,...,x1m1),...,(xn1,...,xnmn))}."
+    },
+    {
+      "id": "4.86/component/HI",
+      "type": "component",
+      "text": "HI = ID(IZ@$)."
+    },
+    {
+      "id": "4.86/component/HO",
+      "type": "component",
+      "text": "HO = ID(OZ@$)."
+    },
+    {
+      "id": "4.86/proof/input_resolution",
+      "type": "proof",
+      "text": "Resolving a component input through CSCR$ in one step agrees with resolving it in two steps: the external input of Zi = RSY(SCRi) through CSCR, then the component input inside SCRi."
+    },
+    {
+      "id": "4.86/proof/isomorphism_witness",
+      "type": "proof",
+      "text": "Z@$ = ISY(Z@, HS, HI, HO): HS, HI and HO are bijections that preserve next state and readout."
+    },
+    {
+      "id": "4.86/theorem/nested_coupling_isomorphic",
+      "type": "theorem",
+      "text": "Z@ = ISY(Z@$, HS, HI, HO) where Z@$ = RSY(SCR$)."
+    }
+  ]
+}

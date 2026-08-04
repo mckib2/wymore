@@ -11,6 +11,7 @@ import Mbse.Homomorphism
 import Mbse.Isomorphism
 import Mbse.IsomorphismConstructions
 import Mbse.CouplingIsomorphism
+import Mbse.NestedCoupling
 import Mbse.FiniteWymore
 import Mbse.TemporalLogic
 import Mbse.FOLTL

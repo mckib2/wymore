@@ -69,6 +69,7 @@ def registry : List ExerciseEntry :=
   , ⟨"4.83", 4, .theoremProof, "solved", "Ch04.ex4_83_mutual_homomorphism_isomorphic"⟩
   , ⟨"4.84", 4, .theoremProof, "solved", "Ch04.ex4_84_reflexive"⟩
   , ⟨"4.85", 4, .theoremProof, "solved", "Ch04.ex4_85_rearrangement_isomorphic"⟩
+  , ⟨"4.86", 4, .theoremProof, "solved", "Ch04.ex4_86_nested_coupling_isomorphic"⟩
   ]
 
 def solvedCount : Nat :=

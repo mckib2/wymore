@@ -30,6 +30,18 @@ This report compiles the analyses of the proofs of core theorems in Wayne Wymore
 23. [Homogeneous SCR component encoding (Exercises 3.124–3.126)](#23-homogeneous-scr-component-encoding-exercises-31243126)
 24. [PortSystemVector.distinct without type injectivity axioms](#24-portsystemvectordistinct-without-type-injectivity-axioms)
 25. [Exercise 3.126 readout index and §3.70 coupling convention](#25-exercise-3126-readout-index-and-370-coupling-convention)
+26. [Definition 4.27 / 4.47: port permutations in port-preserving morphisms](#26-definition-427--447-port-permutations-in-port-preserving-morphisms)
+27. [Theorem 4.45: the nonempty-port side condition](#27-theorem-445-the-nonempty-port-side-condition)
+28. [Definition 3.90: "null order" as "no order at all"](#28-definition-390-null-order-as-no-order-at-all)
+29. [Exercise 4.66: enumerating retained components and reading CSCR$](#29-exercise-466-enumerating-retained-components-and-reading-cscr)
+30. [Theorem 4.56 / Corollary 4.59: the shared port skeleton](#30-theorem-456--corollary-459-the-shared-port-skeleton)
+31. [Theorem 4.58: recoding one output port vs. recoding a family](#31-theorem-458-recoding-one-output-port-vs-recoding-a-family)
+32. [Exercise 4.69: the assertion is false](#32-exercise-469-the-assertion-is-false)
+33. [Exercises 4.71 / 4.72 / 4.74 and Definition A1.189: elaboration constructions](#33-exercises-471--472--474-and-definition-a1189-elaboration-constructions)
+34. [Exercise 4.83: which triple is the isomorphism](#34-exercise-483-which-triple-is-the-isomorphism)
+35. [Exercise 4.85: rearrangement read through a renaming](#35-exercise-485-rearrangement-read-through-a-renaming)
+36. [Exercise 4.86: flattening nested resultants](#36-exercise-486-flattening-nested-resultants)
+37. [Chapter 4 deviation summary](#37-chapter-4-deviation-summary)
 
 ## 1. Theorem 2.25: Closure of Complete Input Trajectories
 
@@ -864,3 +876,295 @@ Exercise 3.126 cites readout `R1Z1(x(2))`; the cascade connects OZ2 to I1Z1. §3
 
 ### Comparison Summary
 SCR-level port identification is unchanged; `uniformNatPortWrap` supplies uniform `Nat → Nat` component boundaries while `CSCR` / `UISCR` resolve which label is which.
+
+---
+
+## 26. Definition 4.27 / 4.47: port permutations in port-preserving morphisms
+
+### Textbook Statement
+> `HI` preserves input ports with respect to `SHIS` if and only if (i) `#IPZ₂ = #IPZ₁`, (ii) for each `i ∈ IJS[1, #IPZ₂]` there exists `HIᵢ ∈ FNS(IᵢZ₂, ONTO, IᵢZ₁)` such that `SHIS = {HIᵢ}` and `PJN(IZ₁, i) ∘ HI = HIᵢ ∘ PJN(IZ₂, i)`.
+
+Because the textbook indexes both systems' ports by the same integer interval `IJS[1, #IP]`, clause (ii) silently assumes that port `i` of `Z₂` corresponds to port `i` of `Z₁`. Clause (i) alone would allow any bijection between the two port sets.
+
+### Lean 4 Representation
+`PreservesPorts` at [Mbse/Isomorphism.lean](Mbse/Isomorphism.lean) carries the correspondence explicitly:
+
+```lean
+structure PreservesPorts {Port1 Port2 : Type} {Val1 : Port1 → Type} {Val2 : Port2 → Type}
+    (σ : Port2 ≃ Port1)
+    (H : ((p : Port2) → Val2 p) → ((p : Port1) → Val1 p)) where
+  port : (p : Port2) → Val2 p → Val1 (σ p)
+  port_surjective : ∀ p, Function.Surjective (port p)
+  proj : ∀ f p, H f (σ p) = port p (f p)
+```
+
+`σ : Port₂ ≃ Port₁` *is* clause (i) (`#IPZ₂ = #IPZ₁` for arbitrary, possibly infinite, port index types), and clause (ii) becomes `H f (σ p) = Hₚ (f p)`. `PortPreservingHomWitness` (Ex 4.80) and `CopyWitness` (Def 4.47) each carry an `inIdx : Port₂ ≃ Port₁` and an `outIdx : OutPort₂ ≃ OutPort₁`.
+
+### Proof Analysis
+* Reflexivity uses `Equiv.refl`; transitivity composes the port bijections (`σ₂₃.trans σ₁₂`) alongside the portwise maps, matching `SHIS₃ = {HI₁ᵢ ∘ HI₂ᵢ}` in Exercise 4.81.
+* Symmetry (Ex 4.84 (iii)) is where permutation costs something: the inverse of `Hₚ : Val₂ p → Val₁ (σ p)` lands in `Val₁ (σ (σ⁻¹ q))`, not in `Val₁ q`, so `PreservesPorts.symm` composes with `Equiv.cast (congrArg Val₁ (σ.apply_symm_apply q).symm)`. The auxiliary `pi_apply_cast` discharges the resulting transport. With a shared indexing (`σ = Equiv.refl`) all of these casts are `rfl` and the difficulty is invisible.
+
+### Comparison Summary
+This is a **strict generalization**: `σ = Equiv.refl` recovers the textbook reading, while the general form also covers systems with entirely different port index types. It is not vacuous — `Ch04.swap_isCopyOf_permuting` in [Mbse/TextbookExercises/Ch04.lean](Mbse/TextbookExercises/Ch04.lean) exhibits `Z₁` carrying `ℕ` on port `false` and `Bool` on port `true`, and `Z₂` carrying them the other way round. These are copies via the swap `σ = not`, and *no* copy with the identity port bijection can exist, since `ℕ` and `Bool` are not equivalent.
+
+---
+
+## 27. Theorem 4.45: the nonempty-port side condition
+
+### Textbook Statement
+> If `Z₁ = ISY(Z₂, HS, HI, HO)`, `HI` preserves input ports with respect to `SHIS`, … then `HIᵢ ∈ FNS(IᵢZ₂, 1TO1, ONTO, IᵢZ₁)` and `IᵢZ₂` is equivalent to `IᵢZ₁`.
+
+### Lean 4 Representation
+`PreservesPorts.port_injective` derives injectivity of each factor `Hₚ` from injectivity of the product map `H`, but requires `[∀ p, Nonempty (Val2 p)]`. The same instance argument propagates to `CopyWitness.inPort_bijective`, `CopyWitness.outPort_bijective`, `PreservesPorts.symm` and hence `isCopyOf_symm`.
+
+### Proof Analysis
+The proof compares two inputs that differ at a single port, built with `Function.update` over an arbitrary base point; producing that base point needs every *other* port to be inhabited. The hypothesis is not an artifact: if some port value set is empty then `IZ₂` is empty, `HI` is vacuously `1TO1`, and the individual `HIᵢ` need not be injective at all. The textbook never states it because its port sets are tacitly nonempty (elsewhere it writes "a set not empty" by hand, as in Theorem 4.58).
+
+### Comparison Summary
+A **reduction in ambiguity**: the implicit "ports carry nonempty sets" assumption is promoted to a typeclass hypothesis, and it is exactly the hypothesis under which the textbook's conclusion is true.
+
+---
+
+## 28. Definition 3.90: "null order" as "no order at all"
+
+### Textbook Statement
+Order 0 means having an unconnected port; order `m + 1` means being coupled to a component of order `m`; *null order* means having no order.
+
+### Lean 4 Representation
+`Mbse/WymoreCouplingStructure.lean` previously defined `ComponentNullOrder = ¬ ComponentOrder0`. It now reads
+
+```lean
+def ComponentHasOrder {n : Nat} (SCR : SystemCouplingRecipe n) (i : Fin n) : Prop :=
+  ∃ m, ComponentOrder SCR i m
+
+def ComponentNullOrder {n : Nat} (SCR : SystemCouplingRecipe n) (i : Fin n) : Prop :=
+  ¬ ComponentHasOrder SCR i
+```
+
+with `componentHasOrder_of_order0` and `componentHasOrder_of_connection` (having an order propagates backwards along couplings), and `scr_has_order_zero_component` re-proved against the new definition.
+
+### Comparison Summary
+A **fidelity correction** forced by Exercise 4.66. Under the old reading, "eliminating components of null order" would delete every component of order 1 or more, and the exercise would be false: deleted components would still be coupled to retained ones, so the reduced connectivity would not be well defined. With the corrected definition, deletion only removes components that no chain of couplings connects to the external interface.
+
+---
+
+## 29. Exercise 4.66: enumerating retained components and reading CSCR$
+
+### Textbook Statement
+> `M = {Z$ : Z$ ∈ VSCR; Z$ is not of null order for SCR}`, `M = {Zi₁, …, Zim}` … `CSCR$ = {(B, A) : (B, A) ∈ CSCR; there exists Z$ ∈ VSCR$ such that B ∈ IPZ$}`, then `Z@$ = RSY(SCR$)` and `Z@$ = HIMSY(Z@, PJN({SZ$ : Z$ ∈ VSCR$}), ID(IZ@), ID(OZ@))`.
+
+### Lean 4 Representation
+[Mbse/CouplingIsomorphism.lean](Mbse/CouplingIsomorphism.lean) replaces the set `M` by an explicit enumeration:
+
+```lean
+structure NullOrderElimination {n : Nat} (SCR : SystemCouplingRecipe n) (m : Nat) where
+  ι : Fin m → Fin n
+  inj : Function.Injective ι
+  retained : ∀ i, ComponentHasOrder SCR (ι i)
+  complete : ∀ k, ComponentHasOrder SCR k → ∃ i, ι i = k
+```
+
+`NullOrderElimination.deleted_iff_null_order` confirms that the components *not* enumerated are exactly the null-order ones. `elimCSCR` keeps a connection when **both** endpoints lie on retained components.
+
+### Proof Analysis
+* Three readings of the textbook's `CSCR$` clause coincide: `(B, A)` retained on the output side, on the input side, or on both. `hasOrder_of_mem_cscr` shows that a coupling makes each endpoint's order-status equal, so requiring one endpoint already forces the other. (The textbook's own phrasing, "`B ∈ IPZ$`", writes the *output* coordinate `B` into the *input* port set — a slip that the equivalence of readings makes harmless.)
+* `HI = ID(IZ@)` and `HO = ID(OZ@)` only typecheck once `UISCR$ ≃ UISCR` is available; `elimUnconnIn` / `elimUnconnOut` build those equivalences from `hasOrder_of_mem_uiscr` (a component with an unconnected port is of order 0, hence retained).
+* `HS = PJN(...)` is surjective for a reason the textbook does not mention: a state of the reduced resultant must be *extended* to a state of the original. `elimSection` supplies values on the deleted components using their `sz_nonempty` fields, and `elim_state_transport` handles the dependent `cast` produced by `Classical.choose`-ing an index in the fibre of `ι`.
+
+### Comparison Summary
+Textbook set-of-components `M` becomes an injective enumeration with an image characterization; the ambiguous connectivity clause is resolved (and proved to be reading-independent); the "obvious" surjectivity of the state projection is where the real content sits in the formal proof.
+
+---
+
+## 30. Theorem 4.56 / Corollary 4.59: the shared port skeleton
+
+### Textbook Statement
+> … for every `i`, `Zᵢ` is the homomorphic, port-preserving image of `Z$ᵢ` …, `(OᵢZⱼ, IₖZₘ) ∈ CSCR` if and only if `(OᵢZ$ⱼ, IₖZ$ₘ) ∈ CSCR$`, and if `(OᵢZ$ⱼ, IₖZ$ₘ) ∈ CSCR` then `HOⱼᵢ = HIₘₖ`; then `Z@` is a homomorphic, port-preserving image of `Z@$`.
+
+### Lean 4 Representation
+`ComponentwiseElaboration SCR` bundles the hypotheses. The crucial modelling decision is that the elaborated vector shares the *port index skeleton* of `SCR` and changes only the value families and the state spaces:
+
+```lean
+structure ComponentwiseElaboration {n : Nat} (SCR : SystemCouplingRecipe n) where
+  SZ : Fin n → Type
+  PortVal : (i : Fin n) → SCR.VSCR.Port i → Type
+  OutPortVal : (i : Fin n) → SCR.VSCR.OutPort i → Type
+  Z : (i : Fin n) → DiscreteSystem (SZ i) …
+  hom : (i : Fin n) → HomomorphicImageWitness (SCR.VSCR.Z i) (Z i)
+  inPorts : (i : Fin n) → PreservesPorts (Equiv.refl (SCR.VSCR.Port i)) (hom i).HI
+  outPorts : (i : Fin n) → PreservesPorts (Equiv.refl (SCR.VSCR.OutPort i)) (hom i).HO
+  compat : ∀ op ip, (op, ip) ∈ SCR.CSCR → OutPortVal op.1 op.2 = PortVal ip.1 ip.2
+  matched : ∀ op ip, (op, ip) ∈ SCR.CSCR →
+      HEq ((outPorts op.1).port op.2) ((inPorts ip.1).port ip.2)
+```
+
+`elabRecipe E` then literally reuses `SCR.CSCR`, so `elabRecipe_uiscr` and `elabRecipe_uoscr` (`UISCR$ = UISCR`, `UOSCR$ = UOSCR`) hold by `rfl`.
+
+### Proof Analysis
+* "`(OᵢZⱼ, IₖZₘ) ∈ CSCR` iff `(OᵢZ$ⱼ, IₖZ$ₘ) ∈ CSCR$`" only typechecks in DTT if the two recipes' tagged-port types agree, which is precisely the shared-skeleton reading. This makes the biconditional an identity of sets rather than a hypothesis to carry.
+* `compat` is new relative to the textbook prose but is not an extra assumption in substance: it is the *connectivity* requirement for `SCR$` (connected ports carry the same value set), which the textbook assumes when it writes `Z@$ = RSY(SCR$)`. Without it `elabRecipe` is not a legal recipe.
+* `HOⱼᵢ = HIₘₖ` becomes a heterogeneous equality, because the two port maps have equal types only after `compat` is applied. `heq_fun_apply` converts it into the pointwise statement used in `elab_component_input`.
+* Corollary 4.59 adds injectivity of each `HSᵢ` and of each port map and reuses the Theorem 4.56 witness verbatim; `HS` is injective because it is a product of injections, `HI`/`HO` because they act portwise.
+
+### Comparison Summary
+The direction of Corollary 4.59 differs cosmetically: we produce `IsCopyOf (rsy SCR) (rsy (elabRecipe E))` where the textbook says "`Z@$` is a copy of `Z@`". By Exercise 4.84 the copy relation is symmetric, so the readings agree — subject to the nonempty-port side condition of §27, which symmetry (unlike reflexivity and transitivity) needs.
+
+---
+
+## 31. Theorem 4.58: recoding one output port vs. recoding a family
+
+### Textbook Statement
+> `OᵢZ₂ = OᵢZ₁` for `i ≠ n` and `OₙZ₂ = B`, `RZ₂` post-composes `F` at port `n`, … then `Z₂ ∈ DSYSTEMS`, `OₙZ₂ = B` and `Z₂ = COPY(Z₁, HS, HI, HO, SHIS, SHOS)`.
+
+### Lean 4 Representation
+Two layers in [Mbse/IsomorphismConstructions.lean](Mbse/IsomorphismConstructions.lean):
+
+* `recodeOutPorts Z1 Fq` recodes **every** output port along a family of bijections `Fq : OqZ₁ ≃ OqZ₂`, with `recodeOutPorts_copyWitness` proving it is always a copy (`SHOS = {Fq}`).
+* `replaceOutVal OutVal1 n B = fun q => if q = n then B else OutVal1 q` and `replaceOutValEquiv F` instantiate that family at the single offending port, giving `replaceOutPort_isCopy : replaceOutVal OutVal1 n B n = B ∧ IsCopyOf …`.
+
+### Proof Analysis
+Defining the value family by cases needs `[DecidableEq OutPort]`, and the branch `q = n` produces a family of *type* equalities rather than a family of set equalities; `replaceOutValEquiv` therefore threads `Equiv.cast` through `replaceOutVal_self` and `replaceOutVal_of_ne`. The readout is post-composed through `Option.map`, so the construction is also valid for systems whose readout is partial — the textbook's `RZ₂` is a total function by assumption.
+
+### Comparison Summary
+A **generalization plus an instance**: the general statement (recode a whole family) is easier to prove and to reuse than the single-port statement, and the textbook's conclusion is the special case. Both are exported.
+
+---
+
+## 32. Exercise 4.69: the assertion is false
+
+### Textbook Statement
+> Prove the following assertion or find a counterexample: if `Z₁` is a finite system and `Z₂` is not a finite system, then `Z₁` is not a homomorphic image of `Z₂`.
+
+### Lean 4 Representation
+The answer is a counterexample. `counterElaboration : DiscreteSystem Nat Unit Unit` is the state counter (`NZ x _ = x + 1`), `pointImage : DiscreteSystem Unit Unit Unit` is the one-state system, and `pointImage_witness` collapses every state to the single one. Two forms are exported: the concrete `ex4_69_counterexample` and the refutation of the universally quantified assertion, `ex4_69_assertion_false`.
+
+### Comparison Summary
+`IsFinite Z = Finite SZ ∧ Finite IZ ∧ Finite OZ` (Definition 2.11), so `counterElaboration` fails finiteness only in its state space, which is the cheapest possible counterexample. Nothing about the textbook statement is ambiguous here; the exercise is simply answered in the negative, and the negative answer is recorded as a theorem rather than as prose.
+
+---
+
+## 33. Exercises 4.71 / 4.72 / 4.74 and Definition A1.189: elaboration constructions
+
+### Textbook Statement
+Three constructions producing a system of which a given `Z₁` is a homomorphic image: by pairing each state with a predecessor (4.71), by splitting each state into a block of a disjoint family and choosing representatives with `CHS ∈ CHF(S)` (4.72), and by pulling back along arbitrary onto maps `HS`, `HI`, `HO` with choice functions on their domains (4.74). `CHF(A) = {CHA ∈ FNS(℘A, A) : B ⊆ A, B ≠ ∅ ⟹ CHA(B) ∈ B}` (A1.189).
+
+### Lean 4 Representation
+| Textbook | Lean |
+|---|---|
+| `CHF(A)` | `ChoiceFunction A` (`pick : Set A → A`, `pick_mem`), with `ChoiceFunction.ofNonempty` |
+| `SZ₂ = {(x, NZ₁(x, p))} ∪ {(x, x)}` | `PredecessorState Z1`, a subtype of `SZ × SZ` |
+| `F ∈ FNS(SZ₁, 1TO1, ℘(S))`, blocks disjoint | `StatePartition` (`F`, `block_nonempty`, `block_disjoint`) |
+| `SZ₂ = ∪ RNG(F)` | `StatePartition.State`, a subtype of `S` |
+| `HS = {(x₂, x₁) : x₂ ∈ F(x₁)}` | `StatePartition.proj`, well defined by disjointness |
+| `RNG(HS) = SZ₁` | `Function.Surjective HS` onto the fixed codomain `SZ₁` |
+| `#SZ₂ ≥ #SZ₁` | injectivity of a section (`StatePartition.rep`, `Function.surjInv`) |
+
+### Proof Analysis
+* **4.71.** The `Option`-unified transition of §15 means the state space must also admit the autonomous step, so the subtype predicate is `y = x ∨ ∃ oi, y = NZ₁(x, oi)` where `oi : Option IZ` ranges over `none` as well as the textbook's `p ∈ IZ₁`. The diagonal `(x, x)` is what makes `HS = PJN₂` surjective.
+* **4.72.** The textbook writes `F ∈ FNS(SZ₁, 1TO1, ℘(S))`; injectivity is *derived* (`StatePartition.F_injective`) from disjointness together with nonemptiness of the blocks, so it is not assumed. Nonemptiness itself is an addition: the textbook applies `CHS` to `F(NZ₁(x₁, p))` and asserts `#SZ₂ ≥ #SZ₁`, both of which fail for an empty block. Well-definedness of `HS` — "if `x ∈ F(x₁)` then …" presupposes a unique such `x₁` — is `StatePartition.proj_eq`.
+* **4.74.** `CHS ∈ CHF(DMN(HS))` is passed as an explicit parameter, and `NZ₂` picks a preimage exactly as the textbook does. The readout `RZ₂(x) = CHO(HO⁻¹(RZ₁(HS(x))))` is formalized through `Option.map`, so partial readouts are allowed where the textbook assumes totality. The three cardinality conclusions become injectivity of `Function.surjInv` of the three maps: an explicit injection replaces cardinal comparison, which is the same content constructively and avoids introducing cardinals for a statement that is only used qualitatively.
+* **A1.189.** `ChoiceFunction.ofNonempty` proves `CHF(A) ≠ ∅` using `Classical.choice`. Lean's ambient choice would let 4.72 and 4.74 dispense with the parameter entirely; it is retained so that the formalization mirrors the textbook's hypotheses and so that A1.189 has a traceable Lean anchor.
+
+### Comparison Summary
+The constructions are faithful; the deviations are (a) the `Option` step in 4.71's state space, (b) nonempty blocks in 4.72 (necessary, implicitly assumed), (c) derived rather than assumed injectivity of `F`, (d) `RNG(H) = X` modeled as surjectivity onto a fixed codomain, and (e) cardinality inequalities modeled as explicit injections.
+
+---
+
+## 34. Exercise 4.83: which triple is the isomorphism
+
+### Textbook Statement
+> If `Z₁` and `Z₂` are finite systems, `Z₁ = HIMSY(Z₂, HS₁, HI₁, HO₁)` and `Z₂ = HIMSY(Z₁, HS₂, HI₂, HO₂)`, then `Z₁ = ISY(Z₂, HS₂, HI₂, HO₂)`.
+
+### Lean 4 Representation
+```lean
+noncomputable def mutualHomomorphism_isomorphismWitness
+    (hfin : IsFinite Z2) (h1 : HomomorphicImageWitness Z1 Z2)
+    (h2 : HomomorphicImageWitness Z2 Z1) : IsomorphismWitness Z1 Z2 :=
+  { toHomomorphicImageWitness := h1
+    HS_injective :=
+      (Finite.injective_iff_surjective.mpr (h2.HS_surjective.comp h1.HS_surjective)).of_comp
+    … }
+```
+
+### Proof Analysis
+In our convention (§20) a witness for `Z₁ = HIMSY(Z₂, …)` has `HS : SZ₂ → SZ₁`, so `HS₂` points from `SZ₁` to `SZ₂` and cannot be the state map of an isomorphism `Z₁ = ISY(Z₂, …)`. The triple that works is `(HS₁, HI₁, HO₁)`, and the conclusion `Z₁ = ISY(Z₂, HS₂, HI₂, HO₂)` reads as a subscript slip in the textbook. The proof is the standard finiteness argument: `HS₂ ∘ HS₁ : SZ₂ → SZ₂` is surjective, hence injective because `SZ₂` is finite, hence `HS₁` is injective.
+
+### Comparison Summary
+Two deviations. **Erratum:** the isomorphism is witnessed by the first triple, not the second. **Weakened hypothesis:** only `Z₂` need be finite — the composite lives on `Z₂`'s state, input and output sets. `IsFinite Z1` is kept in the signature as `_hfin1` so the statement still matches the textbook's hypotheses.
+
+---
+
+## 35. Exercise 4.85: rearrangement read through a renaming
+
+### Textbook Statement
+> `VSCR$ = (Z_F(1), …, Z_F(n))`, `CSCR$ = CSCR`; then `UISCR = UISCR$`, `UOSCR = UOSCR$`, and `Z@$ = ISY(Z@, HS, HI, HO)` with `PJNᵢ(x$) = PJN_F(i)(x)` and `HI`, `HO` the identity on the external ports.
+
+### Lean 4 Representation
+`reindexVector V F` precomposes every field with `F`. Because the tagged-port types `Σ i, Port i` of the two recipes are *different types*, "`CSCR$ = CSCR`" cannot be an equation; it becomes a preimage:
+
+```lean
+def reindexCSCR (SCR : SystemCouplingRecipe n) (F : Fin n ≃ Fin n) :
+    Set (… × …) := { p | (reindexOutTag SCR.VSCR F p.1, reindexInTag SCR.VSCR F p.2) ∈ SCR.CSCR }
+```
+
+with `reindexOutTag`/`reindexInTag` the renamings `Equiv.sigmaCongrLeft F`. Likewise `UISCR = UISCR$` becomes the biconditional `reindex_mem_uiscr` plus the subtype equivalence `reindexUnconnIn`.
+
+### Proof Analysis
+`HS`, `HI` and `HO` are definitionally the inverses of `Equiv.piCongrLeft` instances (`reindexHS_eq` and friends are `rfl`), so all six bijectivity obligations are discharged by `Equiv` lemmas rather than by hand. The work is in `preserves_transition`, which needs `reindex_component_input`: resolving the input of component `i` in the rearranged recipe gives the same value as resolving it in the original. Since `rsy_component_input_fun` is defined by `Classical.choose` on the feeding output port, the proof cannot proceed by `simp`; the helper `rsy_component_input_of_conn` re-expresses it with the feeding port *named*, and `connectedOutput_eq` supplies the uniqueness that makes the two choices agree.
+
+### Comparison Summary
+Faithful, with one **generalization**: the textbook restricts to `n ∈ IJS[2, ∞)`, while the Lean statement holds for every `n`. The renaming of tagged ports is a DTT bookkeeping obligation with no set-theoretic counterpart — in the textbook `CSCR$` and `CSCR` are literally the same set of pairs of labels.
+
+---
+
+## 36. Exercise 4.86: flattening nested resultants
+
+### Textbook Statement
+> `Zᵢ = RSY(SCRᵢ)`, `VSCR$ = (Z₁₁, …, Z₁m₁, …, Zₙ₁, …, Zₙmₙ)`, `CSCR$ = {(OP@(SCRᵢ, Zᵢ)(OhZᵢ), IP@(SCRk, Zk)(IjZk)) : (OhZᵢ, IjZk) ∈ CSCR} ∪ {CSCRᵢ : i ∈ IJS[1, n]}`; then `Z@ = ISY(Z@$, HS, HI, HO)` where `HS` regroups `(x₁₁, …, xₙmₙ)` into `((x₁₁, …, x₁m₁), …, (xₙ₁, …, xₙmₙ))` and `HI = ID(IZ@$)`, `HO = ID(OZ@$)`.
+
+### Lean 4 Representation
+[Mbse/NestedCoupling.lean](Mbse/NestedCoupling.lean). Component indices of the flattened recipe are `Fin (∑ i, mᵢ)`, identified with `Σ i : Fin n, Fin mᵢ` by `finSigmaFinEquiv` — whose ordering is the lexicographic one the textbook writes out. All constructions are phrased on the dependent-pair form and transported:
+
+| Textbook | Lean |
+|---|---|
+| `VSCR = (RSY(SCR₁), …, RSY(SCRₙ))` | `nestVector`, with `Port i = UnconnInPort (sub i)` |
+| `SCR`, `Z@` | `nestRecipe`, `rsy (nestRecipe N) (nest_hOut N)` |
+| `VSCR$` | `flatVector`, indexed by `Fin (∑ i, mᵢ)` |
+| `OP@` / `IP@` (Thm 3.121) | the subtype projection `Q ↦ Q.val` |
+| `CSCR$` | `flatPairs` (internal ∪ external), transported to `flatCSCR` |
+| `HS` | `flatHS`, the inverse of `Equiv.piCongrLeft` composed with `Equiv.piCurry` |
+| `HI`, `HO` | identity read through `flatUnconnIn` / `flatUnconnOut` |
+
+### Proof Analysis
+* **`OP@` and `IP@` disappear.** In the textbook these are the Theorem 3.121 maps that name an external port of a resultant as a port of the component carrying it. Here the input ports of `RSY(SCRᵢ)` *are* the subtype `UnconnInPort SCRᵢ`, so the external clause of `CSCR$` is simply `(⟨oo.1, oo.2.val⟩, ⟨ii.1, ii.2.val⟩)`.
+* **Connectable-vector hypotheses are explicit.** `NestedComponents` carries `distinctOuter` (for `VSCR`) and `distinctInner` (for `VSCR$`) as `¬ HEq` conditions, matching the treatment of `PortSystemVector.distinct` in §24. It also carries `hOut`, the standing requirement of `rsy` that components have total readouts; `rsy_alwaysOutputs` shows the outer level inherits it, so nesting is closed under the requirement.
+* **External ports.** `flat_mem_uiscr_iff` says a flat port is unconnected exactly when it is unconnected inside its own `SCRᵢ` *and* the induced external port of `Zᵢ` is unconnected in the outer recipe. The textbook takes `IZ@$ = IZ@` for granted; here it is a two-level case analysis, and the resulting `flatUnconnIn`/`flatUnconnOut` equivalences are what let `HI` and `HO` be "the identity".
+* **The mathematical heart** is `flat_component_input`: resolving a component input in one step through `CSCR$` equals resolving it in two steps (the external input of `Zᵢ = RSY(SCRᵢ)` through `CSCR`, then the input inside `SCRᵢ`). It splits into three cases — internally connected, externally connected, unconnected at both levels — each needing the feeding output port to be named (`rsy_component_input_of_conn`) and the readouts to be transported along tag equalities (`outAt_tag_congr`). The textbook asserts the corresponding step without proof.
+* **Direction.** Our witness is `IsomorphismWitness (rsy (flatRecipe N) …) (rsy (nestRecipe N) …)`, i.e. `Z@$ = ISY(Z@, HS⁻¹, HI⁻¹, HO⁻¹)` in textbook notation, since our `HS` runs `SZ@ → SZ@$` (uncurrying). By Theorem 4.38 this is equivalent to the textbook's `Z@ = ISY(Z@$, HS, HI, HO)`, and `ex4_86_nested_coupling_isomorphic` states both directions explicitly. (The textbook's own conclusion is written `ISY(Z@$, HS, HI, HO, Z@)` with a spurious fifth argument.)
+
+### Comparison Summary
+The set-theoretic flattening is a one-line re-indexing; in DTT it costs an index equivalence (`finSigmaFinEquiv`), two port-tag equivalences (`Equiv.sigmaCongrLeft` composed with `Equiv.sigmaAssoc`), a full connectivity proof for the union `CSCR$`, and the two-level input-resolution lemma. No hypothesis of the textbook was weakened or strengthened, but three of its silent assumptions — connectable-vector distinctness at both levels, total component readouts, and the identification of external ports across the two levels — became explicit data or proved lemmas.
+
+---
+
+## 37. Chapter 4 deviation summary
+
+| Item | Type of deviation | Note |
+|---|---|---|
+| Def 4.27 / 4.47 | Generalization | Port bijection `σ : Port₂ ≃ Port₁` replaces shared `IJS[1, #IP]` indexing; permuting copies are now expressible (`swap_isCopyOf_permuting`) |
+| Thm 4.45, Ex 4.84 (iii) | Disambiguation | `[∀ p, Nonempty (Val₂ p)]` is required for factorwise injectivity and hence for symmetry of `COPY` |
+| Def 3.90 | Fidelity correction | "Null order" is "has no order", not "not of order 0"; needed for Ex 4.66 to be true |
+| Thm 4.56 | Disambiguation | "Same connectivity" = shared port skeleton with literally the same `CSCR`; `compat` (connected ports carry equal value sets) made explicit; `HOⱼᵢ = HIₘₖ` is a `HEq` |
+| Cor 4.59 | Direction | Proved as `IsCopyOf Z@ Z@$`; equals the textbook direction by Ex 4.84 symmetry (with §27's side condition) |
+| Thm 4.58 | Generalization | Recoding an arbitrary family of output ports; the single-port replacement is an instance; `DecidableEq OutPort` needed for the by-cases value family |
+| Ex 4.66 | Disambiguation + erratum | Set `M` becomes an injective enumeration; the `CSCR$` clause is reading-independent (its "`B ∈ IPZ$`" mixes up the two coordinates); `HS` onto needs an explicit state extension |
+| Ex 4.69 | Answer | The assertion is **false**; counterexample formalized both concretely and as a refutation |
+| Ex 4.71 | Encoding | State space also admits the `Option` autonomous step |
+| Ex 4.72 | Added hypothesis | Blocks must be nonempty (implicit in the textbook); `1TO1` for `F` is derived, not assumed |
+| Ex 4.74 | Encoding | `RNG(H) = X` as surjectivity; `#SZ₂ ≥ #SZ₁` as an explicit injective section; readout through `Option.map` |
+| A1.189 | Redundant but retained | `CHF(A) ≠ ∅` follows from `Classical.choice`; the parameter is kept for faithfulness and traceability |
+| Ex 4.83 | Erratum + weakening | The isomorphism is the *first* triple; only the second system need be finite |
+| Ex 4.85 | Generalization + encoding | Any `n` (not `n ≥ 2`); `CSCR$ = CSCR` becomes a preimage under a tagged-port renaming |
+| Ex 4.86 | Explicit assumptions | `OP@`/`IP@` are subtype projections; connectable-vector distinctness and total readouts are explicit; the two-level input-resolution step is proved, not assumed; both isomorphism directions stated |
+
+**Cross-cutting.** Every Chapter 4 relation follows the pattern of §16–§17: a `structure` of witness data plus a `Prop` obtained by `Nonempty`. `ONTO` is always modeled as surjectivity onto a fixed codomain, `1TO1` as `Function.Injective`, and inverse maps are built with `Equiv.ofBijective`, which is why the symmetry proofs (Thm 4.38, Ex 4.84) are `noncomputable`. All the new results depend only on `propext`, `Classical.choice` and `Quot.sound`.
