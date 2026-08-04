@@ -1,0 +1,19 @@
+{
+  "id": "3.124",
+  "kind": "theorem_proof",
+  "name": "Simple cascade RSY",
+  "chapter": 3,
+  "description": "Exercise 3.124: simple cascade SCR with O2Z1 → I1Z2; resultant NZ and readout align with component systems via rsy_NZ and componentReadoutAt. Homogeneous component encoding: see proof_comparison_report §23.",
+  "elements": [
+    {
+      "id": "3.124/theorem/simple_cascade_rsy",
+      "type": "theorem",
+      "text": "RSY(SCR) next-state and readout match Z1/Z2' on external inputs and connected ports."
+    },
+    {
+      "id": "3.124/theorem/is_cascade",
+      "type": "theorem",
+      "text": "The simple cascade SCR satisfies IsCascade."
+    }
+  ]
+}

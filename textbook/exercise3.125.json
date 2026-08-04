@@ -1,0 +1,19 @@
+{
+  "id": "3.125",
+  "kind": "theorem_proof",
+  "name": "Simple pure feedback RSY",
+  "chapter": 3,
+  "description": "Exercise 3.125: simple pure feedback SCR (n=1) with O2Z1 → I2Z1; resultant dynamics match Z1 with feedback readout on port 1.",
+  "elements": [
+    {
+      "id": "3.125/theorem/simple_feedback_rsy",
+      "type": "theorem",
+      "text": "RSY(SCR) NZ and readout match Z1 with external input on port 0 and feedback from port 1."
+    },
+    {
+      "id": "3.125/theorem/is_pure_feedback",
+      "type": "theorem",
+      "text": "The simple feedback SCR satisfies IsPureFeedback."
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import Mbse.WymoreCore
 import Mbse.Trajectory
 import Mbse.WymoreTactics
 import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.BigOperators
 
 theorem fin_nat_card_le_of_le {m n : Nat} (h : n ≤ m) :
     Fintype.card (Fin n) ≤ Fintype.card (Fin m) := by
@@ -207,6 +208,19 @@ def portReadout {SZ IZ OutPort : Type} {OutPortVal : OutPort → Type}
     (Z : DiscreteSystem SZ IZ ((op : OutPort) → OutPortVal op)) (op : OutPort) :
     SZ → Option (OutPortVal op) :=
   fun s => (Z.RZ s).map (PJN op)
+
+/--
+  Total readout on output port `op` when `AlwaysOutputs` holds (textbook `RjZi(x)`).
+-/
+noncomputable def componentReadoutAt {SZ IZ OutPort : Type} {OutPortVal : OutPort → Type}
+    (Z : DiscreteSystem SZ IZ ((op : OutPort) → OutPortVal op))
+    (hOut : AlwaysOutputs Z) (op : OutPort) (x : SZ) : OutPortVal op :=
+  Classical.choose (hOut x) op
+
+lemma componentReadoutAt_eq_choose {SZ IZ OutPort : Type} {OutPortVal : OutPort → Type}
+    (Z : DiscreteSystem SZ IZ ((op : OutPort) → OutPortVal op))
+    (hOut : AlwaysOutputs Z) (op : OutPort) (x : SZ) :
+    componentReadoutAt Z hOut op x = Classical.choose (hOut x) op := rfl
 
 /--
   [textbook/definition2.62/definition/output_ports]
@@ -979,6 +993,12 @@ noncomputable def rsyOutAt {n : Nat} (SCR : SystemCouplingRecipe n)
     (op : Σ (i : Fin n), SCR.VSCR.OutPort i) : SCR.VSCR.OutPortVal op.1 op.2 :=
   csyOut SCR.VSCR hOut x op
 
+lemma rsyOutAt_eq_componentReadoutAt {n : Nat} (SCR : SystemCouplingRecipe n)
+    (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i)) (i : Fin n)
+    (op : SCR.VSCR.OutPort i) (x : rsy_SZ SCR) :
+    rsyOutAt SCR hOut x ⟨i, op⟩ = componentReadoutAt (SCR.VSCR.Z i) (hOut i) op (x i) := by
+  dsimp [rsyOutAt, csyOut, componentReadoutAt]
+
 /--
   [textbook/definition3.47/definition/component_input]
   Resolve the input function for component `i` from external inputs and feedback wiring.
@@ -1386,6 +1406,209 @@ noncomputable def finArrowOneEquiv (A : Type) : (Fin 1 → A) ≃ A where
   invFun a := fun _ => a
   left_inv f := funext (fun i => by have hi := Trajectory.fin_one_eq i 0; subst hi; rfl)
   right_inv _ := rfl
+
+/--
+  Product state `Fin 2 → A` is equivalent to `A × A` (Exercise 3.124/3.126 two-component layouts).
+-/
+noncomputable def finArrowTwoEquiv (A : Type) : (Fin 2 → A) ≃ A × A where
+  toFun f := (f 0, f 1)
+  invFun ab i :=
+    match i with
+    | ⟨0, _⟩ => ab.1
+    | ⟨1, _⟩ => ab.2
+  left_inv f := funext (fun i => by
+    match i with
+    | ⟨0, h0⟩ => simp
+    | ⟨1, h1⟩ => simp)
+  right_inv _ := rfl
+
+lemma mem_uiscr_of_not_mem_ciscr {n : Nat} (SCR : SystemCouplingRecipe n)
+    (ip : Σ (i : Fin n), SCR.VSCR.Port i) (hC : ip ∉ CISCR SCR) :
+    ip ∈ UISCR SCR := by
+  simpa [UISCR, CISCR] using hC
+
+lemma mem_uoscr_of_not_mem_coscr {n : Nat} (SCR : SystemCouplingRecipe n)
+    (op : Σ (i : Fin n), SCR.VSCR.OutPort i) (hC : op ∉ COSCR SCR) :
+    op ∈ UOSCR SCR := by
+  simpa [UOSCR, COSCR] using hC
+
+/-!
+  Uniform `Nat → Nat` IO for heterogeneous port arities inside `PortSystemVector` (Exercises 3.124–3.126).
+  SCR port metadata uses `Nat` indices; `uniformNatPortWrap` decodes to `Fin n → Nat` component ports.
+-/
+
+/-- Decode uniform input `inp : Nat → Nat` into `Fin n → Nat` (indices `≥ n` read as `inp k` only for `k < n`). -/
+def uniformNatPortDecode (n : Nat) (inp : Nat → Nat) : Fin n → Nat :=
+  fun i => inp i.val
+
+/-- Encode `Fin nOut → Nat` readout into uniform `Nat → Nat` output (higher indices default to `0`). -/
+def uniformNatPortEncode (nOut : Nat) (out : Fin nOut → Nat) : Nat → Nat :=
+  fun k => if hk : k < nOut then out ⟨k, hk⟩ else 0
+
+/--
+  Wrap a `Fin nIn → Nat` / `Fin nOut → Nat` system as `DiscreteSystem Nat (Nat → Nat) (Nat → Nat)`.
+-/
+def uniformNatPortWrap (nIn nOut : Nat)
+    (Z : DiscreteSystem Nat (Fin nIn → Nat) (Fin nOut → Nat)) :
+    DiscreteSystem Nat (Nat → Nat) (Nat → Nat) where
+  sz_nonempty := Z.sz_nonempty
+  NZ := fun s oi =>
+    match oi with
+    | none => Z.NZ s none
+    | some inp => Z.NZ s (some (uniformNatPortDecode nIn inp))
+  RZ := fun s => (Z.RZ s).map (uniformNatPortEncode nOut)
+
+@[simp] lemma uniformNatPortWrap_NZ_none (nIn nOut : Nat)
+    (Z : DiscreteSystem Nat (Fin nIn → Nat) (Fin nOut → Nat)) (s : Nat) :
+    (uniformNatPortWrap nIn nOut Z).NZ s none = Z.NZ s none := rfl
+
+@[simp] lemma uniformNatPortWrap_NZ_some (nIn nOut : Nat)
+    (Z : DiscreteSystem Nat (Fin nIn → Nat) (Fin nOut → Nat)) (s : Nat) (inp : Nat → Nat) :
+    (uniformNatPortWrap nIn nOut Z).NZ s (some inp) =
+      Z.NZ s (some (uniformNatPortDecode nIn inp)) := rfl
+
+lemma uniformNatPortWrap_alwaysOutputs (nIn nOut : Nat)
+    (Z : DiscreteSystem Nat (Fin nIn → Nat) (Fin nOut → Nat))
+    (hOut : AlwaysOutputs Z) :
+    AlwaysOutputs (uniformNatPortWrap nIn nOut Z) := by
+  intro s
+  obtain ⟨out, ho⟩ := hOut s
+  refine ⟨uniformNatPortEncode nOut out, ?_⟩
+  simp [uniformNatPortWrap, ho]
+
+@[simp] lemma uniformNatPortEncode_lt (nOut : Nat) (out : Fin nOut → Nat) (op : Fin nOut) :
+    uniformNatPortEncode nOut out op = out op := by
+  simp [uniformNatPortEncode]
+
+@[simp] lemma uniformNatPortEncode_nat_lt (nOut : Nat) (out : Fin nOut → Nat) (op : Nat)
+    (hop : op < nOut) :
+    uniformNatPortEncode nOut out op = out ⟨op, hop⟩ := by
+  simp [uniformNatPortEncode, hop]
+
+lemma uniformNatPortWrap_readoutAt (nIn nOut : Nat)
+    (Z : DiscreteSystem Nat (Fin nIn → Nat) (Fin nOut → Nat))
+    (hOut : AlwaysOutputs Z) (op : Fin nOut) (x : Nat) :
+    uniformNatPortEncode nOut (Classical.choose (hOut x)) op =
+      componentReadoutAt Z hOut op x := by
+  simp [uniformNatPortEncode, componentReadoutAt]
+
+lemma uniformNatPortWrap_choose_encode (nIn nOut : Nat)
+    (Z : DiscreteSystem Nat (Fin nIn → Nat) (Fin nOut → Nat))
+    (hOut : AlwaysOutputs Z) (x : Nat) :
+    Classical.choose (uniformNatPortWrap_alwaysOutputs nIn nOut Z hOut x) =
+      uniformNatPortEncode nOut (Classical.choose (hOut x)) := by
+  obtain ⟨o, ho⟩ := hOut x
+  have heq : o = Classical.choose (hOut x) :=
+    Option.some_injective _ (ho.symm.trans (Classical.choose_spec (hOut x)))
+  have hwrap := uniformNatPortWrap_alwaysOutputs nIn nOut Z hOut
+  have hRZ : (uniformNatPortWrap nIn nOut Z).RZ x = some (uniformNatPortEncode nOut o) := by
+    dsimp only [uniformNatPortWrap]
+    simp only [ho, Option.map_some]
+  have hchoose_w : Classical.choose (hwrap x) = uniformNatPortEncode nOut o :=
+    Option.some_injective _ ((Classical.choose_spec (hwrap x)).symm.trans hRZ)
+  rw [hchoose_w, congr_arg (uniformNatPortEncode nOut) heq]
+
+lemma uniformNatPortWrap_NZ_fin (nIn nOut : Nat)
+    (Z : DiscreteSystem Nat (Fin nIn → Nat) (Fin nOut → Nat)) (s : Nat) (f : Fin nIn → Nat) :
+    (uniformNatPortWrap nIn nOut Z).NZ s
+        (some (fun k => if h : k < nIn then f ⟨k, h⟩ else 0)) =
+      Z.NZ s (some f) := by
+  simp [uniformNatPortWrap_NZ_some]
+  congr 1
+  apply congr_arg some
+  funext i
+  dsimp [uniformNatPortDecode]
+  simp [i.isLt]
+
+lemma uniformNatPortWrap_distinct {nIn mIn nOut mOut : Nat}
+    (hlt : nIn < mIn)
+    (Z : DiscreteSystem Nat (Fin nIn → Nat) (Fin nOut → Nat))
+    (Z' : DiscreteSystem Nat (Fin mIn → Nat) (Fin mOut → Nat))
+    (hDep : DependsOnInputPort Z' ⟨nIn, hlt⟩) :
+    ¬ HEq (uniformNatPortWrap nIn nOut Z) (uniformNatPortWrap mIn mOut Z') := by
+  intro h
+  rcases hDep with ⟨s, f, v, hne⟩
+  let inp : Nat → Nat := fun k =>
+    if hk : k < mIn then f ⟨k, hk⟩ else 0
+  let inp' : Nat → Nat := fun k =>
+    if hk : k < mIn then
+      if k = nIn then v else f ⟨k, hk⟩
+    else 0
+  have hNZ := congrArg DiscreteSystem.NZ (eq_of_heq h)
+  have hleft' :
+      (uniformNatPortWrap nIn nOut Z).NZ s (some inp) =
+        Z.NZ s (some (uniformNatPortDecode nIn inp)) := by
+    simp [uniformNatPortWrap_NZ_some]
+  have hright' :
+      (uniformNatPortWrap mIn mOut Z').NZ s (some inp) =
+        Z'.NZ s (some (uniformNatPortDecode mIn inp)) := by
+    simp [uniformNatPortWrap_NZ_some]
+  have hdecode : uniformNatPortDecode mIn inp = f := by
+    funext i
+    dsimp [inp, uniformNatPortDecode]
+    simp [i.isLt]
+  have hleft :
+      (uniformNatPortWrap nIn nOut Z).NZ s (some inp') =
+        Z.NZ s (some (uniformNatPortDecode nIn inp')) := by
+    simp [uniformNatPortWrap_NZ_some]
+  have hright :
+      (uniformNatPortWrap mIn mOut Z').NZ s (some inp') =
+        Z'.NZ s (some (uniformNatPortDecode mIn inp')) := by
+    simp [uniformNatPortWrap_NZ_some]
+  have hdecode' : uniformNatPortDecode mIn inp' = Function.update f ⟨nIn, hlt⟩ v := by
+    funext i
+    dsimp [inp', uniformNatPortDecode]
+    rcases i with ⟨val, hi⟩
+    by_cases hval : val = nIn
+    · subst hval
+      simp [Function.update, hi]
+    · have hne' : val ≠ nIn := hval
+      simp [Function.update, hne', hi]
+  have hdecodeIn : uniformNatPortDecode nIn inp' = uniformNatPortDecode nIn inp := by
+    funext i
+    dsimp [inp, inp', uniformNatPortDecode]
+    rcases i with ⟨val, hv⟩
+    have hne' : val ≠ nIn := Nat.ne_of_lt hv
+    simp [hne']
+  have hs' := congrFun (congrFun hNZ s) (some inp)
+  have hs := congrFun (congrFun hNZ s) (some inp')
+  have hinp :
+      (uniformNatPortWrap nIn nOut Z).NZ s (some inp) =
+        (uniformNatPortWrap nIn nOut Z).NZ s (some inp') := by
+    rw [uniformNatPortWrap_NZ_some, uniformNatPortWrap_NZ_some, hdecodeIn]
+  have hf :
+      Z'.NZ s (some f) = Z'.NZ s (some (Function.update f ⟨nIn, hlt⟩ v)) := by
+    have h₁ : Z.NZ s (some (uniformNatPortDecode nIn inp)) = Z'.NZ s (some f) := by
+      calc Z.NZ s (some (uniformNatPortDecode nIn inp))
+          = (uniformNatPortWrap nIn nOut Z).NZ s (some inp) := by rw [hleft']
+        _ = (uniformNatPortWrap mIn mOut Z').NZ s (some inp) := hs'
+        _ = Z'.NZ s (some (uniformNatPortDecode mIn inp)) := by rw [hright']
+        _ = Z'.NZ s (some f) := by rw [hdecode]
+    have h₂ : Z.NZ s (some (uniformNatPortDecode nIn inp)) =
+        Z'.NZ s (some (Function.update f ⟨nIn, hlt⟩ v)) := by
+      calc Z.NZ s (some (uniformNatPortDecode nIn inp))
+          = (uniformNatPortWrap nIn nOut Z).NZ s (some inp) := by rw [hleft']
+        _ = (uniformNatPortWrap nIn nOut Z).NZ s (some inp') := hinp
+        _ = (uniformNatPortWrap mIn mOut Z').NZ s (some inp') := hs
+        _ = Z'.NZ s (some (uniformNatPortDecode mIn inp')) := by rw [hright]
+        _ = Z'.NZ s (some (Function.update f ⟨nIn, hlt⟩ v)) := by rw [hdecode']
+    exact h₁.symm.trans h₂
+  exact hne hf
+
+lemma rsy_two_component_input_uiscr {n : Nat} (SCR : SystemCouplingRecipe n)
+    (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k)) (i : Fin n) (extIn : rsy_IZ SCR)
+    (x : rsy_SZ SCR) (port : SCR.VSCR.Port i) (hU : ⟨i, port⟩ ∈ UISCR SCR) :
+    rsy_component_input_fun SCR hOut i extIn x port = extIn ⟨⟨i, port⟩, hU⟩ :=
+  rsy_component_input_uiscr SCR hOut i extIn x port hU
+
+lemma rsy_two_component_input_ciscr {n : Nat} (SCR : SystemCouplingRecipe n)
+    (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k)) (i : Fin n) (extIn : rsy_IZ SCR)
+    (x : rsy_SZ SCR) (port : SCR.VSCR.Port i) (hC : ⟨i, port⟩ ∈ CISCR SCR) :
+    rsy_component_input_fun SCR hOut i extIn x port =
+      let op := connectedOutput SCR ⟨i, port⟩ hC
+      have hop : (op, ⟨i, port⟩) ∈ SCR.CSCR := connectedOutput_spec SCR ⟨i, port⟩ hC
+      SCR.connectivity.2.2.2 op ⟨i, port⟩ hop ▸ rsyOutAt SCR hOut x op :=
+  rsy_component_input_ciscr SCR hOut i extIn x port hC
 
 noncomputable def singularStateEquiv {SZ Port OutPort : Type}
     (PortVal : Port → Type) (OutPortVal : OutPort → Type)

@@ -1,0 +1,19 @@
+{
+  "id": "3.126",
+  "kind": "theorem_proof",
+  "name": "Simple mixed RSY",
+  "chapter": 3,
+  "description": "Exercise 3.126: simple mixed SCR combining cascade O2Z1 → I1Z2 and feedback OZ2 → I1Z1; resultant NZ and readout alignment for both components. Encoding and readout audit: proof_comparison_report §23–§25.",
+  "elements": [
+    {
+      "id": "3.126/theorem/simple_mixed_rsy",
+      "type": "theorem",
+      "text": "RSY(SCR) next-state at both time indices and readout on Z1 port 0 match component dynamics."
+    },
+    {
+      "id": "3.126/theorem/mixed_readout_audit",
+      "type": "theorem",
+      "text": "Lean proves R1Z1 at state x(0); textbook cites x(2) — documented as likely typo."
+    }
+  ]
+}

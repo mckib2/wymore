@@ -26,9 +26,10 @@ This report compiles the analyses of the proofs of core theorems in Wayne Wymore
 19. [Theorem 4.15: Fundamental Theorem (Forward / Reverse Split)](#19-theorem-415-fundamental-theorem-forward--reverse-split)
 20. [Textbook ↔ Lean Naming Convention Table](#20-textbook--lean-naming-convention-table)
 21. [Meta-Analysis and Synthesis](#21-meta-analysis-and-synthesis)
-
-
----
+22. [Proof Automation (Lemma Library and Tactics)](#22-proof-automation-lemma-library-and-tactics)
+23. [Homogeneous SCR component encoding (Exercises 3.124–3.126)](#23-homogeneous-scr-component-encoding-exercises-31243126)
+24. [PortSystemVector.distinct without type injectivity axioms](#24-portsystemvectordistinct-without-type-injectivity-axioms)
+25. [Exercise 3.126 readout index and §3.70 coupling convention](#25-exercise-3126-readout-index-and-370-coupling-convention)
 
 ## 1. Theorem 2.25: Closure of Complete Input Trajectories
 
@@ -791,6 +792,9 @@ Wymore's textbook features explicit theorems for function extensionality (Theore
 ### 4. Erratum Isolation
 Textbooks written in informal set theory are susceptible to cross-referencing and numbering errata, as observed in Theorem 2.32 (where set preimage lemmas A1.249 and A1.250 are erroneously cited for function composition). In Lean, the compiler enforces strict type checking. If a proof contains an invalid cross-reference, compilation fails, ensuring that only logically consistent proofs are admitted.
 
+### 5. Encoding options for heterogeneous SCR exercises
+Exercises 3.124–3.126 pair components with different port arities (2-in/2-out vs 3-in/1-out). Rather than type-injectivity axioms on `Fin n → Nat`, Lean stores homogeneous `DiscreteSystem Nat (Nat → Nat) (Nat → Nat)` in `PortSystemVector.Z` via `uniformNatPortWrap`, while SCR metadata (`Port`, `CSCR`) keeps numeric port indices. See §23–§25.
+
 ---
 
 ## 22. Proof Automation (Lemma Library and Tactics)
@@ -809,3 +813,54 @@ Recurring proof families in `Wymore.lean` and `Homomorphism.lean` are captured i
 | Pure-feedback index collapse | `fin_one_eq`, `fin_one_indices_eq` | — |
 
 **Pilot refactors:** The eight target theorems (`morphism_preserves_*`, time invariance, nonanticipatory, `csy_*`, `varyingOutput_iff_card_rng`, `pure_feedback_not_other`, `homomorphic_image_eq_himsy`) now delegate to `Trajectory` lemmas or one-line `exact` calls. `Homomorphism.lean` uses `map_preserves_state_trajectory` and `choose_preimage`/`choose_some_map` in Theorem 4.15; `FiniteWymore.lean` continues to delegate via `_root_.` / `Homomorphism.*` wrappers without duplicating tactics.
+
+---
+
+## 23. Homogeneous SCR component encoding (Exercises 3.124–3.126)
+
+### Textbook Statement
+Exercises 3.124–3.126 specify components Z1 (two inputs, two outputs) and Z2′ (three inputs, one output) coupled by cascade and/or feedback. Port labels are identified across `IPZ@`, `IPZ&`, and component ports without chaining `INIP` maps (Scholium §3.70).
+
+### Lean 4 Representation
+* SCR topology unchanged: `Port` / `OutPort` are `Nat` indices; `CSCR` pairs such as `⟨0,1⟩` (O2Z1 → I1Z2) are metadata.
+* Internal `PortSystemVector.Z i` uses `uniformNatPortWrap` so every slot has type `DiscreteSystem Nat (Nat → Nat) (Nat → Nat)` ([Mbse/Wymore.lean](Mbse/Wymore.lean), [Mbse/TextbookExercises/Ch03.lean](Mbse/TextbookExercises/Ch03.lean)).
+* Public theorem signatures still use heterogeneous `Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat)` and `Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat)`.
+* `uniformNatPortDecode` maps uniform input to `Fin n` ports via `inp i.val`.
+
+### Proof Analysis
+RSY proofs use `uniformNatPortWrap_NZ_some` and recover textbook inputs via `uniformNatPortDecode` and `fin_cases`. Readouts use `uniformNatPortWrap_choose_encode` and `uniformNatPortEncode_nat_lt`.
+
+### Comparison Summary
+Textbook heterogeneous arities live in SCR wiring and theorem statements; Lean homogeneous typing follows the Exercise 3.118 pattern and avoids dependent-type injectivity axioms on `Fin n → Nat`. Exercise 3.125 uses the same `uniformNatPortWrap 2 2` encoding for its single component (`n = 1`); no `distinct` proof is required.
+
+---
+
+## 24. PortSystemVector.distinct without type injectivity axioms
+
+### Textbook Statement
+`PortSystemVector.distinct` requires pairwise distinct components under extensional equality (`HEq`).
+
+### Lean 4 Representation
+* `uniformNatPortWrap_distinct` (arity `nIn < mIn` + `DependsOnInputPort Z' ⟨nIn, hlt⟩`) proves `¬ HEq` of wrapped systems ([Mbse/Wymore.lean](Mbse/Wymore.lean)).
+* `DependsOnInputPort Z p` — port `p` can affect `NZ`.
+* `ex3_124_Z_distinct` applies `uniformNatPortWrap_distinct` with `2 < 3` and `hPort2 : DependsOnInputPort Z2' 2`.
+
+### Proof Analysis
+Former axioms `fin_arrow_nat_domain_eq` / `discreteSystem_type_iz_eq` were removed. Distinctness is behavioral (decode + `NZ` inequality), not type-index injectivity.
+
+### Comparison Summary
+Degenerate Z2′ that ignores port 2 is excluded by the port-sensitivity hypothesis, matching exercise wiring where port 2 carries external inputs.
+
+---
+
+## 25. Exercise 3.126 readout index and §3.70 coupling convention
+
+### Textbook Statement
+Exercise 3.126 cites readout `R1Z1(x(2))`; the cascade connects OZ2 to I1Z1. §3.70 simplifies coupling functions on tagged port labels.
+
+### Lean 4 Representation
+* `ex3_126_readout_is_R1Z1_x1` proves readout at `⟨0,0⟩` equals `R1Z1(x(0))` — documented as likely textbook typo ([Mbse/TextbookExercises/Ch03.lean](Mbse/TextbookExercises/Ch03.lean), [textbook/exercise3.126.json](textbook/exercise3.126.json)).
+* Tagged union `Σ (i, port)` ports, `rsy_component_input_fun` UISCR/CISCR branching, and identity open-loop maps align with §3.70; homogeneous wrap only changes internal `Z i` typing.
+
+### Comparison Summary
+SCR-level port identification is unchanged; `uniformNatPortWrap` supplies uniform `Nat → Nat` component boundaries while `CSCR` / `UISCR` resolve which label is which.

@@ -2,9 +2,12 @@ import Mbse.Wymore
 import Mbse.WymoreCouplingStructure
 import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Data.Fin.Basic
+import Mathlib.Tactic.FinCases
 
 /-!
-# Chapter 3 — coupling recipe exercises (3.113–3.123)
+# Chapter 3 — coupling recipe exercises (3.113–3.126)
+
+Encoding choices for exercises 3.124–3.126 (homogeneous `uniformNatPortWrap`, `DependsOnInputPort`, distinctness) are documented in [proof_comparison_report.md](proof_comparison_report.md) §23–§25.
 -/
 
 namespace Mbse.TextbookExercises.Ch03
@@ -344,5 +347,643 @@ abbrev ex3_122_every_system_is_resultant {SZ Port OutPort : Type}
 abbrev ex3_123_conjunctive_rsy_eq_csy {n : Nat} (SCR : SystemCouplingRecipe n)
     (h : IsConjunctive SCR) (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i)) :=
   conjunctive_rsy_eq_csy SCR h hOut
+/-! ## Shared: homogeneous SCR layout (Exercises 3.124 / 3.126) -/
+
+private lemma fin3_eq_zero_one_or_two (i : Fin 3) : i = 0 ∨ i = 1 ∨ i = 2 := by
+  fin_cases i <;> simp
+
+private def ex3_124_feed :
+    (Σ (_ : Fin 2), Nat) × (Σ (_ : Fin 2), Nat) :=
+  ⟨⟨(0 : Fin 2), (1 : Nat)⟩, ⟨(1 : Fin 2), (0 : Nat)⟩⟩
+
+private def ex3_124_cscr :
+    Set ((Σ (_ : Fin 2), Nat) × (Σ (_ : Fin 2), Nat)) :=
+  {ex3_124_feed}
+
+def ex3_124_Z (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (_hPort2 : DependsOnInputPort Z2' 2) (i : Fin 2) :
+    DiscreteSystem Nat (Nat → Nat) (Nat → Nat) :=
+  Fin.cases (uniformNatPortWrap 2 2 Z1) (fun _ => uniformNatPortWrap 3 1 Z2') i
+
+lemma ex3_124_Z_distinct (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (hPort2 : DependsOnInputPort Z2' 2) (i j : Fin 2) (hne : i ≠ j) :
+    ¬ HEq (ex3_124_Z Z1 Z2' hPort2 i) (ex3_124_Z Z1 Z2' hPort2 j) := by
+  intro h
+  rcases fin2_eq_zero_or_one i with hi | hi <;> rcases fin2_eq_zero_or_one j with hj | hj
+  · exact absurd (hi.trans hj.symm) hne
+  · subst hi; subst hj
+    exact uniformNatPortWrap_distinct (by decide : 2 < 3) Z1 Z2' hPort2 h
+  · subst hi; subst hj
+    exact uniformNatPortWrap_distinct (by decide : 2 < 3) Z1 Z2' hPort2 (HEq.symm h)
+  · exact absurd (hi.trans hj.symm) hne
+
+def ex3_124_vscr (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (hPort2 : DependsOnInputPort Z2' 2) : PortSystemVector 2 where
+  SZ := fun _ => Nat
+  Port := fun _ => Nat
+  PortVal := fun _ _ => Nat
+  OutPort := fun _ => Nat
+  OutPortVal := fun _ _ => Nat
+  Z := ex3_124_Z Z1 Z2' hPort2
+  distinct := ex3_124_Z_distinct Z1 Z2' hPort2
+
+private lemma ex3_124_connectivity (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (hPort2 : DependsOnInputPort Z2' 2) :
+    IsSystemConnectivity (ex3_124_vscr Z1 Z2' hPort2) ex3_124_cscr := by
+  refine ⟨ ?_, ?_, ?_, ?_ ⟩
+  · refine ⟨ ?_, ?_ ⟩
+    · intro x y1 y2 h1 h2
+      simp only [ex3_124_cscr] at h1 h2
+      exact congr_arg Prod.snd (h1.trans h2.symm)
+    · intro x1 x2 y h1 h2
+      simp only [ex3_124_cscr] at h1 h2
+      exact congr_arg Prod.fst (h1.trans h2.symm)
+  · intro heq
+    have hnot : ⟨(0 : Fin 2), (0 : Nat)⟩ ∉ {x | ∃ y, (x, y) ∈ ex3_124_cscr} := by
+      intro hmem
+      obtain ⟨ip, hpair⟩ := hmem
+      simp only [ex3_124_cscr, Set.mem_singleton_iff] at hpair
+      cases hpair
+    exact hnot (heq ▸ Set.mem_univ (α := Σ (_ : Fin 2), Nat) ⟨(0 : Fin 2), (0 : Nat)⟩)
+  · intro heq
+    have hnot : ⟨(0 : Fin 2), (1 : Nat)⟩ ∉ {y | ∃ x, (x, y) ∈ ex3_124_cscr} := by
+      intro hmem
+      obtain ⟨op, hpair⟩ := hmem
+      simp only [ex3_124_cscr, Set.mem_singleton_iff] at hpair
+      cases hpair
+    exact hnot (heq ▸ Set.mem_univ (α := Σ (_ : Fin 2), Nat) ⟨(0 : Fin 2), (1 : Nat)⟩)
+  · intro _ _ h
+    simp only [ex3_124_cscr, ex3_124_feed] at h ⊢
+    rfl
+
+def ex3_124_scr (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (hPort2 : DependsOnInputPort Z2' 2) : SystemCouplingRecipe 2 where
+  VSCR := ex3_124_vscr Z1 Z2' hPort2
+  CSCR := ex3_124_cscr
+  connectivity := ex3_124_connectivity Z1 Z2' hPort2
+
+private lemma ex3_124_ip10_in_ciscr (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (hPort2 : DependsOnInputPort Z2' 2) :
+    ⟨(1 : Fin 2), (0 : Nat)⟩ ∈ CISCR (ex3_124_scr Z1 Z2' hPort2) := by
+  rw [mem_ciscr_iff]
+  exact ⟨⟨(0 : Fin 2), (1 : Nat)⟩, by
+    change ex3_124_feed ∈ ex3_124_cscr
+    simp [ex3_124_cscr]⟩
+
+private lemma ex3_124_not_in_ciscr (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (hPort2 : DependsOnInputPort Z2' 2)
+    (ip : Σ (_ : Fin 2), Nat) (hne : ip ≠ ⟨(1 : Fin 2), (0 : Nat)⟩) :
+    ip ∉ CISCR (ex3_124_scr Z1 Z2' hPort2) := by
+  intro hC
+  obtain ⟨op, hop⟩ := (mem_ciscr_iff (ex3_124_scr Z1 Z2' hPort2) ip).mp hC
+  have heq : (op, ip) = ex3_124_feed := by
+    simpa [ex3_124_scr, ex3_124_cscr] using Set.mem_singleton_iff.mp hop
+  exact hne (congr_arg Prod.snd heq)
+
+private lemma ex3_124_in_uiscr (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (hPort2 : DependsOnInputPort Z2' 2)
+    (ip : Σ (_ : Fin 2), Nat) (hne : ip ≠ ⟨(1 : Fin 2), (0 : Nat)⟩) :
+    ip ∈ UISCR (ex3_124_scr Z1 Z2' hPort2) :=
+  mem_uiscr_of_not_mem_ciscr (ex3_124_scr Z1 Z2' hPort2) ip
+    (ex3_124_not_in_ciscr Z1 Z2' hPort2 ip hne)
+
+private def ex3_124_extInVal (g : Fin 4 → Nat) (ip : Σ (_ : Fin 2), Nat) : Nat :=
+  match ip with
+  | ⟨(0 : Fin 2), (0 : Nat)⟩ => g 0
+  | ⟨(0 : Fin 2), (1 : Nat)⟩ => g 1
+  | ⟨(1 : Fin 2), (1 : Nat)⟩ => g 2
+  | ⟨(1 : Fin 2), (2 : Nat)⟩ => g 3
+  | _ => g 0
+
+noncomputable def ex3_124_extIn (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (hPort2 : DependsOnInputPort Z2' 2) (g : Fin 4 → Nat) :
+    rsy_IZ (ex3_124_scr Z1 Z2' hPort2) :=
+  fun ip => ex3_124_extInVal g ip.val
+
+private lemma ex3_124_readout_Z1 (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (hOut1 : AlwaysOutputs Z1) (op : Nat) (hop : op < 2) (x : Nat) :
+    componentReadoutAt (uniformNatPortWrap 2 2 Z1)
+      (uniformNatPortWrap_alwaysOutputs 2 2 Z1 hOut1) op x =
+      componentReadoutAt Z1 hOut1 ⟨op, hop⟩ x := by
+  dsimp [componentReadoutAt]
+  calc Classical.choose (uniformNatPortWrap_alwaysOutputs 2 2 Z1 hOut1 x) op
+      _ = uniformNatPortEncode 2 (Classical.choose (hOut1 x)) op :=
+        congrArg (fun f => f op) (uniformNatPortWrap_choose_encode 2 2 Z1 hOut1 x)
+      _ = Classical.choose (hOut1 x) ⟨op, hop⟩ := uniformNatPortEncode_nat_lt 2 _ op hop
+
+private lemma ex3_124_readout_Z2' (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (hOut2 : AlwaysOutputs Z2') (op : Nat) (hop : op < 1) (x : Nat) :
+    componentReadoutAt (uniformNatPortWrap 3 1 Z2')
+      (uniformNatPortWrap_alwaysOutputs 3 1 Z2' hOut2) op x =
+      componentReadoutAt Z2' hOut2 ⟨op, hop⟩ x := by
+  dsimp [componentReadoutAt]
+  calc Classical.choose (uniformNatPortWrap_alwaysOutputs 3 1 Z2' hOut2 x) op
+      _ = uniformNatPortEncode 1 (Classical.choose (hOut2 x)) op :=
+        congrArg (fun f => f op) (uniformNatPortWrap_choose_encode 3 1 Z2' hOut2 x)
+      _ = Classical.choose (hOut2 x) ⟨op, hop⟩ := uniformNatPortEncode_nat_lt 1 _ op hop
+
+private lemma ex3_124_vscr_hOut
+    (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (hPort2 : DependsOnInputPort Z2' 2) (hOut1 : AlwaysOutputs Z1) (hOut2 : AlwaysOutputs Z2') :
+    ∀ i : Fin 2, AlwaysOutputs ((ex3_124_vscr Z1 Z2' hPort2).Z i) := by
+  intro i
+  fin_cases i <;> dsimp [ex3_124_vscr, ex3_124_Z, Fin.cases]
+  · exact uniformNatPortWrap_alwaysOutputs 2 2 Z1 hOut1
+  · exact uniformNatPortWrap_alwaysOutputs 3 1 Z2' hOut2
+
+/-! ## Exercise 3.124: simple cascade resultant -/
+
+/--
+  [textbook/exercise3.124/theorem/simple_cascade_rsy]
+  Resultant of a simple cascade SCR: `O2Z1 → I1Z2`, external I/O and component `NZ`/`RZ` decomposition.
+-/
+theorem ex3_124_simple_cascade_rsy
+    (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (hPort2 : DependsOnInputPort Z2' 2)
+    (hOut1 : AlwaysOutputs Z1) (hOut2 : AlwaysOutputs Z2')
+    (x : Fin 2 → Nat) (g : Fin 4 → Nat) :
+    let SCR := ex3_124_scr Z1 Z2' hPort2
+    let hOut := ex3_124_vscr_hOut Z1 Z2' hPort2 hOut1 hOut2
+    let extIn := ex3_124_extIn Z1 Z2' hPort2 g
+    rsy_NZ SCR hOut x (some extIn) 0 = Z1.NZ (x 0)
+        (some (fun p : Fin 2 => Fin.cases (g 0) (g 1) p)) ∧
+      rsy_NZ SCR hOut x (some extIn) 1 = Z2'.NZ (x 1)
+        (some (fun p : Fin 3 =>
+          Fin.cases (componentReadoutAt Z1 hOut1 (1 : Fin 2) (x 0))
+            (fun i => Fin.cases (g ⟨2, by decide⟩) (g ⟨3, by decide⟩) i) p)) ∧
+      rsyOutAt SCR hOut x ⟨(0 : Fin 2), (0 : Nat)⟩ =
+        componentReadoutAt Z1 hOut1 (0 : Fin 2) (x 0) ∧
+      rsyOutAt SCR hOut x ⟨(1 : Fin 2), (0 : Nat)⟩ =
+        componentReadoutAt Z2' hOut2 (0 : Fin 1) (x 1) := by
+  intro SCR hOut extIn
+  constructor
+  · dsimp only [SCR, rsy_NZ, uniformNatPortWrap_NZ_some]
+    apply congr_arg (Z1.NZ (x 0))
+    apply congr_arg some
+    have hfin :
+        uniformNatPortDecode 2 (rsy_component_input_fun SCR hOut 0 extIn x) =
+          fun p => Fin.cases (g 0) (g 1) p := by
+      funext p
+      fin_cases p
+      · dsimp [uniformNatPortDecode, Fin.val_zero, Fin.cases]
+        rw [rsy_two_component_input_uiscr SCR hOut 0 extIn x (0 : Nat)
+          (ex3_124_in_uiscr Z1 Z2' hPort2 ⟨(0 : Fin 2), (0 : Nat)⟩ (by decide))]
+        dsimp [extIn, ex3_124_extIn, ex3_124_extInVal]
+      · dsimp [uniformNatPortDecode, Fin.cases]
+        rw [rsy_two_component_input_uiscr SCR hOut 0 extIn x (1 : Nat)
+          (ex3_124_in_uiscr Z1 Z2' hPort2 ⟨(0 : Fin 2), (1 : Nat)⟩ (by decide))]
+        dsimp [extIn, ex3_124_extIn, ex3_124_extInVal]; rfl
+    rw [hfin]
+  · constructor
+    · dsimp only [SCR, rsy_NZ, uniformNatPortWrap_NZ_some]
+      apply congr_arg (Z2'.NZ (x 1))
+      apply congr_arg some
+      have hfin :
+          uniformNatPortDecode 3 (rsy_component_input_fun SCR hOut 1 extIn x) =
+            fun p => Fin.cases (componentReadoutAt Z1 hOut1 (1 : Fin 2) (x 0))
+              (fun i => Fin.cases (g ⟨2, by decide⟩) (g ⟨3, by decide⟩) i) p := by
+        funext p
+        fin_cases p
+        · dsimp [uniformNatPortDecode, Fin.val_zero, Fin.cases]
+          have hC := ex3_124_ip10_in_ciscr Z1 Z2' hPort2
+          rw [rsy_two_component_input_ciscr SCR hOut 1 extIn x (0 : Nat) hC]
+          have hop := connectedOutput_spec SCR ⟨(1 : Fin 2), (0 : Nat)⟩ hC
+          have heq : connectedOutput SCR ⟨(1 : Fin 2), (0 : Nat)⟩ hC = ⟨(0 : Fin 2), (1 : Nat)⟩ :=
+            congr_arg Prod.fst (Set.mem_singleton_iff.mp (by simpa [ex3_124_cscr] using hop))
+          suffices rsyOutAt SCR hOut x (connectedOutput SCR ⟨(1 : Fin 2), (0 : Nat)⟩ hC) =
+              componentReadoutAt Z1 hOut1 1 (x 0) by
+            simpa [heq] using this
+          rw [heq]
+          rw [rsyOutAt_eq_componentReadoutAt SCR hOut 0 (1 : Nat) x]
+          exact ex3_124_readout_Z1 Z1 hOut1 1 (by decide) (x 0)
+        · dsimp [uniformNatPortDecode, Fin.cases]
+          rw [rsy_two_component_input_uiscr SCR hOut 1 extIn x (1 : Nat)
+            (ex3_124_in_uiscr Z1 Z2' hPort2 ⟨(1 : Fin 2), (1 : Nat)⟩ (by decide))]
+          dsimp [extIn, ex3_124_extIn, ex3_124_extInVal]; rfl
+        · dsimp [uniformNatPortDecode, Fin.cases]
+          rw [rsy_two_component_input_uiscr SCR hOut 1 extIn x (2 : Nat)
+            (ex3_124_in_uiscr Z1 Z2' hPort2 ⟨(1 : Fin 2), (2 : Nat)⟩ (by decide))]
+          dsimp [extIn, ex3_124_extIn, ex3_124_extInVal]; rfl
+      rw [hfin]
+    · constructor
+      · dsimp [rsyOutAt]
+        exact ex3_124_readout_Z1 Z1 hOut1 0 (by decide) (x 0)
+      · dsimp [rsyOutAt]
+        exact ex3_124_readout_Z2' Z2' hOut2 0 (by decide) (x 1)
+
+theorem ex3_124_is_cascade
+    (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (hPort2 : DependsOnInputPort Z2' 2) :
+    IsCascade (ex3_124_scr Z1 Z2' hPort2) := by
+  intro p hp
+  have : p = ex3_124_feed := Set.mem_singleton_iff.mp (by simpa [ex3_124_scr, ex3_124_cscr] using hp)
+  subst this
+  simp [IsFeedback, ex3_124_feed]
+
+/-! ## Exercise 3.125: simple pure feedback resultant -/
+
+private def ex3_125_feed :
+    (Σ (_ : Fin 1), Nat) × (Σ (_ : Fin 1), Nat) :=
+  ⟨⟨(0 : Fin 1), (1 : Nat)⟩, ⟨(0 : Fin 1), (1 : Nat)⟩⟩
+
+private def ex3_125_cscr : Set ((Σ (_ : Fin 1), Nat) × (Σ (_ : Fin 1), Nat)) :=
+  {ex3_125_feed}
+
+def ex3_125_Z (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat)) :
+    DiscreteSystem Nat (Nat → Nat) (Nat → Nat) :=
+  uniformNatPortWrap 2 2 Z1
+
+def ex3_125_vscr (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat)) : PortSystemVector 1 where
+  SZ := fun _ => Nat
+  Port := fun _ => Nat
+  PortVal := fun _ _ => Nat
+  OutPort := fun _ => Nat
+  OutPortVal := fun _ _ => Nat
+  Z := fun _ => ex3_125_Z Z1
+  distinct := fun i j hne => absurd (Trajectory.fin_one_eq i j) hne
+
+private lemma ex3_125_connectivity (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat)) :
+    IsSystemConnectivity (ex3_125_vscr Z1) ex3_125_cscr := by
+  refine ⟨ ?_, ?_, ?_, ?_ ⟩
+  · refine ⟨ ?_, ?_ ⟩
+    · intro x y1 y2 h1 h2
+      simp only [ex3_125_cscr] at h1 h2
+      exact congr_arg Prod.snd (h1.trans h2.symm)
+    · intro x1 x2 y h1 h2
+      simp only [ex3_125_cscr] at h1 h2
+      exact congr_arg Prod.fst (h1.trans h2.symm)
+  · intro heq
+    have hnot : ⟨(0 : Fin 1), (0 : Nat)⟩ ∉ {x | ∃ y, (x, y) ∈ ex3_125_cscr} := by
+      intro hmem
+      obtain ⟨ip, hpair⟩ := hmem
+      simp only [ex3_125_cscr, Set.mem_singleton_iff] at hpair
+      cases hpair
+    exact hnot (heq ▸ Set.mem_univ (α := Σ (i : Fin 1), Nat) ⟨(0 : Fin 1), (0 : Nat)⟩)
+  · intro heq
+    have hnot : ⟨(0 : Fin 1), (0 : Nat)⟩ ∉ {y | ∃ x, (x, y) ∈ ex3_125_cscr} := by
+      intro hmem
+      obtain ⟨op, hpair⟩ := hmem
+      simp only [ex3_125_cscr, Set.mem_singleton_iff] at hpair
+      cases hpair
+    exact hnot (heq ▸ Set.mem_univ (α := Σ (i : Fin 1), Nat) ⟨(0 : Fin 1), (0 : Nat)⟩)
+  · intro _ _ h
+    simp only [ex3_125_cscr, ex3_125_feed] at h ⊢
+    rfl
+
+def ex3_125_scr (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat)) : SystemCouplingRecipe 1 where
+  VSCR := ex3_125_vscr Z1
+  CSCR := ex3_125_cscr
+  connectivity := ex3_125_connectivity Z1
+
+private lemma ex3_125_ip1_in_ciscr (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat)) :
+    ⟨(0 : Fin 1), (1 : Nat)⟩ ∈ CISCR (ex3_125_scr Z1) := by
+  rw [mem_ciscr_iff]
+  exact ⟨⟨(0 : Fin 1), (1 : Nat)⟩, by
+    change ex3_125_feed ∈ ex3_125_cscr
+    simp [ex3_125_cscr]⟩
+
+private lemma ex3_125_ip0_in_uiscr (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat)) :
+    ⟨(0 : Fin 1), (0 : Nat)⟩ ∈ UISCR (ex3_125_scr Z1) :=
+  mem_uiscr_of_not_mem_ciscr (ex3_125_scr Z1) ⟨(0 : Fin 1), (0 : Nat)⟩ (by
+    intro hC
+    obtain ⟨op, hop⟩ := (mem_ciscr_iff (ex3_125_scr Z1) ⟨(0 : Fin 1), (0 : Nat)⟩).mp hC
+    have heq := congr_arg Prod.snd (Set.mem_singleton_iff.mp (by simpa [ex3_125_scr, ex3_125_cscr] using hop))
+    simp [ex3_125_feed] at heq
+    cases heq)
+
+private def ex3_125_extInVal (p : Nat) (ip : Σ (_ : Fin 1), Nat) : Nat :=
+  match ip with
+  | ⟨(0 : Fin 1), (0 : Nat)⟩ => p
+  | _ => p
+
+noncomputable def ex3_125_extIn (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (p : Nat) : rsy_IZ (ex3_125_scr Z1) :=
+  fun ip => ex3_125_extInVal p ip.val
+
+private lemma ex3_125_readout_Z1 (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (hOut1 : AlwaysOutputs Z1) (op : Nat) (hop : op < 2) (x : Nat) :
+    componentReadoutAt (ex3_125_Z Z1) (uniformNatPortWrap_alwaysOutputs 2 2 Z1 hOut1) op x =
+      componentReadoutAt Z1 hOut1 ⟨op, hop⟩ x :=
+  ex3_124_readout_Z1 Z1 hOut1 op hop x
+
+/--
+  [textbook/exercise3.125/theorem/simple_feedback_rsy]
+  Resultant of simple pure feedback: `O2Z1 → I2Z1`, external `I1Z1` / `O1Z1`.
+-/
+theorem ex3_125_simple_feedback_rsy
+    (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (hOut1 : AlwaysOutputs Z1) (x : Nat) (p : Nat) :
+    let SCR := ex3_125_scr Z1
+    let hOut := fun _ => uniformNatPortWrap_alwaysOutputs 2 2 Z1 hOut1
+    let extIn := ex3_125_extIn Z1 p
+    rsy_NZ SCR hOut (fun _ => x) (some extIn) 0 = Z1.NZ x
+        (some (fun i : Fin 2 =>
+          Fin.cases p (componentReadoutAt Z1 hOut1 (1 : Fin 2) x) i)) ∧
+      rsyOutAt SCR hOut (fun _ => x) ⟨(0 : Fin 1), (0 : Nat)⟩ =
+        componentReadoutAt Z1 hOut1 (0 : Fin 2) x := by
+  intro SCR hOut extIn
+  constructor
+  · dsimp [rsy_NZ, uniformNatPortWrap_NZ_some, ex3_125_Z]
+    apply congr_arg (Z1.NZ x)
+    apply congr_arg some
+    have hfin :
+        uniformNatPortDecode 2 (rsy_component_input_fun SCR hOut 0 extIn (fun _ => x)) =
+          fun i => Fin.cases p (componentReadoutAt Z1 hOut1 (1 : Fin 2) x) i := by
+      funext i
+      fin_cases i
+      · dsimp [uniformNatPortDecode, Fin.val_zero, Fin.cases]
+        rw [rsy_two_component_input_uiscr SCR hOut 0 extIn (fun _ => x) (0 : Nat)
+          (ex3_125_ip0_in_uiscr Z1)]
+        dsimp [extIn, ex3_125_extIn, ex3_125_extInVal]
+      · dsimp [uniformNatPortDecode, Fin.cases]
+        have hC := ex3_125_ip1_in_ciscr Z1
+        rw [rsy_two_component_input_ciscr SCR hOut 0 extIn (fun _ => x) (1 : Nat) hC]
+        have hop := connectedOutput_spec SCR ⟨(0 : Fin 1), (1 : Nat)⟩ hC
+        have heq : connectedOutput SCR ⟨(0 : Fin 1), (1 : Nat)⟩ hC = ⟨(0 : Fin 1), (1 : Nat)⟩ :=
+          congr_arg Prod.fst (Set.mem_singleton_iff.mp (by simpa [ex3_125_cscr] using hop))
+        suffices rsyOutAt SCR hOut (fun _ => x) (connectedOutput SCR ⟨(0 : Fin 1), (1 : Nat)⟩ hC) =
+            componentReadoutAt Z1 hOut1 1 x by
+          simpa [heq] using this
+        rw [heq]
+        rw [rsyOutAt_eq_componentReadoutAt SCR hOut 0 (1 : Nat) (fun _ => x)]
+        exact ex3_125_readout_Z1 Z1 hOut1 1 (by decide) x
+    rw [hfin]
+  · dsimp [rsyOutAt]
+    exact ex3_125_readout_Z1 Z1 hOut1 0 (by decide) x
+
+theorem ex3_125_is_pure_feedback (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat)) :
+    IsPureFeedback (ex3_125_scr Z1) :=
+  ⟨rfl, Set.singleton_ne_empty _⟩
+
+/-! ## Exercise 3.126: simple mixed resultant -/
+
+private def ex3_126_feed_cascade :
+    (Σ (_ : Fin 2), Nat) × (Σ (_ : Fin 2), Nat) :=
+  ⟨⟨(0 : Fin 2), (1 : Nat)⟩, ⟨(1 : Fin 2), (0 : Nat)⟩⟩
+
+private def ex3_126_feed_back :
+    (Σ (_ : Fin 2), Nat) × (Σ (_ : Fin 2), Nat) :=
+  ⟨⟨(1 : Fin 2), (0 : Nat)⟩, ⟨(0 : Fin 2), (0 : Nat)⟩⟩
+
+private def ex3_126_cscr :
+    Set ((Σ (_ : Fin 2), Nat) × (Σ (_ : Fin 2), Nat)) :=
+  insert ex3_126_feed_cascade {ex3_126_feed_back}
+
+private lemma ex3_126_feeds_ne :
+    ex3_126_feed_cascade ≠ ex3_126_feed_back := by
+  intro h
+  have hfst := congr_arg Prod.fst h
+  simp [ex3_126_feed_cascade, ex3_126_feed_back] at hfst
+
+private lemma ex3_126_connectivity (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (hPort2 : DependsOnInputPort Z2' 2) :
+    IsSystemConnectivity (ex3_124_vscr Z1 Z2' hPort2) ex3_126_cscr := by
+  refine ⟨ ?_, ?_, ?_, ?_ ⟩
+  · refine ⟨ ?_, ?_ ⟩
+    · intro x y1 y2 h1 h2
+      rcases Set.mem_insert_iff.mp h1 with h1c | h1b
+      · rcases Set.mem_insert_iff.mp h2 with h2c | h2b
+        · exact congr_arg Prod.snd (h1c.trans h2c.symm)
+        · exfalso
+          have hx := congr_arg Prod.fst h1c
+          have hx' := congr_arg Prod.fst (Set.mem_singleton_iff.mp h2b)
+          simp [ex3_126_feed_cascade, ex3_126_feed_back] at hx hx'
+          exact (by decide : (0 : Fin 2) ≠ 1) (congr_arg Sigma.fst (hx.symm.trans hx'))
+      · rcases Set.mem_insert_iff.mp h2 with h2c | h2b
+        · exfalso
+          have hx := congr_arg Prod.fst h2c
+          have hx' := congr_arg Prod.fst (Set.mem_singleton_iff.mp h1b)
+          simp [ex3_126_feed_cascade, ex3_126_feed_back] at hx hx'
+          exact (by decide : (0 : Fin 2) ≠ 1) (congr_arg Sigma.fst (hx.symm.trans hx'))
+        · exact congr_arg Prod.snd ((Set.mem_singleton_iff.mp h1b).trans (Set.mem_singleton_iff.mp h2b).symm)
+    · intro x1 x2 y h1 h2
+      rcases Set.mem_insert_iff.mp h1 with h1c | h1b
+      · rcases Set.mem_insert_iff.mp h2 with h2c | h2b
+        · exact congr_arg Prod.fst (h1c.trans h2c.symm)
+        · exfalso
+          have hy := congr_arg Prod.snd h1c
+          have hy' := congr_arg Prod.snd (Set.mem_singleton_iff.mp h2b)
+          simp [ex3_126_feed_cascade, ex3_126_feed_back] at hy hy'
+          exact (by decide : (1 : Fin 2) ≠ 0) (congr_arg Sigma.fst (hy.symm.trans hy'))
+      · rcases Set.mem_insert_iff.mp h2 with h2c | h2b
+        · exfalso
+          have hy := congr_arg Prod.snd h2c
+          have hy' := congr_arg Prod.snd (Set.mem_singleton_iff.mp h1b)
+          simp [ex3_126_feed_cascade, ex3_126_feed_back] at hy hy'
+          exact (by decide : (1 : Fin 2) ≠ 0) (congr_arg Sigma.fst (hy.symm.trans hy'))
+        · exact congr_arg Prod.fst ((Set.mem_singleton_iff.mp h1b).trans (Set.mem_singleton_iff.mp h2b).symm)
+  · intro heq
+    have hnot : ⟨(0 : Fin 2), (0 : Nat)⟩ ∉ {x | ∃ y, (x, y) ∈ ex3_126_cscr} := by
+      intro hmem
+      obtain ⟨ip, hpair⟩ := hmem
+      rcases Set.mem_insert_iff.mp hpair with h1 | h2
+      · have hfst := congr_arg Prod.fst h1
+        simp [ex3_126_feed_cascade] at hfst
+      · have h2eq := Set.mem_singleton_iff.mp h2
+        have hfst := congr_arg Prod.fst h2eq
+        simp [ex3_126_feed_back] at hfst
+    exact hnot (heq ▸ Set.mem_univ (α := Σ (_ : Fin 2), Nat) ⟨(0 : Fin 2), (0 : Nat)⟩)
+  · intro heq
+    have hnot : ⟨(0 : Fin 2), (1 : Nat)⟩ ∉ {y | ∃ x, (x, y) ∈ ex3_126_cscr} := by
+      intro hmem
+      obtain ⟨op, hpair⟩ := hmem
+      rcases Set.mem_insert_iff.mp hpair with h1 | h2
+      · have hsnd := congr_arg Prod.snd h1
+        simp [ex3_126_feed_cascade] at hsnd
+      · have h2eq := Set.mem_singleton_iff.mp h2
+        have hsnd := congr_arg Prod.snd h2eq
+        simp [ex3_126_feed_back] at hsnd
+    exact hnot (heq ▸ Set.mem_univ (α := Σ (_ : Fin 2), Nat) ⟨(0 : Fin 2), (1 : Nat)⟩)
+  · intro op ip h
+    rcases Set.mem_insert_iff.mp h with h1 | h2
+    · rw [show op = ⟨(0 : Fin 2), (1 : Nat)⟩ from congr_arg Prod.fst h1,
+        show ip = ⟨(1 : Fin 2), (0 : Nat)⟩ from congr_arg Prod.snd h1]
+      rfl
+    · have h2' := Set.mem_singleton_iff.mp h2
+      rw [show op = ⟨(1 : Fin 2), (0 : Nat)⟩ from congr_arg Prod.fst h2',
+        show ip = ⟨(0 : Fin 2), (0 : Nat)⟩ from congr_arg Prod.snd h2']
+      rfl
+
+noncomputable def ex3_126_scr (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (hPort2 : DependsOnInputPort Z2' 2) : SystemCouplingRecipe 2 where
+  VSCR := ex3_124_vscr Z1 Z2' hPort2
+  CSCR := ex3_126_cscr
+  connectivity := ex3_126_connectivity Z1 Z2' hPort2
+
+private lemma ex3_126_ip00_in_ciscr (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (hPort2 : DependsOnInputPort Z2' 2) :
+    ⟨(0 : Fin 2), (0 : Nat)⟩ ∈ CISCR (ex3_126_scr Z1 Z2' hPort2) := by
+  rw [mem_ciscr_iff]
+  exact ⟨⟨(1 : Fin 2), (0 : Nat)⟩, by
+    change ex3_126_feed_back ∈ ex3_126_cscr
+    simp [ex3_126_cscr]⟩
+
+private lemma ex3_126_ip10_in_ciscr (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (hPort2 : DependsOnInputPort Z2' 2) :
+    ⟨(1 : Fin 2), (0 : Nat)⟩ ∈ CISCR (ex3_126_scr Z1 Z2' hPort2) := by
+  rw [mem_ciscr_iff]
+  exact ⟨⟨(0 : Fin 2), (1 : Nat)⟩, by
+    change ex3_126_feed_cascade ∈ ex3_126_cscr
+    simp [ex3_126_cscr]⟩
+
+private lemma ex3_126_not_in_ciscr (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (hPort2 : DependsOnInputPort Z2' 2)
+    (ip : Σ (_ : Fin 2), Nat)
+    (hne0 : ip ≠ ⟨(0 : Fin 2), (0 : Nat)⟩) (hne1 : ip ≠ ⟨(1 : Fin 2), (0 : Nat)⟩) :
+    ip ∉ CISCR (ex3_126_scr Z1 Z2' hPort2) := by
+  intro hC
+  obtain ⟨op, hop⟩ := (mem_ciscr_iff (ex3_126_scr Z1 Z2' hPort2) ip).mp hC
+  rcases Set.mem_insert_iff.mp (by simpa [ex3_126_scr, ex3_126_cscr] using hop) with h1 | h2
+  · exact hne1 (congr_arg Prod.snd h1)
+  · exact hne0 (congr_arg Prod.snd (Set.mem_singleton_iff.mp h2))
+
+private lemma ex3_126_in_uiscr (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (hPort2 : DependsOnInputPort Z2' 2)
+    (ip : Σ (_ : Fin 2), Nat)
+    (hne0 : ip ≠ ⟨(0 : Fin 2), (0 : Nat)⟩) (hne1 : ip ≠ ⟨(1 : Fin 2), (0 : Nat)⟩) :
+    ip ∈ UISCR (ex3_126_scr Z1 Z2' hPort2) :=
+  mem_uiscr_of_not_mem_ciscr (ex3_126_scr Z1 Z2' hPort2) ip
+    (ex3_126_not_in_ciscr Z1 Z2' hPort2 ip hne0 hne1)
+
+private def ex3_126_extInVal (g : Fin 3 → Nat) (ip : Σ (_ : Fin 2), Nat) : Nat :=
+  match ip with
+  | ⟨(0 : Fin 2), (1 : Nat)⟩ => g 0
+  | ⟨(1 : Fin 2), (1 : Nat)⟩ => g 1
+  | ⟨(1 : Fin 2), (2 : Nat)⟩ => g 2
+  | _ => g 0
+
+noncomputable def ex3_126_extIn (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (hPort2 : DependsOnInputPort Z2' 2) (g : Fin 3 → Nat) :
+    rsy_IZ (ex3_126_scr Z1 Z2' hPort2) :=
+  fun ip => ex3_126_extInVal g ip.val
+
+/--
+  [textbook/exercise3.126/theorem/simple_mixed_rsy]
+  Resultant of simple mixed SCR: cascade `O2Z1 → I1Z2` plus feedback `OZ2 → I1Z1`.
+-/
+theorem ex3_126_simple_mixed_rsy
+    (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (hPort2 : DependsOnInputPort Z2' 2)
+    (hOut1 : AlwaysOutputs Z1) (hOut2 : AlwaysOutputs Z2')
+    (x : Fin 2 → Nat) (g : Fin 3 → Nat) :
+    let SCR := ex3_126_scr Z1 Z2' hPort2
+    let hOut := ex3_124_vscr_hOut Z1 Z2' hPort2 hOut1 hOut2
+    let extIn := ex3_126_extIn Z1 Z2' hPort2 g
+    rsy_NZ SCR hOut x (some extIn) 0 = Z1.NZ (x 0)
+        (some (fun p : Fin 2 =>
+          Fin.cases (componentReadoutAt Z2' hOut2 (0 : Fin 1) (x 1)) (g 0) p)) ∧
+      rsy_NZ SCR hOut x (some extIn) 1 = Z2'.NZ (x 1)
+        (some (fun p : Fin 3 =>
+          Fin.cases (componentReadoutAt Z1 hOut1 (1 : Fin 2) (x 0))
+            (fun i => Fin.cases (g ⟨1, by decide⟩) (g ⟨2, by decide⟩) i) p)) ∧
+      rsyOutAt SCR hOut x ⟨(0 : Fin 2), (0 : Nat)⟩ =
+        componentReadoutAt Z1 hOut1 (0 : Fin 2) (x 0) := by
+  intro SCR hOut extIn
+  constructor
+  · dsimp only [rsy_NZ, uniformNatPortWrap_NZ_some]
+    apply congr_arg (Z1.NZ (x 0))
+    apply congr_arg some
+    have hfin :
+        uniformNatPortDecode 2 (rsy_component_input_fun SCR hOut 0 extIn x) =
+          fun p => Fin.cases (componentReadoutAt Z2' hOut2 (0 : Fin 1) (x 1)) (g 0) p := by
+      funext p
+      fin_cases p
+      · dsimp [uniformNatPortDecode, Fin.val_zero, Fin.cases]
+        have hC := ex3_126_ip00_in_ciscr Z1 Z2' hPort2
+        rw [rsy_two_component_input_ciscr SCR hOut 0 extIn x (0 : Nat) hC]
+        have hop := connectedOutput_spec SCR ⟨(0 : Fin 2), (0 : Nat)⟩ hC
+        have heq : connectedOutput SCR ⟨(0 : Fin 2), (0 : Nat)⟩ hC = ⟨(1 : Fin 2), (0 : Nat)⟩ := by
+          rcases Set.mem_insert_iff.mp (by simpa [ex3_126_cscr] using hop) with h | h
+          · exfalso
+            have h' := congr_arg Prod.snd h
+            simp [ex3_126_feed_cascade] at h'
+            exact (by decide : (0 : Fin 2) ≠ 1) (congr_arg Sigma.fst h')
+          · exact congr_arg Prod.fst (Set.mem_singleton_iff.mp h)
+        suffices rsyOutAt SCR hOut x (connectedOutput SCR ⟨(0 : Fin 2), (0 : Nat)⟩ hC) =
+            componentReadoutAt Z2' hOut2 0 (x 1) by
+          simpa [heq] using this
+        rw [heq]
+        rw [rsyOutAt_eq_componentReadoutAt SCR hOut 1 (0 : Nat) x]
+        exact ex3_124_readout_Z2' Z2' hOut2 0 (by decide) (x 1)
+      · dsimp [uniformNatPortDecode, Fin.cases]
+        rw [rsy_two_component_input_uiscr SCR hOut 0 extIn x (1 : Nat)
+          (ex3_126_in_uiscr Z1 Z2' hPort2 ⟨(0 : Fin 2), (1 : Nat)⟩ (by decide) (by decide))]
+        dsimp [extIn, ex3_126_extIn, ex3_126_extInVal]; rfl
+    rw [hfin]
+  · constructor
+    · dsimp only [SCR, rsy_NZ, uniformNatPortWrap_NZ_some]
+      apply congr_arg (Z2'.NZ (x 1))
+      apply congr_arg some
+      have hfin :
+          uniformNatPortDecode 3 (rsy_component_input_fun SCR hOut 1 extIn x) =
+            fun p => Fin.cases (componentReadoutAt Z1 hOut1 (1 : Fin 2) (x 0))
+              (fun i => Fin.cases (g ⟨1, by decide⟩) (g ⟨2, by decide⟩) i) p := by
+        funext p
+        fin_cases p
+        · dsimp [uniformNatPortDecode, Fin.val_zero, Fin.cases]
+          have hC := ex3_126_ip10_in_ciscr Z1 Z2' hPort2
+          rw [rsy_two_component_input_ciscr SCR hOut 1 extIn x (0 : Nat) hC]
+          have hop := connectedOutput_spec SCR ⟨(1 : Fin 2), (0 : Nat)⟩ hC
+          have heq : connectedOutput SCR ⟨(1 : Fin 2), (0 : Nat)⟩ hC = ⟨(0 : Fin 2), (1 : Nat)⟩ := by
+            rcases Set.mem_insert_iff.mp (by simpa [ex3_126_cscr] using hop) with h | h
+            · exact congr_arg Prod.fst h
+            · exfalso
+              have h' := congr_arg Prod.snd (Set.mem_singleton_iff.mp h)
+              simp [ex3_126_feed_back] at h'
+              exact (by decide : (1 : Fin 2) ≠ 0) (congr_arg Sigma.fst h')
+          suffices rsyOutAt SCR hOut x (connectedOutput SCR ⟨(1 : Fin 2), (0 : Nat)⟩ hC) =
+              componentReadoutAt Z1 hOut1 1 (x 0) by
+            simpa [heq] using this
+          rw [heq]
+          rw [rsyOutAt_eq_componentReadoutAt SCR hOut 0 (1 : Nat) x]
+          exact ex3_124_readout_Z1 Z1 hOut1 1 (by decide) (x 0)
+        · dsimp [uniformNatPortDecode, Fin.cases]
+          rw [rsy_two_component_input_uiscr SCR hOut 1 extIn x (1 : Nat)
+            (ex3_126_in_uiscr Z1 Z2' hPort2 ⟨(1 : Fin 2), (1 : Nat)⟩ (by decide) (by decide))]
+          dsimp [extIn, ex3_126_extIn, ex3_126_extInVal]; rfl
+        · dsimp [uniformNatPortDecode, Fin.cases]
+          rw [rsy_two_component_input_uiscr SCR hOut 1 extIn x (2 : Nat)
+            (ex3_126_in_uiscr Z1 Z2' hPort2 ⟨(1 : Fin 2), (2 : Nat)⟩ (by decide) (by decide))]
+          dsimp [extIn, ex3_126_extIn, ex3_126_extInVal]; rfl
+      rw [hfin]
+    · dsimp [rsyOutAt]
+      exact ex3_124_readout_Z1 Z1 hOut1 0 (by decide) (x 0)
+
+/--
+  [textbook/exercise3.126/theorem/mixed_readout_audit]
+  Lean readout is `R1Z1(x1)`; textbook states `R1Z1(x2)` (likely typo).
+-/
+theorem ex3_126_readout_is_R1Z1_x1
+    (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
+    (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
+    (hPort2 : DependsOnInputPort Z2' 2)
+    (hOut1 : AlwaysOutputs Z1) (hOut2 : AlwaysOutputs Z2') (x : Fin 2 → Nat) :
+    let SCR := ex3_126_scr Z1 Z2' hPort2
+    let hOut := ex3_124_vscr_hOut Z1 Z2' hPort2 hOut1 hOut2
+    rsyOutAt SCR hOut x ⟨(0 : Fin 2), (0 : Nat)⟩ =
+      componentReadoutAt Z1 hOut1 (0 : Fin 2) (x 0) := by
+  intro SCR hOut
+  dsimp [rsyOutAt]
+  exact ex3_124_readout_Z1 Z1 hOut1 0 (by decide) (x 0)
 
 end Mbse.TextbookExercises.Ch03

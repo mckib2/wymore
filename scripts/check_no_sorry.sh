@@ -43,10 +43,25 @@ filter_code_hits() {
 SORRY_PLACEHOLDER_PATTERN='by[[:space:]]+(sorry|admit)\b|^[[:space:]]*(sorry|admit)[[:space:]]*$|:=[[:space:]]+(sorry|admit)\b'
 AXIOM_PATTERN='^[[:space:]]*axiom[[:space:]]'
 
+AXIOM_ALLOWLIST=(
+)
+
+filter_axiom_hits() {
+  while IFS= read -r line; do
+    [[ -z "$line" ]] && continue
+    for allow in "${AXIOM_ALLOWLIST[@]}"; do
+      if [[ "$line" == *"$allow"* ]]; then
+        continue 2
+      fi
+    done
+    echo "$line"
+  done
+}
+
 if mapfile -t hits < <(
   { rg -n "$SORRY_PLACEHOLDER_PATTERN" "${LEAN_FILES[@]}" || true
     rg -n "$AXIOM_PATTERN" "${LEAN_FILES[@]}" || true
-  } | filter_code_hits
+  } | filter_code_hits | filter_axiom_hits
 ); then
   if ((${#hits[@]} > 0)); then
     printf '%s\n' "${hits[@]}" >&2

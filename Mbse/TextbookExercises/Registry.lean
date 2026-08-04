@@ -47,6 +47,9 @@ def registry : List ExerciseEntry :=
   , ⟨"3.121", 3, .theoremProof, "solved", "Ch03.ex3_121_resultant_port_functions"⟩
   , ⟨"3.122", 3, .theoremProof, "solved", "Ch03.ex3_122_every_system_is_resultant"⟩
   , ⟨"3.123", 3, .theoremProof, "solved", "Ch03.ex3_123_conjunctive_rsy_eq_csy"⟩
+  , ⟨"3.124", 3, .theoremProof, "solved", "Ch03.ex3_124_simple_cascade_rsy"⟩
+  , ⟨"3.125", 3, .theoremProof, "solved", "Ch03.ex3_125_simple_feedback_rsy"⟩
+  , ⟨"3.126", 3, .theoremProof, "solved", "Ch03.ex3_126_simple_mixed_rsy"⟩
   ]
 
 def solvedCount : Nat :=

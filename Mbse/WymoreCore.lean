@@ -48,6 +48,15 @@ def DiscreteSystem.ofTotal {SZ IZ OZ : Type} (NZ : SZ → IZ → SZ) (RZ : SZ �
   NZ := fun s oi => match oi with | some i => NZ s i | none => s
   RZ := fun s => some (RZ s)
 
+/--
+  Port `p` is material to `NZ`: some input change at `p` alters the next state.
+  Used for homogeneous SCR witnesses (Exercises 3.124–3.126) without type-injectivity axioms.
+-/
+def DependsOnInputPort {n : Nat} {OZ : Type} (Z : DiscreteSystem Nat (Fin n → Nat) OZ) (p : Fin n) :
+    Prop :=
+  ∃ (s : Nat) (f : Fin n → Nat) (v : Nat),
+    Z.NZ s (some f) ≠ Z.NZ s (some (Function.update f p v))
+
 /-- [textbook/definition2.4/component/TZ] The time scale TZ of the discrete system defined as IJS++ (natural numbers). -/
 abbrev Time := Nat
 
