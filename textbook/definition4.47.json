@@ -18,6 +18,16 @@
       "id": "4.47/requirement/preserves_output_ports",
       "type": "component",
       "text": "HO preserves output ports with respect to SHOS."
+    },
+    {
+      "id": "4.47/requirement/input_port_count",
+      "type": "component",
+      "text": "#IPZ2 = #IPZ1: a bijection between the input port index types, which the copy may permute."
+    },
+    {
+      "id": "4.47/requirement/output_port_count",
+      "type": "component",
+      "text": "#OPZ2 = #OPZ1: a bijection between the output port index types."
     }
   ]
 }

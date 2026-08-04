@@ -58,10 +58,17 @@ def registry : List ExerciseEntry :=
   , ⟨"3.131", 3, .theoremProof, "solved", "Ch03.ex3_131_subsystem_transitive"⟩
   , ⟨"3.132", 3, .theoremProof, "solved", "Ch03.ex3_132_singular_cfscr_eq_closed_loop"⟩
   , ⟨"3.133", 3, .theoremProof, "solved", "Ch03.ex3_133_conjunctive_cfscr_eq_closed_loop"⟩
+  , ⟨"4.66", 4, .theoremProof, "solved", "Ch04.ex4_66_null_order_elimination"⟩
+  , ⟨"4.69", 4, .theoremProof, "solved", "Ch04.ex4_69_assertion_false"⟩
+  , ⟨"4.71", 4, .theoremProof, "solved", "Ch04.ex4_71_construction"⟩
+  , ⟨"4.72", 4, .theoremProof, "solved", "Ch04.ex4_72_consistent_elaboration"⟩
+  , ⟨"4.74", 4, .theoremProof, "solved", "Ch04.ex4_74_consistent_elaboration"⟩
   , ⟨"4.80", 4, .theoremProof, "solved", "Ch04.ex4_80_himppsy_is_parameterization"⟩
   , ⟨"4.81", 4, .theoremProof, "solved", "Ch04.ex4_81_reflexive"⟩
   , ⟨"4.82", 4, .theoremProof, "solved", "Ch04.ex4_82_reflexive"⟩
+  , ⟨"4.83", 4, .theoremProof, "solved", "Ch04.ex4_83_mutual_homomorphism_isomorphic"⟩
   , ⟨"4.84", 4, .theoremProof, "solved", "Ch04.ex4_84_reflexive"⟩
+  , ⟨"4.85", 4, .theoremProof, "solved", "Ch04.ex4_85_rearrangement_isomorphic"⟩
   ]
 
 def solvedCount : Nat :=

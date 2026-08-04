@@ -1,0 +1,28 @@
+{
+  "id": "A1.189",
+  "name": "Choice functions",
+  "chapter": 1,
+  "description": "Definition A1.189: CHF(A) is the set of choice functions for the subsets of the nonempty set A, i.e. functions from the power set of A to A sending every nonempty subset B to an element of B.",
+  "elements": [
+    {
+      "id": "A1.189/definition/chf",
+      "type": "definition",
+      "text": "CHF(A) = {CHA ∈ FNS(𝒫A, A) : if B ⊆ A and B ≠ ∅ then CHA(B) ∈ B}."
+    },
+    {
+      "id": "A1.189/component/function",
+      "type": "component",
+      "text": "A choice function is a function from the power set of A to A."
+    },
+    {
+      "id": "A1.189/requirement/mem",
+      "type": "component",
+      "text": "If B ⊆ A and B ≠ ∅ then CHA(B) ∈ B."
+    },
+    {
+      "id": "A1.189/theorem/exists",
+      "type": "theorem",
+      "text": "CHF(A) is not empty for every nonempty A."
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "4.69",
+  "kind": "theorem_proof",
+  "name": "Finite homomorphic images of non-finite systems",
+  "chapter": 4,
+  "description": "Exercise 4.69: prove the following assertion or find a counterexample: if Z1 is a finite system and Z2 is not a finite system, then Z1 is not a homomorphic image of Z2. The assertion is false; a counterexample is given.",
+  "elements": [
+    {
+      "id": "4.69/proof/counterexample_witness",
+      "type": "proof",
+      "text": "Collapsing every state of the ℕ-counter onto the single state of the one-state system is a homomorphism."
+    },
+    {
+      "id": "4.69/theorem/counterexample",
+      "type": "theorem",
+      "text": "The one-state system is finite, the counter is not finite, and the one-state system is a homomorphic image of the counter."
+    },
+    {
+      "id": "4.69/theorem/assertion_refuted",
+      "type": "theorem",
+      "text": "The stated assertion does not hold."
+    }
+  ]
+}

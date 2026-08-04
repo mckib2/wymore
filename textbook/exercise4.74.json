@@ -1,0 +1,44 @@
+{
+  "id": "4.74",
+  "kind": "theorem_proof",
+  "name": "Consistent elaboration with respect to states, inputs and outputs",
+  "chapter": 4,
+  "description": "Exercise 4.74: given functions HS, HI, HO with RNG(HS) = SZ1, RNG(HI) = IZ1, RNG(HO) = OZ1 and choice functions CHS ∈ CHF(DMN(HS)), CHO ∈ CHF(DMN(HO)), the system Z2 = (DMN(HS), DMN(HI), DMN(HO), NZ2, RZ2) with NZ2(x,p) = CHS(HS⁻¹(NZ1(HS(x),HI(p)))) and RZ2(x) = CHO(HO⁻¹(RZ1(HS(x)))) satisfies Z2 ∈ DSYSTEMS, #SZ2 ≥ #SZ1, #IZ2 ≥ #IZ1, #OZ2 ≥ #OZ1 and Z1 = HIMSY(Z2, HS, HI, HO).",
+  "elements": [
+    {
+      "id": "4.74/definition/elaboration_data",
+      "type": "definition",
+      "text": "The three functions onto SZ1, IZ1 and OZ1 whose domains are the state, input and output sets of Z2."
+    },
+    {
+      "id": "4.74/component/HS",
+      "type": "component",
+      "text": "RNG(HS) = SZ1, so SZ2 = DMN(HS)."
+    },
+    {
+      "id": "4.74/component/HI",
+      "type": "component",
+      "text": "RNG(HI) = IZ1, so IZ2 = DMN(HI)."
+    },
+    {
+      "id": "4.74/component/HO",
+      "type": "component",
+      "text": "RNG(HO) = OZ1, so OZ2 = DMN(HO)."
+    },
+    {
+      "id": "4.74/definition/system",
+      "type": "definition",
+      "text": "Z2 = (DMN(HS), DMN(HI), DMN(HO), NZ2, RZ2) where NZ2 and RZ2 choose preimages of the corresponding values of Z1."
+    },
+    {
+      "id": "4.74/proof/homomorphism",
+      "type": "proof",
+      "text": "The chosen preimages are genuine preimages, so HS, HI and HO intertwine the dynamics."
+    },
+    {
+      "id": "4.74/theorem/consistent_elaboration",
+      "type": "theorem",
+      "text": "Z2 ∈ DSYSTEMS, #SZ2 ≥ #SZ1, #IZ2 ≥ #IZ1, #OZ2 ≥ #OZ1 and Z1 = HIMSY(Z2, HS, HI, HO)."
+    }
+  ]
+}

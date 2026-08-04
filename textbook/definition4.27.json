@@ -2,7 +2,7 @@
   "id": "4.27",
   "name": "Port-preserving homomorphisms",
   "chapter": 4,
-  "description": "Definition 4.27: HI preserves input ports with respect to SHIS iff #IPZ2 = #IPZ1 and for each i there is HIi ∈ FNS(IiZ2, ONTO, IiZ1) with SHIS = {HIi} and PJN(IZ1,i) ∘ HI = HIi ∘ PJN(IZ2,i); dually for HO and SHOS. Port counts are encoded by sharing the port index type, so clause (ii) says the homomorphism acts coordinatewise.",
+  "description": "Definition 4.27: HI preserves input ports with respect to SHIS iff #IPZ2 = #IPZ1 and for each i there is HIi ∈ FNS(IiZ2, ONTO, IiZ1) with SHIS = {HIi} and PJN(IZ1,i) ∘ HI = HIi ∘ PJN(IZ2,i); dually for HO and SHOS. Port counts are encoded by a bijection σ between the port index types, so a port-preserving map may permute ports and clause (ii) says the homomorphism acts portwise through σ.",
   "elements": [
     {
       "id": "4.27/definition/preserves_ports",
@@ -13,6 +13,16 @@
       "id": "4.27/component/port_family",
       "type": "component",
       "text": "The family SHIS = {HIi} (resp. SHOS = {HOj}) of per-port maps."
+    },
+    {
+      "id": "4.27/requirement/input_port_count",
+      "type": "component",
+      "text": "Clause (i) for inputs: #IPZ2 = #IPZ1, encoded as a bijection between the input port index types."
+    },
+    {
+      "id": "4.27/requirement/output_port_count",
+      "type": "component",
+      "text": "Clause (i) for outputs: #OPZ2 = #OPZ1, encoded as a bijection between the output port index types."
     }
   ]
 }

@@ -1,0 +1,19 @@
+{
+  "id": "4.59",
+  "kind": "theorem_proof",
+  "name": "Resultants of componentwise copies are copies",
+  "chapter": 4,
+  "description": "Corollary 4.59: system resultants of system coupling recipes with the same number of components, the same connectivity and matched port homomorphisms, such that each pair of components are copies, are copies.",
+  "elements": [
+    {
+      "id": "4.59/proof/copy_witness",
+      "type": "proof",
+      "text": "When every component homomorphism is 1TO1, the product state map and the portwise input and output maps are 1TO1 as well."
+    },
+    {
+      "id": "4.59/theorem/resultant_copy",
+      "type": "theorem",
+      "text": "RSY(SCR) is a copy of RSY(SCR$)."
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "id": "4.71",
+  "kind": "theorem_proof",
+  "name": "Construction of a system of which a given system is a homomorphic image",
+  "chapter": 4,
+  "description": "Exercise 4.71: with SZ2 = {(x, NZ1(x,p))} ∪ {(x,x)}, IZ2 = IZ1, OZ2 = OZ1, NZ2((x,y),p) = (y, NZ1(y,p)) and RZ2 = RZ1 ∘ PJN2, prove that Z1 = HIMSY(Z2, PJN(SZ2,2), ID(IZ2), ID(OZ2)).",
+  "elements": [
+    {
+      "id": "4.71/definition/state_space",
+      "type": "definition",
+      "text": "SZ2 = {(x, NZ1(x,p)) : x ∈ SZ1, p ∈ IZ1} ∪ {(x,x) : x ∈ SZ1}, a subtype of SZ1 × SZ1."
+    },
+    {
+      "id": "4.71/definition/system",
+      "type": "definition",
+      "text": "Z2 = (SZ2, IZ1, OZ1, NZ2, RZ2) with NZ2((x,y),p) = (y, NZ1(y,p)) and RZ2 = RZ1 ∘ PJN2."
+    },
+    {
+      "id": "4.71/proof/homomorphism",
+      "type": "proof",
+      "text": "PJN2 is onto SZ1 (via the diagonal pairs) and intertwines the transitions and readouts."
+    },
+    {
+      "id": "4.71/theorem/construction",
+      "type": "theorem",
+      "text": "Z1 = HIMSY(Z2, PJN(SZ2,2), ID(IZ2), ID(OZ2))."
+    }
+  ]
+}

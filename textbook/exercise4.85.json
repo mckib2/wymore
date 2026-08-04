@@ -1,0 +1,39 @@
+{
+  "id": "4.85",
+  "kind": "theorem_proof",
+  "name": "Rearranging a connectable vector yields an isomorphic resultant",
+  "chapter": 4,
+  "description": "Exercise 4.85: if VSCR$ = (ZF(1),...,ZF(n)) for a permutation F of the component indices and CSCR$ = CSCR, then UISCR = UISCR$, UOSCR = UOSCR$ and RSY(SCR$) = ISY(RSY(SCR), HS, HI, HO) where PJNi(x$) = PJNF(i)(x).",
+  "elements": [
+    {
+      "id": "4.85/definition/rearranged_vector",
+      "type": "definition",
+      "text": "VSCR$ = (ZF(1),...,ZF(n))."
+    },
+    {
+      "id": "4.85/definition/rearranged_connectivity",
+      "type": "definition",
+      "text": "CSCR$ = CSCR, read through the renaming of tagged ports induced by F."
+    },
+    {
+      "id": "4.85/definition/rearranged_recipe",
+      "type": "definition",
+      "text": "SCR$ = (VSCR$, CSCR$)."
+    },
+    {
+      "id": "4.85/theorem/uiscr_preserved",
+      "type": "theorem",
+      "text": "UISCR = UISCR$ under the renaming induced by F."
+    },
+    {
+      "id": "4.85/theorem/uoscr_preserved",
+      "type": "theorem",
+      "text": "UOSCR = UOSCR$ under the renaming induced by F."
+    },
+    {
+      "id": "4.85/theorem/rearrangement_isomorphic",
+      "type": "theorem",
+      "text": "RSY(SCR$) is isomorphic to RSY(SCR) via HS(x)i = x(F(i)) and the induced renamings on external ports."
+    }
+  ]
+}

@@ -9,6 +9,8 @@ import Mbse.DPDAWymore
 import Mbse.DPDAExamples
 import Mbse.Homomorphism
 import Mbse.Isomorphism
+import Mbse.IsomorphismConstructions
+import Mbse.CouplingIsomorphism
 import Mbse.FiniteWymore
 import Mbse.TemporalLogic
 import Mbse.FOLTL

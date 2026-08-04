@@ -1,0 +1,54 @@
+{
+  "id": "4.72",
+  "kind": "theorem_proof",
+  "name": "Consistent elaboration with respect to states",
+  "chapter": 4,
+  "description": "Exercise 4.72: given F ∈ FNS(SZ1, 1TO1, 𝒫S) with pairwise disjoint images and a choice function CHS ∈ CHF(S), the system Z2 on SZ2 = ∪RNG(F) with NZ2(x,p) = CHS(F(NZ1(HS(x),p))) and RZ2(x) = RZ1(HS(x)) satisfies Z2 ∈ DSYSTEMS, #SZ2 ≥ #SZ1 and Z1 = HIMSY(Z2, HS, HI, HO).",
+  "elements": [
+    {
+      "id": "4.72/definition/state_partition",
+      "type": "definition",
+      "text": "The data F: a family of pairwise disjoint nonempty subsets of S indexed by the states of Z1."
+    },
+    {
+      "id": "4.72/component/F",
+      "type": "component",
+      "text": "F ∈ FNS(SZ1, 𝒫S)."
+    },
+    {
+      "id": "4.72/requirement/disjoint",
+      "type": "component",
+      "text": "If x1 ≠ x2 then F(x1) ∩ F(x2) = ∅."
+    },
+    {
+      "id": "4.72/theorem/F_injective",
+      "type": "theorem",
+      "text": "F is automatically 1TO1: distinct states have disjoint nonempty blocks."
+    },
+    {
+      "id": "4.72/definition/state_space",
+      "type": "definition",
+      "text": "SZ2 = ∪ RNG(F)."
+    },
+    {
+      "id": "4.72/definition/HS",
+      "type": "definition",
+      "text": "HS sends a point of SZ2 to the unique state of Z1 whose block contains it."
+    },
+    {
+      "id": "4.72/definition/system",
+      "type": "definition",
+      "text": "Z2 = (SZ2, IZ1, OZ1, NZ2, RZ2) with NZ2(x,p) = CHS(F(NZ1(HS(x),p))) and RZ2(x) = RZ1(HS(x))."
+    },
+    {
+      "id": "4.72/proof/homomorphism",
+      "type": "proof",
+      "text": "The chosen next state lies in the block named by NZ1, so HS intertwines the transitions."
+    },
+    {
+      "id": "4.72/theorem/consistent_elaboration_states",
+      "type": "theorem",
+      "text": "Z2 ∈ DSYSTEMS, #SZ2 ≥ #SZ1 and Z1 = HIMSY(Z2, HS, ID(IZ2), ID(OZ2))."
+    }
+  ]
+}

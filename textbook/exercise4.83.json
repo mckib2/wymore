@@ -1,0 +1,19 @@
+{
+  "id": "4.83",
+  "kind": "theorem_proof",
+  "name": "Mutually homomorphic finite systems are isomorphic",
+  "chapter": 4,
+  "description": "Exercise 4.83: if Z1 and Z2 are finite systems, Z1 = HIMSY(Z2, HS1, HI1, HO1) and Z2 = HIMSY(Z1, HS2, HI2, HO2), then Z1 and Z2 are isomorphic.",
+  "elements": [
+    {
+      "id": "4.83/proof/isomorphism_witness",
+      "type": "proof",
+      "text": "Each round trip is a surjective self-map of a finite set, hence injective, so each component homomorphism of the first witness is injective."
+    },
+    {
+      "id": "4.83/theorem/mutual_homomorphism_isomorphic",
+      "type": "theorem",
+      "text": "Two finite systems that are homomorphic images of each other are isomorphic."
+    }
+  ]
+}

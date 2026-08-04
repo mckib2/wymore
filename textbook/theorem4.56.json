@@ -1,0 +1,69 @@
+{
+  "id": "4.56",
+  "kind": "theorem_proof",
+  "name": "Resultants of componentwise port-preserving homomorphic images",
+  "chapter": 4,
+  "description": "Theorem 4.56: if every component Zi of SCR is a port-preserving homomorphic image of the corresponding component Z$i of SCR$, the connectivities agree ((OiZj, IkZm) ∈ CSCR iff (OiZ$j, IkZ$m) ∈ CSCR$), and HOji = HImk for every connected pair, then RSY(SCR) is a port-preserving homomorphic image of RSY(SCR$).",
+  "elements": [
+    {
+      "id": "4.56/definition/componentwise_elaboration",
+      "type": "definition",
+      "text": "The hypotheses of Theorem 4.56 bundled: elaborated components over the same port skeleton, the port-preserving homomorphisms, and the matching condition on connected pairs."
+    },
+    {
+      "id": "4.56/component/elaborated_components",
+      "type": "component",
+      "text": "The components Z$1,...,Z$n of VSCR$."
+    },
+    {
+      "id": "4.56/component/component_homomorphism",
+      "type": "component",
+      "text": "Zi = HIMSY(Z$i, HSi, HIi, HOi) for every i."
+    },
+    {
+      "id": "4.56/component/shis",
+      "type": "component",
+      "text": "SHISi = {HIij}: HIi acts portwise on the input ports of Z$i."
+    },
+    {
+      "id": "4.56/component/shos",
+      "type": "component",
+      "text": "SHOSi = {HOik}: HOi acts portwise on the output ports of Z$i."
+    },
+    {
+      "id": "4.56/requirement/matched_port_homomorphisms",
+      "type": "component",
+      "text": "If (OiZ$j, IkZ$m) ∈ CSCR then HOji = HImk."
+    },
+    {
+      "id": "4.56/definition/elaborated_vector",
+      "type": "definition",
+      "text": "VSCR$ = (Z$1,...,Z$n)."
+    },
+    {
+      "id": "4.56/definition/elaborated_recipe",
+      "type": "definition",
+      "text": "SCR$ = (VSCR$, CSCR$) with CSCR$ = CSCR."
+    },
+    {
+      "id": "4.56/theorem/uiscr_preserved",
+      "type": "theorem",
+      "text": "UISCR$ = UISCR."
+    },
+    {
+      "id": "4.56/theorem/uoscr_preserved",
+      "type": "theorem",
+      "text": "UOSCR$ = UOSCR."
+    },
+    {
+      "id": "4.56/proof/resultant_homomorphism",
+      "type": "proof",
+      "text": "HS is the product of the HSi and HI, HO act portwise on the external ports; the matching condition makes the feedback wiring commute."
+    },
+    {
+      "id": "4.56/theorem/resultant_port_preserving_homomorphism",
+      "type": "theorem",
+      "text": "RSY(SCR) is a port-preserving homomorphic image of RSY(SCR$)."
+    }
+  ]
+}

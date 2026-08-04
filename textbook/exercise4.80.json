@@ -24,6 +24,16 @@
       "id": "4.80/theorem/himppsy_is_parameterization",
       "type": "theorem",
       "text": "HIMPPSY is a system parameterization refining HIMSY: every HIMPPSY witness yields a HIMSY witness."
+    },
+    {
+      "id": "4.80/theorem/preserves_input_ports",
+      "type": "theorem",
+      "text": "HIMPPSY actually preserves input ports: the port index sets correspond bijectively and HI is the portwise product of surjections HIi."
+    },
+    {
+      "id": "4.80/theorem/preserves_output_ports",
+      "type": "theorem",
+      "text": "HIMPPSY actually preserves output ports: the port index sets correspond bijectively and HO is the portwise product of surjections HOj."
     }
   ]
 }

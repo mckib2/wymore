@@ -1,0 +1,34 @@
+{
+  "id": "4.58",
+  "kind": "theorem_proof",
+  "name": "Replacing an output port by an equivalent set yields a copy",
+  "chapter": 4,
+  "description": "Theorem 4.58: if the hypothesis HOji = HImk of Theorem 4.56 is not satisfied, replace the offending component by the system Z2 that agrees with Z1 on states, inputs, next state and all output ports except port n, where OnZ1 is replaced by the equivalent set B via F. Then Z2 ∈ DSYSTEMS, OnZ2 = B, and Z2 = COPY(Z1, ID(SZ1), ID(IZ1), HO, SHIS, SHOS).",
+  "elements": [
+    {
+      "id": "4.58/definition/recoded_system",
+      "type": "definition",
+      "text": "The system obtained from Z1 by recoding each output port along a bijection Fq, leaving SZ, IZ and NZ unchanged and post-composing RZ."
+    },
+    {
+      "id": "4.58/proof/copy_witness",
+      "type": "proof",
+      "text": "HS = ID(SZ1), HI = ID(IZ1) and HO = the portwise product of the Fq witness that the recoded system is a copy."
+    },
+    {
+      "id": "4.58/definition/output_port_values",
+      "type": "definition",
+      "text": "OiZ2 = OiZ1 for i ≠ n and OnZ2 = B."
+    },
+    {
+      "id": "4.58/definition/port_equiv_family",
+      "type": "definition",
+      "text": "SHOS: HOi = ID(OiZ1) for i ≠ n and HOn = F."
+    },
+    {
+      "id": "4.58/theorem/replacement_is_copy",
+      "type": "theorem",
+      "text": "Z2 ∈ DSYSTEMS, OnZ2 = B, and Z2 is a copy of Z1."
+    }
+  ]
+}

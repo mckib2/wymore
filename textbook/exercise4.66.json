@@ -1,0 +1,69 @@
+{
+  "id": "4.66",
+  "kind": "theorem_proof",
+  "name": "Eliminating the components of null order yields a homomorphic image",
+  "chapter": 4,
+  "description": "Exercise 4.66: if Z@ = RSY(SCR), M = {Z$ : Z$ in VSCR; Z$ is not of null order for SCR} = {Zi1,...,Zim}, VSCR$ = (Zi1,...,Zim) and CSCR$ = {(B, A) in CSCR : the ports belong to components of VSCR$}, then Z@$ = RSY(SCR$) and Z@$ = HIMSY(Z@, PJN({SZ$ : Z$ in VSCR$}), ID(IZ@), ID(OZ@)).",
+  "elements": [
+    {
+      "id": "4.66/definition/retained_components",
+      "type": "definition",
+      "text": "M = {Z$ : Z$ in VSCR; Z$ is not of null order for SCR}, enumerated as Zi1,...,Zim with distinct indices i1,...,im in IJS[1, n]."
+    },
+    {
+      "id": "4.66/definition/reduced_vector",
+      "type": "definition",
+      "text": "VSCR$ = (Zi1,...,Zim) is a subvector of VSCR."
+    },
+    {
+      "id": "4.66/definition/reduced_connectivity",
+      "type": "definition",
+      "text": "CSCR$ = {(B, A) : (B, A) in CSCR; there exists Z$ in VSCR$ such that the port belongs to Z$}."
+    },
+    {
+      "id": "4.66/definition/reduced_recipe",
+      "type": "definition",
+      "text": "SCR$ = (VSCR$, CSCR$)."
+    },
+    {
+      "id": "4.66/proof/order_propagates",
+      "type": "proof",
+      "text": "A component coupled to a component of some order is itself of some order, so no connection of CSCR joins a deleted component to a retained one."
+    },
+    {
+      "id": "4.66/theorem/uiscr_preserved",
+      "type": "theorem",
+      "text": "IZ@$ = IZ@: every unconnected input port of SCR belongs to a component of order 0, hence is retained, and stays unconnected in SCR$."
+    },
+    {
+      "id": "4.66/theorem/uoscr_preserved",
+      "type": "theorem",
+      "text": "OZ@$ = OZ@: every unconnected output port of SCR belongs to a component of order 0, hence is retained, and stays unconnected in SCR$."
+    },
+    {
+      "id": "4.66/component/HS",
+      "type": "component",
+      "text": "HS = PJN({SZ$ : Z$ in VSCR$}), the projection of the resultant state onto the retained components."
+    },
+    {
+      "id": "4.66/component/HI",
+      "type": "component",
+      "text": "HI = ID(IZ@)."
+    },
+    {
+      "id": "4.66/component/HO",
+      "type": "component",
+      "text": "HO = ID(OZ@)."
+    },
+    {
+      "id": "4.66/proof/homomorphism_witness",
+      "type": "proof",
+      "text": "Z@$ = HIMSY(Z@, PJN({SZ$ : Z$ in VSCR$}), ID(IZ@), ID(OZ@))."
+    },
+    {
+      "id": "4.66/theorem/null_order_elimination",
+      "type": "theorem",
+      "text": "There exists Z@$ in DSYSTEMS with Z@$ = RSY(SCR$) and Z@$ = HIMSY(Z@, PJN({SZ$ : Z$ in VSCR$}), ID(IZ@), ID(OZ@))."
+    }
+  ]
+}

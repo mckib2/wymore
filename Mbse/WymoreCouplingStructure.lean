@@ -101,12 +101,27 @@ def ComponentOrder {n : Nat} (SCR : SystemCouplingRecipe n) (i : Fin n) : Nat �
   | 0 => ComponentOrder0 SCR i
   | m + 1 => ∃ j, ComponentOrder SCR j m ∧ HasSCRConnection SCR i j
 
+/-- Component `i` has *some* order: it is of order `m` for at least one `m`. -/
+def ComponentHasOrder {n : Nat} (SCR : SystemCouplingRecipe n) (i : Fin n) : Prop :=
+  ∃ m, ComponentOrder SCR i m
+
 /--
   [textbook/definition3.90/definition/null_order]
-  Null order: not of positive order (no external interface).
+  Null order: not of order `m` for any `m`, i.e. no chain of `SCR` couplings reaches a component
+  with an external interface.
 -/
 def ComponentNullOrder {n : Nat} (SCR : SystemCouplingRecipe n) (i : Fin n) : Prop :=
-  ¬ ComponentOrder0 SCR i
+  ¬ ComponentHasOrder SCR i
+
+lemma componentHasOrder_of_order0 {n : Nat} (SCR : SystemCouplingRecipe n) {i : Fin n}
+    (h : ComponentOrder0 SCR i) : ComponentHasOrder SCR i := ⟨0, h⟩
+
+/-- Having an order propagates along couplings: a neighbour of an ordered component is ordered. -/
+lemma componentHasOrder_of_connection {n : Nat} (SCR : SystemCouplingRecipe n) {i j : Fin n}
+    (hconn : HasSCRConnection SCR i j) (hj : ComponentHasOrder SCR j) :
+    ComponentHasOrder SCR i := by
+  obtain ⟨m, hm⟩ := hj
+  exact ⟨m + 1, ⟨j, hm, hconn⟩⟩
 
 /-! ## Theorem 3.92: order-zero component exists -/
 
@@ -140,7 +155,7 @@ theorem scr_has_order_zero_component {n : Nat} (SCR : SystemCouplingRecipe n) :
   refine ⟨ip.1, ?_, ?_⟩
   · exact Or.inl ⟨ip.2, hU⟩
   · intro hnull
-    exact hnull (Or.inl ⟨ip.2, hU⟩)
+    exact hnull ⟨0, Or.inl ⟨ip.2, hU⟩⟩
 
 /-! ## Definition 3.95: component relation -/
 
