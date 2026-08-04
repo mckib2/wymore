@@ -12,9 +12,12 @@ Builds on `Mbse.Homomorphism` (Def 4.3 / Def 4.10):
 * Exercise 4.80 / 4.81 — the parameterization `HIMPPSY` and its reflexivity/transitivity.
 * Definition 4.47 / 4.53 and Exercise 4.84 — copies (`COPY`) form an equivalence.
 
-**Port encoding.** Textbook `#IPZ₂ = #IPZ₁` is modeled by sharing the port index type, so
-`IZ = (p : Port) → PortVal p`. Clause (ii) of Def 4.27 (`PJN(IZ₁,i) ∘ HI = HIᵢ ∘ PJN(IZ₂,i)`)
-then says exactly that `HI` acts coordinatewise through surjections `HIᵢ`.
+**Port encoding.** A system with indexed ports has `IZ = (p : Port) → PortVal p`. Textbook
+`#IPZ₂ = #IPZ₁` (clause (i) of Def 4.27) is modeled by an explicit bijection `σ : Port₂ ≃ Port₁`
+between the two port index types, so the two systems need *not* share a port indexing and `σ` may
+permute ports. Clause (ii) (`PJN(IZ₁,i) ∘ HI = HIᵢ ∘ PJN(IZ₂,i)`) then reads
+`HI f (σ i) = HIᵢ (f i)`: `HI` acts through surjections `HIᵢ : IᵢZ₂ → I_{σ i}Z₁`, one per port.
+Taking `σ = Equiv.refl` recovers the special case of a shared port indexing.
 -/
 
 namespace Homomorphism
@@ -293,39 +296,60 @@ theorem IsIsomorphicTo.isHomomorphicImage {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
 
 /-! ## Definition 4.27: port-preserving homomorphisms -/
 
+/-- Applying a dependent function at `a` agrees with transporting its value at `b` along `h`. -/
+private lemma pi_apply_cast {α : Type} (V : α → Type) (g : (a : α) → V a) {a b : α} (h : a = b) :
+    g a = cast (congrArg V h.symm) (g b) := by
+  subst h; rfl
+
 /--
   [textbook/definition4.27/definition/preserves_ports]
-  `H` preserves ports with respect to the family `port` (textbook `SHIS` / `SHOS`): the port index
-  types agree (clause (i)) and `PJN(·, i) ∘ H = Hᵢ ∘ PJN(·, i)` (clause (ii)), i.e. `H` acts
-  coordinatewise through surjections.
+  `H` preserves ports with respect to the port bijection `σ` and the family `port` (textbook
+  `SHIS` / `SHOS`): the port index sets are equivalent, `#IPZ₂ = #IPZ₁` (clause (i)), and
+  `PJN(·, σ i) ∘ H = Hᵢ ∘ PJN(·, i)` (clause (ii)), i.e. `H` acts portwise through surjections,
+  sending port `i` of the domain to port `σ i` of the codomain.
 -/
-structure PreservesPorts {Port : Type} {Val2 Val1 : Port → Type}
-    (H : ((p : Port) → Val2 p) → ((p : Port) → Val1 p)) where
+structure PreservesPorts {Port1 Port2 : Type} {Val1 : Port1 → Type} {Val2 : Port2 → Type}
+    (σ : Port2 ≃ Port1)
+    (H : ((p : Port2) → Val2 p) → ((p : Port1) → Val1 p)) where
   /-- [textbook/definition4.27/component/port_family] The family `SHIS = {Hᵢ}`. -/
-  port : (p : Port) → Val2 p → Val1 p
+  port : (p : Port2) → Val2 p → Val1 (σ p)
   /-- Each `Hᵢ` is `ONTO`. -/
   port_surjective : ∀ p, Function.Surjective (port p)
-  /-- Clause (ii): `PJN(·, i) ∘ H = Hᵢ ∘ PJN(·, i)`. -/
-  proj : ∀ f p, H f p = port p (f p)
+  /-- Clause (ii): `PJN(·, σ i) ∘ H = Hᵢ ∘ PJN(·, i)`. -/
+  proj : ∀ f p, H f (σ p) = port p (f p)
 
-/-- The identity preserves ports coordinatewise. -/
+/-- The identity preserves ports portwise, with the identity port bijection. -/
 def PreservesPorts.id {Port : Type} {Val : Port → Type} :
-    PreservesPorts (id : ((p : Port) → Val p) → ((p : Port) → Val p)) where
+    PreservesPorts (Equiv.refl Port) (id : ((p : Port) → Val p) → ((p : Port) → Val p)) where
   port := fun _ => _root_.id
   port_surjective := fun _ => Function.surjective_id
   proj := fun _ _ => rfl
 
-/-- Port preservation is closed under composition. -/
-def PreservesPorts.comp {Port : Type} {Val1 Val2 Val3 : Port → Type}
-    {H12 : ((p : Port) → Val2 p) → ((p : Port) → Val1 p)}
-    {H23 : ((p : Port) → Val3 p) → ((p : Port) → Val2 p)}
-    (h12 : PreservesPorts H12) (h23 : PreservesPorts H23) :
-    PreservesPorts (H12 ∘ H23) where
-  port := fun p => h12.port p ∘ h23.port p
-  port_surjective := fun p => (h12.port_surjective p).comp (h23.port_surjective p)
+/-- Port preservation is closed under composition; the port bijections compose too. -/
+def PreservesPorts.comp {Port1 Port2 Port3 : Type}
+    {Val1 : Port1 → Type} {Val2 : Port2 → Type} {Val3 : Port3 → Type}
+    {σ12 : Port2 ≃ Port1} {σ23 : Port3 ≃ Port2}
+    {H12 : ((p : Port2) → Val2 p) → ((p : Port1) → Val1 p)}
+    {H23 : ((p : Port3) → Val3 p) → ((p : Port2) → Val2 p)}
+    (h12 : PreservesPorts σ12 H12) (h23 : PreservesPorts σ23 H23) :
+    PreservesPorts (σ23.trans σ12) (H12 ∘ H23) where
+  port := fun p => h12.port (σ23 p) ∘ h23.port p
+  port_surjective := fun p => (h12.port_surjective (σ23 p)).comp (h23.port_surjective p)
   proj := fun f p => by
-    simp only [Function.comp_apply]
+    simp only [Function.comp_apply, Equiv.trans_apply]
     rw [h12.proj, h23.proj]
+
+/-- Inputs whose ports have equal images have equal images. -/
+theorem PreservesPorts.congr_of_ports {Port1 Port2 : Type}
+    {Val1 : Port1 → Type} {Val2 : Port2 → Type} {σ : Port2 ≃ Port1}
+    {H : ((p : Port2) → Val2 p) → ((p : Port1) → Val1 p)}
+    (hp : PreservesPorts σ H) {f g : (p : Port2) → Val2 p}
+    (h : ∀ p, hp.port p (f p) = hp.port p (g p)) : H f = H g := by
+  have key : ∀ p, H f (σ p) = H g (σ p) := by
+    intro p; rw [hp.proj, hp.proj, h p]
+  funext q
+  have hq := key (σ.symm q)
+  rwa [σ.apply_symm_apply q] at hq
 
 /--
   [textbook/theorem4.45/theorem/port_maps_bijective]
@@ -333,51 +357,61 @@ def PreservesPorts.comp {Port : Type} {Val1 Val2 Val3 : Port → Type}
   `ONTO`), so corresponding ports are equivalent sets. Injectivity of the product map transfers to
   each factor once every port carries a value.
 -/
-theorem PreservesPorts.port_injective {Port : Type} {Val2 Val1 : Port → Type}
-    [∀ p, Nonempty (Val2 p)]
-    {H : ((p : Port) → Val2 p) → ((p : Port) → Val1 p)}
-    (hp : PreservesPorts H) (hinj : Function.Injective H) (p : Port) :
+theorem PreservesPorts.port_injective {Port1 Port2 : Type}
+    {Val1 : Port1 → Type} {Val2 : Port2 → Type} [∀ p, Nonempty (Val2 p)] {σ : Port2 ≃ Port1}
+    {H : ((p : Port2) → Val2 p) → ((p : Port1) → Val1 p)}
+    (hp : PreservesPorts σ H) (hinj : Function.Injective H) (p : Port2) :
     Function.Injective (hp.port p) := by
   classical
   intro a b hab
-  set base : (q : Port) → Val2 q := fun q => Classical.arbitrary (Val2 q) with hbase
+  set base : (q : Port2) → Val2 q := fun q => Classical.arbitrary (Val2 q) with hbase
   have hupd : Function.update base p a = Function.update base p b := by
-    refine hinj ?_
-    funext q
-    rw [hp.proj, hp.proj]
-    by_cases hq : q = p
-    · subst hq; simpa using hab
-    · simp [Function.update_of_ne hq]
+    refine hinj (hp.congr_of_ports ?_)
+    intro r
+    by_cases hr : r = p
+    · subst hr; simpa using hab
+    · simp [Function.update_of_ne hr]
   simpa using congr_fun hupd p
 
-theorem PreservesPorts.port_bijective {Port : Type} {Val2 Val1 : Port → Type}
-    [∀ p, Nonempty (Val2 p)]
-    {H : ((p : Port) → Val2 p) → ((p : Port) → Val1 p)}
-    (hp : PreservesPorts H) (hinj : Function.Injective H) (p : Port) :
+theorem PreservesPorts.port_bijective {Port1 Port2 : Type}
+    {Val1 : Port1 → Type} {Val2 : Port2 → Type} [∀ p, Nonempty (Val2 p)] {σ : Port2 ≃ Port1}
+    {H : ((p : Port2) → Val2 p) → ((p : Port1) → Val1 p)}
+    (hp : PreservesPorts σ H) (hinj : Function.Injective H) (p : Port2) :
     Function.Bijective (hp.port p) :=
   ⟨hp.port_injective hinj p, hp.port_surjective p⟩
 
-/-- The inverse of a port-preserving bijection is again port-preserving. -/
-noncomputable def PreservesPorts.symm {Port : Type} {Val2 Val1 : Port → Type}
-    [∀ p, Nonempty (Val2 p)]
-    {H : ((p : Port) → Val2 p) → ((p : Port) → Val1 p)}
-    (hp : PreservesPorts H) (hbij : Function.Bijective H) :
-    PreservesPorts (Equiv.ofBijective H hbij).symm :=
+/--
+  The inverse of a port-preserving bijection is again port-preserving, with the inverse port
+  bijection `σ⁻¹`. The transport along `σ (σ⁻¹ q) = q` is what makes the permuting case genuinely
+  stronger than the shared-indexing case.
+-/
+noncomputable def PreservesPorts.symm {Port1 Port2 : Type}
+    {Val1 : Port1 → Type} {Val2 : Port2 → Type} [∀ p, Nonempty (Val2 p)] {σ : Port2 ≃ Port1}
+    {H : ((p : Port2) → Val2 p) → ((p : Port1) → Val1 p)}
+    (hp : PreservesPorts σ H) (hbij : Function.Bijective H) :
+    PreservesPorts σ.symm (Equiv.ofBijective H hbij).symm :=
   let e := Equiv.ofBijective H hbij
-  let ep := fun p => Equiv.ofBijective (hp.port p) (hp.port_bijective hbij.1 p)
-  { port := fun p => (ep p).symm
-    port_surjective := fun p => (ep p).symm.surjective
+  let ep : (p : Port2) → Val2 p ≃ Val1 (σ p) :=
+    fun p => Equiv.ofBijective (hp.port p) (hp.port_bijective hbij.1 p)
+  { port := fun q =>
+      (ep (σ.symm q)).symm ∘ Equiv.cast (congrArg Val1 (σ.apply_symm_apply q).symm)
+    port_surjective := fun q =>
+      ((ep (σ.symm q)).symm.surjective).comp (Equiv.cast _).surjective
     proj := by
-      intro g p
-      have hH : H (fun q => (ep q).symm (g q)) = g := by
-        funext q
-        rw [hp.proj]
-        exact (ep q).apply_symm_apply (g q)
-      have : e.symm g = fun q => (ep q).symm (g q) := by
-        refine hbij.1 ?_
-        rw [hH]
-        exact e.apply_symm_apply g
-      rw [this] }
+      intro g q
+      have hH : H (fun p => (ep p).symm (g (σ p))) = g := by
+        have key : ∀ p, H (fun p => (ep p).symm (g (σ p))) (σ p) = g (σ p) := by
+          intro p
+          rw [hp.proj]
+          exact (ep p).apply_symm_apply _
+        funext r
+        have hr := key (σ.symm r)
+        rwa [σ.apply_symm_apply r] at hr
+      have hsymm : e.symm g = fun p => (ep p).symm (g (σ p)) :=
+        e.symm_apply_eq.mpr hH.symm
+      rw [hsymm]
+      simp only [Function.comp_apply, Equiv.cast_apply]
+      exact congrArg (ep (σ.symm q)).symm (pi_apply_cast Val1 g (σ.apply_symm_apply q)) }
 
 /-! ## Exercise 4.80 / 4.81: `HIMPPSY`, the port-preserving homomorphic image parameterization -/
 
@@ -386,33 +420,72 @@ noncomputable def PreservesPorts.symm {Port : Type} {Val2 Val1 : Port → Type}
   A port-preserving homomorphic image witness: a Def 4.3 homomorphism whose input and output
   homomorphisms preserve ports in the sense of Def 4.27.
 -/
-structure PortPreservingHomWitness {SZ1 SZ2 : Type} {Port OutPort : Type}
-    {PortVal1 PortVal2 : Port → Type} {OutPortVal1 OutPortVal2 : OutPort → Type}
-    (Z1 : DiscreteSystem SZ1 ((p : Port) → PortVal1 p) ((q : OutPort) → OutPortVal1 q))
-    (Z2 : DiscreteSystem SZ2 ((p : Port) → PortVal2 p) ((q : OutPort) → OutPortVal2 q))
+structure PortPreservingHomWitness {SZ1 SZ2 : Type} {Port1 Port2 OutPort1 OutPort2 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
+    (Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q))
+    (Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q))
     extends HomomorphicImageWitness Z1 Z2 where
+  /-- [textbook/definition4.27/requirement/input_port_count] `#IPZ₂ = #IPZ₁`. -/
+  inIdx : Port2 ≃ Port1
+  /-- [textbook/definition4.27/requirement/output_port_count] `#OPZ₂ = #OPZ₁`. -/
+  outIdx : OutPort2 ≃ OutPort1
   /-- [textbook/exercise4.80/requirement/preserves_input_ports] `HI` preserves input ports. -/
-  inPorts : PreservesPorts toHomomorphicImageWitness.HI
+  inPorts : PreservesPorts inIdx toHomomorphicImageWitness.HI
   /-- [textbook/exercise4.80/requirement/preserves_output_ports] `HO` preserves output ports. -/
-  outPorts : PreservesPorts toHomomorphicImageWitness.HO
+  outPorts : PreservesPorts outIdx toHomomorphicImageWitness.HO
 
 /--
   [textbook/exercise4.80/definition/himppsy]
   `HIMPPSY`: `Z1` is a port-preserving homomorphic image of `Z2`.
 -/
-def IsPortPreservingHomImage {SZ1 SZ2 : Type} {Port OutPort : Type}
-    {PortVal1 PortVal2 : Port → Type} {OutPortVal1 OutPortVal2 : OutPort → Type}
-    (Z1 : DiscreteSystem SZ1 ((p : Port) → PortVal1 p) ((q : OutPort) → OutPortVal1 q))
-    (Z2 : DiscreteSystem SZ2 ((p : Port) → PortVal2 p) ((q : OutPort) → OutPortVal2 q)) : Prop :=
+def IsPortPreservingHomImage {SZ1 SZ2 : Type} {Port1 Port2 OutPort1 OutPort2 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
+    (Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q))
+    (Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)) : Prop :=
   Nonempty (PortPreservingHomWitness Z1 Z2)
 
 /-- `HIMPPSY` refines `HIMSY`: it really is a system parameterization. -/
-theorem IsPortPreservingHomImage.isHomomorphicImage {SZ1 SZ2 : Type} {Port OutPort : Type}
-    {PortVal1 PortVal2 : Port → Type} {OutPortVal1 OutPortVal2 : OutPort → Type}
-    {Z1 : DiscreteSystem SZ1 ((p : Port) → PortVal1 p) ((q : OutPort) → OutPortVal1 q)}
-    {Z2 : DiscreteSystem SZ2 ((p : Port) → PortVal2 p) ((q : OutPort) → OutPortVal2 q)}
+theorem IsPortPreservingHomImage.isHomomorphicImage {SZ1 SZ2 : Type}
+    {Port1 Port2 OutPort1 OutPort2 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
+    {Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q)}
+    {Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)}
     (h : IsPortPreservingHomImage Z1 Z2) : IsHomomorphicImage Z1 Z2 :=
   ⟨h.some.toHomomorphicImageWitness⟩
+
+/--
+  [textbook/exercise4.80/theorem/preserves_input_ports]
+  `HIMPPSY` really does preserve input ports: the `#IPZ₂` input ports of `Z₂` correspond one-to-one
+  with the `#IPZ₁` input ports of `Z₁`, and `HI` is the portwise product of the family `SHIS`.
+-/
+theorem IsPortPreservingHomImage.inPorts_spec {SZ1 SZ2 : Type}
+    {Port1 Port2 OutPort1 OutPort2 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
+    {Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q)}
+    {Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)}
+    (h : PortPreservingHomWitness Z1 Z2) :
+    ∃ (σ : Port2 ≃ Port1) (HIs : (p : Port2) → PortVal2 p → PortVal1 (σ p)),
+      (∀ p, Function.Surjective (HIs p)) ∧ ∀ f p, h.HI f (σ p) = HIs p (f p) :=
+  ⟨h.inIdx, h.inPorts.port, h.inPorts.port_surjective, h.inPorts.proj⟩
+
+/--
+  [textbook/exercise4.80/theorem/preserves_output_ports]
+  `HIMPPSY` really does preserve output ports.
+-/
+theorem IsPortPreservingHomImage.outPorts_spec {SZ1 SZ2 : Type}
+    {Port1 Port2 OutPort1 OutPort2 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
+    {Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q)}
+    {Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)}
+    (h : PortPreservingHomWitness Z1 Z2) :
+    ∃ (τ : OutPort2 ≃ OutPort1) (HOs : (q : OutPort2) → OutPortVal2 q → OutPortVal1 (τ q)),
+      (∀ q, Function.Surjective (HOs q)) ∧ ∀ f q, h.HO f (τ q) = HOs q (f q) :=
+  ⟨h.outIdx, h.outPorts.port, h.outPorts.port_surjective, h.outPorts.proj⟩
 
 /--
   [textbook/exercise4.81/proof/reflexive]
@@ -423,22 +496,28 @@ def PortPreservingHomWitness.refl {SZ : Type} {Port OutPort : Type}
     (Z : DiscreteSystem SZ ((p : Port) → PortVal p) ((q : OutPort) → OutPortVal q)) :
     PortPreservingHomWitness Z Z where
   toHomomorphicImageWitness := HomomorphicImageWitness.refl Z
+  inIdx := Equiv.refl Port
+  outIdx := Equiv.refl OutPort
   inPorts := PreservesPorts.id
   outPorts := PreservesPorts.id
 
 /--
   [textbook/exercise4.81/proof/transitive]
-  `HIMPPSY` is transitive: coordinatewise maps compose coordinatewise.
+  `HIMPPSY` is transitive: portwise maps compose portwise and the port bijections compose.
 -/
-def PortPreservingHomWitness.comp {SZ1 SZ2 SZ3 : Type} {Port OutPort : Type}
-    {PortVal1 PortVal2 PortVal3 : Port → Type}
-    {OutPortVal1 OutPortVal2 OutPortVal3 : OutPort → Type}
-    {Z1 : DiscreteSystem SZ1 ((p : Port) → PortVal1 p) ((q : OutPort) → OutPortVal1 q)}
-    {Z2 : DiscreteSystem SZ2 ((p : Port) → PortVal2 p) ((q : OutPort) → OutPortVal2 q)}
-    {Z3 : DiscreteSystem SZ3 ((p : Port) → PortVal3 p) ((q : OutPort) → OutPortVal3 q)}
+def PortPreservingHomWitness.comp {SZ1 SZ2 SZ3 : Type}
+    {Port1 Port2 Port3 OutPort1 OutPort2 OutPort3 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type} {PortVal3 : Port3 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
+    {OutPortVal3 : OutPort3 → Type}
+    {Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q)}
+    {Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)}
+    {Z3 : DiscreteSystem SZ3 ((p : Port3) → PortVal3 p) ((q : OutPort3) → OutPortVal3 q)}
     (h12 : PortPreservingHomWitness Z1 Z2) (h23 : PortPreservingHomWitness Z2 Z3) :
     PortPreservingHomWitness Z1 Z3 where
   toHomomorphicImageWitness := h12.toHomomorphicImageWitness.comp h23.toHomomorphicImageWitness
+  inIdx := h23.inIdx.trans h12.inIdx
+  outIdx := h23.outIdx.trans h12.outIdx
   inPorts := h12.inPorts.comp h23.inPorts
   outPorts := h12.outPorts.comp h23.outPorts
 
@@ -456,12 +535,14 @@ theorem isPortPreservingHomImage_refl {SZ : Type} {Port OutPort : Type}
   [textbook/exercise4.81/theorem/himppsy_reflexive_transitive]
   Transitivity half of Exercise 4.81.
 -/
-theorem isPortPreservingHomImage_trans {SZ1 SZ2 SZ3 : Type} {Port OutPort : Type}
-    {PortVal1 PortVal2 PortVal3 : Port → Type}
-    {OutPortVal1 OutPortVal2 OutPortVal3 : OutPort → Type}
-    {Z1 : DiscreteSystem SZ1 ((p : Port) → PortVal1 p) ((q : OutPort) → OutPortVal1 q)}
-    {Z2 : DiscreteSystem SZ2 ((p : Port) → PortVal2 p) ((q : OutPort) → OutPortVal2 q)}
-    {Z3 : DiscreteSystem SZ3 ((p : Port) → PortVal3 p) ((q : OutPort) → OutPortVal3 q)}
+theorem isPortPreservingHomImage_trans {SZ1 SZ2 SZ3 : Type}
+    {Port1 Port2 Port3 OutPort1 OutPort2 OutPort3 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type} {PortVal3 : Port3 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
+    {OutPortVal3 : OutPort3 → Type}
+    {Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q)}
+    {Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)}
+    {Z3 : DiscreteSystem SZ3 ((p : Port3) → PortVal3 p) ((q : OutPort3) → OutPortVal3 q)}
     (h12 : IsPortPreservingHomImage Z1 Z2) (h23 : IsPortPreservingHomImage Z2 Z3) :
     IsPortPreservingHomImage Z1 Z3 :=
   ⟨h12.some.comp h23.some⟩
@@ -473,33 +554,80 @@ theorem isPortPreservingHomImage_trans {SZ1 SZ2 SZ3 : Type} {Port OutPort : Type
   `Z1` is a copy of `Z2` when it is isomorphic to `Z2` and the input/output isomorphisms preserve
   ports with respect to `SHIS` / `SHOS`.
 -/
-structure CopyWitness {SZ1 SZ2 : Type} {Port OutPort : Type}
-    {PortVal1 PortVal2 : Port → Type} {OutPortVal1 OutPortVal2 : OutPort → Type}
-    (Z1 : DiscreteSystem SZ1 ((p : Port) → PortVal1 p) ((q : OutPort) → OutPortVal1 q))
-    (Z2 : DiscreteSystem SZ2 ((p : Port) → PortVal2 p) ((q : OutPort) → OutPortVal2 q))
+structure CopyWitness {SZ1 SZ2 : Type} {Port1 Port2 OutPort1 OutPort2 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
+    (Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q))
+    (Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q))
     extends IsomorphismWitness Z1 Z2 where
+  /-- [textbook/definition4.47/requirement/input_port_count] `#IPZ₂ = #IPZ₁`. -/
+  inIdx : Port2 ≃ Port1
+  /-- [textbook/definition4.47/requirement/output_port_count] `#OPZ₂ = #OPZ₁`. -/
+  outIdx : OutPort2 ≃ OutPort1
   /-- [textbook/definition4.47/requirement/preserves_input_ports] `HI` preserves input ports. -/
-  inPorts : PreservesPorts toIsomorphismWitness.HI
+  inPorts : PreservesPorts inIdx toIsomorphismWitness.HI
   /-- [textbook/definition4.47/requirement/preserves_output_ports] `HO` preserves output ports. -/
-  outPorts : PreservesPorts toIsomorphismWitness.HO
+  outPorts : PreservesPorts outIdx toIsomorphismWitness.HO
 
 /--
   [textbook/definition4.53/definition/copy]
   `COPY`: `Z1` is a copy of `Z2` when a copy witness exists.
 -/
-def IsCopyOf {SZ1 SZ2 : Type} {Port OutPort : Type}
-    {PortVal1 PortVal2 : Port → Type} {OutPortVal1 OutPortVal2 : OutPort → Type}
-    (Z1 : DiscreteSystem SZ1 ((p : Port) → PortVal1 p) ((q : OutPort) → OutPortVal1 q))
-    (Z2 : DiscreteSystem SZ2 ((p : Port) → PortVal2 p) ((q : OutPort) → OutPortVal2 q)) : Prop :=
+def IsCopyOf {SZ1 SZ2 : Type} {Port1 Port2 OutPort1 OutPort2 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
+    (Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q))
+    (Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)) : Prop :=
   Nonempty (CopyWitness Z1 Z2)
 
 /-- Copies are isomorphs. -/
-theorem IsCopyOf.isIsomorphicTo {SZ1 SZ2 : Type} {Port OutPort : Type}
-    {PortVal1 PortVal2 : Port → Type} {OutPortVal1 OutPortVal2 : OutPort → Type}
-    {Z1 : DiscreteSystem SZ1 ((p : Port) → PortVal1 p) ((q : OutPort) → OutPortVal1 q)}
-    {Z2 : DiscreteSystem SZ2 ((p : Port) → PortVal2 p) ((q : OutPort) → OutPortVal2 q)}
+theorem IsCopyOf.isIsomorphicTo {SZ1 SZ2 : Type} {Port1 Port2 OutPort1 OutPort2 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
+    {Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q)}
+    {Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)}
     (h : IsCopyOf Z1 Z2) : IsIsomorphicTo Z1 Z2 :=
   ⟨h.some.toIsomorphismWitness⟩
+
+/-- A copy is in particular a port-preserving homomorphic image. -/
+def CopyWitness.toPortPreservingHomWitness {SZ1 SZ2 : Type}
+    {Port1 Port2 OutPort1 OutPort2 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
+    {Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q)}
+    {Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)}
+    (h : CopyWitness Z1 Z2) : PortPreservingHomWitness Z1 Z2 where
+  toHomomorphicImageWitness := h.toHomomorphicImageWitness
+  inIdx := h.inIdx
+  outIdx := h.outIdx
+  inPorts := h.inPorts
+  outPorts := h.outPorts
+
+/--
+  [textbook/theorem4.45/theorem/port_maps_bijective]
+  Theorem 4.45 for copies: corresponding input ports are equivalent sets.
+-/
+theorem CopyWitness.inPort_bijective {SZ1 SZ2 : Type} {Port1 Port2 OutPort1 OutPort2 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
+    [∀ p, Nonempty (PortVal2 p)]
+    {Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q)}
+    {Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)}
+    (h : CopyWitness Z1 Z2) (p : Port2) : Function.Bijective (h.inPorts.port p) :=
+  h.inPorts.port_bijective h.HI_injective p
+
+/--
+  [textbook/theorem4.45/theorem/port_maps_bijective]
+  Theorem 4.45 for copies: corresponding output ports are equivalent sets.
+-/
+theorem CopyWitness.outPort_bijective {SZ1 SZ2 : Type} {Port1 Port2 OutPort1 OutPort2 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
+    [∀ q, Nonempty (OutPortVal2 q)]
+    {Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q)}
+    {Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)}
+    (h : CopyWitness Z1 Z2) (q : OutPort2) : Function.Bijective (h.outPorts.port q) :=
+  h.outPorts.port_bijective h.HO_injective q
 
 /-- [textbook/exercise4.84/proof/reflexive] Reflexivity of the copy relation. -/
 def CopyWitness.refl {SZ : Type} {Port OutPort : Type}
@@ -507,33 +635,42 @@ def CopyWitness.refl {SZ : Type} {Port OutPort : Type}
     (Z : DiscreteSystem SZ ((p : Port) → PortVal p) ((q : OutPort) → OutPortVal q)) :
     CopyWitness Z Z where
   toIsomorphismWitness := IsomorphismWitness.refl Z
+  inIdx := Equiv.refl Port
+  outIdx := Equiv.refl OutPort
   inPorts := PreservesPorts.id
   outPorts := PreservesPorts.id
 
 /-- [textbook/exercise4.84/proof/transitive] Transitivity of the copy relation. -/
-def CopyWitness.comp {SZ1 SZ2 SZ3 : Type} {Port OutPort : Type}
-    {PortVal1 PortVal2 PortVal3 : Port → Type}
-    {OutPortVal1 OutPortVal2 OutPortVal3 : OutPort → Type}
-    {Z1 : DiscreteSystem SZ1 ((p : Port) → PortVal1 p) ((q : OutPort) → OutPortVal1 q)}
-    {Z2 : DiscreteSystem SZ2 ((p : Port) → PortVal2 p) ((q : OutPort) → OutPortVal2 q)}
-    {Z3 : DiscreteSystem SZ3 ((p : Port) → PortVal3 p) ((q : OutPort) → OutPortVal3 q)}
+def CopyWitness.comp {SZ1 SZ2 SZ3 : Type}
+    {Port1 Port2 Port3 OutPort1 OutPort2 OutPort3 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type} {PortVal3 : Port3 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
+    {OutPortVal3 : OutPort3 → Type}
+    {Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q)}
+    {Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)}
+    {Z3 : DiscreteSystem SZ3 ((p : Port3) → PortVal3 p) ((q : OutPort3) → OutPortVal3 q)}
     (h12 : CopyWitness Z1 Z2) (h23 : CopyWitness Z2 Z3) : CopyWitness Z1 Z3 where
   toIsomorphismWitness := h12.toIsomorphismWitness.comp h23.toIsomorphismWitness
+  inIdx := h23.inIdx.trans h12.inIdx
+  outIdx := h23.outIdx.trans h12.outIdx
   inPorts := h12.inPorts.comp h23.inPorts
   outPorts := h12.outPorts.comp h23.outPorts
 
 /--
   [textbook/exercise4.84/proof/symmetric]
   Symmetry of the copy relation: by Theorem 4.45 each port map is bijective, so the inverse
-  isomorphism is again port-preserving.
+  isomorphism is again port-preserving, now with the inverse port bijections `σ⁻¹`, `τ⁻¹`.
 -/
-noncomputable def CopyWitness.symm {SZ1 SZ2 : Type} {Port OutPort : Type}
-    {PortVal1 PortVal2 : Port → Type} {OutPortVal1 OutPortVal2 : OutPort → Type}
+noncomputable def CopyWitness.symm {SZ1 SZ2 : Type} {Port1 Port2 OutPort1 OutPort2 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
     [∀ p, Nonempty (PortVal2 p)] [∀ q, Nonempty (OutPortVal2 q)]
-    {Z1 : DiscreteSystem SZ1 ((p : Port) → PortVal1 p) ((q : OutPort) → OutPortVal1 q)}
-    {Z2 : DiscreteSystem SZ2 ((p : Port) → PortVal2 p) ((q : OutPort) → OutPortVal2 q)}
+    {Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q)}
+    {Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)}
     (h : CopyWitness Z1 Z2) : CopyWitness Z2 Z1 where
   toIsomorphismWitness := h.toIsomorphismWitness.symm
+  inIdx := h.inIdx.symm
+  outIdx := h.outIdx.symm
   inPorts := h.inPorts.symm h.HI_bijective
   outPorts := h.outPorts.symm h.HO_bijective
 
@@ -551,24 +688,27 @@ theorem isCopyOf_refl {SZ : Type} {Port OutPort : Type}
   [textbook/exercise4.84/theorem/copy_transitive]
   Exercise 4.84: the copy relation is transitive.
 -/
-theorem isCopyOf_trans {SZ1 SZ2 SZ3 : Type} {Port OutPort : Type}
-    {PortVal1 PortVal2 PortVal3 : Port → Type}
-    {OutPortVal1 OutPortVal2 OutPortVal3 : OutPort → Type}
-    {Z1 : DiscreteSystem SZ1 ((p : Port) → PortVal1 p) ((q : OutPort) → OutPortVal1 q)}
-    {Z2 : DiscreteSystem SZ2 ((p : Port) → PortVal2 p) ((q : OutPort) → OutPortVal2 q)}
-    {Z3 : DiscreteSystem SZ3 ((p : Port) → PortVal3 p) ((q : OutPort) → OutPortVal3 q)}
+theorem isCopyOf_trans {SZ1 SZ2 SZ3 : Type}
+    {Port1 Port2 Port3 OutPort1 OutPort2 OutPort3 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type} {PortVal3 : Port3 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
+    {OutPortVal3 : OutPort3 → Type}
+    {Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q)}
+    {Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)}
+    {Z3 : DiscreteSystem SZ3 ((p : Port3) → PortVal3 p) ((q : OutPort3) → OutPortVal3 q)}
     (h12 : IsCopyOf Z1 Z2) (h23 : IsCopyOf Z2 Z3) : IsCopyOf Z1 Z3 :=
   ⟨h12.some.comp h23.some⟩
 
 /--
   [textbook/exercise4.84/theorem/copy_symmetric]
-  Exercise 4.84: the copy relation is symmetric.
+  Exercise 4.84: the copy relation is symmetric, even when the copy permutes ports.
 -/
-theorem isCopyOf_symm {SZ1 SZ2 : Type} {Port OutPort : Type}
-    {PortVal1 PortVal2 : Port → Type} {OutPortVal1 OutPortVal2 : OutPort → Type}
+theorem isCopyOf_symm {SZ1 SZ2 : Type} {Port1 Port2 OutPort1 OutPort2 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
     [∀ p, Nonempty (PortVal2 p)] [∀ q, Nonempty (OutPortVal2 q)]
-    {Z1 : DiscreteSystem SZ1 ((p : Port) → PortVal1 p) ((q : OutPort) → OutPortVal1 q)}
-    {Z2 : DiscreteSystem SZ2 ((p : Port) → PortVal2 p) ((q : OutPort) → OutPortVal2 q)}
+    {Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q)}
+    {Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)}
     (h : IsCopyOf Z1 Z2) : IsCopyOf Z2 Z1 :=
   ⟨h.some.symm⟩
 

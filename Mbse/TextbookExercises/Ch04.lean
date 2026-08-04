@@ -7,8 +7,9 @@ Exercise/theorem aliases for the Chapter 4 algebraic results proved in
 [`Mbse.Isomorphism`](../Isomorphism.lean): Theorem 4.31, Theorem 4.38, Theorem 4.45,
 Exercises 4.80, 4.81, 4.82 and 4.84.
 
-Port encoding: textbook `#IPZ₂ = #IPZ₁` is modeled by sharing the port index type, so that
-Def 4.27 clause (ii) becomes "the homomorphism acts coordinatewise through surjections".
+Port encoding: textbook `#IPZ₂ = #IPZ₁` is modeled by an explicit bijection `σ : Port₂ ≃ Port₁`
+between port index types, so a port-preserving map may *permute* ports; Def 4.27 clause (ii)
+becomes "the homomorphism acts portwise through surjections `HIᵢ : IᵢZ₂ → I_{σ i}Z₁`".
 -/
 
 namespace Mbse.TextbookExercises.Ch04
@@ -51,10 +52,10 @@ abbrev thm4_38_isomorphism_symmetric {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
   In a port-preserving isomorphism each `HIᵢ` is `1TO1` and `ONTO`, so corresponding ports are
   equivalent sets.
 -/
-abbrev thm4_45_port_maps_bijective {Port : Type} {Val2 Val1 : Port → Type}
-    [∀ p, Nonempty (Val2 p)]
-    {H : ((p : Port) → Val2 p) → ((p : Port) → Val1 p)}
-    (hp : PreservesPorts H) (hinj : Function.Injective H) (p : Port) :=
+abbrev thm4_45_port_maps_bijective {Port1 Port2 : Type}
+    {Val1 : Port1 → Type} {Val2 : Port2 → Type} [∀ p, Nonempty (Val2 p)] {σ : Port2 ≃ Port1}
+    {H : ((p : Port2) → Val2 p) → ((p : Port1) → Val1 p)}
+    (hp : PreservesPorts σ H) (hinj : Function.Injective H) (p : Port2) :=
   hp.port_bijective hinj p
 
 /-! ## Exercise 4.80 / 4.81: `HIMPPSY` -/
@@ -64,12 +65,38 @@ abbrev thm4_45_port_maps_bijective {Port : Type} {Val2 Val1 : Port → Type}
   `HIMPPSY` is a system parameterization refining `HIMSY`, and it preserves input and output ports
   by construction.
 -/
-abbrev ex4_80_himppsy_is_parameterization {SZ1 SZ2 : Type} {Port OutPort : Type}
-    {PortVal1 PortVal2 : Port → Type} {OutPortVal1 OutPortVal2 : OutPort → Type}
-    {Z1 : DiscreteSystem SZ1 ((p : Port) → PortVal1 p) ((q : OutPort) → OutPortVal1 q)}
-    {Z2 : DiscreteSystem SZ2 ((p : Port) → PortVal2 p) ((q : OutPort) → OutPortVal2 q)}
+abbrev ex4_80_himppsy_is_parameterization {SZ1 SZ2 : Type}
+    {Port1 Port2 OutPort1 OutPort2 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
+    {Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q)}
+    {Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)}
     (h : IsPortPreservingHomImage Z1 Z2) :=
   h.isHomomorphicImage
+
+/--
+  [textbook/exercise4.80/theorem/preserves_input_ports]
+  `HIMPPSY` actually preserves input ports.
+-/
+abbrev ex4_80_preserves_input_ports {SZ1 SZ2 : Type} {Port1 Port2 OutPort1 OutPort2 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
+    {Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q)}
+    {Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)}
+    (h : PortPreservingHomWitness Z1 Z2) :=
+  IsPortPreservingHomImage.inPorts_spec h
+
+/--
+  [textbook/exercise4.80/theorem/preserves_output_ports]
+  `HIMPPSY` actually preserves output ports.
+-/
+abbrev ex4_80_preserves_output_ports {SZ1 SZ2 : Type} {Port1 Port2 OutPort1 OutPort2 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
+    {Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q)}
+    {Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)}
+    (h : PortPreservingHomWitness Z1 Z2) :=
+  IsPortPreservingHomImage.outPorts_spec h
 
 /--
   [textbook/exercise4.81/theorem/himppsy_reflexive_transitive]
@@ -84,12 +111,14 @@ abbrev ex4_81_reflexive {SZ : Type} {Port OutPort : Type}
   [textbook/exercise4.81/theorem/himppsy_reflexive_transitive]
   `HIMPPSY` is transitive.
 -/
-abbrev ex4_81_transitive {SZ1 SZ2 SZ3 : Type} {Port OutPort : Type}
-    {PortVal1 PortVal2 PortVal3 : Port → Type}
-    {OutPortVal1 OutPortVal2 OutPortVal3 : OutPort → Type}
-    {Z1 : DiscreteSystem SZ1 ((p : Port) → PortVal1 p) ((q : OutPort) → OutPortVal1 q)}
-    {Z2 : DiscreteSystem SZ2 ((p : Port) → PortVal2 p) ((q : OutPort) → OutPortVal2 q)}
-    {Z3 : DiscreteSystem SZ3 ((p : Port) → PortVal3 p) ((q : OutPort) → OutPortVal3 q)}
+abbrev ex4_81_transitive {SZ1 SZ2 SZ3 : Type}
+    {Port1 Port2 Port3 OutPort1 OutPort2 OutPort3 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type} {PortVal3 : Port3 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
+    {OutPortVal3 : OutPort3 → Type}
+    {Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q)}
+    {Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)}
+    {Z3 : DiscreteSystem SZ3 ((p : Port3) → PortVal3 p) ((q : OutPort3) → OutPortVal3 q)}
     (h12 : IsPortPreservingHomImage Z1 Z2) (h23 : IsPortPreservingHomImage Z2 Z3) :=
   isPortPreservingHomImage_trans h12 h23
 
@@ -136,24 +165,27 @@ abbrev ex4_84_reflexive {SZ : Type} {Port OutPort : Type}
   [textbook/exercise4.84/theorem/copy_transitive]
   Exercise 4.84: transitivity.
 -/
-abbrev ex4_84_transitive {SZ1 SZ2 SZ3 : Type} {Port OutPort : Type}
-    {PortVal1 PortVal2 PortVal3 : Port → Type}
-    {OutPortVal1 OutPortVal2 OutPortVal3 : OutPort → Type}
-    {Z1 : DiscreteSystem SZ1 ((p : Port) → PortVal1 p) ((q : OutPort) → OutPortVal1 q)}
-    {Z2 : DiscreteSystem SZ2 ((p : Port) → PortVal2 p) ((q : OutPort) → OutPortVal2 q)}
-    {Z3 : DiscreteSystem SZ3 ((p : Port) → PortVal3 p) ((q : OutPort) → OutPortVal3 q)}
+abbrev ex4_84_transitive {SZ1 SZ2 SZ3 : Type}
+    {Port1 Port2 Port3 OutPort1 OutPort2 OutPort3 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type} {PortVal3 : Port3 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
+    {OutPortVal3 : OutPort3 → Type}
+    {Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q)}
+    {Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)}
+    {Z3 : DiscreteSystem SZ3 ((p : Port3) → PortVal3 p) ((q : OutPort3) → OutPortVal3 q)}
     (h12 : IsCopyOf Z1 Z2) (h23 : IsCopyOf Z2 Z3) :=
   isCopyOf_trans h12 h23
 
 /--
   [textbook/exercise4.84/theorem/copy_symmetric]
-  Exercise 4.84: symmetry.
+  Exercise 4.84: symmetry, in the strong form that allows the copy to permute ports.
 -/
-abbrev ex4_84_symmetric {SZ1 SZ2 : Type} {Port OutPort : Type}
-    {PortVal1 PortVal2 : Port → Type} {OutPortVal1 OutPortVal2 : OutPort → Type}
+abbrev ex4_84_symmetric {SZ1 SZ2 : Type} {Port1 Port2 OutPort1 OutPort2 : Type}
+    {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type}
+    {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
     [∀ p, Nonempty (PortVal2 p)] [∀ q, Nonempty (OutPortVal2 q)]
-    {Z1 : DiscreteSystem SZ1 ((p : Port) → PortVal1 p) ((q : OutPort) → OutPortVal1 q)}
-    {Z2 : DiscreteSystem SZ2 ((p : Port) → PortVal2 p) ((q : OutPort) → OutPortVal2 q)}
+    {Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q)}
+    {Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)}
     (h : IsCopyOf Z1 Z2) :=
   isCopyOf_symm h
 
