@@ -1,0 +1,24 @@
+{
+  "id": "4.81",
+  "kind": "theorem_proof",
+  "name": "HIMPPSY is reflexive and transitive",
+  "chapter": 4,
+  "description": "Exercise 4.81: prove that HIMPPSY (see Exercise 4.80) is reflexive and transitive.",
+  "elements": [
+    {
+      "id": "4.81/theorem/himppsy_reflexive_transitive",
+      "type": "theorem",
+      "text": "HIMPPSY is reflexive (identity homomorphisms preserve every port) and transitive (coordinatewise maps compose coordinatewise)."
+    },
+    {
+      "id": "4.81/proof/reflexive",
+      "type": "proof",
+      "text": "The identity acts coordinatewise through identity port maps."
+    },
+    {
+      "id": "4.81/proof/transitive",
+      "type": "proof",
+      "text": "Composites of coordinatewise surjections are coordinatewise surjections."
+    }
+  ]
+}

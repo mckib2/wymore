@@ -1,0 +1,13 @@
+{
+  "id": "4.53",
+  "name": "Parameterization of system copies",
+  "chapter": 4,
+  "description": "Definition 4.53: COPY = {((Z1, HS, HI, HO, SHIS, SHOS), Z2): Z2 = ISY(Z1, HS, HI, HO); HI preserves input ports with respect to SHIS; HO preserves output ports with respect to SHOS}.",
+  "elements": [
+    {
+      "id": "4.53/definition/copy",
+      "type": "definition",
+      "text": "COPY: Z1 is a copy of Z2 exactly when a copy witness exists."
+    }
+  ]
+}

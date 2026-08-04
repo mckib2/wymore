@@ -1,6 +1,7 @@
 import Mbse.TextbookExercises.Predicates
 import Mbse.TextbookExercises.Ch02
 import Mbse.TextbookExercises.Ch03
+import Mbse.TextbookExercises.Ch04
 import Mbse.TextbookExercises.Registry
 
 /-!

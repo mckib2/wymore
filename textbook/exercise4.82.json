@@ -1,0 +1,24 @@
+{
+  "id": "4.82",
+  "kind": "theorem_proof",
+  "name": "System isomorphism is an equivalence",
+  "chapter": 4,
+  "description": "Exercise 4.82: prove that system isomorphism is (i) reflexive, (ii) transitive and (iii) symmetric.",
+  "elements": [
+    {
+      "id": "4.82/theorem/isomorphism_reflexive",
+      "type": "theorem",
+      "text": "Every system is isomorphic to itself via the identity maps."
+    },
+    {
+      "id": "4.82/theorem/isomorphism_transitive",
+      "type": "theorem",
+      "text": "Composites of isomorphisms are isomorphisms."
+    },
+    {
+      "id": "4.82/theorem/isomorphism_symmetric",
+      "type": "theorem",
+      "text": "Inverses of isomorphisms are isomorphisms."
+    }
+  ]
+}

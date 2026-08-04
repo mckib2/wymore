@@ -1,0 +1,23 @@
+{
+  "id": "4.47",
+  "name": "Copies",
+  "chapter": 4,
+  "description": "Definition 4.47: Z2 is a copy of Z1 with respect to HS, HI, HO, SHIS and SHOS iff Z2 is isomorphic to Z1 with respect to HS, HI, HO, and HI preserves input ports with respect to SHIS while HO preserves output ports with respect to SHOS.",
+  "elements": [
+    {
+      "id": "4.47/definition/copy",
+      "type": "definition",
+      "text": "A copy is a port-preserving isomorphism: an isomorphism whose input and output maps act coordinatewise on ports."
+    },
+    {
+      "id": "4.47/requirement/preserves_input_ports",
+      "type": "component",
+      "text": "HI preserves input ports with respect to SHIS."
+    },
+    {
+      "id": "4.47/requirement/preserves_output_ports",
+      "type": "component",
+      "text": "HO preserves output ports with respect to SHOS."
+    }
+  ]
+}

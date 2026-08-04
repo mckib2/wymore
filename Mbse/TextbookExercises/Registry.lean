@@ -1,5 +1,6 @@
 import Mbse.TextbookExercises.Ch02
 import Mbse.TextbookExercises.Ch03
+import Mbse.TextbookExercises.Ch04
 
 /-!
 # Textbook exercise registry
@@ -57,6 +58,10 @@ def registry : List ExerciseEntry :=
   , ⟨"3.131", 3, .theoremProof, "solved", "Ch03.ex3_131_subsystem_transitive"⟩
   , ⟨"3.132", 3, .theoremProof, "solved", "Ch03.ex3_132_singular_cfscr_eq_closed_loop"⟩
   , ⟨"3.133", 3, .theoremProof, "solved", "Ch03.ex3_133_conjunctive_cfscr_eq_closed_loop"⟩
+  , ⟨"4.80", 4, .theoremProof, "solved", "Ch04.ex4_80_himppsy_is_parameterization"⟩
+  , ⟨"4.81", 4, .theoremProof, "solved", "Ch04.ex4_81_reflexive"⟩
+  , ⟨"4.82", 4, .theoremProof, "solved", "Ch04.ex4_82_reflexive"⟩
+  , ⟨"4.84", 4, .theoremProof, "solved", "Ch04.ex4_84_reflexive"⟩
   ]
 
 def solvedCount : Nat :=

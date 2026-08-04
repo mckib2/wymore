@@ -1,0 +1,13 @@
+{
+  "id": "4.35",
+  "name": "Parameterization of system isomorphs",
+  "chapter": 4,
+  "description": "Definition 4.35: ISY = {((Z2, HS, HI, HO), Z1): Z1 = HIMSY(Z2, HS, HI, HO); HS, HI and HO are 1TO1}.",
+  "elements": [
+    {
+      "id": "4.35/definition/isy",
+      "type": "definition",
+      "text": "ISY: Z1 is an isomorph of Z2 exactly when an isomorphism witness exists."
+    }
+  ]
+}

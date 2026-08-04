@@ -381,6 +381,16 @@
 | `4.10/component/nz1` | `component` | NZ1 induced from Z2 via HS, HI, HO and next-state consistency. | ✅ Faithful | `himsy` ([Mbse/Homomorphism.lean:154](Mbse/Homomorphism.lean#L154)) |
 | `4.10/component/rz1` | `component` | RZ1 induced from Z2 via HS, HO and readout consistency. | ✅ Faithful | `himsy` ([Mbse/Homomorphism.lean:154](Mbse/Homomorphism.lean#L154)) |
 
+### `textbook/definition4.27` — Port-preserving homomorphisms
+
+- Structured source file: [textbook/definition4.27.json](textbook/definition4.27.json)
+- Description: *Definition 4.27: HI preserves input ports with respect to SHIS iff #IPZ2 = #IPZ1 and for each i there is HIi ∈ FNS(IiZ2, ONTO, IiZ1) with SHIS = {HIi} and PJN(IZ1,i) ∘ HI = HIi ∘ PJN(IZ2,i); dually for HO and SHOS. Port counts are encoded by sharing the port index type, so clause (ii) says the homomorphism acts coordinatewise.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `4.27/definition/preserves_ports` | `definition` | H preserves ports with respect to a family {Hi} of surjections when PJN(·,i) ∘ H = Hi ∘ PJN(·,i) for every port i. | ✅ Faithful | `PreservesPorts` ([Mbse/Isomorphism.lean:296](Mbse/Isomorphism.lean#L296)) |
+| `4.27/component/port_family` | `component` | The family SHIS = {HIi} (resp. SHOS = {HOj}) of per-port maps. | ✅ Faithful | `PreservesPorts.port` ([Mbse/Isomorphism.lean:304](Mbse/Isomorphism.lean#L304)) |
+
 ### `textbook/definition4.3` — System Homomorphisms
 
 - Structured source file: [textbook/definition4.3.json](textbook/definition4.3.json)
@@ -396,6 +406,47 @@
 | `4.3/component/output_homomorphism` | `component` | HO is the output homomorphism. | ✅ Faithful | `HomomorphicImageWitness.HO` ([Mbse/Homomorphism.lean:47](Mbse/Homomorphism.lean#L47)) |
 | `4.3/implication/consistent_simplification` | `implication` | If Z1 is a homomorphic image of Z2, then Z1 is a consistent simplification of Z2 and Z2 is a consistent elaboration of Z1. | ✅ Faithful | `homomorphic_image_consistent_simplification` ([Mbse/Homomorphism.lean:101](Mbse/Homomorphism.lean#L101)) |
 | `4.3/implication/functional_capability` | `implication` | If Z1 is a homomorphic image of Z2, then Z2 has the functional capability of Z1. | ✅ Faithful | `homomorphic_image_functional_capability` ([Mbse/Homomorphism.lean:89](Mbse/Homomorphism.lean#L89)) |
+
+### `textbook/definition4.33` — System isomorphisms
+
+- Structured source file: [textbook/definition4.33.json](textbook/definition4.33.json)
+- Description: *Definition 4.33: Z1 is isomorphic to Z2 with respect to HS, HI, HO iff Z1 is a homomorphic image of Z2 with respect to HS, HI, HO and each of HS, HI, HO is 1TO1.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `4.33/definition/system_isomorphism` | `definition` | Z1 is isomorphic to Z2 when a homomorphic image witness exists whose HS, HI, HO are all injective. | ✅ Faithful | `IsomorphismWitness` ([Mbse/Isomorphism.lean:149](Mbse/Isomorphism.lean#L149)) |
+| `4.33/requirement/state_injective` | `component` | HS is 1TO1 (the state isomorphism). | ✅ Faithful | `IsomorphismWitness.HS_injective` ([Mbse/Isomorphism.lean:157](Mbse/Isomorphism.lean#L157)) |
+| `4.33/requirement/input_injective` | `component` | HI is 1TO1 (the input isomorphism). | ✅ Faithful | `IsomorphismWitness.HI_injective` ([Mbse/Isomorphism.lean:159](Mbse/Isomorphism.lean#L159)) |
+| `4.33/requirement/output_injective` | `component` | HO is 1TO1 (the output isomorphism). | ✅ Faithful | `IsomorphismWitness.HO_injective` ([Mbse/Isomorphism.lean:161](Mbse/Isomorphism.lean#L161)) |
+
+### `textbook/definition4.35` — Parameterization of system isomorphs
+
+- Structured source file: [textbook/definition4.35.json](textbook/definition4.35.json)
+- Description: *Definition 4.35: ISY = {((Z2, HS, HI, HO), Z1): Z1 = HIMSY(Z2, HS, HI, HO); HS, HI and HO are 1TO1}.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `4.35/definition/isy` | `definition` | ISY: Z1 is an isomorph of Z2 exactly when an isomorphism witness exists. | ✅ Faithful | `IsIsomorphicTo` ([Mbse/Isomorphism.lean:164](Mbse/Isomorphism.lean#L164)) |
+
+### `textbook/definition4.47` — Copies
+
+- Structured source file: [textbook/definition4.47.json](textbook/definition4.47.json)
+- Description: *Definition 4.47: Z2 is a copy of Z1 with respect to HS, HI, HO, SHIS and SHOS iff Z2 is isomorphic to Z1 with respect to HS, HI, HO, and HI preserves input ports with respect to SHIS while HO preserves output ports with respect to SHOS.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `4.47/definition/copy` | `definition` | A copy is a port-preserving isomorphism: an isomorphism whose input and output maps act coordinatewise on ports. | ✅ Faithful | `CopyWitness` ([Mbse/Isomorphism.lean:471](Mbse/Isomorphism.lean#L471)) |
+| `4.47/requirement/preserves_input_ports` | `component` | HI preserves input ports with respect to SHIS. | ✅ Faithful | `CopyWitness.inPorts` ([Mbse/Isomorphism.lean:481](Mbse/Isomorphism.lean#L481)) |
+| `4.47/requirement/preserves_output_ports` | `component` | HO preserves output ports with respect to SHOS. | ✅ Faithful | `CopyWitness.outPorts` ([Mbse/Isomorphism.lean:483](Mbse/Isomorphism.lean#L483)) |
+
+### `textbook/definition4.53` — Parameterization of system copies
+
+- Structured source file: [textbook/definition4.53.json](textbook/definition4.53.json)
+- Description: *Definition 4.53: COPY = {((Z1, HS, HI, HO, SHIS, SHOS), Z2): Z2 = ISY(Z1, HS, HI, HO); HI preserves input ports with respect to SHIS; HO preserves output ports with respect to SHOS}.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `4.53/definition/copy` | `definition` | COPY: Z1 is a copy of Z2 exactly when a copy witness exists. | ✅ Faithful | `IsCopyOf` ([Mbse/Isomorphism.lean:486](Mbse/Isomorphism.lean#L486)) |
 
 ### `textbook/definition_a1.155` — Function Specification (FNS)
 
@@ -825,6 +876,49 @@
 | `4.15/proof/forward` | `component` | If Z1 = HIMSY(Z2, HS, HI, HO), then Z1 is a homomorphic image of Z2. | ✅ Faithful | `homomorphic_image_eq_himsy` ([Mbse/Homomorphism.lean:204](Mbse/Homomorphism.lean#L204)) |
 | `4.15/proof/reverse` | `component` | If Z1 is a homomorphic image of Z2 with respect to HS, HI, HO, then Z1 = HIMSY(Z2, HS, HI, HO). | ✅ Faithful | `himsy_is_homomorphic_image` ([Mbse/Homomorphism.lean:263](Mbse/Homomorphism.lean#L263)) |
 
+### `textbook/theorem4.22` — Experiments on a system determine experiments on its homomorphisms
+
+- Structured source file: [textbook/theorem4.22.json](textbook/theorem4.22.json)
+- Description: *Theorem 4.22: if Z1 = HIMSY(Z2, HS, HI, HO) and (f, x, t) ∈ EXZ2, then (HI ∘ f, HS(x), t) ∈ EXZ1, HS(STZ2(f,x)(t)) = STZ1(HI∘f, HS(x))(t), HS ∘ STZ2(f,x) = STZ1(HI∘f, HS(x)), and HO ∘ OTZ2(f,x) = OTZ1(HI∘f, HS(x)).*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `4.22/definition/experiment_image` | `definition` | The image experiment (HI ∘ f, HS(x), t) ∈ EXZ1 of an experiment (f, x, t) ∈ EXZ2. | ✅ Faithful | `HomomorphicImageWitness` ([Mbse/Isomorphism.lean:86](Mbse/Isomorphism.lean#L86)) |
+| `4.22/theorem/state_value` | `theorem` | HS(STZ2(f,x)(t)) = STZ1(HI∘f, HS(x))(t). | ✅ Faithful | `homomorphism_experiment_state_value` ([Mbse/Isomorphism.lean:95](Mbse/Isomorphism.lean#L95)) |
+| `4.22/theorem/state_trajectory` | `theorem` | HS ∘ STZ2(f,x) = STZ1(HI∘f, HS(x)). | ✅ Faithful | `homomorphism_experiment_state_trajectory` ([Mbse/Isomorphism.lean:106](Mbse/Isomorphism.lean#L106)) |
+| `4.22/theorem/output_trajectory` | `theorem` | HO ∘ OTZ2(f,x) = OTZ1(HI∘f, HS(x)). | ✅ Faithful | `homomorphism_experiment_output_trajectory` ([Mbse/Isomorphism.lean:117](Mbse/Isomorphism.lean#L117)) |
+| `4.22/theorem/experiments_transfer` | `theorem` | An experiment on Z2 determines an experiment on Z1 whose state and output trajectories are the HS/HO images. | ✅ Faithful | `homomorphism_experiments_transfer` ([Mbse/Isomorphism.lean:128](Mbse/Isomorphism.lean#L128)) |
+
+### `textbook/theorem4.31` — System homomorphism is reflexive and transitive
+
+- Structured source file: [textbook/theorem4.31.json](textbook/theorem4.31.json)
+- Description: *Theorem 4.31: Z = HIMSY(Z, ID(SZ), ID(IZ), ID(OZ)) for every Z; and if Z1 = HIMSY(Z2, HS1, HI1, HO1) and Z2 = HIMSY(Z3, HS2, HI2, HO2) then Z1 = HIMSY(Z3, HS1∘HS2, HI1∘HI2, HO1∘HO2).*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `4.31/theorem/homomorphism_reflexive_transitive` | `theorem` | The homomorphic-image relation is reflexive (identity homomorphisms) and transitive (componentwise composition). | ✅ Faithful | `isHomomorphicImage_refl` ([Mbse/Isomorphism.lean:65](Mbse/Isomorphism.lean#L65))<br>`isHomomorphicImage_trans` ([Mbse/Isomorphism.lean:73](Mbse/Isomorphism.lean#L73))<br>`thm4_31_reflexive` ([Mbse/TextbookExercises/Ch04.lean:20](Mbse/TextbookExercises/Ch04.lean#L20))<br>`thm4_31_transitive` ([Mbse/TextbookExercises/Ch04.lean:27](Mbse/TextbookExercises/Ch04.lean#L27)) |
+| `4.31/proof/reflexive` | `proof` | Identity maps are surjective and trivially preserve NZ and RZ. | ✅ Faithful | `HomomorphicImageWitness` ([Mbse/Isomorphism.lean:26](Mbse/Isomorphism.lean#L26)) |
+| `4.31/proof/transitive` | `proof` | Composites of surjections are surjective; transition and readout consistency chain through the middle system. | ✅ Faithful | `HomomorphicImageWitness` ([Mbse/Isomorphism.lean:41](Mbse/Isomorphism.lean#L41)) |
+
+### `textbook/theorem4.38` — System isomorphism is symmetric
+
+- Structured source file: [textbook/theorem4.38.json](textbook/theorem4.38.json)
+- Description: *Theorem 4.38: Z1 = ISY(Z2, HS, HI, HO) if and only if Z2 = ISY(Z1, HS^-1, HI^-1, HO^-1).*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `4.38/theorem/isomorphism_symmetric` | `theorem` | Z1 is isomorphic to Z2 iff Z2 is isomorphic to Z1, via the inverse isomorphisms. | ✅ Faithful | `isIsomorphicTo_symm` ([Mbse/Isomorphism.lean:269](Mbse/Isomorphism.lean#L269))<br>`isIsomorphicTo_comm` ([Mbse/Isomorphism.lean:279](Mbse/Isomorphism.lean#L279))<br>`thm4_38_isomorphism_symmetric` ([Mbse/TextbookExercises/Ch04.lean:39](Mbse/TextbookExercises/Ch04.lean#L39)) |
+| `4.38/proof/inverse_isomorphism` | `proof` | HS, HI, HO are bijective, so their inverses are bijective and satisfy the transition and readout consistency conditions. | ✅ Faithful | `IsomorphismWitness` ([Mbse/Isomorphism.lean:208](Mbse/Isomorphism.lean#L208)) |
+
+### `textbook/theorem4.45` — Corresponding ports of a port-preserving isomorphism are equivalent
+
+- Structured source file: [textbook/theorem4.45.json](textbook/theorem4.45.json)
+- Description: *Theorem 4.45: if Z1 = ISY(Z2, HS, HI, HO), HI preserves input ports with respect to SHIS and HO preserves output ports with respect to SHOS, then each HIi ∈ FNS(IiZ2, 1TO1, ONTO, IiZ1) and each HOj ∈ FNS(OjZ2, 1TO1, ONTO, OjZ1), so corresponding ports are equivalent sets.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `4.45/theorem/port_maps_bijective` | `theorem` | In a port-preserving isomorphism each per-port map is 1TO1 and ONTO, so corresponding ports are equivalent sets. | ✅ Faithful | `PreservesPorts` ([Mbse/Isomorphism.lean:330](Mbse/Isomorphism.lean#L330))<br>`thm4_45_port_maps_bijective` ([Mbse/TextbookExercises/Ch04.lean:49](Mbse/TextbookExercises/Ch04.lean#L49)) |
+
 ### `textbook/theorem4.8` — CSY Component Homomorphic Image
 
 - Structured source file: [textbook/theorem4.8.json](textbook/theorem4.8.json)
@@ -1248,19 +1342,67 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 | `3.133/theorem/conjunctive_cfscr_eq_closed_loop` | `theorem` | cfscr SCR hOut f x = conjunctiveClosedLoopAsOpenLoop SCR h f. | ✅ Faithful | `conjunctive_cfscr_eq_closed_loop_trajectory` ([Mbse/WymoreCouplingDynamic.lean:627](Mbse/WymoreCouplingDynamic.lean#L627))<br>`ex3_133_conjunctive_cfscr_eq_closed_loop` ([Mbse/TextbookExercises/Ch03.lean:1313](Mbse/TextbookExercises/Ch03.lean#L1313)) |
 | `3.133/theorem/conjunctive_rsy_eq_csy` | `theorem` | Pointwise NZ and readout agreement between rsy SCR and csy SCR.VSCR. | ✅ Faithful | `conjunctive_rsy_agrees_csy` ([Mbse/WymoreCouplingDynamic.lean:640](Mbse/WymoreCouplingDynamic.lean#L640))<br>`ex3_133_conjunctive_rsy_eq_csy` ([Mbse/TextbookExercises/Ch03.lean:1323](Mbse/TextbookExercises/Ch03.lean#L1323)) |
 
-- Exercise kinds: **4** witness, **28** theorem-proof
+### `textbook/exercise4.80` — HIMPPSY parameterization
+
+- Structured source file: [textbook/exercise4.80.json](textbook/exercise4.80.json)
+- Description: *Exercise 4.80: define a parameterization of port-preserving homomorphic image systems denoted HIMPPSY; prove that HIMPPSY is a system parameterization and that it actually preserves input ports and output ports.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `4.80/definition/himppsy` | `definition` | HIMPPSY: Z1 is a port-preserving homomorphic image of Z2 when a witness exists whose HI and HO preserve ports. | ✅ Faithful | `PortPreservingHomWitness` ([Mbse/Isomorphism.lean:384](Mbse/Isomorphism.lean#L384))<br>`IsPortPreservingHomImage` ([Mbse/Isomorphism.lean:399](Mbse/Isomorphism.lean#L399)) |
+| `4.80/requirement/preserves_input_ports` | `component` | The witness carries a proof that HI preserves input ports. | ✅ Faithful | `PortPreservingHomWitness.inPorts` ([Mbse/Isomorphism.lean:394](Mbse/Isomorphism.lean#L394)) |
+| `4.80/requirement/preserves_output_ports` | `component` | The witness carries a proof that HO preserves output ports. | ✅ Faithful | `PortPreservingHomWitness.outPorts` ([Mbse/Isomorphism.lean:396](Mbse/Isomorphism.lean#L396)) |
+| `4.80/theorem/himppsy_is_parameterization` | `theorem` | HIMPPSY is a system parameterization refining HIMSY: every HIMPPSY witness yields a HIMSY witness. | ✅ Faithful | `ex4_80_himppsy_is_parameterization` ([Mbse/TextbookExercises/Ch04.lean:62](Mbse/TextbookExercises/Ch04.lean#L62)) |
+
+### `textbook/exercise4.81` — HIMPPSY is reflexive and transitive
+
+- Structured source file: [textbook/exercise4.81.json](textbook/exercise4.81.json)
+- Description: *Exercise 4.81: prove that HIMPPSY (see Exercise 4.80) is reflexive and transitive.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `4.81/theorem/himppsy_reflexive_transitive` | `theorem` | HIMPPSY is reflexive (identity homomorphisms preserve every port) and transitive (coordinatewise maps compose coordinatewise). | ✅ Faithful | `isPortPreservingHomImage_refl` ([Mbse/Isomorphism.lean:445](Mbse/Isomorphism.lean#L445))<br>`isPortPreservingHomImage_trans` ([Mbse/Isomorphism.lean:455](Mbse/Isomorphism.lean#L455))<br>`ex4_81_reflexive` ([Mbse/TextbookExercises/Ch04.lean:74](Mbse/TextbookExercises/Ch04.lean#L74))<br>`ex4_81_transitive` ([Mbse/TextbookExercises/Ch04.lean:83](Mbse/TextbookExercises/Ch04.lean#L83)) |
+| `4.81/proof/reflexive` | `proof` | The identity acts coordinatewise through identity port maps. | ✅ Faithful | `PortPreservingHomWitness` ([Mbse/Isomorphism.lean:417](Mbse/Isomorphism.lean#L417)) |
+| `4.81/proof/transitive` | `proof` | Composites of coordinatewise surjections are coordinatewise surjections. | ✅ Faithful | `PortPreservingHomWitness` ([Mbse/Isomorphism.lean:429](Mbse/Isomorphism.lean#L429)) |
+
+### `textbook/exercise4.82` — System isomorphism is an equivalence
+
+- Structured source file: [textbook/exercise4.82.json](textbook/exercise4.82.json)
+- Description: *Exercise 4.82: prove that system isomorphism is (i) reflexive, (ii) transitive and (iii) symmetric.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `4.82/theorem/isomorphism_reflexive` | `theorem` | Every system is isomorphic to itself via the identity maps. | ✅ Faithful | `isIsomorphicTo_refl` ([Mbse/Isomorphism.lean:250](Mbse/Isomorphism.lean#L250))<br>`ex4_82_reflexive` ([Mbse/TextbookExercises/Ch04.lean:98](Mbse/TextbookExercises/Ch04.lean#L98)) |
+| `4.82/theorem/isomorphism_transitive` | `theorem` | Composites of isomorphisms are isomorphisms. | ✅ Faithful | `isIsomorphicTo_trans` ([Mbse/Isomorphism.lean:258](Mbse/Isomorphism.lean#L258))<br>`ex4_82_transitive` ([Mbse/TextbookExercises/Ch04.lean:105](Mbse/TextbookExercises/Ch04.lean#L105)) |
+| `4.82/theorem/isomorphism_symmetric` | `theorem` | Inverses of isomorphisms are isomorphisms. | ✅ Faithful | `isIsomorphicTo_symm` ([Mbse/Isomorphism.lean:269](Mbse/Isomorphism.lean#L269))<br>`ex4_82_symmetric` ([Mbse/TextbookExercises/Ch04.lean:115](Mbse/TextbookExercises/Ch04.lean#L115)) |
+
+### `textbook/exercise4.84` — The copy relation is an equivalence
+
+- Structured source file: [textbook/exercise4.84.json](textbook/exercise4.84.json)
+- Description: *Exercise 4.84: the copy relation among systems is reflexive, symmetric and transitive.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `4.84/theorem/copy_reflexive` | `theorem` | Every system is a copy of itself. | ✅ Faithful | `isCopyOf_refl` ([Mbse/Isomorphism.lean:540](Mbse/Isomorphism.lean#L540))<br>`ex4_84_reflexive` ([Mbse/TextbookExercises/Ch04.lean:126](Mbse/TextbookExercises/Ch04.lean#L126)) |
+| `4.84/theorem/copy_transitive` | `theorem` | If Z1 is a copy of Z2 and Z2 is a copy of Z3, then Z1 is a copy of Z3. | ✅ Faithful | `isCopyOf_trans` ([Mbse/Isomorphism.lean:550](Mbse/Isomorphism.lean#L550))<br>`ex4_84_transitive` ([Mbse/TextbookExercises/Ch04.lean:135](Mbse/TextbookExercises/Ch04.lean#L135)) |
+| `4.84/theorem/copy_symmetric` | `theorem` | If Z1 is a copy of Z2, then Z2 is a copy of Z1. | ✅ Faithful | `isCopyOf_symm` ([Mbse/Isomorphism.lean:563](Mbse/Isomorphism.lean#L563))<br>`ex4_84_symmetric` ([Mbse/TextbookExercises/Ch04.lean:148](Mbse/TextbookExercises/Ch04.lean#L148)) |
+| `4.84/proof/reflexive` | `proof` | Identity isomorphism with identity port maps. | ✅ Faithful | `CopyWitness` ([Mbse/Isomorphism.lean:504](Mbse/Isomorphism.lean#L504)) |
+| `4.84/proof/transitive` | `proof` | Compose the isomorphisms and the port families. | ✅ Faithful | `CopyWitness` ([Mbse/Isomorphism.lean:513](Mbse/Isomorphism.lean#L513)) |
+| `4.84/proof/symmetric` | `proof` | By Theorem 4.45 each port map is bijective, so the inverse isomorphism is again port-preserving. | ✅ Faithful | `CopyWitness` ([Mbse/Isomorphism.lean:525](Mbse/Isomorphism.lean#L525)) |
+
+- Exercise kinds: **4** witness, **32** theorem-proof
 
 ## 3. Completeness & Quality Summary
 
-- **Total Structured JSON Entries**: 117 (85 definitions/theorems, 32 exercises)
-- **Definition/Theorem Elements**: 238 (236 faithful)
-- **Exercise Task Elements**: 65 (65 faithful)
-- **Total Individual Requirements/Elements**: 303
-- **Linked Elements (any annotation)**: 301 (301/303)
-- **Faithful Elements (excludes stub/partial)**: 301 (301/303)
+- **Total Structured JSON Entries**: 130 (94 definitions/theorems, 36 exercises)
+- **Definition/Theorem Elements**: 260 (258 faithful)
+- **Exercise Task Elements**: 81 (81 faithful)
+- **Total Individual Requirements/Elements**: 341
+- **Linked Elements (any annotation)**: 339 (339/341)
+- **Faithful Elements (excludes stub/partial)**: 339 (339/341)
 - **Stub/Partial Elements**: 0
-- **Annotation Coverage Rate**: **99.3%**
-- **Faithful Coverage Rate**: **99.3%**
+- **Annotation Coverage Rate**: **99.4%**
+- **Faithful Coverage Rate**: **99.4%**
 
 > Note: *Annotation coverage* counts any tagged link, including placeholders. *Faithful coverage* is the trustworthy figure: it excludes links explicitly marked `|stub` or `|partial`, which indicate the Lean artifact only partially captures (or stands in for) the textbook requirement.
 

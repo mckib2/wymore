@@ -8,6 +8,7 @@ import Mbse.CombinationalWymore
 import Mbse.DPDAWymore
 import Mbse.DPDAExamples
 import Mbse.Homomorphism
+import Mbse.Isomorphism
 import Mbse.FiniteWymore
 import Mbse.TemporalLogic
 import Mbse.FOLTL

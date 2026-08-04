@@ -1,0 +1,23 @@
+{
+  "id": "4.31",
+  "name": "System homomorphism is reflexive and transitive",
+  "chapter": 4,
+  "description": "Theorem 4.31: Z = HIMSY(Z, ID(SZ), ID(IZ), ID(OZ)) for every Z; and if Z1 = HIMSY(Z2, HS1, HI1, HO1) and Z2 = HIMSY(Z3, HS2, HI2, HO2) then Z1 = HIMSY(Z3, HS1∘HS2, HI1∘HI2, HO1∘HO2).",
+  "elements": [
+    {
+      "id": "4.31/theorem/homomorphism_reflexive_transitive",
+      "type": "theorem",
+      "text": "The homomorphic-image relation is reflexive (identity homomorphisms) and transitive (componentwise composition)."
+    },
+    {
+      "id": "4.31/proof/reflexive",
+      "type": "proof",
+      "text": "Identity maps are surjective and trivially preserve NZ and RZ."
+    },
+    {
+      "id": "4.31/proof/transitive",
+      "type": "proof",
+      "text": "Composites of surjections are surjective; transition and readout consistency chain through the middle system."
+    }
+  ]
+}

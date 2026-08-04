@@ -1,0 +1,29 @@
+{
+  "id": "4.80",
+  "kind": "theorem_proof",
+  "name": "HIMPPSY parameterization",
+  "chapter": 4,
+  "description": "Exercise 4.80: define a parameterization of port-preserving homomorphic image systems denoted HIMPPSY; prove that HIMPPSY is a system parameterization and that it actually preserves input ports and output ports.",
+  "elements": [
+    {
+      "id": "4.80/definition/himppsy",
+      "type": "definition",
+      "text": "HIMPPSY: Z1 is a port-preserving homomorphic image of Z2 when a witness exists whose HI and HO preserve ports."
+    },
+    {
+      "id": "4.80/requirement/preserves_input_ports",
+      "type": "component",
+      "text": "The witness carries a proof that HI preserves input ports."
+    },
+    {
+      "id": "4.80/requirement/preserves_output_ports",
+      "type": "component",
+      "text": "The witness carries a proof that HO preserves output ports."
+    },
+    {
+      "id": "4.80/theorem/himppsy_is_parameterization",
+      "type": "theorem",
+      "text": "HIMPPSY is a system parameterization refining HIMSY: every HIMPPSY witness yields a HIMSY witness."
+    }
+  ]
+}

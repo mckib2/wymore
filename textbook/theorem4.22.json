@@ -1,0 +1,33 @@
+{
+  "id": "4.22",
+  "name": "Experiments on a system determine experiments on its homomorphisms",
+  "chapter": 4,
+  "description": "Theorem 4.22: if Z1 = HIMSY(Z2, HS, HI, HO) and (f, x, t) ∈ EXZ2, then (HI ∘ f, HS(x), t) ∈ EXZ1, HS(STZ2(f,x)(t)) = STZ1(HI∘f, HS(x))(t), HS ∘ STZ2(f,x) = STZ1(HI∘f, HS(x)), and HO ∘ OTZ2(f,x) = OTZ1(HI∘f, HS(x)).",
+  "elements": [
+    {
+      "id": "4.22/definition/experiment_image",
+      "type": "definition",
+      "text": "The image experiment (HI ∘ f, HS(x), t) ∈ EXZ1 of an experiment (f, x, t) ∈ EXZ2."
+    },
+    {
+      "id": "4.22/theorem/state_value",
+      "type": "theorem",
+      "text": "HS(STZ2(f,x)(t)) = STZ1(HI∘f, HS(x))(t)."
+    },
+    {
+      "id": "4.22/theorem/state_trajectory",
+      "type": "theorem",
+      "text": "HS ∘ STZ2(f,x) = STZ1(HI∘f, HS(x))."
+    },
+    {
+      "id": "4.22/theorem/output_trajectory",
+      "type": "theorem",
+      "text": "HO ∘ OTZ2(f,x) = OTZ1(HI∘f, HS(x))."
+    },
+    {
+      "id": "4.22/theorem/experiments_transfer",
+      "type": "theorem",
+      "text": "An experiment on Z2 determines an experiment on Z1 whose state and output trajectories are the HS/HO images."
+    }
+  ]
+}

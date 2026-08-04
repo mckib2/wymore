@@ -1,0 +1,18 @@
+{
+  "id": "4.38",
+  "name": "System isomorphism is symmetric",
+  "chapter": 4,
+  "description": "Theorem 4.38: Z1 = ISY(Z2, HS, HI, HO) if and only if Z2 = ISY(Z1, HS^-1, HI^-1, HO^-1).",
+  "elements": [
+    {
+      "id": "4.38/theorem/isomorphism_symmetric",
+      "type": "theorem",
+      "text": "Z1 is isomorphic to Z2 iff Z2 is isomorphic to Z1, via the inverse isomorphisms."
+    },
+    {
+      "id": "4.38/proof/inverse_isomorphism",
+      "type": "proof",
+      "text": "HS, HI, HO are bijective, so their inverses are bijective and satisfy the transition and readout consistency conditions."
+    }
+  ]
+}

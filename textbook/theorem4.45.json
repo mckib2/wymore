@@ -1,0 +1,13 @@
+{
+  "id": "4.45",
+  "name": "Corresponding ports of a port-preserving isomorphism are equivalent",
+  "chapter": 4,
+  "description": "Theorem 4.45: if Z1 = ISY(Z2, HS, HI, HO), HI preserves input ports with respect to SHIS and HO preserves output ports with respect to SHOS, then each HIi ∈ FNS(IiZ2, 1TO1, ONTO, IiZ1) and each HOj ∈ FNS(OjZ2, 1TO1, ONTO, OjZ1), so corresponding ports are equivalent sets.",
+  "elements": [
+    {
+      "id": "4.45/theorem/port_maps_bijective",
+      "type": "theorem",
+      "text": "In a port-preserving isomorphism each per-port map is 1TO1 and ONTO, so corresponding ports are equivalent sets."
+    }
+  ]
+}

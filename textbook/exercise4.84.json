@@ -1,0 +1,39 @@
+{
+  "id": "4.84",
+  "kind": "theorem_proof",
+  "name": "The copy relation is an equivalence",
+  "chapter": 4,
+  "description": "Exercise 4.84: the copy relation among systems is reflexive, symmetric and transitive.",
+  "elements": [
+    {
+      "id": "4.84/theorem/copy_reflexive",
+      "type": "theorem",
+      "text": "Every system is a copy of itself."
+    },
+    {
+      "id": "4.84/theorem/copy_transitive",
+      "type": "theorem",
+      "text": "If Z1 is a copy of Z2 and Z2 is a copy of Z3, then Z1 is a copy of Z3."
+    },
+    {
+      "id": "4.84/theorem/copy_symmetric",
+      "type": "theorem",
+      "text": "If Z1 is a copy of Z2, then Z2 is a copy of Z1."
+    },
+    {
+      "id": "4.84/proof/reflexive",
+      "type": "proof",
+      "text": "Identity isomorphism with identity port maps."
+    },
+    {
+      "id": "4.84/proof/transitive",
+      "type": "proof",
+      "text": "Compose the isomorphisms and the port families."
+    },
+    {
+      "id": "4.84/proof/symmetric",
+      "type": "proof",
+      "text": "By Theorem 4.45 each port map is bijective, so the inverse isomorphism is again port-preserving."
+    }
+  ]
+}

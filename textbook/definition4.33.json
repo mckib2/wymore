@@ -1,0 +1,28 @@
+{
+  "id": "4.33",
+  "name": "System isomorphisms",
+  "chapter": 4,
+  "description": "Definition 4.33: Z1 is isomorphic to Z2 with respect to HS, HI, HO iff Z1 is a homomorphic image of Z2 with respect to HS, HI, HO and each of HS, HI, HO is 1TO1.",
+  "elements": [
+    {
+      "id": "4.33/definition/system_isomorphism",
+      "type": "definition",
+      "text": "Z1 is isomorphic to Z2 when a homomorphic image witness exists whose HS, HI, HO are all injective."
+    },
+    {
+      "id": "4.33/requirement/state_injective",
+      "type": "component",
+      "text": "HS is 1TO1 (the state isomorphism)."
+    },
+    {
+      "id": "4.33/requirement/input_injective",
+      "type": "component",
+      "text": "HI is 1TO1 (the input isomorphism)."
+    },
+    {
+      "id": "4.33/requirement/output_injective",
+      "type": "component",
+      "text": "HO is 1TO1 (the output isomorphism)."
+    }
+  ]
+}
