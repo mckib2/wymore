@@ -1,0 +1,14 @@
+{
+  "id": "3.130",
+  "kind": "theorem_proof",
+  "name": "Subsystem reflexivity",
+  "chapter": 3,
+  "description": "Exercise 3.130: every resultant system is a subsystem of itself (φ = id, CSCR restriction is reflexive).",
+  "elements": [
+    {
+      "id": "3.130/theorem/subsystem_reflexive",
+      "type": "theorem",
+      "text": "IsSubsystemOf Z Z for any resultant Z = RSY(SCR)."
+    }
+  ]
+}

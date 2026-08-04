@@ -41,6 +41,21 @@ structure DiscreteSystem (SZ : Type) (IZ : Type) (OZ : Type) where
         Readout Function: RZ ∈ FNS(SZ, OZ) on states that produce output (`some o`); `none` when OZ is empty. -/
     RZ : SZ → Option OZ
 
+/-- Heterogeneous equality implies definitional equality after casting along the induced type equality. -/
+theorem heq_to_eq.{u} {α β : Sort u} {a : α} {b : β} (h : HEq a b) :
+    cast (type_eq_of_heq h) a = b := by
+  cases h
+  rfl
+
+/-- Extensionality on `DiscreteSystem` fields (`sz_nonempty` is proof-irrelevant). -/
+theorem DiscreteSystem.ext {SZ IZ OZ : Type}
+    {Z1 Z2 : DiscreteSystem SZ IZ OZ} (hNZ : Z1.NZ = Z2.NZ) (hRZ : Z1.RZ = Z2.RZ) :
+    Z1 = Z2 := by
+  rcases Z1 with ⟨hNE1, _, _⟩
+  rcases Z2 with ⟨hNE2, _, _⟩
+  simp [DiscreteSystem.mk.injEq]
+  exact ⟨hNZ, hRZ⟩
+
 /-- Open Moore fragment: total NZ/RZ wrapped in `some`; autonomous steps stutter. -/
 def DiscreteSystem.ofTotal {SZ IZ OZ : Type} (NZ : SZ → IZ → SZ) (RZ : SZ → OZ) (hNE : Nonempty SZ) :
     DiscreteSystem SZ IZ OZ where

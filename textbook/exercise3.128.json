@@ -1,0 +1,24 @@
+{
+  "id": "3.128",
+  "kind": "theorem_proof",
+  "name": "System determining a nonsingular coupling recipe",
+  "chapter": 3,
+  "description": "Exercise 3.128: for nonempty A, n ≥ 2 and Ni ∈ FNS(A^(n+1), A), the components Zi (SZi = A, IZi = OZi = A^(n+1), NZi(x,p) = Ni(p), RZi(x) constant) together with CSCR = {(OiZj, IjZi)} form a nonsingular coupling recipe whose resultant is Z0. Definition 3.3 pairwise distinctness of VSCR forces the additional hypothesis that the Ni are pairwise distinct.",
+  "elements": [
+    {
+      "id": "3.128/theorem/rsy_next_state",
+      "type": "theorem",
+      "text": "PJNi(NZ@(x, g)) = Ni(x1,...,xn, gi): the resultant next-state agrees with NZ0."
+    },
+    {
+      "id": "3.128/theorem/rsy_readout",
+      "type": "theorem",
+      "text": "RZ@ = ID(SZ@): every output port of component i reports state x i, matching RZ0 = ID(SZ0)."
+    },
+    {
+      "id": "3.128/theorem/determines_nonsingular_scr",
+      "type": "theorem",
+      "text": "The constructed SCR is nonsingular with nonempty CSCR, and Z0 = RSY(SCR) on state, next-state and readout."
+    }
+  ]
+}

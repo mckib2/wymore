@@ -1,0 +1,14 @@
+{
+  "id": "3.131",
+  "kind": "theorem_proof",
+  "name": "Subsystem transitivity",
+  "chapter": 3,
+  "description": "Exercise 3.131: if Z1 is a subsystem of Z2 and Z2 is a subsystem of Z3, then Z1 is a subsystem of Z3 (φ composes, CSCR restrictions compose).",
+  "elements": [
+    {
+      "id": "3.131/theorem/subsystem_transitive",
+      "type": "theorem",
+      "text": "IsSubsystemOf is transitive on resultant systems."
+    }
+  ]
+}

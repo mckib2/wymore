@@ -1,0 +1,19 @@
+{
+  "id": "3.127",
+  "kind": "theorem_proof",
+  "name": "Resultant vs conjunctive readout",
+  "chapter": 3,
+  "description": "Exercise 3.127: on conjunctive recipes, RZ@ agrees with CSY readout on UOSCR (PJN(INOP@(SCR,Z&)(UOSCR)) ∘ RZ&).",
+  "elements": [
+    {
+      "id": "3.127/theorem/resultant_conjunctive_readout",
+      "type": "theorem",
+      "text": "rsyOutAt SCR hOut x op = csyOut SCR.VSCR hOut x op when SCR is conjunctive."
+    },
+    {
+      "id": "3.127/theorem/rsy_RZ_eq_csy_readout_fun",
+      "type": "theorem",
+      "text": "Full resultant readout function on UnconnOutPort equals CSY readout at each unconnected output tag."
+    }
+  ]
+}

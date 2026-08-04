@@ -1,5 +1,7 @@
 import Mbse.Wymore
 import Mbse.WymoreCouplingDynamic
+import Mathlib.Data.Fin.Basic
+import Mathlib.Data.Fintype.Card
 
 /-!
 # Chapter 3 — coupling recipe structure (order, components, subsystems)
@@ -155,10 +157,150 @@ def IsComponentOf {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
 
 /-! ## Definition 3.97: subsystem relation -/
 
+/-- Component indices of `SCR2` that host the embedded subsystem `φ : Fin n₁ → Fin n₂`. -/
+def SCRSubsystemIndices {n1 n2 : Nat} (φ : Fin n1 → Fin n2) : Set (Fin n2) :=
+  Set.range φ
+
+/-- `CSCR₂` pairs whose tagged output and input indices lie in the embedded subsystem. -/
+def SCRSubsystemCscrPairs {n1 n2 : Nat} (SCR2 : SystemCouplingRecipe n2) (φ : Fin n1 → Fin n2) :
+    Set ((Σ (i : Fin n2), SCR2.VSCR.OutPort i) × (Σ (i : Fin n2), SCR2.VSCR.Port i)) :=
+  {p | p.1.1 ∈ SCRSubsystemIndices φ ∧ p.2.1 ∈ SCRSubsystemIndices φ}
+
+/-- Embed a `SCR₁` connection pair into `SCR₂` tagged port indices via `φ`. -/
+def scrEmbedOutPort {n1 n2 : Nat} (φ : Fin n1 → Fin n2)
+    (SCR1 : PortSystemVector n1) (SCR2 : PortSystemVector n2)
+    (hOut : ∀ i, HEq (SCR1.OutPort i) (SCR2.OutPort (φ i)))
+    (op : Σ (i : Fin n1), SCR1.OutPort i) : Σ (i : Fin n2), SCR2.OutPort i :=
+  ⟨φ op.1, eq_of_heq (hOut op.1) ▸ op.2⟩
+
+/-- Embed a `SCR₁` input port tag into `SCR₂`. -/
+def scrEmbedInPort {n1 n2 : Nat} (φ : Fin n1 → Fin n2)
+    (SCR1 : PortSystemVector n1) (SCR2 : PortSystemVector n2)
+    (hIn : ∀ i, HEq (SCR1.Port i) (SCR2.Port (φ i)))
+    (ip : Σ (i : Fin n1), SCR1.Port i) : Σ (i : Fin n2), SCR2.Port i :=
+  ⟨φ ip.1, eq_of_heq (hIn ip.1) ▸ ip.2⟩
+
+/-- Embed a `SCR₁` `CSCR` pair into `SCR₂` port tags. -/
+def scrEmbedCscrPair {n1 n2 : Nat} (φ : Fin n1 → Fin n2)
+    (SCR1 : SystemCouplingRecipe n1) (SCR2 : SystemCouplingRecipe n2)
+    (hOut : ∀ i, HEq (SCR1.VSCR.OutPort i) (SCR2.VSCR.OutPort (φ i)))
+    (hIn : ∀ i, HEq (SCR1.VSCR.Port i) (SCR2.VSCR.Port (φ i)))
+    (p : (Σ (i : Fin n1), SCR1.VSCR.OutPort i) × (Σ (i : Fin n1), SCR1.VSCR.Port i)) :
+    (Σ (i : Fin n2), SCR2.VSCR.OutPort i) × (Σ (i : Fin n2), SCR2.VSCR.Port i) :=
+  (scrEmbedOutPort φ SCR1.VSCR SCR2.VSCR hOut p.1, scrEmbedInPort φ SCR1.VSCR SCR2.VSCR hIn p.2)
+
+lemma scrEmbedCscrPair_fst {n1 n2 : Nat} (φ : Fin n1 → Fin n2)
+    (SCR1 : SystemCouplingRecipe n1) (SCR2 : SystemCouplingRecipe n2)
+    (hOut : ∀ i, HEq (SCR1.VSCR.OutPort i) (SCR2.VSCR.OutPort (φ i)))
+    (hIn : ∀ i, HEq (SCR1.VSCR.Port i) (SCR2.VSCR.Port (φ i)))
+    (p : (Σ (i : Fin n1), SCR1.VSCR.OutPort i) × (Σ (i : Fin n1), SCR1.VSCR.Port i)) :
+    (scrEmbedCscrPair φ SCR1 SCR2 hOut hIn p).1.1 = φ p.1.1 := rfl
+
+lemma scrEmbedCscrPair_snd {n1 n2 : Nat} (φ : Fin n1 → Fin n2)
+    (SCR1 : SystemCouplingRecipe n1) (SCR2 : SystemCouplingRecipe n2)
+    (hOut : ∀ i, HEq (SCR1.VSCR.OutPort i) (SCR2.VSCR.OutPort (φ i)))
+    (hIn : ∀ i, HEq (SCR1.VSCR.Port i) (SCR2.VSCR.Port (φ i)))
+    (p : (Σ (i : Fin n1), SCR1.VSCR.OutPort i) × (Σ (i : Fin n1), SCR1.VSCR.Port i)) :
+    (scrEmbedCscrPair φ SCR1 SCR2 hOut hIn p).2.1 = φ p.2.1 := rfl
+
+lemma heq_of_eq' {α : Sort u} {a b : α} (h : a = b) : HEq a b :=
+  h ▸ HEq.rfl
+
+/-- Casting along a composite port-type `HEq` agrees with casting along each factor in turn. -/
+lemma eq_of_heq_trans_cast {A B C : Sort u} (h1 : HEq A B) (h2 : HEq B C) (a : A) :
+    eq_of_heq (HEq.trans h1 h2) ▸ a = eq_of_heq h2 ▸ (eq_of_heq h1 ▸ a) := by
+  cases h1
+  cases h2
+  rfl
+
+lemma scrEmbedOutPort_comp {n1 n2 n3 : Nat}
+    (φ1 : Fin n1 → Fin n2) (φ2 : Fin n2 → Fin n3)
+    (SCR1 : PortSystemVector n1) (SCR2 : PortSystemVector n2) (SCR3 : PortSystemVector n3)
+    (hOut12 : ∀ i, HEq (SCR1.OutPort i) (SCR2.OutPort (φ1 i)))
+    (hOut23 : ∀ i, HEq (SCR2.OutPort i) (SCR3.OutPort (φ2 i)))
+    (op : Σ (i : Fin n1), SCR1.OutPort i) :
+    scrEmbedOutPort (φ2 ∘ φ1) SCR1 SCR3
+        (fun i => HEq.trans (hOut12 i) (hOut23 (φ1 i))) op =
+      scrEmbedOutPort φ2 SCR2 SCR3 hOut23 (scrEmbedOutPort φ1 SCR1 SCR2 hOut12 op) := by
+  dsimp [scrEmbedOutPort]
+  ext
+  · simp
+  · exact heq_of_eq' (eq_of_heq_trans_cast (hOut12 op.1) (hOut23 (φ1 op.1)) op.2)
+
+lemma scrEmbedInPort_comp {n1 n2 n3 : Nat}
+    (φ1 : Fin n1 → Fin n2) (φ2 : Fin n2 → Fin n3)
+    (SCR1 : PortSystemVector n1) (SCR2 : PortSystemVector n2) (SCR3 : PortSystemVector n3)
+    (hIn12 : ∀ i, HEq (SCR1.Port i) (SCR2.Port (φ1 i)))
+    (hIn23 : ∀ i, HEq (SCR2.Port i) (SCR3.Port (φ2 i)))
+    (ip : Σ (i : Fin n1), SCR1.Port i) :
+    scrEmbedInPort (φ2 ∘ φ1) SCR1 SCR3
+        (fun i => HEq.trans (hIn12 i) (hIn23 (φ1 i))) ip =
+      scrEmbedInPort φ2 SCR2 SCR3 hIn23 (scrEmbedInPort φ1 SCR1 SCR2 hIn12 ip) := by
+  dsimp [scrEmbedInPort]
+  ext
+  · simp
+  · exact heq_of_eq' (eq_of_heq_trans_cast (hIn12 ip.1) (hIn23 (φ1 ip.1)) ip.2)
+
+lemma scrEmbedCscrPair_comp {n1 n2 n3 : Nat}
+    (φ1 : Fin n1 → Fin n2) (φ2 : Fin n2 → Fin n3)
+    (SCR1 : SystemCouplingRecipe n1) (SCR2 : SystemCouplingRecipe n2) (SCR3 : SystemCouplingRecipe n3)
+    (hOut12 : ∀ i, HEq (SCR1.VSCR.OutPort i) (SCR2.VSCR.OutPort (φ1 i)))
+    (hIn12 : ∀ i, HEq (SCR1.VSCR.Port i) (SCR2.VSCR.Port (φ1 i)))
+    (hOut23 : ∀ i, HEq (SCR2.VSCR.OutPort i) (SCR3.VSCR.OutPort (φ2 i)))
+    (hIn23 : ∀ i, HEq (SCR2.VSCR.Port i) (SCR3.VSCR.Port (φ2 i)))
+    (p : (Σ (i : Fin n1), SCR1.VSCR.OutPort i) × (Σ (i : Fin n1), SCR1.VSCR.Port i)) :
+    scrEmbedCscrPair (φ2 ∘ φ1) SCR1 SCR3
+        (fun i => HEq.trans (hOut12 i) (hOut23 (φ1 i)))
+        (fun i => HEq.trans (hIn12 i) (hIn23 (φ1 i))) p =
+      scrEmbedCscrPair φ2 SCR2 SCR3 hOut23 hIn23
+        (scrEmbedCscrPair φ1 SCR1 SCR2 hOut12 hIn12 p) := by
+  dsimp [scrEmbedCscrPair]
+  congr 1
+  · exact scrEmbedOutPort_comp φ1 φ2 SCR1.VSCR SCR2.VSCR SCR3.VSCR hOut12 hOut23 p.1
+  · exact scrEmbedInPort_comp φ1 φ2 SCR1.VSCR SCR2.VSCR SCR3.VSCR hIn12 hIn23 p.2
+
+lemma scrEmbedCscrPair_mem_subsystem {n1 n2 : Nat} (φ : Fin n1 → Fin n2)
+    (SCR1 : SystemCouplingRecipe n1) (SCR2 : SystemCouplingRecipe n2)
+    (hOut : ∀ i, HEq (SCR1.VSCR.OutPort i) (SCR2.VSCR.OutPort (φ i)))
+    (hIn : ∀ i, HEq (SCR1.VSCR.Port i) (SCR2.VSCR.Port (φ i)))
+    (p : (Σ (i : Fin n1), SCR1.VSCR.OutPort i) × (Σ (i : Fin n1), SCR1.VSCR.Port i)) :
+    scrEmbedCscrPair φ SCR1 SCR2 hOut hIn p ∈ SCRSubsystemCscrPairs SCR2 φ := by
+  dsimp [scrEmbedCscrPair, SCRSubsystemCscrPairs, SCRSubsystemIndices]
+  refine ⟨?_, ?_⟩
+  · exact ⟨p.1.1, rfl⟩
+  · exact ⟨p.2.1, rfl⟩
+
+/-- Textbook (iv): `CSCR₁` equals `CSCR₂` restricted to subsystem port pairs. -/
+def SCRSubsystemCSCRRestriction {n1 n2 : Nat} (φ : Fin n1 → Fin n2)
+    (SCR1 : SystemCouplingRecipe n1) (SCR2 : SystemCouplingRecipe n2)
+    (hOutPort : ∀ i, HEq (SCR1.VSCR.OutPort i) (SCR2.VSCR.OutPort (φ i)))
+    (hInPort : ∀ i, HEq (SCR1.VSCR.Port i) (SCR2.VSCR.Port (φ i))) : Prop :=
+  ∀ p,
+    p ∈ SCR1.CSCR ↔
+      scrEmbedCscrPair φ SCR1 SCR2 hOutPort hInPort p ∈ SCR2.CSCR ∩ SCRSubsystemCscrPairs SCR2 φ
+
+/--
+  Recipe-level form of the subsystem relation: `φ` embeds `VSCR₁` into `VSCR₂` preserving
+  components and port structure (textbook (iii)), and `CSCR₁` is `CSCR₂` restricted to the
+  embedded ports (textbook (iv)).
+-/
+structure IsSubrecipeOf {n1 n2 : Nat} (φ : Fin n1 → Fin n2)
+    (SCR1 : SystemCouplingRecipe n1) (SCR2 : SystemCouplingRecipe n2) : Prop where
+  /-- Distinct components of `SCR₁` embed to distinct components of `SCR₂`. -/
+  inj : Function.Injective φ
+  /-- Output port tags are preserved by the embedding. -/
+  outPort : ∀ i, HEq (SCR1.VSCR.OutPort i) (SCR2.VSCR.OutPort (φ i))
+  /-- Input port tags are preserved by the embedding. -/
+  inPort : ∀ i, HEq (SCR1.VSCR.Port i) (SCR2.VSCR.Port (φ i))
+  /-- Embedded components are the same systems. -/
+  component : ∀ i, HEq (SCR1.VSCR.Z i) (SCR2.VSCR.Z (φ i))
+  /-- Textbook (iv): `CSCR₁` is the restriction of `CSCR₂` to embedded ports. -/
+  cscr : SCRSubsystemCSCRRestriction φ SCR1 SCR2 outPort inPort
+
 /--
   [textbook/definition3.97/definition/is_subsystem_of]
   `Z1` is a subsystem of `Z2` when both are resultants of recipes with nested component vectors
-  and `CSCR1` is the restriction of `CSCR2` to subsystem ports.
+  and `CSCR1` is the restriction of `CSCR2` to subsystem ports (textbook (iv)).
 -/
 def IsSubsystemOf {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     (Z1 : DiscreteSystem SZ1 IZ1 OZ1)
@@ -166,13 +308,171 @@ def IsSubsystemOf {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
   ∃ (n1 n2 : Nat) (SCR1 : SystemCouplingRecipe n1) (SCR2 : SystemCouplingRecipe n2)
       (hOut1 : ∀ k, AlwaysOutputs (SCR1.VSCR.Z k))
       (hOut2 : ∀ k, AlwaysOutputs (SCR2.VSCR.Z k))
-      (φ : Fin n1 → Fin n2),
+      (φ : Fin n1 → Fin n2)
+      (hOutPort : ∀ i, HEq (SCR1.VSCR.OutPort i) (SCR2.VSCR.OutPort (φ i)))
+      (hInPort : ∀ i, HEq (SCR1.VSCR.Port i) (SCR2.VSCR.Port (φ i))),
     Function.Injective φ ∧
     (∀ i, HEq (SCR1.VSCR.Z i) (SCR2.VSCR.Z (φ i))) ∧
     HEq Z1 (rsy SCR1 hOut1) ∧
     HEq Z2 (rsy SCR2 hOut2) ∧
-    (∀ (i j : Fin n1), SCRInterface SCR1 i j ⊆ SCR1.CSCR)
+    SCRSubsystemCSCRRestriction φ SCR1 SCR2 hOutPort hInPort
 
+/--
+  `Z1` is a subsystem of `Z2` *via* the named recipe witnesses. Recording the witnesses is what
+  makes the relation composable: a resultant does not determine its own coupling recipe, so the
+  witness-free `IsSubsystemOf` cannot be chained directly (see `subsystem_transitive`).
+-/
+def IsSubsystemVia {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    (Z1 : DiscreteSystem SZ1 IZ1 OZ1) (Z2 : DiscreteSystem SZ2 IZ2 OZ2)
+    {n1 n2 : Nat} (SCR1 : SystemCouplingRecipe n1) (SCR2 : SystemCouplingRecipe n2)
+    (hOut1 : ∀ k, AlwaysOutputs (SCR1.VSCR.Z k)) (hOut2 : ∀ k, AlwaysOutputs (SCR2.VSCR.Z k))
+    (φ : Fin n1 → Fin n2) : Prop :=
+  IsSubrecipeOf φ SCR1 SCR2 ∧ HEq Z1 (rsy SCR1 hOut1) ∧ HEq Z2 (rsy SCR2 hOut2)
+
+/-- Forgetting the recipe witnesses recovers the witness-free subsystem relation. -/
+theorem IsSubsystemVia.isSubsystemOf {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z1 : DiscreteSystem SZ1 IZ1 OZ1} {Z2 : DiscreteSystem SZ2 IZ2 OZ2}
+    {n1 n2 : Nat} {SCR1 : SystemCouplingRecipe n1} {SCR2 : SystemCouplingRecipe n2}
+    {hOut1 : ∀ k, AlwaysOutputs (SCR1.VSCR.Z k)} {hOut2 : ∀ k, AlwaysOutputs (SCR2.VSCR.Z k)}
+    {φ : Fin n1 → Fin n2}
+    (h : IsSubsystemVia Z1 Z2 SCR1 SCR2 hOut1 hOut2 φ) :
+    IsSubsystemOf Z1 Z2 :=
+  ⟨n1, n2, SCR1, SCR2, hOut1, hOut2, φ, h.1.outPort, h.1.inPort,
+    h.1.inj, h.1.component, h.2.1, h.2.2, h.1.cscr⟩
+
+/-! ## Exercise 3.129: recipe characterisation of the subsystem relation -/
+
+/--
+  [textbook/exercise3.129/theorem/subsystem_iff_recipes]
+  Ex. 3.129 — the assertion holds. `Z1` is a subsystem of `Z2` exactly when there are coupling
+  recipes with `Z1 = RSY(SCR1)` (i), `Z2 = RSY(SCR2)` (ii), `VSCR1 ⊆ VSCR2` via an injective
+  component embedding (iii), and `CSCR1` the restriction of `CSCR2` to the embedded output/input
+  ports (iv). Clauses (iii)–(iv) are exactly `IsSubrecipeOf`.
+-/
+theorem subsystem_iff_recipes {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    (Z1 : DiscreteSystem SZ1 IZ1 OZ1) (Z2 : DiscreteSystem SZ2 IZ2 OZ2) :
+    IsSubsystemOf Z1 Z2 ↔
+      ∃ (n1 n2 : Nat) (SCR1 : SystemCouplingRecipe n1) (SCR2 : SystemCouplingRecipe n2)
+        (hOut1 : ∀ k, AlwaysOutputs (SCR1.VSCR.Z k))
+        (hOut2 : ∀ k, AlwaysOutputs (SCR2.VSCR.Z k))
+        (φ : Fin n1 → Fin n2),
+        IsSubsystemVia Z1 Z2 SCR1 SCR2 hOut1 hOut2 φ := by
+  constructor
+  · rintro ⟨n1, n2, SCR1, SCR2, hOut1, hOut2, φ, hOutPort, hInPort, hinj, hcomp, hZ1, hZ2, hcscr⟩
+    exact ⟨n1, n2, SCR1, SCR2, hOut1, hOut2, φ, ⟨hinj, hOutPort, hInPort, hcomp, hcscr⟩, hZ1, hZ2⟩
+  · rintro ⟨n1, n2, SCR1, SCR2, hOut1, hOut2, φ, h⟩
+    exact IsSubsystemVia.isSubsystemOf h
+
+/-! ## Exercises 3.130 / 3.131: subsystem reflexivity and transitivity -/
+
+/-- Every recipe is a subrecipe of itself via the identity embedding. -/
+theorem subrecipe_refl {n : Nat} (SCR : SystemCouplingRecipe n) : IsSubrecipeOf id SCR SCR where
+  inj := Function.injective_id
+  outPort := fun _ => HEq.rfl
+  inPort := fun _ => HEq.rfl
+  component := fun _ => HEq.rfl
+  cscr := by
+    intro p
+    constructor
+    · intro hp
+      exact ⟨hp, scrEmbedCscrPair_mem_subsystem id SCR SCR (fun _ => HEq.rfl) (fun _ => HEq.rfl) p⟩
+    · intro hp
+      exact hp.1
+
+/--
+  Subrecipe embeddings compose: `φ₂ ∘ φ₁` embeds `SCR₁` into `SCR₃`, and the `CSCR`
+  restrictions chain through the middle recipe.
+-/
+theorem subrecipe_trans {n1 n2 n3 : Nat}
+    {φ1 : Fin n1 → Fin n2} {φ2 : Fin n2 → Fin n3}
+    {SCR1 : SystemCouplingRecipe n1} {SCR2 : SystemCouplingRecipe n2}
+    {SCR3 : SystemCouplingRecipe n3}
+    (h12 : IsSubrecipeOf φ1 SCR1 SCR2) (h23 : IsSubrecipeOf φ2 SCR2 SCR3) :
+    IsSubrecipeOf (φ2 ∘ φ1) SCR1 SCR3 where
+  inj := h23.inj.comp h12.inj
+  outPort := fun i => HEq.trans (h12.outPort i) (h23.outPort (φ1 i))
+  inPort := fun i => HEq.trans (h12.inPort i) (h23.inPort (φ1 i))
+  component := fun i => HEq.trans (h12.component i) (h23.component (φ1 i))
+  cscr := by
+    intro p
+    have hcomp :=
+      scrEmbedCscrPair_comp φ1 φ2 SCR1 SCR2 SCR3
+        h12.outPort h12.inPort h23.outPort h23.inPort p
+    have hmid :=
+      scrEmbedCscrPair_mem_subsystem φ1 SCR1 SCR2 h12.outPort h12.inPort p
+    constructor
+    · intro hp
+      have h2 := (h12.cscr p).mp hp
+      have h3 := (h23.cscr (scrEmbedCscrPair φ1 SCR1 SCR2 h12.outPort h12.inPort p)).mp h2.1
+      refine ⟨?_, scrEmbedCscrPair_mem_subsystem (φ2 ∘ φ1) SCR1 SCR3 _ _ p⟩
+      rw [hcomp]
+      exact h3.1
+    · intro hp
+      refine (h12.cscr p).mpr ⟨?_, hmid⟩
+      refine (h23.cscr (scrEmbedCscrPair φ1 SCR1 SCR2 h12.outPort h12.inPort p)).mpr ⟨?_, ?_⟩
+      · rw [← hcomp]; exact hp.1
+      · exact scrEmbedCscrPair_mem_subsystem φ2 SCR2 SCR3 h23.outPort h23.inPort _
+
+/--
+  [textbook/exercise3.130/theorem/subsystem_reflexive]
+  Every resultant is a subsystem of itself (`φ = id`, `CSCR` restriction is reflexive).
+-/
+theorem subsystem_reflexive {SZ IZ OZ : Type}
+    (Z : DiscreteSystem SZ IZ OZ) (n : Nat) (SCR : SystemCouplingRecipe n)
+    (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k))
+    (hZ : HEq Z (rsy SCR hOut)) :
+    IsSubsystemOf Z Z :=
+  IsSubsystemVia.isSubsystemOf ⟨subrecipe_refl SCR, hZ, hZ⟩
+
+lemma Fin.not_heq_of_lt {n m : Nat} (hlt : n < m) : ¬ HEq (Fin n) (Fin m) := by
+  intro h
+  exact Nat.ne_of_lt hlt (fin_injective (eq_of_heq h))
+
+lemma Fin.not_heq_of_ne {n m : Nat} (h : n ≠ m) : ¬ HEq (Fin n) (Fin m) := by
+  rcases Nat.lt_or_gt_of_ne h with hlt | hgt
+  · exact Fin.not_heq_of_lt hlt
+  · intro heq; exact Fin.not_heq_of_lt hgt (HEq.symm heq)
+
+/--
+  [textbook/exercise3.131/theorem/subsystem_transitive]
+  The subsystem relation is transitive: the embeddings compose as `φ₂ ∘ φ₁` and the `CSCR`
+  restrictions chain through the shared middle recipe.
+
+  Transitivity is stated on `IsSubsystemVia` rather than `IsSubsystemOf` because a resultant does
+  not determine its own coupling recipe: from `HEq Z2 (rsy SCR2 _)` and `HEq Z2 (rsy SCR2' _)` the
+  equality `SCR2 = SCR2'` is not derivable (it would need injectivity of `Pi` types in the index,
+  which Lean's type theory does not provide). Naming the middle recipe supplies exactly the
+  identification the textbook argument uses implicitly.
+-/
+theorem subsystem_transitive {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 SZ3 IZ3 OZ3 : Type}
+    {Z1 : DiscreteSystem SZ1 IZ1 OZ1} {Z2 : DiscreteSystem SZ2 IZ2 OZ2}
+    {Z3 : DiscreteSystem SZ3 IZ3 OZ3}
+    {n1 n2 n3 : Nat} {SCR1 : SystemCouplingRecipe n1} {SCR2 : SystemCouplingRecipe n2}
+    {SCR3 : SystemCouplingRecipe n3}
+    {hOut1 : ∀ k, AlwaysOutputs (SCR1.VSCR.Z k)} {hOut2 : ∀ k, AlwaysOutputs (SCR2.VSCR.Z k)}
+    {hOut3 : ∀ k, AlwaysOutputs (SCR3.VSCR.Z k)}
+    {φ1 : Fin n1 → Fin n2} {φ2 : Fin n2 → Fin n3}
+    (h12 : IsSubsystemVia Z1 Z2 SCR1 SCR2 hOut1 hOut2 φ1)
+    (h23 : IsSubsystemVia Z2 Z3 SCR2 SCR3 hOut2 hOut3 φ2) :
+    IsSubsystemVia Z1 Z3 SCR1 SCR3 hOut1 hOut3 (φ2 ∘ φ1) :=
+  ⟨subrecipe_trans h12.1 h23.1, h12.2.1, h23.2.2⟩
+
+/--
+  [textbook/exercise3.131/theorem/subsystem_transitive]
+  Witness-free form of Ex. 3.131: chaining two witnessed subsystem facts yields `IsSubsystemOf`.
+-/
+theorem subsystem_transitive_of_via {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 SZ3 IZ3 OZ3 : Type}
+    {Z1 : DiscreteSystem SZ1 IZ1 OZ1} {Z2 : DiscreteSystem SZ2 IZ2 OZ2}
+    {Z3 : DiscreteSystem SZ3 IZ3 OZ3}
+    {n1 n2 n3 : Nat} {SCR1 : SystemCouplingRecipe n1} {SCR2 : SystemCouplingRecipe n2}
+    {SCR3 : SystemCouplingRecipe n3}
+    {hOut1 : ∀ k, AlwaysOutputs (SCR1.VSCR.Z k)} {hOut2 : ∀ k, AlwaysOutputs (SCR2.VSCR.Z k)}
+    {hOut3 : ∀ k, AlwaysOutputs (SCR3.VSCR.Z k)}
+    {φ1 : Fin n1 → Fin n2} {φ2 : Fin n2 → Fin n3}
+    (h12 : IsSubsystemVia Z1 Z2 SCR1 SCR2 hOut1 hOut2 φ1)
+    (h23 : IsSubsystemVia Z2 Z3 SCR2 SCR3 hOut2 hOut3 φ2) :
+    IsSubsystemOf Z1 Z3 :=
+  (subsystem_transitive h12 h23).isSubsystemOf
 /--
   [textbook/exercise3.116/theorem/cascade_min_two_components]
   Nonempty cascade connectivity requires at least two components.

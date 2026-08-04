@@ -50,6 +50,13 @@ def registry : List ExerciseEntry :=
   , ⟨"3.124", 3, .theoremProof, "solved", "Ch03.ex3_124_simple_cascade_rsy"⟩
   , ⟨"3.125", 3, .theoremProof, "solved", "Ch03.ex3_125_simple_feedback_rsy"⟩
   , ⟨"3.126", 3, .theoremProof, "solved", "Ch03.ex3_126_simple_mixed_rsy"⟩
+  , ⟨"3.127", 3, .theoremProof, "solved", "Ch03.ex3_127_resultant_conjunctive_readout"⟩
+  , ⟨"3.128", 3, .theoremProof, "solved", "Ch03.ex3_128_determines_nonsingular_scr"⟩
+  , ⟨"3.129", 3, .theoremProof, "solved", "Ch03.ex3_129_subsystem_iff_recipes"⟩
+  , ⟨"3.130", 3, .theoremProof, "solved", "Ch03.ex3_130_subsystem_reflexive"⟩
+  , ⟨"3.131", 3, .theoremProof, "solved", "Ch03.ex3_131_subsystem_transitive"⟩
+  , ⟨"3.132", 3, .theoremProof, "solved", "Ch03.ex3_132_singular_cfscr_eq_closed_loop"⟩
+  , ⟨"3.133", 3, .theoremProof, "solved", "Ch03.ex3_133_conjunctive_cfscr_eq_closed_loop"⟩
   ]
 
 def solvedCount : Nat :=

@@ -1378,6 +1378,13 @@ theorem singularSCR_is_singular (V : PortSystemVector 1)
     IsSingular (singularSCR V hOutNE hInNE) :=
   ⟨rfl, rfl⟩
 
+instance singularSCR_portVal_inhabited {V : PortSystemVector 1}
+    (hOutNE : Nonempty (Σ (i : Fin 1), V.OutPort i))
+    (hInNE : Nonempty (Σ (i : Fin 1), V.Port i)) (i : Fin 1) (p : V.Port i)
+    [h : Inhabited (V.PortVal i p)] :
+    Inhabited ((singularSCR V hOutNE hInNE).VSCR.PortVal i p) :=
+  inferInstanceAs (Inhabited (V.PortVal i p))
+
 theorem singular_scr_inRSY (V : PortSystemVector 1)
     (hOut : ∀ i, AlwaysOutputs (V.Z i))
     (hOutNE : Nonempty (Σ (i : Fin 1), V.OutPort i))
@@ -1682,6 +1689,29 @@ theorem rsy_conjunctive_scr_RZ_eq {n : Nat} (SCR : SystemCouplingRecipe n)
     (x : rsy_SZ SCR) (op : Σ (i : Fin n), SCR.VSCR.OutPort i) :
     rsyOutAt SCR hOut x op = csyOut SCR.VSCR hOut x op := by
   dsimp [rsyOutAt, csyOut]
+
+/--
+  [textbook/exercise3.127/theorem/resultant_conjunctive_readout]
+  On conjunctive recipes (`Z@ = RSY(SCR)`, `Z& = CSY(VSCR)`), readout at tagged output `op`
+  agrees with `Z&` readout — textbook `RZ@ = PJN(INOP@(SCR,Z&)(UOSCR)) ∘ RZ&`.
+-/
+theorem conjunctive_rsy_readout_eq_csy_readout {n : Nat} (SCR : SystemCouplingRecipe n)
+    (h : IsConjunctive SCR) (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i))
+    (x : rsy_SZ SCR) (op : Σ (i : Fin n), SCR.VSCR.OutPort i) :
+    rsyOutAt SCR hOut x op = csyOut SCR.VSCR hOut x op :=
+  rsy_conjunctive_scr_RZ_eq SCR h hOut x op
+
+/--
+  [textbook/exercise3.127/theorem/rsy_RZ_eq_csy_readout_fun]
+  The full resultant readout function on `UnconnOutPort` equals the `CSY` readout at each
+  unconnected output tag.
+-/
+theorem conjunctive_rsy_RZ_eq_csy_readout_fun {n : Nat} (SCR : SystemCouplingRecipe n)
+    (_h : IsConjunctive SCR) (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i))
+    (x : rsy_SZ SCR) :
+    (rsy SCR hOut).RZ x = some (fun uop : UnconnOutPort SCR => csyOut SCR.VSCR hOut x uop.val) := by
+  dsimp [rsy, rsy_RZ]
+  rfl
 
 lemma singular_scr_NZ_eq {SCR : SystemCouplingRecipe 1} (h : IsConjunctive SCR)
     (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i)) (x : rsy_SZ SCR)

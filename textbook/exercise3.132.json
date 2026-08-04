@@ -1,0 +1,19 @@
+{
+  "id": "3.132",
+  "kind": "theorem_proof",
+  "name": "Singular SCR coupling function",
+  "chapter": 3,
+  "description": "Exercise 3.132: singular SCR has CFSCR(f,x)=f and resultant agrees with component Z0 dynamics.",
+  "elements": [
+    {
+      "id": "3.132/theorem/singular_cfscr_eq_closed_loop",
+      "type": "theorem",
+      "text": "cfscr on singularSCR equals conjunctiveClosedLoopAsOpenLoop f."
+    },
+    {
+      "id": "3.132/theorem/singular_rsy_eq_component",
+      "type": "theorem",
+      "text": "InRSY and NZ/RZ agreement between rsy singularSCR and V.Z 0."
+    }
+  ]
+}

@@ -582,6 +582,10 @@ theorem ex3_124_simple_cascade_rsy
       · dsimp [rsyOutAt]
         exact ex3_124_readout_Z2' Z2' hOut2 0 (by decide) (x 1)
 
+/--
+  [textbook/exercise3.124/theorem/is_cascade]
+  The simple cascade recipe of Ex. 3.124 satisfies `IsCascade`.
+-/
 theorem ex3_124_is_cascade
     (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat))
     (Z2' : DiscreteSystem Nat (Fin 3 → Nat) (Fin 1 → Nat))
@@ -723,6 +727,10 @@ theorem ex3_125_simple_feedback_rsy
   · dsimp [rsyOutAt]
     exact ex3_125_readout_Z1 Z1 hOut1 0 (by decide) x
 
+/--
+  [textbook/exercise3.125/theorem/is_pure_feedback]
+  The simple feedback recipe of Ex. 3.125 satisfies `IsPureFeedback`.
+-/
 theorem ex3_125_is_pure_feedback (Z1 : DiscreteSystem Nat (Fin 2 → Nat) (Fin 2 → Nat)) :
     IsPureFeedback (ex3_125_scr Z1) :=
   ⟨rfl, Set.singleton_ne_empty _⟩
@@ -985,5 +993,339 @@ theorem ex3_126_readout_is_R1Z1_x1
   intro SCR hOut
   dsimp [rsyOutAt]
   exact ex3_124_readout_Z1 Z1 hOut1 0 (by decide) (x 0)
+
+/-! ## Exercise 3.127: resultant vs conjunctive readout -/
+
+/--
+  [textbook/exercise3.127/theorem/resultant_conjunctive_readout]
+  On conjunctive recipes, `RSY(SCR)` readout at unconnected outputs equals `CSY(VSCR)` readout.
+-/
+abbrev ex3_127_resultant_conjunctive_readout {n : Nat} (SCR : SystemCouplingRecipe n)
+    (h : IsConjunctive SCR) (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i))
+    (x : rsy_SZ SCR) (op : Σ (i : Fin n), SCR.VSCR.OutPort i) :=
+  conjunctive_rsy_readout_eq_csy_readout SCR h hOut x op
+
+/--
+  [textbook/exercise3.127/theorem/rsy_RZ_eq_csy_readout_fun]
+  Resultant readout function equals `CSY` readout on every unconnected output port.
+-/
+abbrev ex3_127_rsy_RZ_eq_csy_readout_fun {n : Nat} (SCR : SystemCouplingRecipe n)
+    (h : IsConjunctive SCR) (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i))
+    (x : rsy_SZ SCR) :=
+  conjunctive_rsy_RZ_eq_csy_readout_fun SCR h hOut x
+
+/-! ## Exercise 3.128: a system that determines a nonsingular coupling recipe
+
+Textbook data: a nonempty `A`, `n ≥ 2`, and `Ni ∈ FNS(A^(n+1), A)` for each `i`. Component `Zi`
+has `SZi = A`, `IZi = OZi = A^(n+1)`, `NZi(x, p) = Ni(p)` and `RZi(x)` the constant vector `x`;
+`CSCR = {(OiZj, IjZi)}` wires output `i` of `Zj` into input `j` of `Zi`, leaving port `n+1` of each
+component free. Definition 3.3 requires the components of `VSCR` to be pairwise distinct, which the
+textbook statement leaves implicit; since `Zi` is determined by `Ni`, that forces the extra
+hypothesis `hN` below (with two equal `Ni` the hypotheses describe no connectable vector at all).
+-/
+
+/-- Component `Zi` of Ex. 3.128: state `A`, ports `A^(n+1)`, `NZi(x,p) = Ni(p)`, `RZi(x)` constant. -/
+noncomputable def ex3_128_component {A : Type} [Nonempty A] {n : Nat}
+    (N : Fin n → (Fin (n + 1) → A) → A) (i : Fin n) :
+    DiscreteSystem A (Fin (n + 1) → A) (Fin (n + 1) → A) :=
+  DiscreteSystem.ofTotal (fun _ p => N i p) (fun x _ => x) inferInstance
+
+lemma ex3_128_component_alwaysOutputs {A : Type} [Nonempty A] {n : Nat}
+    (N : Fin n → (Fin (n + 1) → A) → A) (i : Fin n) :
+    AlwaysOutputs (ex3_128_component N i) :=
+  ofTotal_alwaysOutputs _ _ _
+
+/-- `RZi` is the constant vector, so every output port reports the state. -/
+lemma ex3_128_component_readout {A : Type} [Nonempty A] {n : Nat}
+    (N : Fin n → (Fin (n + 1) → A) → A) (i : Fin n) (op : Fin (n + 1)) (x : A) :
+    componentReadoutAt (ex3_128_component N i) (ex3_128_component_alwaysOutputs N i) op x = x := by
+  have hspec := Classical.choose_spec (ex3_128_component_alwaysOutputs N i x)
+  have hrz : (ex3_128_component N i).RZ x = some (fun _ => x) := rfl
+  have heq : Classical.choose (ex3_128_component_alwaysOutputs N i x) = fun _ => x :=
+    Option.some_injective _ (hspec.symm.trans hrz)
+  simp [componentReadoutAt, heq]
+
+/-- `Zi` determines `Ni`, so distinct components require distinct next-state functions. -/
+lemma ex3_128_component_inj {A : Type} [Nonempty A] {n : Nat}
+    (N : Fin n → (Fin (n + 1) → A) → A) {i j : Fin n}
+    (h : HEq (ex3_128_component N i) (ex3_128_component N j)) : N i = N j := by
+  have he : ex3_128_component N i = ex3_128_component N j := eq_of_heq h
+  funext p
+  have := congr_arg (fun Z => Z.NZ (Classical.choice ‹Nonempty A›) (some p)) he
+  simpa [ex3_128_component, DiscreteSystem.ofTotal] using this
+
+/-- `VSCR = (Z1,…,Zn)`: uniform state `A`, `n+1` input and output ports per component. -/
+noncomputable def ex3_128_vscr {A : Type} [Nonempty A] {n : Nat}
+    (N : Fin n → (Fin (n + 1) → A) → A) (hN : ∀ i j, i ≠ j → N i ≠ N j) :
+    PortSystemVector n where
+  SZ := fun _ => A
+  Port := fun _ => Fin (n + 1)
+  PortVal := fun _ _ => A
+  OutPort := fun _ => Fin (n + 1)
+  OutPortVal := fun _ _ => A
+  Z := ex3_128_component N
+  distinct := fun i j hne h => hN i j hne (ex3_128_component_inj N h)
+
+/-- The connection `(OiZj, IjZi)`: output port `i` of `Zj` feeds input port `j` of `Zi`. -/
+def ex3_128_conn {n : Nat} (i j : Fin n) :
+    (Σ (_ : Fin n), Fin (n + 1)) × (Σ (_ : Fin n), Fin (n + 1)) :=
+  (⟨j, i.castSucc⟩, ⟨i, j.castSucc⟩)
+
+/-- `CSCR = {(OiZj, IjZi) : (i,j) ∈ [1,n]²}`. -/
+def ex3_128_cscr (n : Nat) :
+    Set ((Σ (_ : Fin n), Fin (n + 1)) × (Σ (_ : Fin n), Fin (n + 1))) :=
+  {p | ∃ i j : Fin n, p = ex3_128_conn i j}
+
+/-- Port tags live in a constant fibre, so sigma equality splits into plain equalities. -/
+private lemma ex3_128_sigma_eq {n : Nat} {j1 j2 : Fin n} {a1 a2 : Fin (n + 1)}
+    (h : (⟨j1, a1⟩ : Σ (_ : Fin n), Fin (n + 1)) = ⟨j2, a2⟩) : j1 = j2 ∧ a1 = a2 := by
+  simpa [Sigma.mk.injEq, heq_iff_eq] using h
+
+lemma ex3_128_connectivity {A : Type} [Nonempty A] {n : Nat}
+    (N : Fin n → (Fin (n + 1) → A) → A) (hN : ∀ i j, i ≠ j → N i ≠ N j) (hn : 2 ≤ n) :
+    IsSystemConnectivity (ex3_128_vscr N hN) (ex3_128_cscr n) := by
+  have hpos : 0 < n := by omega
+  refine ⟨⟨?_, ?_⟩, ?_, ?_, ?_⟩
+  · rintro x y1 y2 ⟨i1, j1, h1⟩ ⟨i2, j2, h2⟩
+    obtain ⟨hx1, hy1⟩ := Prod.mk.injEq .. ▸ h1
+    obtain ⟨hx2, hy2⟩ := Prod.mk.injEq .. ▸ h2
+    obtain ⟨hj, hi⟩ := ex3_128_sigma_eq (hx1.symm.trans hx2)
+    have hi' : i1 = i2 := Fin.castSucc_inj.mp hi
+    subst hi'; subst hj
+    exact hy1.trans hy2.symm
+  · rintro x1 x2 y ⟨i1, j1, h1⟩ ⟨i2, j2, h2⟩
+    obtain ⟨hx1, hy1⟩ := Prod.mk.injEq .. ▸ h1
+    obtain ⟨hx2, hy2⟩ := Prod.mk.injEq .. ▸ h2
+    obtain ⟨hi, hj⟩ := ex3_128_sigma_eq (hy1.symm.trans hy2)
+    have hj' : j1 = j2 := Fin.castSucc_inj.mp hj
+    subst hi; subst hj'
+    exact hx1.trans hx2.symm
+  · intro heq
+    have hnot : (⟨⟨0, hpos⟩, Fin.last n⟩ : Σ (_ : Fin n), Fin (n + 1)) ∉
+        {x | ∃ y, (x, y) ∈ ex3_128_cscr n} := by
+      rintro ⟨y, i, j, hp⟩
+      obtain ⟨-, hlast⟩ :=
+        ex3_128_sigma_eq (by simpa [ex3_128_conn] using congr_arg Prod.fst hp)
+      exact absurd hlast.symm (Fin.castSucc_lt_last i).ne
+    exact hnot (heq ▸ Set.mem_univ _)
+  · intro heq
+    have hnot : (⟨⟨0, hpos⟩, Fin.last n⟩ : Σ (_ : Fin n), Fin (n + 1)) ∉
+        {y | ∃ x, (x, y) ∈ ex3_128_cscr n} := by
+      rintro ⟨x, i, j, hp⟩
+      obtain ⟨-, hlast⟩ :=
+        ex3_128_sigma_eq (by simpa [ex3_128_conn] using congr_arg Prod.snd hp)
+      exact absurd hlast.symm (Fin.castSucc_lt_last j).ne
+    exact hnot (heq ▸ Set.mem_univ _)
+  · intro _ _ _
+    rfl
+
+/-- `SCR = (VSCR, CSCR)` of Ex. 3.128. -/
+noncomputable def ex3_128_scr {A : Type} [Nonempty A] {n : Nat}
+    (N : Fin n → (Fin (n + 1) → A) → A) (hN : ∀ i j, i ≠ j → N i ≠ N j) (hn : 2 ≤ n) :
+    SystemCouplingRecipe n where
+  VSCR := ex3_128_vscr N hN
+  CSCR := ex3_128_cscr n
+  connectivity := ex3_128_connectivity N hN hn
+
+lemma ex3_128_hOut {A : Type} [Nonempty A] {n : Nat}
+    (N : Fin n → (Fin (n + 1) → A) → A) (hN : ∀ i j, i ≠ j → N i ≠ N j) (hn : 2 ≤ n) :
+    ∀ i, AlwaysOutputs ((ex3_128_scr N hN hn).VSCR.Z i) :=
+  fun i => ex3_128_component_alwaysOutputs N i
+
+/-- The recipe is nonsingular: it has `n ≥ 2` components. -/
+theorem ex3_128_not_singular {A : Type} [Nonempty A] {n : Nat}
+    (N : Fin n → (Fin (n + 1) → A) → A) (hN : ∀ i j, i ≠ j → N i ≠ N j) (hn : 2 ≤ n) :
+    ¬ IsSingular (ex3_128_scr N hN hn) := by
+  rintro ⟨h1, -⟩
+  omega
+
+/-- The recipe has genuine feedback: `CSCR ≠ ∅`. -/
+theorem ex3_128_cscr_ne_empty {A : Type} [Nonempty A] {n : Nat}
+    (N : Fin n → (Fin (n + 1) → A) → A) (hN : ∀ i j, i ≠ j → N i ≠ N j) (hn : 2 ≤ n) :
+    (ex3_128_scr N hN hn).CSCR ≠ ∅ := by
+  have hpos : 0 < n := by omega
+  intro hempty
+  have hmem : ex3_128_conn (⟨0, hpos⟩ : Fin n) ⟨0, hpos⟩ ∈ (ex3_128_scr N hN hn).CSCR :=
+    ⟨_, _, rfl⟩
+  simpa [hempty] using hmem
+
+/-- Input port `j` of component `i` is fed by output port `i` of component `j`. -/
+lemma ex3_128_mem_ciscr {A : Type} [Nonempty A] {n : Nat}
+    (N : Fin n → (Fin (n + 1) → A) → A) (hN : ∀ i j, i ≠ j → N i ≠ N j) (hn : 2 ≤ n)
+    (i j : Fin n) :
+    (⟨i, j.castSucc⟩ : Σ (k : Fin n), (ex3_128_scr N hN hn).VSCR.Port k) ∈
+      CISCR (ex3_128_scr N hN hn) :=
+  (mem_ciscr_iff _ _).mpr ⟨⟨j, i.castSucc⟩, i, j, rfl⟩
+
+/-- Input port `n+1` of each component is the only unconnected one. -/
+lemma ex3_128_mem_uiscr {A : Type} [Nonempty A] {n : Nat}
+    (N : Fin n → (Fin (n + 1) → A) → A) (hN : ∀ i j, i ≠ j → N i ≠ N j) (hn : 2 ≤ n)
+    (i : Fin n) :
+    (⟨i, Fin.last n⟩ : Σ (k : Fin n), (ex3_128_scr N hN hn).VSCR.Port k) ∈
+      UISCR (ex3_128_scr N hN hn) := by
+  refine mem_uiscr_of_not_mem_ciscr _ _ ?_
+  intro hC
+  obtain ⟨op, i', j', hp⟩ := (mem_ciscr_iff _ _).mp hC
+  have hsig : (⟨i, Fin.last n⟩ : Σ (_ : Fin n), Fin (n + 1)) = ⟨i', j'.castSucc⟩ :=
+    congr_arg Prod.snd hp
+  obtain ⟨-, hlast⟩ := ex3_128_sigma_eq hsig
+  exact absurd hlast.symm (Fin.castSucc_lt_last j').ne
+
+lemma ex3_128_connectedOutput {A : Type} [Nonempty A] {n : Nat}
+    (N : Fin n → (Fin (n + 1) → A) → A) (hN : ∀ i j, i ≠ j → N i ≠ N j) (hn : 2 ≤ n)
+    (i j : Fin n) :
+    connectedOutput (ex3_128_scr N hN hn) ⟨i, j.castSucc⟩ (ex3_128_mem_ciscr N hN hn i j) =
+      ⟨j, i.castSucc⟩ :=
+  (ex3_128_scr N hN hn).connectivity.1.2 _ _ _
+    (connectedOutput_spec _ _ (ex3_128_mem_ciscr N hN hn i j)) ⟨i, j, rfl⟩
+
+/-- External inputs: component `i` reads `gᵢ` on its single unconnected input port. -/
+noncomputable def ex3_128_extIn {A : Type} [Nonempty A] {n : Nat}
+    (N : Fin n → (Fin (n + 1) → A) → A) (hN : ∀ i j, i ≠ j → N i ≠ N j) (hn : 2 ≤ n)
+    (g : Fin n → A) : rsy_IZ (ex3_128_scr N hN hn) :=
+  fun ip => g ip.val.1
+
+/-- The resolved input of component `i` is `(x₁,…,xₙ, gᵢ)`. -/
+lemma ex3_128_component_input {A : Type} [Nonempty A] {n : Nat}
+    (N : Fin n → (Fin (n + 1) → A) → A) (hN : ∀ i j, i ≠ j → N i ≠ N j) (hn : 2 ≤ n)
+    (g : Fin n → A) (x : rsy_SZ (ex3_128_scr N hN hn)) (i : Fin n) :
+    rsy_component_input_fun (ex3_128_scr N hN hn) (ex3_128_hOut N hN hn) i
+        (ex3_128_extIn N hN hn g) x =
+      Fin.snoc x (g i) := by
+  funext p
+  rcases Fin.eq_castSucc_or_eq_last p with ⟨j, hj⟩ | hlast
+  · subst hj
+    rw [rsy_component_input_ciscr _ _ _ _ _ _ (ex3_128_mem_ciscr N hN hn i j)]
+    dsimp only
+    rw [ex3_128_connectedOutput N hN hn i j, rsyOutAt_eq_componentReadoutAt]
+    simpa using ex3_128_component_readout N j i.castSucc (x j)
+  · subst hlast
+    rw [rsy_component_input_uiscr _ _ _ _ _ _ (ex3_128_mem_uiscr N hN hn i)]
+    simp [ex3_128_extIn]
+
+/--
+  [textbook/exercise3.128/theorem/rsy_next_state]
+  `PJNᵢ(NZ@(x, g)) = Nᵢ(x₁,…,xₙ, gᵢ)`: the resultant's next state agrees with the given `Z0`.
+-/
+theorem ex3_128_rsy_NZ {A : Type} [Nonempty A] {n : Nat}
+    (N : Fin n → (Fin (n + 1) → A) → A) (hN : ∀ i j, i ≠ j → N i ≠ N j) (hn : 2 ≤ n)
+    (g : Fin n → A) (x : rsy_SZ (ex3_128_scr N hN hn)) (i : Fin n) :
+    rsy_NZ (ex3_128_scr N hN hn) (ex3_128_hOut N hN hn) x
+        (some (ex3_128_extIn N hN hn g)) i =
+      N i (Fin.snoc x (g i)) := by
+  dsimp only [rsy_NZ, Option.map_some]
+  rw [ex3_128_component_input N hN hn g x i]
+  rfl
+
+/--
+  [textbook/exercise3.128/theorem/rsy_readout]
+  `RZ@ = ID(SZ@)`: each component's readout reports its own state, so the resultant readout is
+  the identity on `A^n`, matching `RZ0 = ID(SZ0)`.
+-/
+theorem ex3_128_rsy_readout {A : Type} [Nonempty A] {n : Nat}
+    (N : Fin n → (Fin (n + 1) → A) → A) (hN : ∀ i j, i ≠ j → N i ≠ N j) (hn : 2 ≤ n)
+    (x : rsy_SZ (ex3_128_scr N hN hn)) (i : Fin n) (op : Fin (n + 1)) :
+    rsyOutAt (ex3_128_scr N hN hn) (ex3_128_hOut N hN hn) x ⟨i, op⟩ = x i := by
+  rw [rsyOutAt_eq_componentReadoutAt]
+  simpa using ex3_128_component_readout N i op (x i)
+
+/--
+  [textbook/exercise3.128/theorem/determines_nonsingular_scr]
+  Ex. 3.128 — the assertion holds. The stated data determine a nonsingular coupling recipe whose
+  resultant is `Z0`: the state space is literally `A^n`, `PJNᵢ ∘ NZ@ = Nᵢ`, and `RZ@ = ID(SZ@)`.
+-/
+theorem ex3_128_determines_nonsingular_scr {A : Type} [Nonempty A] {n : Nat}
+    (N : Fin n → (Fin (n + 1) → A) → A) (hN : ∀ i j, i ≠ j → N i ≠ N j) (hn : 2 ≤ n) :
+    ¬ IsSingular (ex3_128_scr N hN hn) ∧
+      (ex3_128_scr N hN hn).CSCR ≠ ∅ ∧
+      (∀ (g : Fin n → A) (x : rsy_SZ (ex3_128_scr N hN hn)) (i : Fin n),
+        rsy_NZ (ex3_128_scr N hN hn) (ex3_128_hOut N hN hn) x
+            (some (ex3_128_extIn N hN hn g)) i =
+          N i (Fin.snoc x (g i))) ∧
+      (∀ (x : rsy_SZ (ex3_128_scr N hN hn)) (i : Fin n) (op : Fin (n + 1)),
+        rsyOutAt (ex3_128_scr N hN hn) (ex3_128_hOut N hN hn) x ⟨i, op⟩ = x i) :=
+  ⟨ex3_128_not_singular N hN hn, ex3_128_cscr_ne_empty N hN hn,
+    ex3_128_rsy_NZ N hN hn, ex3_128_rsy_readout N hN hn⟩
+
+/-! ## Exercise 3.129: recipe characterisation of the subsystem relation -/
+
+/--
+  [textbook/exercise3.129/theorem/subsystem_iff_recipes]
+  `Z1` is a subsystem of `Z2` iff suitable coupling recipes exist (textbook (i)–(iv)).
+-/
+abbrev ex3_129_subsystem_iff_recipes {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    (Z1 : DiscreteSystem SZ1 IZ1 OZ1) (Z2 : DiscreteSystem SZ2 IZ2 OZ2) :=
+  subsystem_iff_recipes Z1 Z2
+
+/-! ## Exercises 3.130 / 3.131: subsystem reflexivity and transitivity -/
+
+/--
+  [textbook/exercise3.130/theorem/subsystem_reflexive]
+  Every resultant is a subsystem of itself.
+-/
+abbrev ex3_130_subsystem_reflexive {SZ IZ OZ : Type}
+    (Z : DiscreteSystem SZ IZ OZ) (n : Nat) (SCR : SystemCouplingRecipe n)
+    (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k))
+    (hZ : HEq Z (rsy SCR hOut)) :=
+  subsystem_reflexive Z n SCR hOut hZ
+
+/--
+  [textbook/exercise3.131/theorem/subsystem_transitive]
+  Subsystem relation is transitive: the recipe embeddings compose through the shared middle
+  recipe, and forgetting the witnesses gives `IsSubsystemOf Z1 Z3`.
+-/
+abbrev ex3_131_subsystem_transitive {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 SZ3 IZ3 OZ3 : Type}
+    {Z1 : DiscreteSystem SZ1 IZ1 OZ1}
+    {Z2 : DiscreteSystem SZ2 IZ2 OZ2}
+    {Z3 : DiscreteSystem SZ3 IZ3 OZ3}
+    {n1 n2 n3 : Nat} {SCR1 : SystemCouplingRecipe n1} {SCR2 : SystemCouplingRecipe n2}
+    {SCR3 : SystemCouplingRecipe n3}
+    {hOut1 : ∀ k, AlwaysOutputs (SCR1.VSCR.Z k)} {hOut2 : ∀ k, AlwaysOutputs (SCR2.VSCR.Z k)}
+    {hOut3 : ∀ k, AlwaysOutputs (SCR3.VSCR.Z k)}
+    {φ1 : Fin n1 → Fin n2} {φ2 : Fin n2 → Fin n3}
+    (h12 : IsSubsystemVia Z1 Z2 SCR1 SCR2 hOut1 hOut2 φ1)
+    (h23 : IsSubsystemVia Z2 Z3 SCR2 SCR3 hOut2 hOut3 φ2) :=
+  subsystem_transitive_of_via h12 h23
+
+/-! ## Exercise 3.132: singular SCR coupling function -/
+
+/--
+  [textbook/exercise3.132/theorem/singular_cfscr_eq_closed_loop]
+  On singular recipes, `CFSCR(f,x)` equals closed-loop input as open-loop trajectory.
+-/
+abbrev ex3_132_singular_cfscr_eq_closed_loop {V : PortSystemVector 1}
+    [∀ i p, Inhabited (V.PortVal i p)]
+    (hOutNE : Nonempty (Σ (i : Fin 1), V.OutPort i))
+    (hInNE : Nonempty (Σ (i : Fin 1), V.Port i))
+    (hOut : ∀ i, AlwaysOutputs (V.Z i))
+    (f : rsyClosedLoopITZ (singularSCR V hOutNE hInNE))
+    (x : rsy_SZ (singularSCR V hOutNE hInNE)) :=
+  singular_cfscr_eq_closed_loop_trajectory (V := V) hOutNE hInNE hOut f x
+
+abbrev ex3_132_singular_rsy_eq_component {V : PortSystemVector 1}
+    (hOutNE : Nonempty (Σ (i : Fin 1), V.OutPort i))
+    (hInNE : Nonempty (Σ (i : Fin 1), V.Port i))
+    (hOut : ∀ i, AlwaysOutputs (V.Z i)) :=
+  singular_scr_rsy_agrees_component (V := V) hOutNE hInNE hOut
+
+/-! ## Exercise 3.133: conjunctive SCR coupling function -/
+
+/--
+  [textbook/exercise3.133/theorem/conjunctive_cfscr_eq_closed_loop]
+  On conjunctive recipes, `CFSCR(f,x)` equals closed-loop input lifted to open-loop ports.
+-/
+abbrev ex3_133_conjunctive_cfscr_eq_closed_loop {n : Nat} (SCR : SystemCouplingRecipe n)
+    [∀ i p, Inhabited (SCR.VSCR.PortVal i p)]
+    (h : IsConjunctive SCR) (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i))
+    (f : rsyClosedLoopITZ SCR) (x : rsy_SZ SCR) :=
+  conjunctive_cfscr_eq_closed_loop_trajectory SCR h hOut f x
+
+/--
+  [textbook/exercise3.133/theorem/conjunctive_rsy_eq_csy]
+  On conjunctive recipes, `RSY(SCR)` and `CSY(VSCR)` agree pointwise on next-state and readout.
+-/
+abbrev ex3_133_conjunctive_rsy_eq_csy {n : Nat} (SCR : SystemCouplingRecipe n)
+    (h : IsConjunctive SCR) (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i)) :=
+  conjunctive_rsy_agrees_csy SCR h hOut
 
 end Mbse.TextbookExercises.Ch03

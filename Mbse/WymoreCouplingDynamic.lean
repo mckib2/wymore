@@ -604,4 +604,77 @@ theorem resultant_output_component_decomposition {n : Nat} (SCR : SystemCoupling
           (rsy_component_input_trajectory SCR hOut i f x) t).map (fun r => r B') :=
   rsy_output_trajectory SCR hOut x f t i B' hU
 
+/-! ## Exercises 3.132 / 3.133: coupling function on singular / conjunctive recipes -/
+
+/--
+  [textbook/exercise3.133/theorem/conjunctive_cfscr_input]
+  On conjunctive recipes, open-loop coupling inputs at `UISCR` ports equal closed-loop external inputs.
+-/
+theorem conjunctive_cfscrInputAt_eq_closed_loop {n : Nat} (SCR : SystemCouplingRecipe n)
+    [∀ i p, Inhabited (SCR.VSCR.PortVal i p)]
+    (h : IsConjunctive SCR) (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k))
+    (f : rsyClosedLoopITZ SCR) (x : rsy_SZ SCR) (t : Time)
+    (ip : Σ (i : Fin n), SCR.VSCR.Port i) :
+    cfscrInputAt SCR hOut f x t ip =
+      f t ⟨⟨ip.1, ip.2⟩, mem_uiscr_conjunctive SCR h ip⟩ :=
+  cfscrInputAt_uiscr SCR hOut f x t ip (mem_uiscr_conjunctive SCR h ip)
+
+/-- Lift closed-loop input trajectory to open-loop tagged ports on conjunctive recipes. -/
+noncomputable def conjunctiveClosedLoopAsOpenLoop {n : Nat} (SCR : SystemCouplingRecipe n)
+    (h : IsConjunctive SCR) (f : rsyClosedLoopITZ SCR) : rsyOpenLoopITZ SCR :=
+  fun t ip => f t ⟨⟨ip.1, ip.2⟩, mem_uiscr_conjunctive SCR h ip⟩
+
+/--
+  [textbook/exercise3.133/theorem/conjunctive_cfscr_eq_closed_loop]
+  Textbook `CFSCR = PJN(ITZ@ × SZ@, 1)`: coupling function returns closed-loop input as open-loop trajectory.
+-/
+theorem conjunctive_cfscr_eq_closed_loop_trajectory {n : Nat} (SCR : SystemCouplingRecipe n)
+    [∀ i p, Inhabited (SCR.VSCR.PortVal i p)]
+    (h : IsConjunctive SCR) (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k))
+    (f : rsyClosedLoopITZ SCR) (x : rsy_SZ SCR) :
+    cfscr SCR hOut f x = conjunctiveClosedLoopAsOpenLoop SCR h f := by
+  funext t ip
+  dsimp [cfscr, conjunctiveClosedLoopAsOpenLoop]
+  exact conjunctive_cfscrInputAt_eq_closed_loop SCR h hOut f x t ip
+
+/--
+  [textbook/exercise3.133/theorem/conjunctive_rsy_eq_csy]
+  On conjunctive recipes (`Z@ = RSY(SCR)`, `Z& = CSY(VSCR)`), next-state and readout agree pointwise.
+-/
+theorem conjunctive_rsy_agrees_csy {n : Nat} (SCR : SystemCouplingRecipe n)
+    (h : IsConjunctive SCR) (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i)) :
+    (∀ (x : rsy_SZ SCR) (extIn : rsy_IZ SCR) (i : Fin n),
+      (rsy SCR hOut).NZ x (some extIn) i =
+        (csy SCR.VSCR hOut).NZ x (some (rsyExtInOfCsy SCR h extIn)) i) ∧
+      (∀ (x : rsy_SZ SCR) (op : Σ (i : Fin n), SCR.VSCR.OutPort i),
+        rsyOutAt SCR hOut x op = csyOut SCR.VSCR hOut x op) :=
+  conjunctive_rsy_eq_csy SCR h hOut |>.2
+
+/--
+  [textbook/exercise3.132/theorem/singular_cfscr_eq_closed_loop]
+  Singular recipes are conjunctive; `CFSCR(f,x) = f` after open-loop identification.
+-/
+theorem singular_cfscr_eq_closed_loop_trajectory {V : PortSystemVector 1}
+    [∀ i p, Inhabited (V.PortVal i p)]
+    (hOutNE : Nonempty (Σ (i : Fin 1), V.OutPort i))
+    (hInNE : Nonempty (Σ (i : Fin 1), V.Port i))
+    (hOut : ∀ i, AlwaysOutputs (V.Z i))
+    (f : rsyClosedLoopITZ (singularSCR V hOutNE hInNE))
+    (x : rsy_SZ (singularSCR V hOutNE hInNE)) :
+    cfscr (singularSCR V hOutNE hInNE) hOut f x =
+      conjunctiveClosedLoopAsOpenLoop (singularSCR V hOutNE hInNE)
+        (singularSCR_is_conjunctive V hOutNE hInNE) f := by
+  let SCR := singularSCR V hOutNE hInNE
+  exact conjunctive_cfscr_eq_closed_loop_trajectory SCR (singularSCR_is_conjunctive V hOutNE hInNE) hOut f x
+
+/--
+  [textbook/exercise3.132/theorem/singular_rsy_eq_component]
+  On singular recipe `VSCR = (Z0)`, resultant dynamics agree with `Z0` at embedded state/input.
+-/
+theorem singular_scr_rsy_agrees_component {V : PortSystemVector 1}
+    (hOutNE : Nonempty (Σ (i : Fin 1), V.OutPort i))
+    (hInNE : Nonempty (Σ (i : Fin 1), V.Port i))
+    (hOut : ∀ i, AlwaysOutputs (V.Z i)) :
+    InRSY 1 ⟨singularSCR V hOutNE hInNE, hOut⟩ (rsy (singularSCR V hOutNE hInNE) hOut) := rfl
+
 end Mbse.Wymore

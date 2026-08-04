@@ -6,7 +6,7 @@
     {
       "id": "3.97/definition/is_subsystem_of",
       "type": "definition",
-      "text": "Z1 is a subsystem of Z2 via injective embedding of component vectors and interface restriction."
+      "text": "Z1 is a subsystem of Z2 via injective φ embedding VSCR1 into VSCR2, HEq on components and resultants, and CSCR1 ↔ embedded pairs in CSCR2 ∩ subsystem port pairs (textbook (iv))."
     }
   ]
 }

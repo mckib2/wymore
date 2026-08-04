@@ -1,0 +1,19 @@
+{
+  "id": "3.133",
+  "kind": "theorem_proof",
+  "name": "Conjunctive SCR coupling function",
+  "chapter": 3,
+  "description": "Exercise 3.133: conjunctive SCR has CFSCR(f,x)=f and RSY agrees with CSY on NZ/RZ.",
+  "elements": [
+    {
+      "id": "3.133/theorem/conjunctive_cfscr_eq_closed_loop",
+      "type": "theorem",
+      "text": "cfscr SCR hOut f x = conjunctiveClosedLoopAsOpenLoop SCR h f."
+    },
+    {
+      "id": "3.133/theorem/conjunctive_rsy_eq_csy",
+      "type": "theorem",
+      "text": "Pointwise NZ and readout agreement between rsy SCR and csy SCR.VSCR."
+    }
+  ]
+}
