@@ -1168,3 +1168,48 @@ The set-theoretic flattening is a one-line re-indexing; in DTT it costs an index
 | Ex 4.86 | Explicit assumptions | `OP@`/`IP@` are subtype projections; connectable-vector distinctness and total readouts are explicit; the two-level input-resolution step is proved, not assumed; both isomorphism directions stated |
 
 **Cross-cutting.** Every Chapter 4 relation follows the pattern of §16–§17: a `structure` of witness data plus a `Prop` obtained by `Nonempty`. `ONTO` is always modeled as surjectivity onto a fixed codomain, `1TO1` as `Function.Injective`, and inverse maps are built with `Equiv.ofBijective`, which is why the symmetry proofs (Thm 4.38, Ex 4.84) are `noncomputable`. All the new results depend only on `propext`, `Classical.choice` and `Quot.sound`.
+
+---
+
+## 38. Applying Chapter 4: the coupled machine, and what the textbook does not tell you
+
+The Chapter 4 apparatus above was built to be used, and using it on a real coupling surfaced obligations the textbook never discusses. This section records those, because they are the places where a reader following the book alone would get stuck, and because two of them changed the design of the paper's case study.
+
+### 38.1 Building a Turing machine as a `SystemCouplingRecipe`
+
+[`TuringCoupling.lean`](Mbse/TuringCoupling.lean) couples a tape zone to a finite-control zone (`tmVector : PortSystemVector 2`, connectivity `tmCSCR`, resultant `tmResultant = rsy tmSCR _`) and proves the resultant isomorphic to a monolithic reference `tmReference`.
+
+| Obligation | Where it comes from | How it was discharged | Textbook treatment |
+|---|---|---|---|
+| A component's scanned symbol is needed *both* by the other component and at the boundary | `CSCR` is a one-to-one correspondence of output ports with input ports, so a connected port cannot also be free | The tape gets **two** output ports, `scan` (wired) and `window` (free), carrying the same value | Never raised; the book's examples never need a value in two places |
+| Control cannot sense and act in one tick | `RZ` is a function of state alone, so the command a component offers this tick was fixed by its previous state | Control is a two-phase (`sense`/`act`) system; **one machine step = two coupling ticks** (`tmReference_two_ticks`) | Never raised; the book does not discuss what Moore readout costs in a feedback coupling |
+| `PortSystemVector.distinct` for two structurally unrelated zones | `¬ HEq (Z i) (Z j)` (§24) | Cardinality: `TapeState` is infinite, `CtlState` finite, so `not_heq_of_infinite_finite` applies | Distinctness is silent in the book (see §24) |
+| Component inputs must be *evaluated* to state the resultant's dynamics | `rsy` resolves each input port through `CSCR` or the environment | `tm_input_tape_cmd`, `tm_input_ctl_sym`, `tm_input_ctl_load`, plus `rsyOutAt_congr_heq`/`heq_of_eqRec` to transport readouts across tag equalities | Asserted in one line; in DTT it is the bulk of the work |
+
+The second row is the consequential one. Because conformance is lock-step, the two-tick coupling forces the *reference* to carry a phase component that functional intent would not otherwise mention. That is a real modeling obligation, not an artifact of the formalization, and it is proved to be unavoidable in [`TickGranularity.lean`](Mbse/TickGranularity.lean) (`no_hom_flip`: no homomorphism from a two-phase build onto a one-tick reference, for *any* choice of maps).
+
+### 38.2 Negative results are cheap; that is the point
+
+[`TuringZoneVariants.lean`](Mbse/TuringZoneVariants.lean) contains four rejections (`no_hom_frozenTape`, `no_hom_blindTape`, `no_hom_quietTape_from_tape`, and `flip_fragment_fails` in the tick module). Each is proved *from the definition of a homomorphic image*, so no search over candidate maps is involved: surjectivity supplies a preimage, one step or readout law is instantiated there, and a contradiction follows in a handful of lines. This is worth naming as a methodological observation, since the textbook only ever exhibits positive witnesses: in this setting refuting implementability is typically **easier** than establishing it.
+
+The `quietTapeZone` family was added for a specific gap. Every zone in the earlier development had a total readout, so the *closed readout* clause family (`RZ = none`) was exercised by no example at all. A reference with a deliberately silent mode fixes that, and yields the more interesting verdict direction: an implementation can fail by reporting where the reference is silent.
+
+### 38.3 Chapter 4 theorems doing load-bearing work
+
+[`FragmentInvariance.lean`](Mbse/FragmentInvariance.lean) turns the Chapter 4 results into statements about the temporal fragment. The mapping is direct, which is the evidence that the fragment was the right object to identify:
+
+| Chapter 4 result | Invariance obtained |
+|---|---|
+| Thm 4.56 / Cor 4.59 (§30) | `satisfies_of_elaboration`, `satisfies_iff_of_elaboration_copy` — verify the zones, obtain the coupled system |
+| Def 4.47 copies with a port bijection (§20's generalization) | `satisfies_of_copy_spec/impl` — port renaming **and** permutation |
+| Ex 4.85 (§35), Ex 4.86 (§36) | `satisfies_iff_of_rearrangement`, `satisfies_iff_of_nesting` — reindexing and hierarchy flattening |
+| Ex 4.66 (§29) | `satisfies_of_null_order_elimination` — components irrelevant to the boundary |
+| Ex 4.83 (§34) | `mutual_satisfaction_isomorphic` — canonicity of the fragment |
+
+Note that the §20 generalization of Def 4.27/4.47 (a port bijection rather than shared index ranges) is what makes the port-**permutation** invariance statable at all; under the textbook's shared-indexing reading only renaming would be expressible. The generalization was made for fidelity reasons before this application existed.
+
+### 38.4 The solver instance is a different system, and says so
+
+`scripts/phi_dyn_solver.py` decides conformance for finite instances by CNF encoding. One point of fidelity deserves recording, because it would be easy to overclaim: the solver's tape is bounded to a fixed window, so that machine is a **linear bounded automaton, not a Turing machine**. It shares the shape of the table but is *not* related to the unbounded construction by a homomorphism, since the head can run off the window. It is a finite reference in its own right. Universality belongs to the unbounded `TuringCoupling` development, where conformance is established symbolically.
+
+Cross-checking runs both ways. Every solver verdict for which a theorem exists is compared against it, with a non-zero exit on disagreement — a disagreement would mean the encoding had drifted from the theorem it implements. In the other direction, `--emit-lean` replays a solver-found map as [`SolverWitness.lean`](Mbse/SolverWitness.lean), where each law of Def 4.3 is re-checked by `decide`, so no verdict rests on trusting the solver.

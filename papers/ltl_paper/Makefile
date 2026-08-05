@@ -13,10 +13,13 @@ TEX_SOURCES := \
 	sections/00-introduction.tex \
 	sections/01-background.tex \
 	sections/02-methodology.tex \
+	sections/025-invariance.tex \
 	sections/03-case-study.tex \
 	sections/03-case-study-basics.tex \
 	sections/03-case-study-alternates.tex \
-	sections/03-case-study-fibonacci.tex \
+	sections/03-case-study-machine.tex \
+	sections/03-case-study-solver.tex \
+	sections/03-case-study-ticks.tex \
 	sections/04-discussion.tex \
 	sections/05-conclusions.tex \
 	appendix/hom-biimp.tex
@@ -25,7 +28,8 @@ TEX_OPTIONAL := appendix/pathology-sketches.tex
 
 ASSETS := refs.bib ama.bst wiley-article.cls \
 	$(wildcard template-images/*) \
-	$(wildcard figures/*)
+	$(wildcard figures/*) \
+	$(wildcard generated/*)
 
 ROOT_ARTIFACTS := \
 	$(MAIN).aux $(MAIN).bbl $(MAIN).blg \

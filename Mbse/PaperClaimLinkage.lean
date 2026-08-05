@@ -14,6 +14,11 @@ import Mbse.MinskyKit
 import Mbse.FibCaseStudy
 import Mbse.PartialDynamicsHomFragment
 import Mbse.Homomorphism
+import Mbse.TuringCoupling
+import Mbse.TuringZoneVariants
+import Mbse.TickGranularity
+import Mbse.FragmentInvariance
+import Mbse.SolverWitness
 
 /-!
 # Paper claim linkage
@@ -27,7 +32,7 @@ namespace BlockerAudit
 open BiImplicationFailures PathologyExamples WymorePathologyExamples
   PropertyFragment.FSM FSMProperties PhiDecode ExtensionalDynamicsFragment
   ClassicalAssertionalBridge WymoreExercises ComposedCaseStudy MinskyKit FibCaseStudy
-  PartialDynamicsHomFragment Homomorphism
+  PartialDynamicsHomFragment Homomorphism TuringCoupling
 
 theorem paperClaim_outputTableOnly_blocked
     (_h : SatisfactionWithoutHom (FSMSatisfiesOutputTable fsmStay fsmJump)
@@ -111,5 +116,83 @@ theorem audit_dualPortMechanized :
 theorem audit_restrictedFU_open :
     paperClaimStatus .restrictedFUInDynamicsEncoding = .openQuestion :=
   paperClaim_restrictedFU_open
+
+/-! ## Turing-machine case study
+
+The paper's spine: a machine presented as a genuine coupling recipe, the reference it realises, the
+alternative zone buildables, and the compositional lift.  These audits are what the case-study
+prose is allowed to claim.
+-/
+
+/--
+Case-study spine: the coupling of a tape zone and a control zone realises the monolithic reference,
+in fact isomorphically, and therefore satisfies the fragment compiled from it.
+-/
+theorem audit_turingCoupling :
+    (SystemSatisfiesPartialDynamicsHom (TuringCoupling.tmReference Bool Bool bitFlipTable)
+        (TuringCoupling.tmResultant Bool Bool bitFlipTable) ↔
+      IsHomomorphicImage (TuringCoupling.tmReference Bool Bool bitFlipTable)
+        (TuringCoupling.tmResultant Bool Bool bitFlipTable)) ∧
+    IsIsomorphicTo (TuringCoupling.tmReference Bool Bool bitFlipTable)
+      (TuringCoupling.tmResultant Bool Bool bitFlipTable) :=
+  ⟨TuringCoupling.tmResultant_satisfies_iff_hom Bool Bool bitFlipTable,
+    TuringCoupling.tmResultant_isomorphic_reference Bool Bool bitFlipTable⟩
+
+/--
+Alternative buildables: two zones accepted (extra internal state, re-encoded state), three rejected
+with impossibility proofs, and the rebuilt machine still realises the reference through Theorem
+4.56 without re-verifying the machine.
+-/
+theorem audit_turingZoneVariants :
+    IsHomomorphicImage (TuringCoupling.tapeZone Bool) (TuringCoupling.instrTapeZone Bool) ∧
+    IsIsomorphicTo (TuringCoupling.ctlZone Bool Bool bitFlipTable)
+      (TuringCoupling.altCtlZone Bool Bool bitFlipTable) ∧
+    ¬ IsHomomorphicImage (TuringCoupling.tapeZone Bool) (TuringCoupling.frozenTapeZone Bool) ∧
+    ¬ IsHomomorphicImage (TuringCoupling.tapeZone Bool) (TuringCoupling.blindTapeZone Bool) ∧
+    ¬ IsHomomorphicImage (TuringCoupling.quietTapeZone Bool) (TuringCoupling.tapeZone Bool) ∧
+    SystemSatisfiesPartialDynamicsHom (TuringCoupling.tmReference Bool Bool bitFlipTable)
+      (TuringCoupling.tmElaboratedResultant Bool Bool bitFlipTable) :=
+  ⟨⟨TuringCoupling.instrTapeHom Bool⟩,
+    ⟨TuringCoupling.altCtlIso Bool Bool bitFlipTable⟩,
+    TuringCoupling.no_hom_frozenTape Bool false true (by decide),
+    TuringCoupling.no_hom_blindTape Bool false true (by decide),
+    TuringCoupling.no_hom_quietTape_from_tape Bool,
+    TuringCoupling.tmElaboratedResultant_satisfies_reference_fragment Bool Bool bitFlipTable⟩
+
+/--
+Tick granularity: the same build fails a one-tick reference and satisfies the same reference
+restated at two ticks per logical step.  Conformance is a statement about a reference *and* a clock.
+-/
+theorem audit_tickGranularity :
+    ¬ SystemSatisfiesPartialDynamicsHom TickGranularity.flipRef TickGranularity.flipImpl ∧
+      SystemSatisfiesPartialDynamicsHom TickGranularity.stretchedRef TickGranularity.flipImpl :=
+  TickGranularity.tick_granularity_matters
+
+/--
+Fragment invariance: the compiled property set depends on neither side's encoding, survives port
+relabelling, composes across a coupling recipe, and on finite systems determines its reference up to
+isomorphism.  This is the defensible form of the paper's "you need not maintain `h`" claim.
+-/
+theorem audit_fragmentInvariance :
+    (∀ {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 SZ3 IZ3 OZ3 : Type}
+      {Z_spec : DiscreteSystem SZ1 IZ1 OZ1} {Z_impl : DiscreteSystem SZ2 IZ2 OZ2}
+      {Z_impl' : DiscreteSystem SZ3 IZ3 OZ3}, IsIsomorphicTo Z_impl Z_impl' →
+        (SystemSatisfiesPartialDynamicsHom Z_spec Z_impl ↔
+          SystemSatisfiesPartialDynamicsHom Z_spec Z_impl')) ∧
+    (∀ {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+      {Z1 : DiscreteSystem SZ1 IZ1 OZ1} {Z2 : DiscreteSystem SZ2 IZ2 OZ2},
+        IsFinite Z1 → IsFinite Z2 →
+        SystemSatisfiesPartialDynamicsHom Z1 Z2 → SystemSatisfiesPartialDynamicsHom Z2 Z1 →
+        IsIsomorphicTo Z1 Z2) :=
+  ⟨fun h => FragmentInvariance.satisfies_iff_of_impl_iso h,
+    fun h1 h2 s1 s2 => FragmentInvariance.mutual_satisfaction_isomorphic h1 h2 s1 s2⟩
+
+/--
+Solver linkage: the conformance map the SAT solver returned for the tape/instrumented-tape instance,
+re-checked by the kernel.  The solver proposes, Lean verifies.
+-/
+theorem audit_solverWitness :
+    SystemSatisfiesPartialDynamicsHom SolverWitness.specSys SolverWitness.implSys :=
+  SolverWitness.solver_verdict_confirmed
 
 end BlockerAudit

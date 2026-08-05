@@ -12,6 +12,8 @@ there exists a Wymore system homomorphism $h : Z_{\text{impl}} \to Z_{\text{spec
 \label{app:hom-setup}
 Write $Z_{\text{spec}}=(S_{\text{spec}},I_{\text{spec}},O_{\text{spec}},\delta_{\text{spec}},\rho_{\text{spec}})$ and $Z_{\text{impl}}=(S_{\text{impl}},I_{\text{impl}},O_{\text{impl}},\delta_{\text{impl}},\rho_{\text{impl}})$. Types may differ. A run of $Z_{\text{impl}}$ is determined by $s_0$ and $f:T\to I_{\text{impl}}\cup\{\mathrm{none}\}$ via \eqref{eq:trace-init}--\eqref{eq:trace-readout}. Maps $h_S,h_I,h_O$ are surjective; $h_I$ lifts to options by sending $\mathrm{none}$ to $\mathrm{none}$.
 
+The admissible class quantifies over all states of $Z_{\text{impl}}$ as initial states and all input trajectories. This is used in one direction only---recovering the static laws from the runs---and it is necessary there: a state reached by no admissible run is unconstrained by any run-based reading, whereas Definition~4.3 constrains every state. When a designated initial state is intended, replace $Z_{\text{impl}}$ throughout by the subsystem it generates; the argument is unchanged and the conclusion is about that subsystem.
+
 \subsection{Hom-relative fragment}
 \label{app:hom-fragment}
 Clauses are indexed by specification states. The atom $\mathit{specState}(s)$ holds at tick $t$ when $h_S(g(t))=s$. For each spec state $s$:
@@ -52,3 +54,6 @@ If $h$ is a homomorphism, the static laws hold, hence by the bridge lemma every 
   \exists\, h : Z_{\text{impl}} \to Z_{\text{spec}}\ \text{Wymore homomorphism}.
 \]
 When types coincide and identity maps are used, this specializes to pointwise $\delta$/$\rho$ agreement (partial identity homomorphic image). Formulas outside the fragment---including $F$ properties and output-table-only encodings---are outside the bi-implication. Global FC equality for arbitrary such $\Phi$ remains open.
+
+\paragraph{Machine-checked formalization.}
+This bi-implication, the invariance and composition results of Section~\ref{sec:invariance}, and every conformance and rejection claim of the case study are formalized in a proof assistant, including the coupling recipe of Section~\ref{sec:case-machine} and its resultant, the accepted and rejected zone variants, the lift of zone conformance to the coupled system, and the tick-granularity negative result. The rejections are proofs that no maps exist rather than reports of failed search. The finite instances decided by the checker of Section~\ref{sec:case-solver} are compared against those theorems wherever a theorem covers the instance, and one map found by the checker is re-verified inside the formalization.

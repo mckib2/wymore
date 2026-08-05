@@ -1,0 +1,25 @@
+\subsection{The Fragment Is an Invariant; the Homomorphism Is Not}
+\label{sec:invariance}
+
+The bi-implication of Section~\ref{sec:dynamics-encoding-fragment} is an equivalence of conditions, and on its own it might suggest that nothing is gained by working with the property set rather than the map. The two sides differ in a way the equivalence does not show: the compiled fragment is determined by the reference system alone, whereas a homomorphism is a piece of data attached to a particular pair of systems and a particular encoding of each. Design churn changes the data and leaves the fragment untouched. This subsection states the invariance results that make that precise; all are machine-checked, and each identifies a class of design change after which nothing needs to be re-verified.
+
+\paragraph{Encoding independence.}
+If two reference systems are isomorphic, they compile to fragments with the same buildables: satisfaction of one is satisfaction of the other. The same holds on the buildable side. Consequently a re-encoding of state---a tagged sum instead of a record, a different bit layout, a renumbered state set---cannot change any conformance verdict. The homomorphism, by contrast, is literally a different function after such a change.
+
+\paragraph{Port renaming and permutation.}
+Copies in the sense of T3SD carry bijections between the two systems' port index sets, so a copy relates systems whose ports have been renamed \emph{and} permuted. Conformance is invariant under copies on either side. This is the form interface churn usually takes---the same signals, a reorganized interface---and it is worth separating from state re-encoding, because a permutation of ports changes which wire in a coupling recipe carries which value while leaving behavior alone.
+
+\paragraph{Transport along a homomorphism.}
+Conformance composes on both sides: if a build conforms to a reference, and the reference is itself a realization of a more abstract reference, the build conforms to the more abstract one; and if a build conforms and is itself realized by a more detailed build, that detailed build conforms too. Layered specifications and stepwise elaboration therefore chain without re-deriving anything at intermediate layers.
+
+\paragraph{Composition.}
+The result that matters for scale concerns couplings. Replace each zone of a coupling recipe by a zone that realizes it, preserving ports, and the resultant of the new recipe realizes the resultant of the old one, with an unchanged boundary---the same free ports carrying the same values. So conformance of a coupled system follows from conformance of its zones, and the coupled system is never re-examined. If in addition the zone-level maps are injective, resultant and resultant are copies, and the verdict transfers in both directions. Section~\ref{sec:case-machine-lift} is this result in use: both zones of the machine are swapped at once and the machine-level argument is not reopened.
+
+\paragraph{Architectural rearrangement.}
+Three further transformations leave conformance alone. Reindexing the components of a recipe---presenting the same zones in a different order---yields an isomorphic resultant. Flattening a nested coupling into a single recipe likewise does, so a hierarchy may be regrouped without consequence. And eliminating components that participate in no connection and expose no boundary port yields a resultant that the original realizes. Each corresponds to a way architectures get redrawn in practice without any intent changing.
+
+\paragraph{Canonicity.}
+Finally, the fragment is a \emph{characteristic} description of its reference and not merely a necessary condition. If two finite systems each satisfy the fragment compiled from the other, they are isomorphic. So the fragment compiled from $Z_{\text{spec}}$ pins $Z_{\text{spec}}$ down to isomorphism among finite systems---it is a complete description of intent up to the encoding choices that intent should not care about, which is exactly the property the invariance results above describe from the other direction.
+
+\paragraph{Why this is the operative claim.}
+Taken together these results say that the compiled fragment is stable under state re-encoding, port renaming and permutation, component reindexing, hierarchy flattening, boundary-irrelevant component removal, and zone-by-zone rebuilding, and that it determines its reference up to isomorphism. A homomorphism survives none of those changes as the same object. The bi-implication is what licenses treating the fragment as the primary artifact; the invariance results are why one would want to.

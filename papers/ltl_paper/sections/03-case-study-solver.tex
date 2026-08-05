@@ -1,0 +1,65 @@
+\subsection{Deciding Conformance with a Solver}
+\label{sec:case-solver}
+
+Everything so far has been reasoning. The reason to care about the bi-implication in practice is that it converts a design review question---\emph{does this build realize that intent?}---into a query a machine can answer, returning either a conformance map or a proof that none exists. This section reports that check, run over the machine of Section~\ref{sec:case-machine} and its zone variants.
+
+\subsubsection{The query}
+\label{sec:case-solver-query}
+
+Satisfaction of the compiled fragment is, by the bi-implication, existence of surjective maps $h_S, h_I, h_O$ obeying the readout and step laws. Over finite systems that is a satisfiability question, and it is the \emph{existential} form that is useful: the engineer supplies a reference table and a candidate build, and asks whether \emph{any} conformance map exists. A positive answer arrives as a model, and the model \emph{is} the map---discovered, not maintained.
+
+Written as clauses over atoms $S_{x,s}$, $I_{i,j}$ and $O_{o,p}$, asserting respectively that $h_S$ sends implementation state $x$ to reference state $s$, and similarly for inputs and outputs, the query is small and mirrors the fragment of Table~\ref{tab:phi-dyn-fragment} clause family by clause family:
+
+\begin{itemize}
+    \item \emph{functionality}: for each implementation element, exactly one atom holds---this is what makes the three relations maps at all;
+    \item \emph{readout}: $\neg S_{x,s} \vee O_{\rho_{\text{impl}}(x),\,\rho_{\text{spec}}(s)}$, degenerating to the unit clause $\neg S_{x,s}$ when one side produces an output and the other does not, which is how the closed-readout family enters;
+    \item \emph{guided step}: $\neg S_{x,s} \vee \neg I_{i,j} \vee S_{\delta_{\text{impl}}(x,i),\,\delta_{\text{spec}}(s,j)}$ for every implementation state and input and every reference state and input;
+    \item \emph{autonomous step}: the same clause with the unguided tick in place of $i$ and $j$; omitting this family would make the encoding unsound relative to the theorem, since a build may not drift when the reference idles;
+    \item \emph{surjectivity}: one clause per reference state, input and output, requiring it to be covered. Without these the collapse that maps everything to a single reference row would satisfy the rest.
+\end{itemize}
+
+The encoding is propositional, so the instances are ordinary conjunctive normal form and are written out in DIMACS alongside the results; a reader may reproduce the verdicts with any solver. The compiled clause set is generated from the reference table by the same tool, so what the solver receives is the fragment itself rather than a paraphrase of it.
+
+\subsubsection{What the check reports}
+\label{sec:case-solver-results}
+
+Table~\ref{tab:solver-results} lists every instance: three concern the whole machine, four vary a single zone, two use the reference with a silent mode, and two are the tick-granularity pair of Section~\ref{sec:case-ticks}. Sizes are reference and candidate state counts; the two size columns and the clause count together show where the cost lives.
+
+\begingroup
+\renewcommand{\arraystretch}{1.2}
+\footnotesize
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.24\linewidth}rrrrlrc@{}}
+    \rowcolor{tableheader}
+    \headingfont\bfseries Instance & \headingfont\bfseries $|S_{\text{ref}}|$ & \headingfont\bfseries $|S_{\text{cand}}|$ &
+    \headingfont\bfseries vars & \headingfont\bfseries clauses & \headingfont\bfseries verdict &
+    \headingfont\bfseries ms & \headingfont\bfseries proved \\
+    \addlinespace[2pt]
+    \input{generated/solver-results.tex}
+\end{tabularx}
+\end{center}
+\captionof{table}{Conformance verdicts. SAT means a conformance map was found and is returned; UNSAT means the candidate provably does not realize the reference. The last column marks the instances whose verdict is independently established by a machine-checked theorem.}
+\label{tab:solver-results}
+\endgroup
+\vspace{4pt}
+
+Four observations, in descending order of importance.
+
+\emph{The rejections carry the weight.} A checker that only ever says yes demonstrates nothing. Five instances come back negative: the frozen tape, the blind tape, the over-reporting build against the silent reference, a machine whose tape zone was replaced by the frozen one, and the tick-mismatched pair. In each case the answer is not ``no map was found'' but ``no map exists,'' because unsatisfiability of the clause set is exactly non-existence of the triple.
+
+\emph{The accepted maps were not supplied.} For the rebuilt machine---both zones changed at once---the solver returns a state map that forgets the instrumentation counter and decodes the re-encoded control. That map is the artifact a classical treatment would ask an engineer to invent and then maintain. Here it is output.
+
+\emph{Every verdict that a theorem covers agrees with it.} Ten of the eleven instances correspond to a machine-checked theorem, and the tool compares its verdict against the expected one and fails loudly on disagreement; a disagreement would mean the encoding had drifted away from the theorem it claims to implement. The remaining instances---among them the machine whose tape zone is frozen---are questions the solver settles that we did not prove by hand, which is the point of having the tool. In the other direction, one solver-found map has been re-checked inside the machine-checked development, so at least one verdict does not rest on trusting the solver at all: the solver proposes and the proof assistant verifies.
+
+\emph{Finding is not checking.} Verifying a map that is already in hand is a scan of the clause set, linear in its size; finding one is a search. Both numbers appear because the contrast is the practical content of the workflow: an engineer who has a map pays almost nothing to re-check it after a change, and an engineer who does not have one can ask for it.
+
+\subsubsection{What this does not show}
+\label{sec:case-solver-limits}
+
+Three limits, stated plainly, because each is a place where the demonstration could be over-read.
+
+\emph{A solver needs a finite system, and bounding the tape costs universality.} The instances above use a fixed tape window, which makes that machine a linear bounded automaton, not a Turing machine. It is a finite reference in its own right, sharing the shape of the table, and it is \emph{not} related to the unbounded machine by a homomorphism, since the head can run off the window. Universality belongs to Section~\ref{sec:case-machine}, where the construction is unbounded and the reasoning is symbolic; the solver's role is to settle finite questions, and the two claims should not be merged.
+
+\emph{Existence of a conformance map is hard in general.} Deciding whether a surjective homomorphism exists subsumes surjective graph homomorphism and is NP-hard. The instances here are decided in milliseconds and the largest has on the order of $10^5$ clauses, which is feasibility evidence and nothing more. We make no scalability claim, and the timings are reported so that a reader can see the scale for themselves.
+
+\emph{The solver is not what makes large systems tractable.} What scales is the composition result of Section~\ref{sec:case-machine-lift}: zone-level verdicts lift to the resultant, and the invariance results of Section~\ref{sec:invariance} make re-encodings free. The intended division of labor is that a solver settles leaf zones---which are small, because zones are what engineers actually design and swap---and the theorems assemble those verdicts into a statement about the coupled system. Reporting a solver that scaled to whole systems would be a different and much weaker claim than reporting one that does not need to.

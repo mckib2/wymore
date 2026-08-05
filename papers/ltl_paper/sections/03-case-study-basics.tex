@@ -1,6 +1,8 @@
 \subsection{Basic Kit: Counter, Subtracter, Adder, and Zero-Test}
 \label{sec:case-basics}
 
+Each zone below is a five-tuple $Z=(S,I,O,\delta,\rho)$ with a single input port and a single output port, so its port value sets are just $I$ and $O$ and the port structure can be left implicit. That is the only reason these tables look like plain five-tuples; ports are not an extra layer added later but part of what a connectable system is, and they carry weight as soon as a zone has more than one of each (Section~\ref{sec:case-machine}). Read $\delta(s,\mathrm{none})$ as the autonomous tick: what the zone does when nothing arrives on its input port.
+
 \paragraph{Counter $Z_{\mathrm{inc}}$.}
 Behavior in plain language: start at count $0$; on enable $1$ increment; on enable $0$ hold; the output at every tick is the current count.
 
@@ -124,4 +126,4 @@ Behavior: Moore latch whose next state (and readout) is whether the sampled Nat 
 
 Compiled $\Phi_{Z_{\mathrm{jz}}}$ constrains the latch update and readout. The direct buildable coincides with the reference.
 
-Together these four zones are the shelf kit used below: increment, decrement, accumulate-with-clear, and zero-test. Each has a compiled $\Phi_{\mathrm{dyn}}$ and a verified identity buildable.
+Together these four zones are the shelf kit used below: increment, decrement, accumulate-with-clear, and zero-test. Each has a compiled $\Phi_{\mathrm{dyn}}$ and a verified identity buildable. They are introductory on purpose: each zone's intent fits in a sentence, each compiled fragment fits on the page, and each identity buildable conforms trivially. Nothing about verification method is demonstrated by an example this small, which is why the case study does not stop here.
