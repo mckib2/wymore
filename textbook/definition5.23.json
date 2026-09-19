@@ -25,6 +25,14 @@
       "lean_anchor": "reachableMode",
       "status": "proved",
       "fidelity": "faithful"
+    },
+    {
+      "id": "5.23/lean/RSYSMO",
+      "type": "definition",
+      "text": "Lean anchor `rsysmo` system parameterization over nonempty generating sets.",
+      "lean_anchor": "rsysmo",
+      "status": "proved",
+      "fidelity": "faithful"
     }
   ],
   "status": "proved"

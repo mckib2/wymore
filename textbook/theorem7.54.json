@@ -17,6 +17,14 @@
       "lean_anchor": "sgtyr_implementable",
       "status": "proved",
       "fidelity": "faithful-with-notes"
+    },
+    {
+      "id": "7.54/theorem/sgtyr_conjunctive_implementable",
+      "type": "theorem",
+      "text": "Conjunctive S^n SGTYR SCR implementability",
+      "lean_anchor": "sgtyr_conjunctive_implementable",
+      "status": "proved",
+      "fidelity": "faithful-with-notes"
     }
   ],
   "status": "proved"

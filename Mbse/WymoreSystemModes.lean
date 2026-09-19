@@ -707,6 +707,7 @@ theorem transient_vs_isolated_differences (M : SystemMode Z₁ Z₂)
     exact ⟨hi.1.2.2, fun x p => absorbing_closed_under_NZ M hi.1 x p⟩
 
 /--
+  [textbook/theorem5.36/source/statement|partial]
   [textbook/theorem5.36/related/transient_not_absorbing]
   Related to Statement 5.36 (informal prose), not a proof of it: one mode cannot
   be both transient and absorbing.

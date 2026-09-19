@@ -4,6 +4,48 @@
   "description": "When SCR is not conjunctive, the open-loop system Z& is the resultant of (VSCR, ∅), the feedback recipe SCR$ is pure feedback, and the closed-loop systems Z@ and Z@$ agree on product state and external I/O.",
   "elements": [
     {
+      "id": "3.64/definition/open_loop_ports",
+      "type": "definition",
+      "text": "Open-loop port types for Z& (tagged union of component ports).",
+      "fidelity": "faithful",
+      "status": "proved"
+    },
+    {
+      "id": "3.64/definition/conjunctive_scr",
+      "type": "definition",
+      "text": "Conjunctive coupling recipe (VSCR, ∅) for the same component vector.",
+      "fidelity": "faithful",
+      "status": "proved"
+    },
+    {
+      "id": "3.64/definition/open_loop_port_vector",
+      "type": "definition",
+      "text": "Singleton connectable vector whose component is the open-loop system Z&.",
+      "fidelity": "faithful",
+      "status": "proved"
+    },
+    {
+      "id": "3.64/definition/feedback_cscr",
+      "type": "definition",
+      "text": "CSCR$: relabeled original connections onto open-loop ports.",
+      "fidelity": "faithful",
+      "status": "proved"
+    },
+    {
+      "id": "3.64/definition/feedback_scr",
+      "type": "definition",
+      "text": "Pure-feedback coupling recipe SCR$ = (VSCR$, CSCR$).",
+      "fidelity": "faithful",
+      "status": "proved"
+    },
+    {
+      "id": "3.64/definition/feedback_rsy_param",
+      "type": "definition",
+      "text": "Parameter bundle for Z@$ = RSY(SCR$).",
+      "fidelity": "faithful",
+      "status": "proved"
+    },
+    {
       "id": "3.64/theorem/open_loop_conjunctive_rsy",
       "type": "implication",
       "text": "Z& is the resultant of the conjunctive coupling recipe (VSCR, ∅).",

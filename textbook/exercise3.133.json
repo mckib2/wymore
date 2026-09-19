@@ -6,6 +6,13 @@
   "description": "Exercise 3.133: conjunctive SCR has CFSCR(f,x)=f and RSY agrees with CSY on NZ/RZ.",
   "elements": [
     {
+      "id": "3.133/theorem/conjunctive_cfscr_input",
+      "type": "theorem",
+      "text": "On conjunctive recipes, open-loop coupling inputs at UISCR ports equal closed-loop external inputs.",
+      "fidelity": "faithful",
+      "status": "solved"
+    },
+    {
       "id": "3.133/theorem/conjunctive_cfscr_eq_closed_loop",
       "type": "theorem",
       "text": "cfscr SCR hOut f x = conjunctiveClosedLoopAsOpenLoop SCR h f.",

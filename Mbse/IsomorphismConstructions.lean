@@ -204,6 +204,33 @@ theorem ex4_69_assertion_false :
   exact h _ _ _ _ _ _ pointImage counterElaboration pointImage_isFinite
     counterElaboration_not_isFinite ⟨pointImage_witness⟩
 
+/--
+  Minimal positive variant of Exercise 4.69: the homomorphic image of a finite system is finite.
+  Because homomorphism maps `HS`, `HI`, `HO` are surjective, finiteness of the exhibiting
+  system `Z₂` transfers to the homomorphic image `Z₁`.
+-/
+theorem isFinite_of_isHomomorphicImage {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z1 : DiscreteSystem SZ1 IZ1 OZ1} {Z2 : DiscreteSystem SZ2 IZ2 OZ2}
+    (hfin2 : IsFinite Z2) (hHom : IsHomomorphicImage Z1 Z2) : IsFinite Z1 := by
+  rcases hHom with ⟨W⟩
+  haveI : Finite SZ2 := hfin2.1
+  haveI : Finite IZ2 := hfin2.2.1
+  haveI : Finite OZ2 := hfin2.2.2
+  haveI : Finite SZ1 := Finite.of_surjective W.HS W.HS_surjective
+  haveI : Finite IZ1 := Finite.of_surjective W.HI W.HI_surjective
+  haveI : Finite OZ1 := Finite.of_surjective W.HO W.HO_surjective
+  exact ⟨inferInstance, inferInstance, inferInstance⟩
+
+/--
+  Minimal positive contrapositive of Exercise 4.69: a non-finite system cannot be a
+  homomorphic image of a finite system.
+-/
+theorem ex4_69_positive_variant {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z1 : DiscreteSystem SZ1 IZ1 OZ1} {Z2 : DiscreteSystem SZ2 IZ2 OZ2}
+    (hfin1 : ¬ IsFinite Z1) (hfin2 : IsFinite Z2) : ¬ IsHomomorphicImage Z1 Z2 := by
+  intro hHom
+  exact hfin1 (isFinite_of_isHomomorphicImage hfin2 hHom)
+
 /-! ## Exercise 4.71: a system of which a given system is a homomorphic image -/
 
 /--

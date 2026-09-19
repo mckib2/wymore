@@ -137,17 +137,19 @@ theorem memTechnology_of_subtechnology {SZ IZ OZ : Type}
 
 /--
   [textbook/definition7.9/definition/closed_under_isomorphism]
-  TYR is closed under isomorphism: isomorphic systems of members remain in TYR.
+  TYR is closed under isomorphism: isomorphic systems of members remain in TYR,
+  including every fresh-name wrap (book set-membership of the isomorph).
 -/
 def ClosedUnderIsomorphism (TYR : Technology) : Prop :=
   ∀ {SZ IZ OZ SZ' IZ' OZ' : Type}
     (Z : DiscreteSystem SZ IZ OZ) (Z' : DiscreteSystem SZ' IZ' OZ'),
-    memTechnology TYR Z → IsIsomorphicTo Z Z' → memTechnology TYR Z'
+    memTechnology TYR Z → IsIsomorphicTo Z Z' →
+      ∀ n, AnyDiscreteSystem.ofNamed n Z' ∈ TYR.carrier
 
 /--
   [textbook/definition7.9b/definition/closed_under_copying]
   Recovered from usage (Thm 7.25, Ex 7.85–86): if `Z ∈ TYR` and `Z'` is a copy of `Z`,
-  then `Z' ∈ TYR`.
+  then every named wrap of `Z'` is in TYR (fresh copies are distinct carrier elements).
 -/
 def ClosedUnderCopying (TYR : Technology) : Prop :=
   ∀ {SZ1 SZ2 : Type} {Port1 Port2 OutPort1 OutPort2 : Type}
@@ -155,7 +157,8 @@ def ClosedUnderCopying (TYR : Technology) : Prop :=
     {OutPortVal1 : OutPort1 → Type} {OutPortVal2 : OutPort2 → Type}
     (Z1 : DiscreteSystem SZ1 ((p : Port1) → PortVal1 p) ((q : OutPort1) → OutPortVal1 q))
     (Z2 : DiscreteSystem SZ2 ((p : Port2) → PortVal2 p) ((q : OutPort2) → OutPortVal2 q)),
-    memTechnology TYR Z1 → IsCopyOf Z1 Z2 → memTechnology TYR Z2
+    memTechnology TYR Z1 → IsCopyOf Z1 Z2 →
+      ∀ n, AnyDiscreteSystem.ofNamed n Z2 ∈ TYR.carrier
 
 /--
   [textbook/definition7.12/definition/closed_under_pure_feedback]
@@ -330,14 +333,22 @@ def tagPortedCopy {SZ Port OutPort α : Type}
 
 /-! ## Easy theorems / exercise anchors -/
 
+/-- Naming is the identity-copy case of strengthened `ClosedUnderCopying` (ported systems). -/
+theorem closedUnderCopying_implies_closedUnderNaming_ported
+    {SZ Port OutPort : Type} {PortVal : Port → Type} {OutPortVal : OutPort → Type}
+    (TYR : Technology) (hcopy : ClosedUnderCopying TYR)
+    (Z : DiscreteSystem SZ ((p : Port) → PortVal p) ((q : OutPort) → OutPortVal q)) :
+    memTechnology TYR Z → ∀ n, AnyDiscreteSystem.ofNamed n Z ∈ TYR.carrier :=
+  fun hmem n => hcopy Z Z hmem ⟨CopyWitness.refl Z⟩ n
+
 /--
   [textbook/exercise7.85/theorem/iso_implies_copying]
   Closure under isomorphism implies closure under copying.
 -/
 theorem closedUnderIsomorphism_implies_closedUnderCopying (TYR : Technology)
     (h : ClosedUnderIsomorphism TYR) : ClosedUnderCopying TYR := by
-  intro SZ1 SZ2 Port1 Port2 OutPort1 OutPort2 PortVal1 PortVal2 OutPortVal1 OutPortVal2 Z1 Z2 hmem hcopy
-  exact h Z1 Z2 hmem hcopy.isIsomorphicTo
+  intro SZ1 SZ2 Port1 Port2 OutPort1 OutPort2 PortVal1 PortVal2 OutPortVal1 OutPortVal2 Z1 Z2 hmem hcopy n
+  exact h Z1 Z2 hmem hcopy.isIsomorphicTo n
 
 /--
   [textbook/exercise7.87/theorem/buildable_monotonic]
@@ -423,12 +434,12 @@ theorem singular_member_buildable {SZ Port OutPort : Type}
 /--
   [textbook/theorem7.25/theorem/concurrent_copies_buildable]
   Book: buildables in a technology closed under copying admit a concurrently buildable
-  family of copies. Lean: if `TYR` is closed under naming (fresh copies) and each of
-  `m` recipes has `VSCR ⊆ TYR`, then the same recipes are concurrently buildable when
-  components are tracked under distinct names `0..m-1` (pairwise-disjoint named sets).
+  family of copies. Lean: `ClosedUnderCopying` supplies named wraps of each ported
+  VSCR component (`CopyWitness.refl`), so `Fin m` recipes with `VSCR ⊆ TYR` are
+  concurrently buildable under distinct names `0..m-1`.
 -/
 theorem concurrent_copies_buildable {m : Nat} (TYR : Technology)
-    (hname : ClosedUnderNaming TYR)
+    (hcopy : ClosedUnderCopying TYR)
     (SCR : Fin m → Σ n : Nat, SystemCouplingRecipe n)
     (hVSCR : ∀ i, VSCRSubsetTechnology (SCR i).2.VSCR TYR) :
     ConcurrentlyBuildableFin TYR SCR ∧
@@ -441,7 +452,8 @@ theorem concurrent_copies_buildable {m : Nat} (TYR : Technology)
       congrArg AnyDiscreteSystem.name (hk.trans hl.symm)
     exact hij (Fin.ext hnames)
   · intro i k
-    exact hname ((SCR i).2.VSCR.Z k) i.val (hVSCR i k)
+    exact hcopy ((SCR i).2.VSCR.Z k) ((SCR i).2.VSCR.Z k) (hVSCR i k)
+      ⟨CopyWitness.refl _⟩ i.val
 
 /-- Singleton family corollary (disjointness vacuous; no naming hyp needed). -/
 theorem concurrent_copies_buildable_singleton {n : Nat} (TYR : Technology)
@@ -465,7 +477,6 @@ def IsConcurrentlyBuildableIn {m : Nat} (TYR1 TYR2 : Technology)
   [textbook/theorem7.27/theorem/buildable_in_concurrent_subtech_copy]
   If `TYR1` is concurrently buildable in `TYR2` (via `SCR`) and `Z` is buildable in
   `TYR1` w.r.t. one of those recipes, then `Z` itself is buildable in `TYR2`.
-  For ported systems, the reflexive copy witness packages the book’s “there is a copy”.
 -/
 theorem buildable_in_concurrent_subtech_copy {m : Nat} {SZ IZ OZ : Type}
     {TYR1 TYR2 : Technology}
@@ -480,20 +491,65 @@ theorem buildable_in_concurrent_subtech_copy {m : Nat} {SZ IZ OZ : Type}
     ⟨fun k => hconc.1.1 i k, hB.2⟩
   exact ⟨(SCR i).1, (SCR i).2, hOut, hB2⟩
 
-/-- Ported packaging of Thm 7.27: a copy (reflexive) is buildable in `TYR2`. -/
+/-- AlwaysOutputs transports along phantom retagging. -/
+theorem tagPorted_alwaysOutputs {SZ Port OutPort : Type}
+    {PortVal : Port → Type} {OutPortVal : OutPort → Type} {α : Type}
+    (Z : DiscreteSystem SZ ((p : Port) → PortVal p) ((q : OutPort) → OutPortVal q))
+    (h : AlwaysOutputs Z) : AlwaysOutputs (tagPortedSystem (α := α) Z) := fun sa => by
+  obtain ⟨o, ho⟩ := h sa.1
+  exact ⟨o, by simp [tagPortedSystem, tagStateSystem, ho]⟩
+
+/--
+  Ported Thm 7.27: a non-identity `tagPorted` copy has a singular buildable design in
+  `TYR` when the original is a technology member and `TYR` is closed under copying.
+  The buildable system is the singular resultant of the tagged component (Fin-1 packaging).
+-/
+theorem buildable_tagPorted_copy {SZ Port OutPort : Type}
+    {PortVal : Port → Type} {OutPortVal : OutPort → Type}
+    (TYR : Technology) (hcopy : ClosedUnderCopying TYR)
+    (Z : DiscreteSystem SZ ((p : Port) → PortVal p) ((q : OutPort) → OutPortVal q))
+    (hmem : memTechnology TYR Z)
+    (hOutZ : AlwaysOutputs Z)
+    (hOutNE : Nonempty (Σ _ : Fin 1, OutPort))
+    (hInNE : Nonempty (Σ _ : Fin 1, Port)) :
+    IsCopyOf Z (tagPortedSystem (α := Fin 1) Z) ∧
+      IsBuildable TYR
+        (rsy (singularSCR (portVectorOfSystem PortVal OutPortVal
+            (tagPortedSystem (α := Fin 1) Z)) hOutNE hInNE)
+          (fun _ => tagPorted_alwaysOutputs (α := Fin 1) Z hOutZ)) := by
+  let Zcopy := tagPortedSystem (α := Fin 1) Z
+  refine ⟨⟨tagPortedCopy (α := Fin 1) Z⟩, ?_⟩
+  have hmemCopy : memTechnology TYR Zcopy :=
+    ⟨0, hcopy Z Zcopy hmem ⟨tagPortedCopy (α := Fin 1) Z⟩ 0⟩
+  have hOutCopy : AlwaysOutputs Zcopy := tagPorted_alwaysOutputs (α := Fin 1) Z hOutZ
+  let SCR := singularSCR (portVectorOfSystem PortVal OutPortVal Zcopy) hOutNE hInNE
+  let hOut' : ∀ k, AlwaysOutputs (SCR.VSCR.Z k) := fun _ => hOutCopy
+  exact ⟨1, SCR, hOut', singular_member_buildable TYR Zcopy hmemCopy hOutCopy hOutNE hInNE⟩
+
+/-- Ported packaging of Thm 7.27 with concurrent transport + tagged copy. -/
 theorem buildable_copy_in_concurrent_subtech {m : Nat}
     {SZ Port OutPort : Type}
     {PortVal : Port → Type} {OutPortVal : OutPort → Type}
     {TYR1 TYR2 : Technology}
     (SCR : Fin m → Σ n : Nat, SystemCouplingRecipe n)
     (hconc : IsConcurrentlyBuildableIn TYR1 TYR2 SCR)
+    (hcopy : ClosedUnderCopying TYR2)
     (i : Fin m)
     (hOut : ∀ k, AlwaysOutputs ((SCR i).2.VSCR.Z k))
     (Z : DiscreteSystem SZ ((p : Port) → PortVal p) ((q : OutPort) → OutPortVal q))
-    (hB : IsBuildableWith TYR1 (SCR i).2 hOut Z) :
-    IsCopyOf Z Z ∧ IsBuildable TYR2 Z :=
-  ⟨⟨CopyWitness.refl Z⟩,
-    buildable_in_concurrent_subtech_copy SCR hconc i hOut Z hB⟩
+    (hB : IsBuildableWith TYR1 (SCR i).2 hOut Z)
+    (hmem : memTechnology TYR2 Z)
+    (hOutZ : AlwaysOutputs Z)
+    (hOutNE : Nonempty (Σ _ : Fin 1, OutPort))
+    (hInNE : Nonempty (Σ _ : Fin 1, Port)) :
+    IsCopyOf Z (tagPortedSystem (α := Fin 1) Z) ∧ IsBuildable TYR2 Z ∧
+      IsBuildable TYR2
+        (rsy (singularSCR (portVectorOfSystem PortVal OutPortVal
+            (tagPortedSystem (α := Fin 1) Z)) hOutNE hInNE)
+          (fun _ => tagPorted_alwaysOutputs (α := Fin 1) Z hOutZ)) :=
+  ⟨(buildable_tagPorted_copy TYR2 hcopy Z hmem hOutZ hOutNE hInNE).1,
+    buildable_in_concurrent_subtech_copy SCR hconc i hOut Z hB,
+    (buildable_tagPorted_copy TYR2 hcopy Z hmem hOutZ hOutNE hInNE).2⟩
 
 /-- Subtechnology still transports buildability (identity copy). -/
 theorem buildable_of_subtechnology_exist {SZ IZ OZ : Type}
@@ -505,11 +561,43 @@ theorem buildable_of_subtechnology_exist {SZ IZ OZ : Type}
 
 /--
   [textbook/exercise7.86/theorem/copying_implies_infinite]
-  Book: closure under copying ⇒ not finite. Lean: `ClosedUnderNaming` (fresh-name
-  packaging of minting copies) + one member ⇒ carrier contains an injective `Nat`
-  family ⇒ not finite.
+  Book: closure under copying ⇒ not finite. Lean: for a ported member, `ClosedUnderCopying`
+  mints all named wraps of a `tagPorted` copy (`IsCopyOf` via `tagPortedCopy`); the
+  `ofNamed n Zcopy` family is injective on names ⇒ carrier infinite.
 -/
-theorem closedUnderCopying_not_finite {SZ IZ OZ : Type}
+theorem closedUnderCopying_not_finite {SZ Port OutPort : Type}
+    {PortVal : Port → Type} {OutPortVal : OutPort → Type}
+    (TYR : Technology) (hcopy : ClosedUnderCopying TYR)
+    (Z : DiscreteSystem SZ ((p : Port) → PortVal p) ((q : OutPort) → OutPortVal q))
+    (hmem : memTechnology TYR Z) :
+    ¬ IsFiniteTechnology TYR := by
+  intro hfin
+  let Zcopy := tagPortedSystem (α := Fin 1) Z
+  have hmemCopy : ∀ n, AnyDiscreteSystem.ofNamed n Zcopy ∈ TYR.carrier :=
+    fun n => hcopy Z Zcopy hmem ⟨tagPortedCopy (α := Fin 1) Z⟩ n
+  let f : Nat → AnyDiscreteSystem := fun n => AnyDiscreteSystem.ofNamed n Zcopy
+  have hinj : Function.Injective f := by
+    intro n m hnm
+    by_contra hne
+    exact AnyDiscreteSystem.ofNamed_ne Zcopy hne hnm
+  have hinf : (Set.range f).Infinite := Set.infinite_range_of_injective hinj
+  exact Set.not_infinite.2
+    (hfin.subset fun a ha => by
+      obtain ⟨n, rfl⟩ := ha
+      exact hmemCopy n)
+    hinf
+
+/-- Alias matching exercise / JSON anchor. -/
+theorem copying_implies_infinite {SZ Port OutPort : Type}
+    {PortVal : Port → Type} {OutPortVal : OutPort → Type}
+    (TYR : Technology) (hcopy : ClosedUnderCopying TYR)
+    (Z : DiscreteSystem SZ ((p : Port) → PortVal p) ((q : OutPort) → OutPortVal q))
+    (hmem : memTechnology TYR Z) :
+    ¬ IsFiniteTechnology TYR :=
+  closedUnderCopying_not_finite TYR hcopy Z hmem
+
+/-- Naming-only packaging (derived helper for unported systems). -/
+theorem closedUnderNaming_not_finite {SZ IZ OZ : Type}
     (TYR : Technology) (hname : ClosedUnderNaming TYR)
     (Z : DiscreteSystem SZ IZ OZ) (hmem : memTechnology TYR Z) :
     ¬ IsFiniteTechnology TYR := by
@@ -526,12 +614,5 @@ theorem closedUnderCopying_not_finite {SZ IZ OZ : Type}
       obtain ⟨n, rfl⟩ := ha
       exact hmemf n)
     hinf
-
-/-- Alias matching exercise / JSON anchor. -/
-theorem copying_implies_infinite {SZ IZ OZ : Type}
-    (TYR : Technology) (hname : ClosedUnderNaming TYR)
-    (Z : DiscreteSystem SZ IZ OZ) (hmem : memTechnology TYR Z) :
-    ¬ IsFiniteTechnology TYR :=
-  closedUnderCopying_not_finite TYR hname Z hmem
 
 end WymoreTechnology

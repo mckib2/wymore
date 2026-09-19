@@ -487,6 +487,10 @@ structure SystemMorphism
   preserves_transition : ∀ s oi, φS (Z1.NZ s oi) = Z2.NZ (φS s) (oi.map φI)
   preserves_readout : ∀ s, (Z1.RZ s).map φO = Z2.RZ (φS s)
 
+/--
+  [textbook/definition_a1.284/definition/translation_operator]
+  Function translation operator `f → r = fun t => f (t + r)`.
+-/
 def translate {A : Type} (f : Time → A) (r : Time) : Time → A :=
   fun t => f (t + r)
 
@@ -516,6 +520,10 @@ theorem concatenation_value_right {A : Type} (f g : Time → A) (r : Time) (t : 
   have h_not : ¬(t < r) := Nat.not_lt_of_ge ht
   simp only [h_not, ↓reduceIte]
 
+/--
+  [textbook/definition_a1.257/definition/restriction]
+  Function restriction `RSN(f, S)` to a subtype `{a // a ∈ S}`.
+-/
 def RSN {A B : Type} (f : A → B) (S : Set A) : {a : A // a ∈ S} → B :=
   fun ⟨a, _⟩ => f a
 

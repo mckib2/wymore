@@ -33,6 +33,14 @@
       "lean_anchor": "one_hot_implementable_tyrx2",
       "status": "proved",
       "fidelity": "faithful-with-notes"
+    },
+    {
+      "id": "7.60/theorem/finSystem_implementable_tyrx2",
+      "type": "theorem",
+      "text": "finSystem implementable in TYRx2 via multi-cell SCR",
+      "lean_anchor": "finSystem_implementable_tyrx2",
+      "status": "proved",
+      "fidelity": "faithful-with-notes"
     }
   ],
   "status": "proved"

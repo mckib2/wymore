@@ -55,11 +55,13 @@ theorem ex7_85_iso_implies_copying (TYR : Technology)
   closedUnderIsomorphism_implies_closedUnderCopying TYR h
 
 /-- [textbook/exercise7.86/source/exercise] -/
-theorem ex7_86_copying_implies_infinite {SZ IZ OZ : Type}
-    (TYR : Technology) (hname : ClosedUnderNaming TYR)
-    (Z : DiscreteSystem SZ IZ OZ) (hmem : memTechnology TYR Z) :
+theorem ex7_86_copying_implies_infinite {SZ Port OutPort : Type}
+    {PortVal : Port → Type} {OutPortVal : OutPort → Type}
+    (TYR : Technology) (hcopy : ClosedUnderCopying TYR)
+    (Z : DiscreteSystem SZ ((p : Port) → PortVal p) ((q : OutPort) → OutPortVal q))
+    (hmem : memTechnology TYR Z) :
     ¬ IsFiniteTechnology TYR :=
-  copying_implies_infinite TYR hname Z hmem
+  copying_implies_infinite TYR hcopy Z hmem
 
 /-- [textbook/exercise7.87/source/exercise] -/
 theorem ex7_87_buildable_monotonic {n : Nat} {SZ IZ OZ : Type}
@@ -108,9 +110,16 @@ def IsT0Design (TYR : Technology) (d : BuildableSystemDesign TYR) : Prop :=
 def IsT1Design (TYR : Technology) (d : BuildableSystemDesign TYR) : Prop :=
   IsConjunctive d.SCR ∧ VSCRSubsetTechnology d.SCR.VSCR TYR
 
-/-- T2: pure-feedback designs whose unique component is itself a T1 resultant packaging. -/
+/--
+  T2: pure-feedback designs whose unique component is itself a T1 (conjunctive)
+  buildable resultant (Ex 7.74 nesting / flatten reading).
+-/
 def IsT2Design (TYR : Technology) (d : BuildableSystemDesign TYR) : Prop :=
-  IsPureFeedback d.SCR ∧ VSCRSubsetTechnology d.SCR.VSCR TYR
+  ∃ (hPF : IsPureFeedback d.SCR) (d1 : BuildableSystemDesign TYR),
+    IsT1Design TYR d1 ∧
+      Nonempty
+        (IsomorphismWitness
+          (d.SCR.VSCR.Z ⟨0, Nat.lt_of_lt_of_eq Nat.zero_lt_one hPF.1.symm⟩) d1.Z)
 
 theorem ex7_74_T0_of_singular (TYR : Technology) (d : BuildableSystemDesign TYR)
     (h : IsSingular d.SCR) : IsT0Design TYR d :=
@@ -121,8 +130,14 @@ theorem ex7_74_T1_of_conjunctive (TYR : Technology) (d : BuildableSystemDesign T
   ⟨h, d.buildable.1⟩
 
 theorem ex7_74_T2_of_pure_feedback (TYR : Technology) (d : BuildableSystemDesign TYR)
-    (h : IsPureFeedback d.SCR) : IsT2Design TYR d :=
-  ⟨h, d.buildable.1⟩
+    (hPF : IsPureFeedback d.SCR)
+    (d1 : BuildableSystemDesign TYR) (hT1 : IsT1Design TYR d1)
+    (hiso :
+      Nonempty
+        (IsomorphismWitness
+          (d.SCR.VSCR.Z ⟨0, Nat.lt_of_lt_of_eq Nat.zero_lt_one hPF.1.symm⟩) d1.Z)) :
+    IsT2Design TYR d :=
+  ⟨hPF, d1, hT1, hiso⟩
 
 /-- Every T0/T1/T2 design is in BSR (by definition of `BuildableSystemDesign`). -/
 theorem ex7_74_Ti_subset_bsr (TYR : Technology) (d : BuildableSystemDesign TYR) :
@@ -132,21 +147,34 @@ theorem ex7_74_Ti_subset_bsr (TYR : Technology) (d : BuildableSystemDesign TYR) 
 
 /--
   Three-step decomposition under the Ch3 classification hyp
-  `IsSingular ∨ IsConjunctive ∨ IsPureFeedback` (cascade/mixed recipes are outside
-  T0–T2; documented residual in the Ch7 audit).
+  `IsSingular ∨ IsConjunctive ∨ IsPureFeedback` plus a T1-nesting witness for the
+  pure-feedback case (cascade/mixed recipes remain outside T0–T2; audit residual).
 -/
 theorem ex7_74_bsr_decomposition (TYR : Technology) (d : BuildableSystemDesign TYR)
-    (hClass : IsSingular d.SCR ∨ IsConjunctive d.SCR ∨ IsPureFeedback d.SCR) :
+    (hClass : IsSingular d.SCR ∨ IsConjunctive d.SCR ∨ IsPureFeedback d.SCR)
+    (hNest : ∀ hPF : IsPureFeedback d.SCR,
+      ∃ (d1 : BuildableSystemDesign TYR),
+        IsT1Design TYR d1 ∧
+          Nonempty
+            (IsomorphismWitness
+              (d.SCR.VSCR.Z ⟨0, Nat.lt_of_lt_of_eq Nat.zero_lt_one hPF.1.symm⟩) d1.Z)) :
     IsT0Design TYR d ∨ IsT1Design TYR d ∨ IsT2Design TYR d := by
   rcases hClass with h | h | h
   · exact Or.inl (ex7_74_T0_of_singular TYR d h)
   · exact Or.inr (Or.inl (ex7_74_T1_of_conjunctive TYR d h))
-  · exact Or.inr (Or.inr (ex7_74_T2_of_pure_feedback TYR d h))
+  · obtain ⟨d1, hT1, hiso⟩ := hNest h
+    exact Or.inr (Or.inr (ex7_74_T2_of_pure_feedback TYR d h d1 hT1 hiso))
 
 /-- Aliases kept for Registry anchors. -/
 theorem ex7_74_pure_feedback_is_T2 (TYR : Technology) (d : BuildableSystemDesign TYR)
-    (h : IsPureFeedback d.SCR) : IsT2Design TYR d :=
-  ex7_74_T2_of_pure_feedback TYR d h
+    (hPF : IsPureFeedback d.SCR)
+    (d1 : BuildableSystemDesign TYR) (hT1 : IsT1Design TYR d1)
+    (hiso :
+      Nonempty
+        (IsomorphismWitness
+          (d.SCR.VSCR.Z ⟨0, Nat.lt_of_lt_of_eq Nat.zero_lt_one hPF.1.symm⟩) d1.Z)) :
+    IsT2Design TYR d :=
+  ex7_74_T2_of_pure_feedback TYR d hPF d1 hT1 hiso
 
 /-- [textbook/exercise7.75/source/exercise] -/
 theorem ex7_75_pure_feedback_buildable {n : Nat} (N : NestedCoupling n) (TYR : Technology)

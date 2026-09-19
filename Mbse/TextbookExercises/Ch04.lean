@@ -322,6 +322,23 @@ abbrev ex4_69_counterexample := Homomorphism.ex4_69_counterexample
 -/
 abbrev ex4_69_assertion_false := Homomorphism.ex4_69_assertion_false
 
+/--
+  Minimal positive variant of Exercise 4.69: the homomorphic image of a finite system is finite.
+-/
+theorem isFinite_of_isHomomorphicImage {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z1 : DiscreteSystem SZ1 IZ1 OZ1} {Z2 : DiscreteSystem SZ2 IZ2 OZ2}
+    (hfin2 : IsFinite Z2) (hHom : IsHomomorphicImage Z1 Z2) : IsFinite Z1 :=
+  Homomorphism.isFinite_of_isHomomorphicImage hfin2 hHom
+
+/--
+  Minimal positive contrapositive of Exercise 4.69: a non-finite system cannot be a
+  homomorphic image of a finite system.
+-/
+theorem ex4_69_positive_variant {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z1 : DiscreteSystem SZ1 IZ1 OZ1} {Z2 : DiscreteSystem SZ2 IZ2 OZ2}
+    (hfin1 : ¬ IsFinite Z1) (hfin2 : IsFinite Z2) : ¬ IsHomomorphicImage Z1 Z2 :=
+  Homomorphism.ex4_69_positive_variant hfin1 hfin2
+
 /-! ## Exercise 4.71 -/
 
 /--

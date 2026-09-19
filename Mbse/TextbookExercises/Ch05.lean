@@ -1058,6 +1058,34 @@ theorem constantInput_nonprimary_not_implies_constantTime :
       HasVariableTimeIndex twoStateModeWitness :=
   ⟨twoStateMode_constantInput, twoStateMode_not_primary, twoStateMode_variableTime⟩
 
+/--
+  Minimal positive variant of Exercise 5.169: if a mode has a constant time index `d`
+  and is not primary, then its time index must be strictly greater than 1.
+-/
+theorem constantInput_constantTime_nonprimary_gt_one
+    (M : SystemMode Z₁ Z₂) (d : Time)
+    (htime : HasConstantTimeIndex M d)
+    (hNotPrim : ¬ IsPrimaryMode M) : 1 < d := by
+  by_contra hnot
+  have hdpos : 0 < d := htime.1
+  have hd1 : d = 1 := by
+    cases d with
+    | zero => contradiction
+    | succ d' =>
+      cases d' with
+      | zero => rfl
+      | succ d'' =>
+        exfalso
+        apply hnot
+        exact Nat.succ_lt_succ (Nat.succ_pos d'')
+  have hprim : IsPrimaryMode M := by
+    dsimp [IsPrimaryMode, HasConstantTimeIndex]
+    refine ⟨Nat.one_pos, fun x p => ?_⟩
+    have h := htime.2 x p
+    rw [hd1] at h
+    exact h
+  exact hNotPrim hprim
+
 open WymoreImplementation
 open Homomorphism
 

@@ -17,6 +17,14 @@
       "lean_anchor": "sgtyr",
       "status": "proved",
       "fidelity": "faithful-with-notes"
+    },
+    {
+      "id": "7.52/definition/is_sgtyr_member",
+      "type": "definition",
+      "text": "IsSGTYRMember: membership in SGTYR(S), isomorphic to a finite-port state-readout generator on S.",
+      "lean_anchor": "IsSGTYRMember",
+      "status": "proved",
+      "fidelity": "faithful-with-notes"
     }
   ],
   "status": "proved"

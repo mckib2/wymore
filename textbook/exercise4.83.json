@@ -6,6 +6,13 @@
   "description": "Exercise 4.83 (erratum lock): if Z2 is finite and the systems are mutual homomorphic images, the first homomorphism yields an isomorphism. Finiteness of Z1 is not required.",
   "elements": [
     {
+      "id": "4.83/source/exercise",
+      "type": "exercise",
+      "text": "Exercise 4.83: Mutually homomorphic finite systems are isomorphic.",
+      "fidelity": "faithful",
+      "status": "solved"
+    },
+    {
       "id": "4.83/proof/isomorphism_witness",
       "type": "proof",
       "text": "Each round trip is a surjective self-map of a finite set, hence injective, so each component homomorphism of the first witness is injective.",
