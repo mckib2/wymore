@@ -222,7 +222,8 @@ noncomputable def reindexIsomorphismWitness {n : Nat} (SCR : SystemCouplingRecip
 /--
   [textbook/exercise4.85/theorem/rearrangement_isomorphic]
   Exercise 4.85: rearranging a connectable vector by `F` while keeping the same connectivity
-  preserves `UISCR` and `UOSCR` and yields an isomorphic resultant.
+  preserves `UISCR` and `UOSCR` and yields an isomorphic resultant. Stated for any `n`
+  (book writes `n ∈ IJS[2, ∞)`; see `ex4_85_rearrangement_isomorphic_of_ge_two`).
 -/
 theorem ex4_85_rearrangement_isomorphic {n : Nat} (SCR : SystemCouplingRecipe n)
     (F : Fin n ≃ Fin n) (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k)) :
@@ -231,6 +232,15 @@ theorem ex4_85_rearrangement_isomorphic {n : Nat} (SCR : SystemCouplingRecipe n)
       IsIsomorphicTo (rsy (reindexRecipe SCR F) (fun k => hOut (F k))) (rsy SCR hOut) :=
   ⟨reindex_mem_uiscr SCR F, reindex_mem_uoscr SCR F,
     ⟨reindexIsomorphismWitness SCR F hOut⟩⟩
+
+/-- Book-shaped packaging of Exercise 4.85 with `n ≥ 2`. -/
+theorem ex4_85_rearrangement_isomorphic_of_ge_two {n : Nat} (_hn : 2 ≤ n)
+    (SCR : SystemCouplingRecipe n)
+    (F : Fin n ≃ Fin n) (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k)) :
+    (∀ ip, ip ∈ UISCR (reindexRecipe SCR F) ↔ reindexInTag SCR.VSCR F ip ∈ UISCR SCR) ∧
+      (∀ op, op ∈ UOSCR (reindexRecipe SCR F) ↔ reindexOutTag SCR.VSCR F op ∈ UOSCR SCR) ∧
+      IsIsomorphicTo (rsy (reindexRecipe SCR F) (fun k => hOut (F k))) (rsy SCR hOut) :=
+  ex4_85_rearrangement_isomorphic SCR F hOut
 
 /-! ## Theorem 4.56: componentwise port-preserving homomorphisms lift to the resultant -/
 
@@ -430,8 +440,7 @@ noncomputable def elabResultantCopyWitness {n : Nat} {SCR : SystemCouplingRecipe
   [textbook/corollary4.59/theorem/resultant_copy]
   Corollary 4.59: resultants of coupling recipes with the same number of components, the same
   connectivity and matched port homomorphisms, such that each pair of components are copies, are
-  copies. (By Exercise 4.84 the copy relation is symmetric, so the direction of the statement is
-  immaterial.)
+  copies.
 -/
 theorem cor4_59_resultant_copy {n : Nat} {SCR : SystemCouplingRecipe n}
     (E : ComponentwiseElaboration SCR)
@@ -442,6 +451,42 @@ theorem cor4_59_resultant_copy {n : Nat} {SCR : SystemCouplingRecipe n}
     (hO : ∀ (i : Fin n) (q : SCR.VSCR.OutPort i), Function.Injective ((E.outPorts i).port q)) :
     IsCopyOf (rsy SCR hOut1) (rsy (elabRecipe E) hOut2) :=
   ⟨elabResultantCopyWitness E hOut1 hOut2 hS hI hO⟩
+
+/--
+  [textbook/corollary4.59/theorem/resultant_copy_symm]
+  Opposite `IsCopyOf` direction via Exercise 4.84 symmetry (needs nonempty free-port values on the
+  elaborated resultant).
+-/
+theorem cor4_59_resultant_copy_symm {n : Nat} {SCR : SystemCouplingRecipe n}
+    (E : ComponentwiseElaboration SCR)
+    (hOut1 : ∀ k, AlwaysOutputs (SCR.VSCR.Z k))
+    (hOut2 : ∀ k, AlwaysOutputs ((elabRecipe E).VSCR.Z k))
+    (hS : ∀ i, Function.Injective (E.hom i).HS)
+    (hI : ∀ (i : Fin n) (p : SCR.VSCR.Port i), Function.Injective ((E.inPorts i).port p))
+    (hO : ∀ (i : Fin n) (q : SCR.VSCR.OutPort i), Function.Injective ((E.outPorts i).port q))
+    [hIn : ∀ ip : UnconnInPort (elabRecipe E),
+      Nonempty ((elabRecipe E).VSCR.PortVal ip.val.1 ip.val.2)]
+    [hOutP : ∀ op : UnconnOutPort (elabRecipe E),
+      Nonempty ((elabRecipe E).VSCR.OutPortVal op.val.1 op.val.2)] :
+    IsCopyOf (rsy (elabRecipe E) hOut2) (rsy SCR hOut1) :=
+  isCopyOf_symm (cor4_59_resultant_copy E hOut1 hOut2 hS hI hO)
+
+/-- Both `IsCopyOf` directions for Corollary 4.59. -/
+theorem cor4_59_resultant_copy_both {n : Nat} {SCR : SystemCouplingRecipe n}
+    (E : ComponentwiseElaboration SCR)
+    (hOut1 : ∀ k, AlwaysOutputs (SCR.VSCR.Z k))
+    (hOut2 : ∀ k, AlwaysOutputs ((elabRecipe E).VSCR.Z k))
+    (hS : ∀ i, Function.Injective (E.hom i).HS)
+    (hI : ∀ (i : Fin n) (p : SCR.VSCR.Port i), Function.Injective ((E.inPorts i).port p))
+    (hO : ∀ (i : Fin n) (q : SCR.VSCR.OutPort i), Function.Injective ((E.outPorts i).port q))
+    [∀ ip : UnconnInPort (elabRecipe E),
+      Nonempty ((elabRecipe E).VSCR.PortVal ip.val.1 ip.val.2)]
+    [∀ op : UnconnOutPort (elabRecipe E),
+      Nonempty ((elabRecipe E).VSCR.OutPortVal op.val.1 op.val.2)] :
+    IsCopyOf (rsy SCR hOut1) (rsy (elabRecipe E) hOut2) ∧
+      IsCopyOf (rsy (elabRecipe E) hOut2) (rsy SCR hOut1) :=
+  ⟨cor4_59_resultant_copy E hOut1 hOut2 hS hI hO,
+    cor4_59_resultant_copy_symm E hOut1 hOut2 hS hI hO⟩
 
 /-! ## Exercise 4.66: deleting the components of null order -/
 

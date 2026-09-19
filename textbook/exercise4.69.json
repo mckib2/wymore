@@ -8,17 +8,25 @@
     {
       "id": "4.69/proof/counterexample_witness",
       "type": "proof",
-      "text": "Collapsing every state of the ℕ-counter onto the single state of the one-state system is a homomorphism."
+      "text": "Collapsing every state of the \u2115-counter onto the single state of the one-state system is a homomorphism.",
+      "fidelity": "faithful",
+      "status": "counterexample"
     },
     {
       "id": "4.69/theorem/counterexample",
       "type": "theorem",
-      "text": "The one-state system is finite, the counter is not finite, and the one-state system is a homomorphic image of the counter."
+      "text": "The one-state system is finite, the counter is not finite, and the one-state system is a homomorphic image of the counter.",
+      "fidelity": "faithful",
+      "status": "counterexample"
     },
     {
       "id": "4.69/theorem/assertion_refuted",
       "type": "theorem",
-      "text": "The stated assertion does not hold."
+      "text": "The stated assertion does not hold.",
+      "fidelity": "faithful",
+      "status": "counterexample"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "counterexample"
 }

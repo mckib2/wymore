@@ -8,17 +8,25 @@
     {
       "id": "4.82/theorem/isomorphism_reflexive",
       "type": "theorem",
-      "text": "Every system is isomorphic to itself via the identity maps."
+      "text": "Every system is isomorphic to itself via the identity maps.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "4.82/theorem/isomorphism_transitive",
       "type": "theorem",
-      "text": "Composites of isomorphisms are isomorphisms."
+      "text": "Composites of isomorphisms are isomorphisms.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "4.82/theorem/isomorphism_symmetric",
       "type": "theorem",
-      "text": "Inverses of isomorphisms are isomorphisms."
+      "text": "Inverses of isomorphisms are isomorphisms.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

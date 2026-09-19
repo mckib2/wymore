@@ -176,7 +176,7 @@ theorem mutual_satisfaction_isomorphic {Z1 : DiscreteSystem SZ1 IZ1 OZ1}
     (h12 : SystemSatisfiesPartialDynamicsHom Z1 Z2)
     (h21 : SystemSatisfiesPartialDynamicsHom Z2 Z1) :
     IsIsomorphicTo Z1 Z2 :=
-  ex4_83_mutual_homomorphism_isomorphic hfin1 hfin2
+  ex4_83_mutual_homomorphism_isomorphic_both_finite hfin1 hfin2
     (hom_of_partialDynamicsHom h12) (hom_of_partialDynamicsHom h21)
 
 end FragmentInvariance

@@ -6,7 +6,12 @@
     {
       "id": "4.13/theorem/himsy_parameterization",
       "type": "theorem",
-      "text": "HIMSY is a system parameterization."
+      "text": "HIMSY is a system parameterization.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "chapter": 4,
+  "fidelity": "faithful",
+  "status": "proved"
 }

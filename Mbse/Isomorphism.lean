@@ -12,12 +12,17 @@ Builds on `Mbse.Homomorphism` (Def 4.3 / Def 4.10):
 * Exercise 4.80 / 4.81 — the parameterization `HIMPPSY` and its reflexivity/transitivity.
 * Definition 4.47 / 4.53 and Exercise 4.84 — copies (`COPY`) form an equivalence.
 
-**Port encoding.** A system with indexed ports has `IZ = (p : Port) → PortVal p`. Textbook
-`#IPZ₂ = #IPZ₁` (clause (i) of Def 4.27) is modeled by an explicit bijection `σ : Port₂ ≃ Port₁`
-between the two port index types, so the two systems need *not* share a port indexing and `σ` may
-permute ports. Clause (ii) (`PJN(IZ₁,i) ∘ HI = HIᵢ ∘ PJN(IZ₂,i)`) then reads
-`HI f (σ i) = HIᵢ (f i)`: `HI` acts through surjections `HIᵢ : IᵢZ₂ → I_{σ i}Z₁`, one per port.
-Taking `σ = Equiv.refl` recovers the special case of a shared port indexing.
+**Port encoding (implementation policy).** A system with indexed ports has
+`IZ = (p : Port) → PortVal p`. Textbook `#IPZ₂ = #IPZ₁` (clause (i) of Def 4.27) is modeled
+by an explicit bijection `σ : Port₂ ≃ Port₁` between the two port index types, so the two
+systems need *not* share a port indexing and `σ` may permute ports. Clause (ii)
+(`PJN(IZ₁,i) ∘ HI = HIᵢ ∘ PJN(IZ₂,i)`) then reads `HI f (σ i) = HIᵢ (f i)`: `HI` acts through
+surjections `HIᵢ : IᵢZ₂ → I_{σ i}Z₁`, one per port. Taking `σ = Equiv.refl` recovers the
+special case of a shared port indexing. This is intentional encoding (parallel to Ch.5
+`ModePreservesAutonomous`), not a silent overclaim.
+
+**Side condition.** Theorem 4.45 / Exercise 4.84(iii) need `[∀ p, Nonempty (Val₂ p)]` to
+transfer product injectivity to port factors; tagged `|partial` on those anchors.
 -/
 
 namespace Homomorphism
@@ -352,10 +357,10 @@ theorem PreservesPorts.congr_of_ports {Port1 Port2 : Type}
   rwa [σ.apply_symm_apply q] at hq
 
 /--
-  [textbook/theorem4.45/theorem/port_maps_bijective]
+  [textbook/theorem4.45/theorem/port_maps_bijective|partial]
   Theorem 4.45: in a port-preserving *isomorphism* the port maps are themselves `1TO1` (and
   `ONTO`), so corresponding ports are equivalent sets. Injectivity of the product map transfers to
-  each factor once every port carries a value.
+  each factor once every port carries a value (`[∀ p, Nonempty (Val₂ p)]` — partial vs book).
 -/
 theorem PreservesPorts.port_injective {Port1 Port2 : Type}
     {Val1 : Port1 → Type} {Val2 : Port2 → Type} [∀ p, Nonempty (Val2 p)] {σ : Port2 ≃ Port1}
@@ -373,6 +378,9 @@ theorem PreservesPorts.port_injective {Port1 Port2 : Type}
     · simp [Function.update_of_ne hr]
   simpa using congr_fun hupd p
 
+/--
+  [textbook/theorem4.45/theorem/port_maps_bijective|partial]
+-/
 theorem PreservesPorts.port_bijective {Port1 Port2 : Type}
     {Val1 : Port1 → Type} {Val2 : Port2 → Type} [∀ p, Nonempty (Val2 p)] {σ : Port2 ≃ Port1}
     {H : ((p : Port2) → Val2 p) → ((p : Port1) → Val1 p)}
@@ -604,7 +612,7 @@ def CopyWitness.toPortPreservingHomWitness {SZ1 SZ2 : Type}
   outPorts := h.outPorts
 
 /--
-  [textbook/theorem4.45/theorem/port_maps_bijective]
+  [textbook/theorem4.45/theorem/port_maps_bijective|partial]
   Theorem 4.45 for copies: corresponding input ports are equivalent sets.
 -/
 theorem CopyWitness.inPort_bijective {SZ1 SZ2 : Type} {Port1 Port2 OutPort1 OutPort2 : Type}
@@ -617,7 +625,7 @@ theorem CopyWitness.inPort_bijective {SZ1 SZ2 : Type} {Port1 Port2 OutPort1 OutP
   h.inPorts.port_bijective h.HI_injective p
 
 /--
-  [textbook/theorem4.45/theorem/port_maps_bijective]
+  [textbook/theorem4.45/theorem/port_maps_bijective|partial]
   Theorem 4.45 for copies: corresponding output ports are equivalent sets.
 -/
 theorem CopyWitness.outPort_bijective {SZ1 SZ2 : Type} {Port1 Port2 OutPort1 OutPort2 : Type}
@@ -657,7 +665,7 @@ def CopyWitness.comp {SZ1 SZ2 SZ3 : Type}
   outPorts := h12.outPorts.comp h23.outPorts
 
 /--
-  [textbook/exercise4.84/proof/symmetric]
+  [textbook/exercise4.84/proof/symmetric|partial]
   Symmetry of the copy relation: by Theorem 4.45 each port map is bijective, so the inverse
   isomorphism is again port-preserving, now with the inverse port bijections `σ⁻¹`, `τ⁻¹`.
 -/
@@ -700,8 +708,9 @@ theorem isCopyOf_trans {SZ1 SZ2 SZ3 : Type}
   ⟨h12.some.comp h23.some⟩
 
 /--
-  [textbook/exercise4.84/theorem/copy_symmetric]
+  [textbook/exercise4.84/theorem/copy_symmetric|partial]
   Exercise 4.84: the copy relation is symmetric, even when the copy permutes ports.
+  Partial: requires nonempty port/output value types (same as Thm 4.45).
 -/
 theorem isCopyOf_symm {SZ1 SZ2 : Type} {Port1 Port2 OutPort1 OutPort2 : Type}
     {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type}

@@ -15,6 +15,10 @@ original resultant, the state isomorphism being the currying
 Component indices of the flattened recipe are `Fin (∑ i, mᵢ)`, identified with the dependent pairs
 `Σ i, Fin mᵢ` by `finSigmaFinEquiv`; all constructions below are phrased on the pair form and
 transported by that equivalence.
+
+Explicit hypotheses (faithful disambiguation of silent book assumptions): connectable-vector
+distinctness at both levels, total component readouts, and identification of external ports across
+levels — see `proof_comparison_report.md` §36–§37 and `wymore_chapter4_audit.md`.
 -/
 
 namespace Homomorphism

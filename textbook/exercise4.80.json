@@ -8,32 +8,46 @@
     {
       "id": "4.80/definition/himppsy",
       "type": "definition",
-      "text": "HIMPPSY: Z1 is a port-preserving homomorphic image of Z2 when a witness exists whose HI and HO preserve ports."
+      "text": "HIMPPSY: Z1 is a port-preserving homomorphic image of Z2 when a witness exists whose HI and HO preserve ports.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "4.80/requirement/preserves_input_ports",
       "type": "component",
-      "text": "The witness carries a proof that HI preserves input ports."
+      "text": "The witness carries a proof that HI preserves input ports.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "4.80/requirement/preserves_output_ports",
       "type": "component",
-      "text": "The witness carries a proof that HO preserves output ports."
+      "text": "The witness carries a proof that HO preserves output ports.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "4.80/theorem/himppsy_is_parameterization",
       "type": "theorem",
-      "text": "HIMPPSY is a system parameterization refining HIMSY: every HIMPPSY witness yields a HIMSY witness."
+      "text": "HIMPPSY is a system parameterization refining HIMSY: every HIMPPSY witness yields a HIMSY witness.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "4.80/theorem/preserves_input_ports",
       "type": "theorem",
-      "text": "HIMPPSY actually preserves input ports: the port index sets correspond bijectively and HI is the portwise product of surjections HIi."
+      "text": "HIMPPSY actually preserves input ports: the port index sets correspond bijectively and HI is the portwise product of surjections HIi.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "4.80/theorem/preserves_output_ports",
       "type": "theorem",
-      "text": "HIMPPSY actually preserves output ports: the port index sets correspond bijectively and HO is the portwise product of surjections HOj."
+      "text": "HIMPPSY actually preserves output ports: the port index sets correspond bijectively and HO is the portwise product of surjections HOj.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

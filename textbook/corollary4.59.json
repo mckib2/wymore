@@ -3,17 +3,32 @@
   "kind": "theorem_proof",
   "name": "Resultants of componentwise copies are copies",
   "chapter": 4,
-  "description": "Corollary 4.59: system resultants of system coupling recipes with the same number of components, the same connectivity and matched port homomorphisms, such that each pair of components are copies, are copies.",
+  "description": "Corollary 4.59: componentwise copies lift to resultant copies. Both IsCopyOf directions are stated (cor4_59_resultant_copy and cor4_59_resultant_copy_symm / _both).",
   "elements": [
     {
       "id": "4.59/proof/copy_witness",
       "type": "proof",
-      "text": "When every component homomorphism is 1TO1, the product state map and the portwise input and output maps are 1TO1 as well."
+      "text": "When every component homomorphism is 1TO1, the product state map and the portwise input and output maps are 1TO1 as well.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "4.59/theorem/resultant_copy",
       "type": "theorem",
-      "text": "RSY(SCR) is a copy of RSY(SCR$)."
+      "text": "IsCopyOf (RSY SCR) (RSY SCR$).",
+      "fidelity": "faithful",
+      "status": "proved",
+      "lean_anchor": "cor4_59_resultant_copy"
+    },
+    {
+      "id": "4.59/theorem/resultant_copy_symm",
+      "type": "theorem",
+      "text": "Opposite IsCopyOf direction via Ex 4.84 symmetry under Nonempty free-port values.",
+      "lean_anchor": "cor4_59_resultant_copy_symm",
+      "status": "proved",
+      "fidelity": "faithful"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved"
 }

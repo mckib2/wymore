@@ -9,13 +9,12 @@ import Mbse.NestedCoupling
 Exercise/theorem aliases for the Chapter 4 results proved in
 [`Mbse.Isomorphism`](../Isomorphism.lean) (Theorems 4.31, 4.38, 4.45 and Exercises 4.80, 4.81,
 4.82, 4.84), [`Mbse.IsomorphismConstructions`](../IsomorphismConstructions.lean) (Theorem 4.58 and
-Exercises 4.69, 4.71, 4.72, 4.74, 4.83) and
-[`Mbse.CouplingIsomorphism`](../CouplingIsomorphism.lean) (Theorem 4.56, Corollary 4.59 and
-Exercise 4.85).
+Exercises 4.69, 4.71, 4.72, 4.74, 4.83),
+[`Mbse.CouplingIsomorphism`](../CouplingIsomorphism.lean) (Theorem 4.56 = book 4.55, Corollary 4.59
+and Exercises 4.66, 4.85), and [`Mbse.NestedCoupling`](../NestedCoupling.lean) (Exercise 4.86).
 
-Port encoding: textbook `#IPZ₂ = #IPZ₁` is modeled by an explicit bijection `σ : Port₂ ≃ Port₁`
-between port index types, so a port-preserving map may *permute* ports; Def 4.27 clause (ii)
-becomes "the homomorphism acts portwise through surjections `HIᵢ : IᵢZ₂ → I_{σ i}Z₁`".
+Port encoding policy: textbook `#IPZ₂ = #IPZ₁` is an explicit bijection `σ : Port₂ ≃ Port₁`
+(may permute); `σ = Equiv.refl` recovers shared indexing. See [`wymore_chapter4_audit.md`](../../wymore_chapter4_audit.md).
 -/
 
 namespace Mbse.TextbookExercises.Ch04
@@ -54,9 +53,9 @@ abbrev thm4_38_isomorphism_symmetric {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
 /-! ## Theorem 4.45: port maps of a port-preserving isomorphism are bijections -/
 
 /--
-  [textbook/theorem4.45/theorem/port_maps_bijective]
+  [textbook/theorem4.45/theorem/port_maps_bijective|partial]
   In a port-preserving isomorphism each `HIᵢ` is `1TO1` and `ONTO`, so corresponding ports are
-  equivalent sets.
+  equivalent sets. Partial: needs `[∀ p, Nonempty (Val₂ p)]`.
 -/
 abbrev thm4_45_port_maps_bijective {Port1 Port2 : Type}
     {Val1 : Port1 → Type} {Val2 : Port2 → Type} [∀ p, Nonempty (Val2 p)] {σ : Port2 ≃ Port1}
@@ -183,8 +182,9 @@ abbrev ex4_84_transitive {SZ1 SZ2 SZ3 : Type}
   isCopyOf_trans h12 h23
 
 /--
-  [textbook/exercise4.84/theorem/copy_symmetric]
+  [textbook/exercise4.84/theorem/copy_symmetric|partial]
   Exercise 4.84: symmetry, in the strong form that allows the copy to permute ports.
+  Partial: needs nonempty port/output value types (Thm 4.45).
 -/
 abbrev ex4_84_symmetric {SZ1 SZ2 : Type} {Port1 Port2 OutPort1 OutPort2 : Type}
     {PortVal1 : Port1 → Type} {PortVal2 : Port2 → Type}
@@ -292,7 +292,7 @@ theorem swap_isCopyOf_permuting :
   intro p
   cases p <;> simp [swapCopyWitness, swapPorts]
 
-/-- [textbook/exercise4.84/theorem/copy_symmetric] The port-permuting copy is symmetric too. -/
+/-- [textbook/exercise4.84/theorem/copy_symmetric|partial] The port-permuting copy is symmetric too. -/
 theorem swap_isCopyOf_symm : IsCopyOf swapSystem2 swapSystem1 :=
   isCopyOf_symm ⟨swapCopyWitness⟩
 
@@ -354,13 +354,20 @@ abbrev ex4_74_consistent_elaboration {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
 
 /--
   [textbook/exercise4.83/theorem/mutual_homomorphism_isomorphic]
-  Exercise 4.83: mutually homomorphic finite systems are isomorphic.
+  Exercise 4.83 (erratum): mutual HOM with `Z₂` finite ⇒ isomorphism via the first witness.
 -/
 abbrev ex4_83_mutual_homomorphism_isomorphic {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     {Z1 : DiscreteSystem SZ1 IZ1 OZ1} {Z2 : DiscreteSystem SZ2 IZ2 OZ2}
+    (hfin2 : IsFinite Z2)
+    (h1 : IsHomomorphicImage Z1 Z2) (h2 : IsHomomorphicImage Z2 Z1) :=
+  Homomorphism.ex4_83_mutual_homomorphism_isomorphic hfin2 h1 h2
+
+/-- Book-shaped packaging that still lists both finiteness hyps. -/
+abbrev ex4_83_mutual_homomorphism_isomorphic_both_finite {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z1 : DiscreteSystem SZ1 IZ1 OZ1} {Z2 : DiscreteSystem SZ2 IZ2 OZ2}
     (hfin1 : IsFinite Z1) (hfin2 : IsFinite Z2)
     (h1 : IsHomomorphicImage Z1 Z2) (h2 : IsHomomorphicImage Z2 Z1) :=
-  Homomorphism.ex4_83_mutual_homomorphism_isomorphic hfin1 hfin2 h1 h2
+  Homomorphism.ex4_83_mutual_homomorphism_isomorphic_both_finite hfin1 hfin2 h1 h2
 
 /-! ## Theorem 4.56 / Corollary 4.59 / Exercise 4.85: coupling-level results -/
 
@@ -387,6 +394,20 @@ abbrev cor4_59_resultant_copy {n : Nat} {SCR : SystemCouplingRecipe n}
     (hO : ∀ (i : Fin n) (q : SCR.VSCR.OutPort i), Function.Injective ((E.outPorts i).port q)) :=
   Homomorphism.cor4_59_resultant_copy E hOut1 hOut2 hS hI hO
 
+/-- Opposite `IsCopyOf` direction for Corollary 4.59. -/
+abbrev cor4_59_resultant_copy_symm {n : Nat} {SCR : SystemCouplingRecipe n}
+    (E : ComponentwiseElaboration SCR)
+    (hOut1 : ∀ k, AlwaysOutputs (SCR.VSCR.Z k))
+    (hOut2 : ∀ k, AlwaysOutputs ((elabRecipe E).VSCR.Z k))
+    (hS : ∀ i, Function.Injective (E.hom i).HS)
+    (hI : ∀ (i : Fin n) (p : SCR.VSCR.Port i), Function.Injective ((E.inPorts i).port p))
+    (hO : ∀ (i : Fin n) (q : SCR.VSCR.OutPort i), Function.Injective ((E.outPorts i).port q))
+    [∀ ip : UnconnInPort (elabRecipe E),
+      Nonempty ((elabRecipe E).VSCR.PortVal ip.val.1 ip.val.2)]
+    [∀ op : UnconnOutPort (elabRecipe E),
+      Nonempty ((elabRecipe E).VSCR.OutPortVal op.val.1 op.val.2)] :=
+  Homomorphism.cor4_59_resultant_copy_symm E hOut1 hOut2 hS hI hO
+
 /--
   [textbook/exercise4.85/theorem/rearrangement_isomorphic]
   Exercise 4.85: rearranging a connectable vector yields an isomorphic resultant.
@@ -394,6 +415,12 @@ abbrev cor4_59_resultant_copy {n : Nat} {SCR : SystemCouplingRecipe n}
 abbrev ex4_85_rearrangement_isomorphic {n : Nat} (SCR : SystemCouplingRecipe n)
     (F : Fin n ≃ Fin n) (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k)) :=
   Homomorphism.ex4_85_rearrangement_isomorphic SCR F hOut
+
+/-- Book-shaped `n ≥ 2` packaging of Exercise 4.85. -/
+abbrev ex4_85_rearrangement_isomorphic_of_ge_two {n : Nat} (hn : 2 ≤ n)
+    (SCR : SystemCouplingRecipe n)
+    (F : Fin n ≃ Fin n) (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k)) :=
+  Homomorphism.ex4_85_rearrangement_isomorphic_of_ge_two hn SCR F hOut
 
 /--
   [textbook/exercise4.66/theorem/null_order_elimination]

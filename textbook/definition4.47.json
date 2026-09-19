@@ -7,27 +7,39 @@
     {
       "id": "4.47/definition/copy",
       "type": "definition",
-      "text": "A copy is a port-preserving isomorphism: an isomorphism whose input and output maps act coordinatewise on ports."
+      "text": "A copy is a port-preserving isomorphism: an isomorphism whose input and output maps act coordinatewise on ports.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "4.47/requirement/preserves_input_ports",
       "type": "component",
-      "text": "HI preserves input ports with respect to SHIS."
+      "text": "HI preserves input ports with respect to SHIS.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "4.47/requirement/preserves_output_ports",
       "type": "component",
-      "text": "HO preserves output ports with respect to SHOS."
+      "text": "HO preserves output ports with respect to SHOS.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "4.47/requirement/input_port_count",
       "type": "component",
-      "text": "#IPZ2 = #IPZ1: a bijection between the input port index types, which the copy may permute."
+      "text": "#IPZ2 = #IPZ1: a bijection between the input port index types, which the copy may permute.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "4.47/requirement/output_port_count",
       "type": "component",
-      "text": "#OPZ2 = #OPZ1: a bijection between the output port index types."
+      "text": "#OPZ2 = #OPZ1: a bijection between the output port index types.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved"
 }

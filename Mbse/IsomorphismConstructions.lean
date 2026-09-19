@@ -182,8 +182,9 @@ theorem counterElaboration_not_isFinite : ¬ IsFinite counterElaboration := by
 
 /--
   [textbook/exercise4.69/theorem/counterexample]
-  Exercise 4.69: the assertion is **false**. `pointImage` is finite, `counterElaboration` is not,
-  and yet `pointImage` is a homomorphic image of `counterElaboration`.
+  Exercise 4.69: the assertion is **false** (counterexample). `pointImage` is finite,
+  `counterElaboration` is not, and yet `pointImage` is a homomorphic image of
+  `counterElaboration`.
 -/
 theorem ex4_69_counterexample :
     IsFinite pointImage ∧ ¬ IsFinite counterElaboration ∧
@@ -459,8 +460,9 @@ theorem ex4_74_consistent_elaboration {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
 
 /--
   [textbook/exercise4.83/proof/isomorphism_witness]
-  If two finite systems are homomorphic images of each other, the first homomorphism is already an
-  isomorphism.
+  If `Z₂` is finite and the systems are mutual homomorphic images, the *first* homomorphism
+  (`Z₁ ← Z₂`) is already an isomorphism. Book erratum: the concluded `ISY` triple is the first
+  one; finiteness of `Z₁` is not required.
 -/
 noncomputable def mutualHomomorphism_isomorphismWitness {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     {Z1 : DiscreteSystem SZ1 IZ1 OZ1} {Z2 : DiscreteSystem SZ2 IZ2 OZ2}
@@ -478,15 +480,24 @@ noncomputable def mutualHomomorphism_isomorphismWitness {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2
       (Finite.injective_iff_surjective.mpr (h2.HO_surjective.comp h1.HO_surjective)).of_comp }
 
 /--
+  [textbook/exercise4.83/source/exercise]
   [textbook/exercise4.83/theorem/mutual_homomorphism_isomorphic]
-  Exercise 4.83: if two finite systems are each a homomorphic image of the other, they are
-  isomorphic.
+  Exercise 4.83 (erratum lock): mutual homomorphic images with `Z₂` finite yield an isomorphism
+  given by the first witness. Finiteness of `Z₁` is not used.
 -/
 theorem ex4_83_mutual_homomorphism_isomorphic {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z1 : DiscreteSystem SZ1 IZ1 OZ1} {Z2 : DiscreteSystem SZ2 IZ2 OZ2}
+    (hfin2 : IsFinite Z2)
+    (h1 : IsHomomorphicImage Z1 Z2) (h2 : IsHomomorphicImage Z2 Z1) :
+    IsIsomorphicTo Z1 Z2 :=
+  ⟨mutualHomomorphism_isomorphismWitness hfin2 h1.some h2.some⟩
+
+/-- Book-shaped packaging that still mentions both finiteness hypotheses; only `Z₂` is used. -/
+theorem ex4_83_mutual_homomorphism_isomorphic_both_finite {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     {Z1 : DiscreteSystem SZ1 IZ1 OZ1} {Z2 : DiscreteSystem SZ2 IZ2 OZ2}
     (_hfin1 : IsFinite Z1) (hfin2 : IsFinite Z2)
     (h1 : IsHomomorphicImage Z1 Z2) (h2 : IsHomomorphicImage Z2 Z1) :
     IsIsomorphicTo Z1 Z2 :=
-  ⟨mutualHomomorphism_isomorphismWitness hfin2 h1.some h2.some⟩
+  ex4_83_mutual_homomorphism_isomorphic hfin2 h1 h2
 
 end Homomorphism

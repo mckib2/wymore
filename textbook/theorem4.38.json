@@ -7,12 +7,18 @@
     {
       "id": "4.38/theorem/isomorphism_symmetric",
       "type": "theorem",
-      "text": "Z1 is isomorphic to Z2 iff Z2 is isomorphic to Z1, via the inverse isomorphisms."
+      "text": "Z1 is isomorphic to Z2 iff Z2 is isomorphic to Z1, via the inverse isomorphisms.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "4.38/proof/inverse_isomorphism",
       "type": "proof",
-      "text": "HS, HI, HO are bijective, so their inverses are bijective and satisfy the transition and readout consistency conditions."
+      "text": "HS, HI, HO are bijective, so their inverses are bijective and satisfy the transition and readout consistency conditions.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved"
 }

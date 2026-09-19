@@ -6,32 +6,47 @@
     {
       "id": "4.8/theorem/csy_component_homomorphic",
       "type": "theorem",
-      "text": "If SCR is a conjunctive system coupling recipe, Z& = CSY(VSCR), and Z$ ∈ VSCR, then Z$ is a homomorphic image of Z& with respect to PJN(SZ$), PJN(IPZ$), and PJN(OPZ$)."
+      "text": "If SCR is a conjunctive system coupling recipe, Z& = CSY(VSCR), and Z$ \u2208 VSCR, then Z$ is a homomorphic image of Z& with respect to PJN(SZ$), PJN(IPZ$), and PJN(OPZ$).",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "4.8/proof/state_homomorphism",
       "type": "component",
-      "text": "HS = PJN(SZ$) ∈ FNS(SZ&, ONTO, SZ$) by theorem A1.176."
+      "text": "HS = PJN(SZ$) \u2208 FNS(SZ&, ONTO, SZ$) by theorem A1.176.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "4.8/proof/input_homomorphism",
       "type": "component",
-      "text": "HI = PJN(IPZ$) ∈ FNS(IZ&, ONTO, IZ$) by theorem A1.176."
+      "text": "HI = PJN(IPZ$) \u2208 FNS(IZ&, ONTO, IZ$) by theorem A1.176.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "4.8/proof/output_homomorphism",
       "type": "component",
-      "text": "HO = PJN(OPZ$) ∈ FNS(OZ&, ONTO, OZ$) by theorem A1.176."
+      "text": "HO = PJN(OPZ$) \u2208 FNS(OZ&, ONTO, OZ$) by theorem A1.176.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "4.8/proof/next_state_consistency",
       "type": "component",
-      "text": "Next-state consistency follows from the CSY definition at 3.40."
+      "text": "Next-state consistency follows from the CSY definition at 3.40.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "4.8/proof/readout_consistency",
       "type": "component",
-      "text": "Readout consistency follows from the CSY definition at 3.40."
+      "text": "Readout consistency follows from the CSY definition at 3.40.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "chapter": 4,
+  "fidelity": "faithful",
+  "status": "proved"
 }

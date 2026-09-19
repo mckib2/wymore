@@ -2,27 +2,37 @@
   "id": "4.27",
   "name": "Port-preserving homomorphisms",
   "chapter": 4,
-  "description": "Definition 4.27: HI preserves input ports with respect to SHIS iff #IPZ2 = #IPZ1 and for each i there is HIi ∈ FNS(IiZ2, ONTO, IiZ1) with SHIS = {HIi} and PJN(IZ1,i) ∘ HI = HIi ∘ PJN(IZ2,i); dually for HO and SHOS. Port counts are encoded by a bijection σ between the port index types, so a port-preserving map may permute ports and clause (ii) says the homomorphism acts portwise through σ.",
+  "description": "Definition 4.27: HI preserves input ports with respect to SHIS iff #IPZ2 = #IPZ1 and for each i there is HIi \u2208 FNS(IiZ2, ONTO, IiZ1) with SHIS = {HIi} and PJN(IZ1,i) \u2218 HI = HIi \u2218 PJN(IZ2,i); dually for HO and SHOS. Port counts are encoded by a bijection \u03c3 between the port index types, so a port-preserving map may permute ports and clause (ii) says the homomorphism acts portwise through \u03c3.",
   "elements": [
     {
       "id": "4.27/definition/preserves_ports",
       "type": "definition",
-      "text": "H preserves ports with respect to a family {Hi} of surjections when PJN(·,i) ∘ H = Hi ∘ PJN(·,i) for every port i."
+      "text": "H preserves ports with respect to a family {Hi} of surjections when PJN(\u00b7,i) \u2218 H = Hi \u2218 PJN(\u00b7,i) for every port i.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "4.27/component/port_family",
       "type": "component",
-      "text": "The family SHIS = {HIi} (resp. SHOS = {HOj}) of per-port maps."
+      "text": "The family SHIS = {HIi} (resp. SHOS = {HOj}) of per-port maps.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "4.27/requirement/input_port_count",
       "type": "component",
-      "text": "Clause (i) for inputs: #IPZ2 = #IPZ1, encoded as a bijection between the input port index types."
+      "text": "Clause (i) for inputs: #IPZ2 = #IPZ1, encoded as a bijection between the input port index types.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "4.27/requirement/output_port_count",
       "type": "component",
-      "text": "Clause (i) for outputs: #OPZ2 = #OPZ1, encoded as a bijection between the output port index types."
+      "text": "Clause (i) for outputs: #OPZ2 = #OPZ1, encoded as a bijection between the output port index types.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved"
 }
