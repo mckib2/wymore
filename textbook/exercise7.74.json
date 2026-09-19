@@ -1,0 +1,23 @@
+{
+  "id": "7.74",
+  "kind": "traceability",
+  "name": "Exercise 7.74",
+  "chapter": 7,
+  "description": "Exercise 7.74",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful-with-notes",
+  "elements": [
+    {
+      "id": "7.74/source/exercise",
+      "type": "exercise",
+      "text": "Exercise 7.74",
+      "lean_anchor": "exercise",
+      "status": "proved",
+      "fidelity": "faithful-with-notes"
+    }
+  ],
+  "status": "solved"
+}

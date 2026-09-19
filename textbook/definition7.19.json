@@ -1,0 +1,23 @@
+{
+  "id": "7.19",
+  "kind": "traceability",
+  "name": "Definition 7.19",
+  "chapter": 7,
+  "description": "Chapter 7 definition 7.19",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "7.19/definition/bld",
+      "type": "definition",
+      "text": "Source definition 7.19",
+      "lean_anchor": "bld",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

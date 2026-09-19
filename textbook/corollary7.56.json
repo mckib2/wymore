@@ -1,0 +1,23 @@
+{
+  "id": "7.56",
+  "kind": "traceability",
+  "name": "Corollary 7.56",
+  "chapter": 7,
+  "description": "Chapter 7 corollary 7.56",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful-with-notes",
+  "elements": [
+    {
+      "id": "7.56/theorem/finite_implementable_tyrx2",
+      "type": "theorem",
+      "text": "Source corollary 7.56",
+      "lean_anchor": "finite_implementable_tyrx2",
+      "status": "proved",
+      "fidelity": "faithful-with-notes"
+    }
+  ],
+  "status": "proved"
+}

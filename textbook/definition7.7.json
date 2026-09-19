@@ -1,0 +1,23 @@
+{
+  "id": "7.7",
+  "kind": "traceability",
+  "name": "Definition 7.7",
+  "chapter": 7,
+  "description": "Chapter 7 definition 7.7",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "7.7/definition/finite_technology",
+      "type": "definition",
+      "text": "Source definition 7.7",
+      "lean_anchor": "finite_technology",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

@@ -1,0 +1,39 @@
+{
+  "id": "7.60",
+  "kind": "traceability",
+  "name": "Theorem 7.60",
+  "chapter": 7,
+  "description": "Chapter 7 theorem 7.60",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful-with-notes",
+  "elements": [
+    {
+      "id": "7.60/definition/one_hot_system",
+      "type": "theorem",
+      "text": "Source theorem 7.60",
+      "lean_anchor": "one_hot_system",
+      "status": "proved",
+      "fidelity": "faithful-with-notes"
+    },
+    {
+      "id": "7.60/theorem/one_hot_hom",
+      "type": "theorem",
+      "text": "Source theorem 7.60",
+      "lean_anchor": "one_hot_hom",
+      "status": "proved",
+      "fidelity": "faithful-with-notes"
+    },
+    {
+      "id": "7.60/theorem/one_hot_implementable_tyrx2",
+      "type": "theorem",
+      "text": "Source theorem 7.60",
+      "lean_anchor": "one_hot_implementable_tyrx2",
+      "status": "proved",
+      "fidelity": "faithful-with-notes"
+    }
+  ],
+  "status": "proved"
+}

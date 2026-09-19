@@ -1,0 +1,39 @@
+{
+  "id": "7.17",
+  "kind": "traceability",
+  "name": "Definition 7.17",
+  "chapter": 7,
+  "description": "Chapter 7 definition 7.17",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "7.17/definition/buildable",
+      "type": "definition",
+      "text": "Source definition 7.17",
+      "lean_anchor": "buildable",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "7.17/definition/buildable_system_design",
+      "type": "definition",
+      "text": "Source definition 7.17",
+      "lean_anchor": "buildable_system_design",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "7.17/requirement/vscr_subseteq_tyr",
+      "type": "definition",
+      "text": "Source definition 7.17",
+      "lean_anchor": "vscr_subseteq_tyr",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

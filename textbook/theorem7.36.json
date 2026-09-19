@@ -1,0 +1,23 @@
+{
+  "id": "7.36",
+  "kind": "traceability",
+  "name": "Theorem 7.36",
+  "chapter": 7,
+  "description": "Chapter 7 theorem 7.36",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "7.36/theorem/flattened_buildable_copy",
+      "type": "theorem",
+      "text": "Source theorem 7.36",
+      "lean_anchor": "flattened_buildable_copy",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

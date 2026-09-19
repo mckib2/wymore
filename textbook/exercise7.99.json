@@ -1,0 +1,23 @@
+{
+  "id": "7.99",
+  "kind": "traceability",
+  "name": "Exercise 7.99",
+  "chapter": 7,
+  "description": "Exercise 7.99",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "7.99/source/exercise",
+      "type": "exercise",
+      "text": "Exercise 7.99",
+      "lean_anchor": "exercise",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

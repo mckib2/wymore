@@ -1,0 +1,23 @@
+{
+  "id": "7.52",
+  "kind": "traceability",
+  "name": "Definition 7.52",
+  "chapter": 7,
+  "description": "Chapter 7 definition 7.52",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful-with-notes",
+  "elements": [
+    {
+      "id": "7.52/definition/sgtyr",
+      "type": "definition",
+      "text": "Source definition 7.52",
+      "lean_anchor": "sgtyr",
+      "status": "proved",
+      "fidelity": "faithful-with-notes"
+    }
+  ],
+  "status": "proved"
+}

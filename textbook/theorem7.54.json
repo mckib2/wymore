@@ -1,0 +1,23 @@
+{
+  "id": "7.54",
+  "kind": "traceability",
+  "name": "Theorem 7.54",
+  "chapter": 7,
+  "description": "Chapter 7 theorem 7.54",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful-with-notes",
+  "elements": [
+    {
+      "id": "7.54/theorem/sgtyr_implementable",
+      "type": "theorem",
+      "text": "Source theorem 7.54",
+      "lean_anchor": "sgtyr_implementable",
+      "status": "proved",
+      "fidelity": "faithful-with-notes"
+    }
+  ],
+  "status": "proved"
+}

@@ -1,0 +1,23 @@
+{
+  "id": "7.55",
+  "kind": "traceability",
+  "name": "Definition 7.55",
+  "chapter": 7,
+  "description": "Chapter 7 definition 7.55",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "7.55/definition/tyrx2",
+      "type": "definition",
+      "text": "Source definition 7.55",
+      "lean_anchor": "tyrx2",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

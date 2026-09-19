@@ -1,0 +1,23 @@
+{
+  "id": "7.9",
+  "kind": "traceability",
+  "name": "Definition 7.9",
+  "chapter": 7,
+  "description": "Chapter 7 definition 7.9",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "7.9/definition/closed_under_isomorphism",
+      "type": "definition",
+      "text": "Source definition 7.9",
+      "lean_anchor": "closed_under_isomorphism",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

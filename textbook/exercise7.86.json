@@ -1,0 +1,31 @@
+{
+  "id": "7.86",
+  "kind": "traceability",
+  "name": "Exercise 7.86",
+  "chapter": 7,
+  "description": "Exercise 7.86",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "7.86/source/exercise",
+      "type": "exercise",
+      "text": "Exercise 7.86",
+      "lean_anchor": "exercise",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "7.86/theorem/copying_implies_infinite",
+      "type": "exercise",
+      "text": "Exercise 7.86",
+      "lean_anchor": "copying_implies_infinite",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

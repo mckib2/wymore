@@ -1,0 +1,23 @@
+{
+  "id": "7.22",
+  "kind": "traceability",
+  "name": "Definition 7.22",
+  "chapter": 7,
+  "description": "Chapter 7 definition 7.22",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "7.22/definition/concurrently_buildable",
+      "type": "definition",
+      "text": "Source definition 7.22",
+      "lean_anchor": "concurrently_buildable",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

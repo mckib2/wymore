@@ -1,0 +1,31 @@
+{
+  "id": "7.4",
+  "kind": "traceability",
+  "name": "Definition 7.4",
+  "chapter": 7,
+  "description": "Chapter 7 definition 7.4",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "7.4/definition/mem_technology",
+      "type": "definition",
+      "text": "Source definition 7.4",
+      "lean_anchor": "mem_technology",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "7.4/definition/technology",
+      "type": "definition",
+      "text": "Source definition 7.4",
+      "lean_anchor": "technology",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

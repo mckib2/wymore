@@ -1,0 +1,31 @@
+{
+  "id": "7.79",
+  "kind": "traceability",
+  "name": "Exercise 7.79",
+  "chapter": 7,
+  "description": "Exercise 7.79",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "7.79/source/exercise",
+      "type": "exercise",
+      "text": "Exercise 7.79",
+      "lean_anchor": "exercise",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "7.79/theorem/himsy_preserves_ctl",
+      "type": "exercise",
+      "text": "Exercise 7.79",
+      "lean_anchor": "himsy_preserves_ctl",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

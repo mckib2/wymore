@@ -2,6 +2,8 @@ import Mbse.TextbookExercises.Ch02
 import Mbse.TextbookExercises.Ch03
 import Mbse.TextbookExercises.Ch04
 import Mbse.TextbookExercises.Ch05
+import Mbse.TextbookExercises.Ch06
+import Mbse.TextbookExercises.Ch07
 
 /-!
 # Textbook exercise registry
@@ -128,6 +130,28 @@ def registry : List ExerciseEntry :=
   , ⟨"6.101", 6, .theoremProof, "solved", "Ch06.fsr_closed_under_ts_subset_exercise"⟩
   , ⟨"6.102", 6, .theoremProof, "solved", "Ch06.tsy_isSystemParameterization_exercise"⟩
   , ⟨"6.103", 6, .theoremProof, "solved", "Ch06.tsy_trajectory_characterization_exercise"⟩
+  , ⟨"7.72", 7, .theoremProof, "counterexample", "Ch07.ex7_72_counterexample"⟩
+  , ⟨"7.74", 7, .theoremProof, "solved", "Ch07.ex7_74_bsr_decomposition"⟩
+  , ⟨"7.75", 7, .theoremProof, "solved", "Ch07.ex7_75_pure_feedback_buildable"⟩
+  , ⟨"7.76", 7, .theoremProof, "counterexample", "Ch07.ex7_76"⟩
+  , ⟨"7.79", 7, .theoremProof, "solved", "Ch07.ex7_79_himsy_preserves_ctl"⟩
+  , ⟨"7.82", 7, .theoremProof, "counterexample", "Ch07.ex7_82_counterexample"⟩
+  , ⟨"7.83", 7, .theoremProof, "qualified", "Ch07.ex7_83"⟩
+  , ⟨"7.85", 7, .theoremProof, "solved", "Ch07.ex7_85_iso_implies_copying"⟩
+  , ⟨"7.86", 7, .theoremProof, "solved", "Ch07.ex7_86_copying_implies_infinite"⟩
+  , ⟨"7.87", 7, .theoremProof, "solved", "Ch07.ex7_87_buildable_monotonic"⟩
+  , ⟨"7.89", 7, .theoremProof, "qualified", "Ch07.ex7_89"⟩
+  , ⟨"7.90", 7, .theoremProof, "solved", "Ch07.ex7_90_tyr_embeds_bsr"⟩
+  , ⟨"7.91", 7, .theoremProof, "qualified", "Ch07.ex7_91"⟩
+  , ⟨"7.92", 7, .theoremProof, "solved", "Ch07.ex7_92_bsr_monotonic"⟩
+  , ⟨"7.93", 7, .theoremProof, "counterexample", "Ch07.ex7_93"⟩
+  , ⟨"7.94", 7, .theoremProof, "solved", "Ch07.ex7_94_components_in_tyr"⟩
+  , ⟨"7.95", 7, .theoremProof, "solved", "Ch07.ex7_95_mode_of_buildable_implementable"⟩
+  , ⟨"7.96", 7, .theoremProof, "solved", "Ch07.ex7_96_subsystem_of_buildable_implementable"⟩
+  , ⟨"7.97", 7, .theoremProof, "solved", "Ch07.ex7_97_mode_of_implementable_implementable"⟩
+  , ⟨"7.98", 7, .theoremProof, "solved", "Ch07.ex7_98_hom_image_of_buildable_implementable"⟩
+  , ⟨"7.99", 7, .theoremProof, "solved", "Ch07.ex7_99_hom_image_of_implementable_implementable"⟩
+  , ⟨"7.100", 7, .theoremProof, "solved", "Ch07.ex7_100_conjunctive_component_implementable"⟩
   ]
 
 def solvedCount : Nat :=

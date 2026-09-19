@@ -1,0 +1,23 @@
+{
+  "id": "7.48",
+  "kind": "traceability",
+  "name": "Definition 7.48",
+  "chapter": 7,
+  "description": "Chapter 7 definition 7.48",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "7.48/definition/imptysy",
+      "type": "definition",
+      "text": "Source definition 7.48",
+      "lean_anchor": "imptysy",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

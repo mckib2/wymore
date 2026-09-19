@@ -1,0 +1,23 @@
+{
+  "id": "7.9b",
+  "kind": "traceability",
+  "name": "Definition 7.9b",
+  "chapter": 7,
+  "description": "Chapter 7 definition 7.9b",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "7.9b/definition/closed_under_copying",
+      "type": "definition",
+      "text": "Source definition 7.9b",
+      "lean_anchor": "closed_under_copying",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

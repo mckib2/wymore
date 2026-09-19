@@ -1,0 +1,23 @@
+{
+  "id": "7.27",
+  "kind": "traceability",
+  "name": "Theorem 7.27",
+  "chapter": 7,
+  "description": "Chapter 7 theorem 7.27",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful-with-notes",
+  "elements": [
+    {
+      "id": "7.27/theorem/buildable_in_concurrent_subtech_copy",
+      "type": "theorem",
+      "text": "Source theorem 7.27",
+      "lean_anchor": "buildable_in_concurrent_subtech_copy",
+      "status": "proved",
+      "fidelity": "faithful-with-notes"
+    }
+  ],
+  "status": "proved"
+}

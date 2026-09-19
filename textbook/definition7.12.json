@@ -1,0 +1,23 @@
+{
+  "id": "7.12",
+  "kind": "traceability",
+  "name": "Definition 7.12",
+  "chapter": 7,
+  "description": "Chapter 7 definition 7.12",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "7.12/definition/closed_under_pure_feedback",
+      "type": "definition",
+      "text": "Source definition 7.12",
+      "lean_anchor": "closed_under_pure_feedback",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

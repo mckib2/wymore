@@ -1,0 +1,31 @@
+{
+  "id": "7.92",
+  "kind": "traceability",
+  "name": "Exercise 7.92",
+  "chapter": 7,
+  "description": "Exercise 7.92",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "7.92/source/exercise",
+      "type": "exercise",
+      "text": "Exercise 7.92",
+      "lean_anchor": "exercise",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "7.92/theorem/bsr_monotonic",
+      "type": "exercise",
+      "text": "Exercise 7.92",
+      "lean_anchor": "bsr_monotonic",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

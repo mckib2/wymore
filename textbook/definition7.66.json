@@ -1,0 +1,23 @@
+{
+  "id": "7.66",
+  "kind": "traceability",
+  "name": "Definition 7.66",
+  "chapter": 7,
+  "description": "Chapter 7 definition 7.66",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp7.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "7.66/definition/ctl_ior_tyr",
+      "type": "definition",
+      "text": "Source definition 7.66",
+      "lean_anchor": "ctl_ior_tyr",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}
