@@ -1,11 +1,12 @@
 import Mbse.WymoreSystemModes
 import Mbse.WymoreCouplingStructure
+import Mbse.WymoreImplementation
 import Mbse.Isomorphism
 
 /-!
 # Chapter 5 — system-mode exercises
 
-Exercises 5.141, 5.142, 5.146–5.153, and 5.156–5.169.
+Exercises 5.141, 5.142, 5.146–5.153, and 5.156–5.179.
 
 Two different relations meet here.  `Mbse.Wymore.IsSubsystemOf` is *recipe based*:
 it asserts the existence of coupling recipes, an injective component embedding,
@@ -1083,5 +1084,147 @@ theorem constantInput_nonprimary_not_implies_constantTime :
       ¬ IsPrimaryMode twoStateModeWitness ∧
       HasVariableTimeIndex twoStateModeWitness :=
   ⟨twoStateMode_constantInput, twoStateMode_not_primary, twoStateMode_variableTime⟩
+
+open WymoreImplementation
+open Homomorphism
+
+/-! ## Exercise 5.170 — fixed-time sampled mode -/
+
+/--
+  [textbook/exercise5.170/source/exercise]
+  [textbook/exercise5.170/plan/fixedTimeMode_constant_indices]
+  Exercise 5.170: fixed-time `STZ(CNS_p,x)(s)` image is a constant-input mode of time `s`.
+-/
+theorem fixedTimeMode_constant_indices (Z : DiscreteSystem S₂ I₂ O₂)
+    (S : Set S₂) (P : Set I₂) (s : Time) (hs : 0 < s)
+    (hS : S.Nonempty) (hP : P.Nonempty)
+    (hImageSubsetS : ∀ y, FixedTimeReachable Z S P s y → y ∈ S) :
+    HasConstantInput (fixedTimeMode Z S P s hs hS hP hImageSubsetS) ∧
+      HasConstantTimeIndex (fixedTimeMode Z S P s hs hS hP hImageSubsetS) s :=
+  ⟨fixedTimeMode_constantInput Z S P s hs hS hP hImageSubsetS,
+    fixedTimeMode_constantTime Z S P s hs hS hP hImageSubsetS⟩
+
+/-! ## Exercise 5.171 — transient complement is absorbing -/
+
+/--
+  [textbook/exercise5.171/source/exercise]
+  [textbook/exercise5.171/plan/transientComplement_isAbsorbing_exercise]
+  Exercise 5.171: complement of a transient mode is absorbing.
+-/
+theorem transientComplement_isAbsorbing_exercise (M : SystemMode Z₁ Z₂)
+    (h : IsTransientMode M) (hproper : IsProperMode M) :
+    IsAbsorbingMode (transientComplementMode M h hproper) :=
+  transientComplement_isAbsorbing M h hproper
+
+/-! ## Exercise 5.172 — inevitable transitions admit alternate SMBFs -/
+
+/--
+  [textbook/exercise5.172/source/exercise]
+  [textbook/exercise5.172/plan/inevitable_admits_alternate_SMBF_exercise]
+  Exercise 5.172: under inevitable transitions, every alternate SMBF with the
+  same durations and initial inputs still yields a system mode.
+-/
+theorem inevitable_admits_alternate_SMBF_exercise (M : SystemMode Z₁ Z₂)
+    (hInev : HasInevitableTransitions M)
+    (input' : S₁ → I₁ → ITZ I₂)
+    (hinit : ∀ x p, input' x p 0 = M.inputMap p) :
+    ∃ M' : SystemMode Z₁ Z₂,
+      (∀ x p, M'.timeIndex x p = M.timeIndex x p) ∧
+        (∀ x p, M'.inputIndex x p 0 = M.inputMap p) ∧
+        M'.stateMap = M.stateMap :=
+  inevitable_admits_alternate_SMBF M hInev input' hinit
+
+/-! ## Exercise 5.173 — primary ⇒ constant output and inevitable -/
+
+/--
+  [textbook/exercise5.173/source/exercise]
+  [textbook/exercise5.173/plan/primary_constOutput_inevitable_exercise]
+  Exercise 5.173: primary modes have constant output and inevitable transitions.
+-/
+theorem primary_constOutput_inevitable_exercise (M : SystemMode Z₁ Z₂)
+    (h : IsPrimaryMode M) :
+    HasConstantOutput (primaryConstantInputMode M h) ∧
+      HasInevitableTransitions M :=
+  primary_hasConstantOutput_and_inevitable M h
+
+/-! ## Exercise 5.174 — time elaboration implements -/
+
+/--
+  [textbook/exercise5.174/source/exercise]
+  [textbook/exercise5.174/plan/timeElaborate_implements_exercise]
+  Exercise 5.174: time elaboration yields a constant-input/time/output mode
+  (CNS-inevitable) that implements the original system.
+-/
+theorem timeElaborate_implements_exercise (Z : DiscreteSystem S I O)
+    (n : Nat) (hn : 1 < n) :
+    HasConstantInput (timeElaborateMode Z n hn) ∧
+      HasConstantTimeIndex (timeElaborateMode Z n hn) n ∧
+      HasConstantOutput (timeElaborateMode Z n hn) ∧
+      Nonempty (Implements Z (timeElaborate Z n hn)) :=
+  ⟨timeElaborateMode_constantInput Z n hn,
+    timeElaborateMode_constantTime Z n hn,
+    timeElaborateMode_constantOutput Z n hn,
+    ⟨timeElaborateImplements Z n hn⟩⟩
+
+/-! ## Exercise 5.175 — primary mode reflexive -/
+
+/--
+  [textbook/exercise5.175/source/exercise]
+  [textbook/exercise5.175/plan/primaryMode_reflexive_exercise]
+  Exercise 5.175: the primary system-mode relation is reflexive.
+-/
+theorem primaryMode_reflexive_exercise (Z : DiscreteSystem S I O) :
+    IsPrimaryMode (primarySelfMode Z) :=
+  primaryMode_reflexive Z
+
+/-! ## Exercise 5.176 — primary mode transitive -/
+
+/--
+  [textbook/exercise5.176/source/exercise]
+  [textbook/exercise5.176/plan/primaryMode_transitive_exercise]
+  Exercise 5.176: the primary system-mode relation is transitive.
+-/
+theorem primaryMode_transitive_exercise (M₁₂ : SystemMode Z₁ Z₂)
+    (M₂₃ : SystemMode Z₂ Z₃) (h₁₂ : IsPrimaryMode M₁₂) (h₂₃ : IsPrimaryMode M₂₃) :
+    IsPrimaryMode (M₁₂.trans M₂₃) :=
+  primaryMode_transitive M₁₂ M₂₃ h₁₂ h₂₃
+
+/-! ## Exercise 5.177 — Implements from mode / HIMSY / iso -/
+
+/--
+  [textbook/exercise5.177/source/exercise]
+  [textbook/exercise5.177/plan/implements_of_mode_hom_iso_exercise]
+  Exercise 5.177: mode, homomorphic image, or isomorphism each yields `Implements`.
+-/
+theorem implements_of_mode_hom_iso_exercise :
+    (Nonempty (SystemMode Z₁ Z₂) → Nonempty (Implements Z₁ Z₂)) ∧
+    (Nonempty (HomomorphicImageWitness Z₁ Z₂) → Nonempty (Implements Z₁ Z₂)) ∧
+    (Nonempty (IsomorphismWitness Z₁ Z₂) → Nonempty (Implements Z₁ Z₂)) :=
+  implements_of_mode_hom_iso_copy
+
+/-! ## Exercise 5.178 — IIMPSY parameterization -/
+
+/--
+  [textbook/exercise5.178/source/exercise]
+  [textbook/exercise5.178/plan/iimpsys_isSystemParameterization]
+  Exercise 5.178: `IIMPSY` is a system parameterization.
+-/
+theorem iimpsys_isSystemParameterization {S I O : Type} (p : IimpsysParam S I O) :
+    iimpsys S I O p = p.implemented :=
+  iimpsys_eq p
+
+/-! ## Exercise 5.179 — EIMPSY parameterization -/
+
+/--
+  [textbook/exercise5.179/source/exercise]
+  [textbook/exercise5.179/plan/eimpsys_isSystemParameterization]
+  Exercise 5.179: `EIMPSY` is a system parameterization (exact implementation;
+  textbook once says “isomorphically”).
+-/
+theorem eimpsys_isSystemParameterization {S : Type} {Port OutPort : Type}
+    {PV : Port → Type} {OV : OutPort → Type}
+    (p : EimpsysParam S Port OutPort PV OV) :
+    eimpsys S Port OutPort PV OV p = p.implemented :=
+  eimpsys_eq p
 
 end Mbse.TextbookExercises.Ch05

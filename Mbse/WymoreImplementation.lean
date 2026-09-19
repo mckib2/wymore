@@ -634,4 +634,170 @@ theorem implementedExperiment_output
     simp only [liftInput]
     simpa using congrArg some (implementedInputLift_maps w f n)
 
+/-! ## Implements from mode / HIMSY / iso / copy (Exercise 5.177) -/
+
+/-- A system mode yields an implementation of the mode system by the exhibitor. -/
+def Implements.ofSystemMode
+    {S₁ I₁ O₁ S₂ I₂ O₂ : Type}
+    {Z₁ : DiscreteSystem S₁ I₁ O₁} {Z₂ : DiscreteSystem S₂ I₂ O₂}
+    (M : SystemMode Z₁ Z₂) : Implements Z₁ Z₂ where
+  ModeState := S₁
+  ModeInput := I₁
+  ModeOutput := O₁
+  modeSystem := Z₁
+  mode := M
+  hom := HomomorphicImageWitness.refl Z₁
+
+/-- A homomorphic image witness yields an implementation via the exhibitor self-mode. -/
+def Implements.ofHomomorphicImage
+    {S₁ I₁ O₁ S₂ I₂ O₂ : Type}
+    {Z₁ : DiscreteSystem S₁ I₁ O₁} {Z₂ : DiscreteSystem S₂ I₂ O₂}
+    (h : HomomorphicImageWitness Z₁ Z₂) : Implements Z₁ Z₂ where
+  ModeState := S₂
+  ModeInput := I₂
+  ModeOutput := O₂
+  modeSystem := Z₂
+  mode := primarySelfMode Z₂
+  hom := h
+
+/-- An isomorphism yields an implementation. -/
+def Implements.ofIsomorphism
+    {S₁ I₁ O₁ S₂ I₂ O₂ : Type}
+    {Z₁ : DiscreteSystem S₁ I₁ O₁} {Z₂ : DiscreteSystem S₂ I₂ O₂}
+    (h : IsomorphismWitness Z₁ Z₂) : Implements Z₁ Z₂ :=
+  Implements.ofHomomorphicImage h.toHomomorphicImageWitness
+
+/-- A copy yields an implementation. -/
+def Implements.ofCopy
+    {S₁ S₂ : Type} {Port₁ Port₂ OutPort₁ OutPort₂ : Type}
+    {PV₁ : Port₁ → Type} {PV₂ : Port₂ → Type}
+    {OV₁ : OutPort₁ → Type} {OV₂ : OutPort₂ → Type}
+    {Z₁ : DiscreteSystem S₁ ((p : Port₁) → PV₁ p) ((q : OutPort₁) → OV₁ q)}
+    {Z₂ : DiscreteSystem S₂ ((p : Port₂) → PV₂ p) ((q : OutPort₂) → OV₂ q)}
+    (h : CopyWitness Z₁ Z₂) : Implements Z₁ Z₂ :=
+  Implements.ofIsomorphism h.toIsomorphismWitness
+
+/--
+  [textbook/exercise5.177/plan/implements_of_mode_hom_iso_exercise]
+  Mode, homomorphic image, isomorphism, or copy each yields `Implements`.
+-/
+theorem implements_of_mode_hom_iso_copy
+    {S₁ I₁ O₁ S₂ I₂ O₂ : Type}
+    {Z₁ : DiscreteSystem S₁ I₁ O₁} {Z₂ : DiscreteSystem S₂ I₂ O₂} :
+    (Nonempty (SystemMode Z₁ Z₂) → Nonempty (Implements Z₁ Z₂)) ∧
+    (Nonempty (HomomorphicImageWitness Z₁ Z₂) → Nonempty (Implements Z₁ Z₂)) ∧
+    (Nonempty (IsomorphismWitness Z₁ Z₂) → Nonempty (Implements Z₁ Z₂)) :=
+  ⟨fun ⟨M⟩ => ⟨Implements.ofSystemMode M⟩,
+    fun ⟨h⟩ => ⟨Implements.ofHomomorphicImage h⟩,
+    fun ⟨h⟩ => ⟨Implements.ofIsomorphism h⟩⟩
+
+/-! ## Time-elaboration implements (Exercise 5.174) -/
+
+theorem timeElaborateModeSystem_NZ_eq
+    {S I O : Type} (Z : DiscreteSystem S I O) (n : Nat) (hn : 1 < n)
+    (x : S) (p : I) :
+    (timeElaborateModeSystem Z n hn).NZ x (some p) = Z.NZ x (some p) := by
+  change (generateStateTrajectory (timeElaborate Z n hn)
+      (timeElaborateSliceEmbed Z n hn x) (liftInput (fun _ => p)) n).1 = Z.NZ x (some p)
+  rw [timeElaborate_full_cycle]
+  rfl
+
+/-- The original system is implemented by its time elaboration via the phase-0 mode. -/
+def timeElaborateImplements
+    {S I O : Type} (Z : DiscreteSystem S I O) (n : Nat) (hn : 1 < n) :
+    Implements Z (timeElaborate Z n hn) where
+  ModeState := S
+  ModeInput := I
+  ModeOutput := O
+  modeSystem := timeElaborateModeSystem Z n hn
+  mode := timeElaborateMode Z n hn
+  hom := {
+    HS := id
+    HI := id
+    HO := id
+    HS_surjective := Function.surjective_id
+    HI_surjective := Function.surjective_id
+    HO_surjective := Function.surjective_id
+    preserves_transition := by
+      intro x oi
+      cases oi with
+      | none => rfl
+      | some p =>
+        change (timeElaborateModeSystem Z n hn).NZ x (some p) = Z.NZ x (some p)
+        exact timeElaborateModeSystem_NZ_eq Z n hn x p
+    preserves_readout := fun _ => by simp [timeElaborateModeSystem]
+  }
+
+/-! ## IIMPSY / EIMPSY parameterizations (Exercises 5.178–5.179) -/
+
+/-- Parameters for isomorphic implementation systems `IIMPSY`. -/
+structure IimpsysParam (S I O : Type) where
+  ImplState : Type
+  ImplInput : Type
+  ImplOutput : Type
+  implemented : DiscreteSystem S I O
+  implementing : DiscreteSystem ImplState ImplInput ImplOutput
+  witness : IsomorphicallyImplements implemented implementing
+
+/--
+  [textbook/exercise5.178/plan/iimpsys_isSystemParameterization]
+  `IIMPSY` returns the implemented system from an isomorphic-implementation parameter.
+-/
+def iimpsys (S I O : Type) :
+    DiscreteSystemParameterization (IimpsysParam S I O)
+      (fun _ => S) (fun _ => I) (fun _ => O) :=
+  fun p => p.implemented
+
+theorem iimpsys_eq {S I O : Type} (p : IimpsysParam S I O) :
+    iimpsys S I O p = p.implemented :=
+  rfl
+
+theorem iimpsys_iff_isomorphicallyImplements
+    {S I O S₂ I₂ O₂ : Type}
+    (Z₁ : DiscreteSystem S I O) (Z₂ : DiscreteSystem S₂ I₂ O₂) :
+    (∃ p : IimpsysParam S I O, p.implemented = Z₁ ∧ HEq p.implementing Z₂ ∧
+      Nonempty (IsomorphicallyImplements Z₁ Z₂)) ↔
+      Nonempty (IsomorphicallyImplements Z₁ Z₂) := by
+  constructor
+  · intro ⟨_, _, _, ⟨w⟩⟩
+    exact ⟨w⟩
+  · intro ⟨w⟩
+    refine ⟨⟨S₂, I₂, O₂, Z₁, Z₂, w⟩, rfl, HEq.rfl, ⟨w⟩⟩
+
+/--
+Parameters for exact implementation systems `EIMPSY`.
+Textbook 5.179 once says “isomorphically”; the charitable reading is **exactly**.
+-/
+structure EimpsysParam
+    (S : Type) (Port OutPort : Type)
+    (PV : Port → Type) (OV : OutPort → Type) where
+  ImplState : Type
+  ImplInput : Type
+  ImplOutput : Type
+  ModeState : Type
+  ModePort : Type
+  ModeOutPort : Type
+  ModePV : ModePort → Type
+  ModeOV : ModeOutPort → Type
+  implemented : DiscreteSystem S ((p : Port) → PV p) ((q : OutPort) → OV q)
+  implementing : DiscreteSystem ImplState ImplInput ImplOutput
+  witness : @ExactlyImplements S ImplState ModeState Port ModePort OutPort ModeOutPort
+    PV ModePV OV ModeOV ImplInput ImplOutput implemented implementing
+
+/--
+  [textbook/exercise5.179/plan/eimpsys_isSystemParameterization]
+  `EIMPSY` returns the implemented system from an exact-implementation parameter.
+-/
+def eimpsys (S : Type) (Port OutPort : Type)
+    (PV : Port → Type) (OV : OutPort → Type) :
+    DiscreteSystemParameterization (EimpsysParam S Port OutPort PV OV)
+      (fun _ => S) (fun _ => (p : Port) → PV p) (fun _ => (q : OutPort) → OV q) :=
+  fun p => p.implemented
+
+theorem eimpsys_eq {S : Type} {Port OutPort : Type}
+    {PV : Port → Type} {OV : OutPort → Type}
+    (p : EimpsysParam S Port OutPort PV OV) :
+    eimpsys S Port OutPort PV OV p = p.implemented :=
+  rfl
+
 end WymoreImplementation

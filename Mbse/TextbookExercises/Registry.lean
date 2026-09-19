@@ -95,6 +95,16 @@ def registry : List ExerciseEntry :=
   , ⟨"5.167", 5, .theoremProof, "solved", "Ch05.proper_reachableMode_absorbing_exercise"⟩
   , ⟨"5.168", 5, .theoremProof, "solved", "Ch05.isolated_isAbsorbing_exercise"⟩
   , ⟨"5.169", 5, .theoremProof, "solved", "Ch05.constantInput_nonprimary_not_implies_constantTime"⟩
+  , ⟨"5.170", 5, .theoremProof, "solved", "Ch05.fixedTimeMode_constant_indices"⟩
+  , ⟨"5.171", 5, .theoremProof, "solved", "Ch05.transientComplement_isAbsorbing_exercise"⟩
+  , ⟨"5.172", 5, .theoremProof, "solved", "Ch05.inevitable_admits_alternate_SMBF_exercise"⟩
+  , ⟨"5.173", 5, .theoremProof, "solved", "Ch05.primary_constOutput_inevitable_exercise"⟩
+  , ⟨"5.174", 5, .theoremProof, "solved", "Ch05.timeElaborate_implements_exercise"⟩
+  , ⟨"5.175", 5, .theoremProof, "solved", "Ch05.primaryMode_reflexive_exercise"⟩
+  , ⟨"5.176", 5, .theoremProof, "solved", "Ch05.primaryMode_transitive_exercise"⟩
+  , ⟨"5.177", 5, .theoremProof, "solved", "Ch05.implements_of_mode_hom_iso_exercise"⟩
+  , ⟨"5.178", 5, .theoremProof, "solved", "Ch05.iimpsys_isSystemParameterization"⟩
+  , ⟨"5.179", 5, .theoremProof, "solved", "Ch05.eimpsys_isSystemParameterization"⟩
   ]
 
 def solvedCount : Nat :=

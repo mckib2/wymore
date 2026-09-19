@@ -2026,9 +2026,9 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.141/source/exercise` | `exercise` | Source Exercise 5.141, lines 416. The universal claim is refuted unconditionally: `IsSubsystemOf loneSystem pairSystem` and `¬ IsSystemMode loneSystem pairSystem`. | ✅ Faithful | `subsystem_isSystemMode_or_counterexample` ([Mbse/TextbookExercises/Ch05.lean:266](Mbse/TextbookExercises/Ch05.lean#L266)) |
-| `5.141/plan/subsystem_isSystemMode_or_counterexample` | `exercise` | Lean theorem `subsystem_isSystemMode_or_counterexample`. Status: counterexample; fidelity: faithful. No extra hypotheses. | ✅ Faithful | `subsystem_isSystemMode_or_counterexample` ([Mbse/TextbookExercises/Ch05.lean:266](Mbse/TextbookExercises/Ch05.lean#L266)) |
-| `5.141/counterexample/literal_claim` | `counterexample` | Unconditional finite counterexample: a subsystem whose readout separates two states cannot be a mode of a cascade whose external readout is constant. | ✅ Faithful | `subsystem_isSystemMode_or_counterexample` ([Mbse/TextbookExercises/Ch05.lean:266](Mbse/TextbookExercises/Ch05.lean#L266)) |
+| `5.141/source/exercise` | `exercise` | Source Exercise 5.141, lines 416. The universal claim is refuted unconditionally: `IsSubsystemOf loneSystem pairSystem` and `¬ IsSystemMode loneSystem pairSystem`. | ✅ Faithful | `subsystem_isSystemMode_or_counterexample` ([Mbse/TextbookExercises/Ch05.lean:267](Mbse/TextbookExercises/Ch05.lean#L267)) |
+| `5.141/plan/subsystem_isSystemMode_or_counterexample` | `exercise` | Lean theorem `subsystem_isSystemMode_or_counterexample`. Status: counterexample; fidelity: faithful. No extra hypotheses. | ✅ Faithful | `subsystem_isSystemMode_or_counterexample` ([Mbse/TextbookExercises/Ch05.lean:267](Mbse/TextbookExercises/Ch05.lean#L267)) |
+| `5.141/counterexample/literal_claim` | `counterexample` | Unconditional finite counterexample: a subsystem whose readout separates two states cannot be a mode of a cascade whose external readout is constant. | ✅ Faithful | `subsystem_isSystemMode_or_counterexample` ([Mbse/TextbookExercises/Ch05.lean:267](Mbse/TextbookExercises/Ch05.lean#L267)) |
 
 ### `textbook/exercise5.142` — Exercise 5.142
 
@@ -2037,10 +2037,10 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.142/source/exercise` | `exercise` | Unconditional counterexample shape: IsSystemMode plus recipe cardinality obstruction 2 ∤ 3. | ⚠️ Stub/Partial | `exercise5_142_unconditional` ([Mbse/TextbookExercises/Ch05.lean:405](Mbse/TextbookExercises/Ch05.lean#L405)) _(partial)_ |
-| `5.142/plan/exercise5_142_unconditional` | `exercise` | Primary unconditional answer to Exercise 5.142. | ⚠️ Stub/Partial | `exercise5_142_unconditional` ([Mbse/TextbookExercises/Ch05.lean:405](Mbse/TextbookExercises/Ch05.lean#L405)) _(partial)_ |
-| `5.142/plan/systemMode_not_subsystem_counterexample` | `exercise` | Conditional ¬ IsSubsystemOf under DiscreteSystemStateReflection. | ⚠️ Stub/Partial | `systemMode_not_subsystem_counterexample` ([Mbse/TextbookExercises/Ch05.lean:426](Mbse/TextbookExercises/Ch05.lean#L426)) _(partial)_ |
-| `5.142/counterexample/literal_claim` | `counterexample` | Full ¬ IsSubsystemOf needs DiscreteSystemStateReflection; unconditional content is exercise5_142_unconditional. | ⚠️ Stub/Partial | `systemMode_not_subsystem_counterexample` ([Mbse/TextbookExercises/Ch05.lean:426](Mbse/TextbookExercises/Ch05.lean#L426)) _(partial)_ |
+| `5.142/source/exercise` | `exercise` | Unconditional counterexample shape: IsSystemMode plus recipe cardinality obstruction 2 ∤ 3. | ⚠️ Stub/Partial | `exercise5_142_unconditional` ([Mbse/TextbookExercises/Ch05.lean:406](Mbse/TextbookExercises/Ch05.lean#L406)) _(partial)_ |
+| `5.142/plan/exercise5_142_unconditional` | `exercise` | Primary unconditional answer to Exercise 5.142. | ⚠️ Stub/Partial | `exercise5_142_unconditional` ([Mbse/TextbookExercises/Ch05.lean:406](Mbse/TextbookExercises/Ch05.lean#L406)) _(partial)_ |
+| `5.142/plan/systemMode_not_subsystem_counterexample` | `exercise` | Conditional ¬ IsSubsystemOf under DiscreteSystemStateReflection. | ⚠️ Stub/Partial | `systemMode_not_subsystem_counterexample` ([Mbse/TextbookExercises/Ch05.lean:427](Mbse/TextbookExercises/Ch05.lean#L427)) _(partial)_ |
+| `5.142/counterexample/literal_claim` | `counterexample` | Full ¬ IsSubsystemOf needs DiscreteSystemStateReflection; unconditional content is exercise5_142_unconditional. | ⚠️ Stub/Partial | `systemMode_not_subsystem_counterexample` ([Mbse/TextbookExercises/Ch05.lean:427](Mbse/TextbookExercises/Ch05.lean#L427)) _(partial)_ |
 
 ### `textbook/exercise5.146` — Exercise 5.146
 
@@ -2049,8 +2049,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.146/source/exercise` | `exercise` | Source Exercise 5.146, lines 420. Corrected traceability decision: Strongest reading is provable: from `T^d=T` under constant input, derive `T^(k*(d-1)+1)=T`; retain `k≥1`. | ✅ Faithful | `selfMode_constantTime_iterate` ([Mbse/TextbookExercises/Ch05.lean:461](Mbse/TextbookExercises/Ch05.lean#L461)) |
-| `5.146/plan/selfMode_constantTime_iterate` | `exercise` | Lean anchor `selfMode_constantTime_iterate` for this corrected reading. Status: solved; fidelity: faithful. | ✅ Faithful | `selfMode_constantTime_iterate` ([Mbse/TextbookExercises/Ch05.lean:461](Mbse/TextbookExercises/Ch05.lean#L461)) |
+| `5.146/source/exercise` | `exercise` | Source Exercise 5.146, lines 420. Corrected traceability decision: Strongest reading is provable: from `T^d=T` under constant input, derive `T^(k*(d-1)+1)=T`; retain `k≥1`. | ✅ Faithful | `selfMode_constantTime_iterate` ([Mbse/TextbookExercises/Ch05.lean:462](Mbse/TextbookExercises/Ch05.lean#L462)) |
+| `5.146/plan/selfMode_constantTime_iterate` | `exercise` | Lean anchor `selfMode_constantTime_iterate` for this corrected reading. Status: solved; fidelity: faithful. | ✅ Faithful | `selfMode_constantTime_iterate` ([Mbse/TextbookExercises/Ch05.lean:462](Mbse/TextbookExercises/Ch05.lean#L462)) |
 
 ### `textbook/exercise5.147` — Exercise 5.147
 
@@ -2059,8 +2059,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.147/source/exercise` | `exercise` | Exercise 5.147: the state after m constant mode steps is the exhibitor state after d * m steps. | ✅ Faithful | `constantMode_state_at_mul` ([Mbse/TextbookExercises/Ch05.lean:563](Mbse/TextbookExercises/Ch05.lean#L563)) |
-| `5.147/plan/constantMode_state_at_mul` | `exercise` | Proved multiplication law constantMode_state_at_mul. | ✅ Faithful | `constantMode_state_at_mul` ([Mbse/TextbookExercises/Ch05.lean:563](Mbse/TextbookExercises/Ch05.lean#L563)) |
+| `5.147/source/exercise` | `exercise` | Exercise 5.147: the state after m constant mode steps is the exhibitor state after d * m steps. | ✅ Faithful | `constantMode_state_at_mul` ([Mbse/TextbookExercises/Ch05.lean:564](Mbse/TextbookExercises/Ch05.lean#L564)) |
+| `5.147/plan/constantMode_state_at_mul` | `exercise` | Proved multiplication law constantMode_state_at_mul. | ✅ Faithful | `constantMode_state_at_mul` ([Mbse/TextbookExercises/Ch05.lean:564](Mbse/TextbookExercises/Ch05.lean#L564)) |
 
 ### `textbook/exercise5.148` — Exercise 5.148
 
@@ -2069,8 +2069,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.148/source/exercise` | `exercise` | Source Exercise 5.148, lines 424–428. Corrected traceability decision: Correct `timex` to `×`, bind `t`, and interpret `CNSp` as the appropriately typed constant trajectory; prove by induction using accumulated duration `H`. | ✅ Faithful | `variableTime_constantInput_state_at_accumulatedTime` ([Mbse/TextbookExercises/Ch05.lean:613](Mbse/TextbookExercises/Ch05.lean#L613)) |
-| `5.148/plan/variableTime_constantInput_state_at_accumulatedTime` | `exercise` | Lean anchor `variableTime_constantInput_state_at_accumulatedTime` for this corrected reading. Status: corrected. | ✅ Faithful | `variableTime_constantInput_state_at_accumulatedTime` ([Mbse/TextbookExercises/Ch05.lean:613](Mbse/TextbookExercises/Ch05.lean#L613)) |
+| `5.148/source/exercise` | `exercise` | Source Exercise 5.148, lines 424–428. Corrected traceability decision: Correct `timex` to `×`, bind `t`, and interpret `CNSp` as the appropriately typed constant trajectory; prove by induction using accumulated duration `H`. | ✅ Faithful | `variableTime_constantInput_state_at_accumulatedTime` ([Mbse/TextbookExercises/Ch05.lean:614](Mbse/TextbookExercises/Ch05.lean#L614)) |
+| `5.148/plan/variableTime_constantInput_state_at_accumulatedTime` | `exercise` | Lean anchor `variableTime_constantInput_state_at_accumulatedTime` for this corrected reading. Status: corrected. | ✅ Faithful | `variableTime_constantInput_state_at_accumulatedTime` ([Mbse/TextbookExercises/Ch05.lean:614](Mbse/TextbookExercises/Ch05.lean#L614)) |
 
 ### `textbook/exercise5.149` — Exercise 5.149
 
@@ -2079,8 +2079,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.149/source/exercise` | `exercise` | Source Exercise 5.149. Constant-input modes of times e and d compose to constant-input time e*d. | ✅ Faithful | `constantMode_compose_indices` ([Mbse/TextbookExercises/Ch05.lean:648](Mbse/TextbookExercises/Ch05.lean#L648)) |
-| `5.149/plan/constantMode_compose_indices` | `exercise` | Lean anchor `constantMode_compose_indices` for Exercise 5.149. | ✅ Faithful | `constantMode_compose_indices` ([Mbse/TextbookExercises/Ch05.lean:648](Mbse/TextbookExercises/Ch05.lean#L648)) |
+| `5.149/source/exercise` | `exercise` | Source Exercise 5.149. Constant-input modes of times e and d compose to constant-input time e*d. | ✅ Faithful | `constantMode_compose_indices` ([Mbse/TextbookExercises/Ch05.lean:649](Mbse/TextbookExercises/Ch05.lean#L649)) |
+| `5.149/plan/constantMode_compose_indices` | `exercise` | Lean anchor `constantMode_compose_indices` for Exercise 5.149. | ✅ Faithful | `constantMode_compose_indices` ([Mbse/TextbookExercises/Ch05.lean:649](Mbse/TextbookExercises/Ch05.lean#L649)) |
 
 ### `textbook/exercise5.150` — Exercise 5.150
 
@@ -2089,8 +2089,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.150/source/exercise` | `exercise` | Source Exercise 5.150. Variable-time constant-input composition via compiledElapsed TI (SystemMode.trans). | ✅ Faithful | `variableTime_compose_isSystemMode` ([Mbse/TextbookExercises/Ch05.lean:673](Mbse/TextbookExercises/Ch05.lean#L673)) |
-| `5.150/plan/variableTime_compose_isSystemMode` | `exercise` | Lean anchor `variableTime_compose_isSystemMode` for Exercise 5.150. | ✅ Faithful | `variableTime_compose_isSystemMode` ([Mbse/TextbookExercises/Ch05.lean:673](Mbse/TextbookExercises/Ch05.lean#L673)) |
+| `5.150/source/exercise` | `exercise` | Source Exercise 5.150. Variable-time constant-input composition via compiledElapsed TI (SystemMode.trans). | ✅ Faithful | `variableTime_compose_isSystemMode` ([Mbse/TextbookExercises/Ch05.lean:674](Mbse/TextbookExercises/Ch05.lean#L674)) |
+| `5.150/plan/variableTime_compose_isSystemMode` | `exercise` | Lean anchor `variableTime_compose_isSystemMode` for Exercise 5.150. | ✅ Faithful | `variableTime_compose_isSystemMode` ([Mbse/TextbookExercises/Ch05.lean:674](Mbse/TextbookExercises/Ch05.lean#L674)) |
 
 ### `textbook/exercise5.151` — Exercise 5.151
 
@@ -2099,8 +2099,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.151/source/exercise` | `exercise` | Source Exercise 5.151. Mutual constant modes of duration d yield round-trip self-modes at d*d. | ✅ Faithful | `mutual_constantMode_self_d_sq_indices` ([Mbse/TextbookExercises/Ch05.lean:725](Mbse/TextbookExercises/Ch05.lean#L725)) |
-| `5.151/plan/mutual_constantMode_self_d_sq_indices` | `exercise` | Lean anchor `mutual_constantMode_self_d_sq_indices` for Exercise 5.151. | ✅ Faithful | `mutual_constantMode_self_d_sq_indices` ([Mbse/TextbookExercises/Ch05.lean:725](Mbse/TextbookExercises/Ch05.lean#L725)) |
+| `5.151/source/exercise` | `exercise` | Source Exercise 5.151. Mutual constant modes of duration d yield round-trip self-modes at d*d. | ✅ Faithful | `mutual_constantMode_self_d_sq_indices` ([Mbse/TextbookExercises/Ch05.lean:726](Mbse/TextbookExercises/Ch05.lean#L726)) |
+| `5.151/plan/mutual_constantMode_self_d_sq_indices` | `exercise` | Lean anchor `mutual_constantMode_self_d_sq_indices` for Exercise 5.151. | ✅ Faithful | `mutual_constantMode_self_d_sq_indices` ([Mbse/TextbookExercises/Ch05.lean:726](Mbse/TextbookExercises/Ch05.lean#L726)) |
 
 ### `textbook/exercise5.152` — Exercise 5.152
 
@@ -2109,8 +2109,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.152/source/exercise` | `exercise` | Source Exercise 5.152. Corrected: mutual primary modes with inverse embeddings yield IsIsomorphicTo, not type equality. | ✅ Faithful | `mutual_primary_modes_isomorphism` ([Mbse/TextbookExercises/Ch05.lean:746](Mbse/TextbookExercises/Ch05.lean#L746)) |
-| `5.152/plan/mutual_primary_modes_isomorphic` | `exercise` | Lean anchor `mutual_primary_modes_isomorphic` (qualified registry status). | ✅ Faithful | `mutual_primary_modes_isomorphism` ([Mbse/TextbookExercises/Ch05.lean:746](Mbse/TextbookExercises/Ch05.lean#L746)) |
+| `5.152/source/exercise` | `exercise` | Source Exercise 5.152. Corrected: mutual primary modes with inverse embeddings yield IsIsomorphicTo, not type equality. | ✅ Faithful | `mutual_primary_modes_isomorphism` ([Mbse/TextbookExercises/Ch05.lean:747](Mbse/TextbookExercises/Ch05.lean#L747)) |
+| `5.152/plan/mutual_primary_modes_isomorphic` | `exercise` | Lean anchor `mutual_primary_modes_isomorphic` (qualified registry status). | ✅ Faithful | `mutual_primary_modes_isomorphism` ([Mbse/TextbookExercises/Ch05.lean:747](Mbse/TextbookExercises/Ch05.lean#L747)) |
 
 ### `textbook/exercise5.153` — Exercise 5.153
 
@@ -2119,8 +2119,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.153/source/exercise` | `exercise` | Source Exercise 5.153. Counterexample: cycleSampledMode and cycleExhibitor are mutual modes but unequal (+2 vs +1). | ✅ Faithful | `mutual_modes_not_equal_counterexample` ([Mbse/TextbookExercises/Ch05.lean:818](Mbse/TextbookExercises/Ch05.lean#L818)) |
-| `5.153/plan/mutual_modes_not_equal_counterexample` | `exercise` | Lean anchor `mutual_modes_not_equal_counterexample` for Exercise 5.153. | ✅ Faithful | `mutual_modes_not_equal_counterexample` ([Mbse/TextbookExercises/Ch05.lean:818](Mbse/TextbookExercises/Ch05.lean#L818)) |
+| `5.153/source/exercise` | `exercise` | Source Exercise 5.153. Counterexample: cycleSampledMode and cycleExhibitor are mutual modes but unequal (+2 vs +1). | ✅ Faithful | `mutual_modes_not_equal_counterexample` ([Mbse/TextbookExercises/Ch05.lean:819](Mbse/TextbookExercises/Ch05.lean#L819)) |
+| `5.153/plan/mutual_modes_not_equal_counterexample` | `exercise` | Lean anchor `mutual_modes_not_equal_counterexample` for Exercise 5.153. | ✅ Faithful | `mutual_modes_not_equal_counterexample` ([Mbse/TextbookExercises/Ch05.lean:819](Mbse/TextbookExercises/Ch05.lean#L819)) |
 
 ### `textbook/exercise5.156` — Exercise 5.156
 
@@ -2129,8 +2129,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.156/source/exercise` | `exercise` | Source Exercise 5.156. Not manifest at time 0 implies not in-mode at time 0. | ✅ Faithful | `not_manifest_zero_not_inMode` ([Mbse/TextbookExercises/Ch05.lean:833](Mbse/TextbookExercises/Ch05.lean#L833)) |
-| `5.156/plan/not_manifest_zero_not_inMode` | `exercise` | Lean anchor `not_manifest_zero_not_inMode` for Exercise 5.156. | ✅ Faithful | `not_manifest_zero_not_inMode` ([Mbse/TextbookExercises/Ch05.lean:833](Mbse/TextbookExercises/Ch05.lean#L833)) |
+| `5.156/source/exercise` | `exercise` | Source Exercise 5.156. Not manifest at time 0 implies not in-mode at time 0. | ✅ Faithful | `not_manifest_zero_not_inMode` ([Mbse/TextbookExercises/Ch05.lean:834](Mbse/TextbookExercises/Ch05.lean#L834)) |
+| `5.156/plan/not_manifest_zero_not_inMode` | `exercise` | Lean anchor `not_manifest_zero_not_inMode` for Exercise 5.156. | ✅ Faithful | `not_manifest_zero_not_inMode` ([Mbse/TextbookExercises/Ch05.lean:834](Mbse/TextbookExercises/Ch05.lean#L834)) |
 
 ### `textbook/exercise5.157` — Exercise 5.157
 
@@ -2139,8 +2139,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.157/source/exercise` | `exercise` | Source Exercise 5.157. Primary mode admits canonical CNS duration-one SMBF. | ✅ Faithful | `primary_has_CNS_SMBF` ([Mbse/TextbookExercises/Ch05.lean:846](Mbse/TextbookExercises/Ch05.lean#L846)) |
-| `5.157/plan/primary_has_CNS_SMBF` | `exercise` | Lean anchor `primary_has_CNS_SMBF` for Exercise 5.157. | ✅ Faithful | `primary_has_CNS_SMBF` ([Mbse/TextbookExercises/Ch05.lean:846](Mbse/TextbookExercises/Ch05.lean#L846)) |
+| `5.157/source/exercise` | `exercise` | Source Exercise 5.157. Primary mode admits canonical CNS duration-one SMBF. | ✅ Faithful | `primary_has_CNS_SMBF` ([Mbse/TextbookExercises/Ch05.lean:847](Mbse/TextbookExercises/Ch05.lean#L847)) |
+| `5.157/plan/primary_has_CNS_SMBF` | `exercise` | Lean anchor `primary_has_CNS_SMBF` for Exercise 5.157. | ✅ Faithful | `primary_has_CNS_SMBF` ([Mbse/TextbookExercises/Ch05.lean:847](Mbse/TextbookExercises/Ch05.lean#L847)) |
 
 ### `textbook/exercise5.158` — Exercise 5.158
 
@@ -2149,8 +2149,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.158/source/exercise` | `exercise` | Source Exercise 5.158. Typed RSN reading of primary NZ and RZ restrictions. | ✅ Faithful | `primary_NZ_RZ_restriction` ([Mbse/TextbookExercises/Ch05.lean:862](Mbse/TextbookExercises/Ch05.lean#L862)) |
-| `5.158/plan/primary_NZ_RZ_restriction` | `exercise` | Lean anchor `primary_NZ_RZ_restriction` for Exercise 5.158. | ✅ Faithful | `primary_NZ_RZ_restriction` ([Mbse/TextbookExercises/Ch05.lean:862](Mbse/TextbookExercises/Ch05.lean#L862)) |
+| `5.158/source/exercise` | `exercise` | Source Exercise 5.158. Typed RSN reading of primary NZ and RZ restrictions. | ✅ Faithful | `primary_NZ_RZ_restriction` ([Mbse/TextbookExercises/Ch05.lean:863](Mbse/TextbookExercises/Ch05.lean#L863)) |
+| `5.158/plan/primary_NZ_RZ_restriction` | `exercise` | Lean anchor `primary_NZ_RZ_restriction` for Exercise 5.158. | ✅ Faithful | `primary_NZ_RZ_restriction` ([Mbse/TextbookExercises/Ch05.lean:863](Mbse/TextbookExercises/Ch05.lean#L863)) |
 
 ### `textbook/exercise5.159` — Exercise 5.159
 
@@ -2159,8 +2159,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.159/source/exercise` | `exercise` | Source Exercise 5.159. Primary mode stays manifest while inputs remain in the mode input image. | ✅ Faithful | `primary_manifest_persists` ([Mbse/TextbookExercises/Ch05.lean:876](Mbse/TextbookExercises/Ch05.lean#L876)) |
-| `5.159/plan/primary_manifest_persists` | `exercise` | Lean anchor `primary_manifest_persists` for Exercise 5.159. | ✅ Faithful | `primary_manifest_persists` ([Mbse/TextbookExercises/Ch05.lean:876](Mbse/TextbookExercises/Ch05.lean#L876)) |
+| `5.159/source/exercise` | `exercise` | Source Exercise 5.159. Primary mode stays manifest while inputs remain in the mode input image. | ✅ Faithful | `primary_manifest_persists` ([Mbse/TextbookExercises/Ch05.lean:877](Mbse/TextbookExercises/Ch05.lean#L877)) |
+| `5.159/plan/primary_manifest_persists` | `exercise` | Lean anchor `primary_manifest_persists` for Exercise 5.159. | ✅ Faithful | `primary_manifest_persists` ([Mbse/TextbookExercises/Ch05.lean:877](Mbse/TextbookExercises/Ch05.lean#L877)) |
 
 ### `textbook/exercise5.160` — Exercise 5.160
 
@@ -2169,8 +2169,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.160/source/exercise` | `exercise` | Source Exercise 5.160. RSYSMO is a DiscreteSystemParameterization. | ✅ Faithful | `rsysmo_isSystemParameterization` ([Mbse/TextbookExercises/Ch05.lean:927](Mbse/TextbookExercises/Ch05.lean#L927)) |
-| `5.160/plan/rsysmo_isSystemParameterization` | `exercise` | Lean anchor `rsysmo_isSystemParameterization` for Exercise 5.160. | ✅ Faithful | `rsysmo_isSystemParameterization` ([Mbse/TextbookExercises/Ch05.lean:927](Mbse/TextbookExercises/Ch05.lean#L927)) |
+| `5.160/source/exercise` | `exercise` | Source Exercise 5.160. RSYSMO is a DiscreteSystemParameterization. | ✅ Faithful | `rsysmo_isSystemParameterization` ([Mbse/TextbookExercises/Ch05.lean:928](Mbse/TextbookExercises/Ch05.lean#L928)) |
+| `5.160/plan/rsysmo_isSystemParameterization` | `exercise` | Lean anchor `rsysmo_isSystemParameterization` for Exercise 5.160. | ✅ Faithful | `rsysmo_isSystemParameterization` ([Mbse/TextbookExercises/Ch05.lean:928](Mbse/TextbookExercises/Ch05.lean#L928)) |
 
 ### `textbook/exercise5.161` — Exercise 5.161
 
@@ -2179,8 +2179,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.161/source/exercise` | `exercise` | Source Exercise 5.161. The reachable system mode is primary. | ✅ Faithful | `reachableMode_isPrimary_exercise` ([Mbse/TextbookExercises/Ch05.lean:938](Mbse/TextbookExercises/Ch05.lean#L938)) |
-| `5.161/plan/reachableMode_isPrimary_exercise` | `exercise` | Lean anchor `reachableMode_isPrimary_exercise` for Exercise 5.161. | ✅ Faithful | `reachableMode_isPrimary_exercise` ([Mbse/TextbookExercises/Ch05.lean:938](Mbse/TextbookExercises/Ch05.lean#L938)) |
+| `5.161/source/exercise` | `exercise` | Source Exercise 5.161. The reachable system mode is primary. | ✅ Faithful | `reachableMode_isPrimary_exercise` ([Mbse/TextbookExercises/Ch05.lean:939](Mbse/TextbookExercises/Ch05.lean#L939)) |
+| `5.161/plan/reachableMode_isPrimary_exercise` | `exercise` | Lean anchor `reachableMode_isPrimary_exercise` for Exercise 5.161. | ✅ Faithful | `reachableMode_isPrimary_exercise` ([Mbse/TextbookExercises/Ch05.lean:939](Mbse/TextbookExercises/Ch05.lean#L939)) |
 
 ### `textbook/exercise5.162` — Exercise 5.162
 
@@ -2189,8 +2189,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.162/source/exercise` | `exercise` | Source Exercise 5.162. Complement of an isolated mode is isolated. | ✅ Faithful | `complement_isolated_isIsolated` ([Mbse/TextbookExercises/Ch05.lean:950](Mbse/TextbookExercises/Ch05.lean#L950)) |
-| `5.162/plan/complement_isolated_isIsolated` | `exercise` | Lean anchor `complement_isolated_isIsolated` for Exercise 5.162. | ✅ Faithful | `complement_isolated_isIsolated` ([Mbse/TextbookExercises/Ch05.lean:950](Mbse/TextbookExercises/Ch05.lean#L950)) |
+| `5.162/source/exercise` | `exercise` | Source Exercise 5.162. Complement of an isolated mode is isolated. | ✅ Faithful | `complement_isolated_isIsolated` ([Mbse/TextbookExercises/Ch05.lean:951](Mbse/TextbookExercises/Ch05.lean#L951)) |
+| `5.162/plan/complement_isolated_isIsolated` | `exercise` | Lean anchor `complement_isolated_isIsolated` for Exercise 5.162. | ✅ Faithful | `complement_isolated_isIsolated` ([Mbse/TextbookExercises/Ch05.lean:951](Mbse/TextbookExercises/Ch05.lean#L951)) |
 
 ### `textbook/exercise5.163` — Exercise 5.163
 
@@ -2199,8 +2199,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.163/source/exercise` | `exercise` | Source Exercise 5.163. Isolated mode occupied throughout iff start state in mode. | ✅ Faithful | `isolated_throughout_iff_start` ([Mbse/TextbookExercises/Ch05.lean:963](Mbse/TextbookExercises/Ch05.lean#L963)) |
-| `5.163/plan/isolated_throughout_iff_start` | `exercise` | Lean anchor `isolated_throughout_iff_start` for Exercise 5.163. | ✅ Faithful | `isolated_throughout_iff_start` ([Mbse/TextbookExercises/Ch05.lean:963](Mbse/TextbookExercises/Ch05.lean#L963)) |
+| `5.163/source/exercise` | `exercise` | Source Exercise 5.163. Isolated mode occupied throughout iff start state in mode. | ✅ Faithful | `isolated_throughout_iff_start` ([Mbse/TextbookExercises/Ch05.lean:964](Mbse/TextbookExercises/Ch05.lean#L964)) |
+| `5.163/plan/isolated_throughout_iff_start` | `exercise` | Lean anchor `isolated_throughout_iff_start` for Exercise 5.163. | ✅ Faithful | `isolated_throughout_iff_start` ([Mbse/TextbookExercises/Ch05.lean:964](Mbse/TextbookExercises/Ch05.lean#L964)) |
 
 ### `textbook/exercise5.164` — Exercise 5.164
 
@@ -2209,8 +2209,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.164/source/exercise` | `exercise` | Source Exercise 5.164. Differences between transient and isolated modes. | ✅ Faithful | `transient_vs_isolated_exercise` ([Mbse/TextbookExercises/Ch05.lean:976](Mbse/TextbookExercises/Ch05.lean#L976)) |
-| `5.164/plan/transient_vs_isolated_exercise` | `exercise` | Lean anchor `transient_vs_isolated_exercise` for Exercise 5.164. | ✅ Faithful | `transient_vs_isolated_exercise` ([Mbse/TextbookExercises/Ch05.lean:976](Mbse/TextbookExercises/Ch05.lean#L976)) |
+| `5.164/source/exercise` | `exercise` | Source Exercise 5.164. Differences between transient and isolated modes. | ✅ Faithful | `transient_vs_isolated_exercise` ([Mbse/TextbookExercises/Ch05.lean:977](Mbse/TextbookExercises/Ch05.lean#L977)) |
+| `5.164/plan/transient_vs_isolated_exercise` | `exercise` | Lean anchor `transient_vs_isolated_exercise` for Exercise 5.164. | ✅ Faithful | `transient_vs_isolated_exercise` ([Mbse/TextbookExercises/Ch05.lean:977](Mbse/TextbookExercises/Ch05.lean#L977)) |
 
 ### `textbook/exercise5.165` — Exercise 5.165
 
@@ -2219,8 +2219,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.165/source/exercise` | `exercise` | Source Exercise 5.165. A transient state generates a transient singleton mode. | ✅ Faithful | `transientState_generates_transientMode_exercise` ([Mbse/TextbookExercises/Ch05.lean:994](Mbse/TextbookExercises/Ch05.lean#L994)) |
-| `5.165/plan/transientState_generates_transientMode_exercise` | `exercise` | Lean anchor `transientState_generates_transientMode_exercise` for Exercise 5.165. | ✅ Faithful | `transientState_generates_transientMode_exercise` ([Mbse/TextbookExercises/Ch05.lean:994](Mbse/TextbookExercises/Ch05.lean#L994)) |
+| `5.165/source/exercise` | `exercise` | Source Exercise 5.165. A transient state generates a transient singleton mode. | ✅ Faithful | `transientState_generates_transientMode_exercise` ([Mbse/TextbookExercises/Ch05.lean:995](Mbse/TextbookExercises/Ch05.lean#L995)) |
+| `5.165/plan/transientState_generates_transientMode_exercise` | `exercise` | Lean anchor `transientState_generates_transientMode_exercise` for Exercise 5.165. | ✅ Faithful | `transientState_generates_transientMode_exercise` ([Mbse/TextbookExercises/Ch05.lean:995](Mbse/TextbookExercises/Ch05.lean#L995)) |
 
 ### `textbook/exercise5.166` — Exercise 5.166
 
@@ -2229,8 +2229,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.166/source/exercise` | `exercise` | Source Exercise 5.166. An absorbing state generates absorbing trivial RSYSMO. | ✅ Faithful | `absorbingState_generates_absorbing_rsysmo` ([Mbse/TextbookExercises/Ch05.lean:1010](Mbse/TextbookExercises/Ch05.lean#L1010)) |
-| `5.166/plan/absorbingState_generates_absorbing_rsysmo` | `exercise` | Lean anchor `absorbingState_generates_absorbing_rsysmo` for Exercise 5.166. | ✅ Faithful | `absorbingState_generates_absorbing_rsysmo` ([Mbse/TextbookExercises/Ch05.lean:1010](Mbse/TextbookExercises/Ch05.lean#L1010)) |
+| `5.166/source/exercise` | `exercise` | Source Exercise 5.166. An absorbing state generates absorbing trivial RSYSMO. | ✅ Faithful | `absorbingState_generates_absorbing_rsysmo` ([Mbse/TextbookExercises/Ch05.lean:1011](Mbse/TextbookExercises/Ch05.lean#L1011)) |
+| `5.166/plan/absorbingState_generates_absorbing_rsysmo` | `exercise` | Lean anchor `absorbingState_generates_absorbing_rsysmo` for Exercise 5.166. | ✅ Faithful | `absorbingState_generates_absorbing_rsysmo` ([Mbse/TextbookExercises/Ch05.lean:1011](Mbse/TextbookExercises/Ch05.lean#L1011)) |
 
 ### `textbook/exercise5.167` — Exercise 5.167
 
@@ -2239,8 +2239,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.167/source/exercise` | `exercise` | Source Exercise 5.167. A proper reachable system mode is absorbing. | ✅ Faithful | `proper_reachableMode_absorbing_exercise` ([Mbse/TextbookExercises/Ch05.lean:1033](Mbse/TextbookExercises/Ch05.lean#L1033)) |
-| `5.167/plan/proper_reachableMode_absorbing_exercise` | `exercise` | Lean anchor `proper_reachableMode_absorbing_exercise` for Exercise 5.167. | ✅ Faithful | `proper_reachableMode_absorbing_exercise` ([Mbse/TextbookExercises/Ch05.lean:1033](Mbse/TextbookExercises/Ch05.lean#L1033)) |
+| `5.167/source/exercise` | `exercise` | Source Exercise 5.167. A proper reachable system mode is absorbing. | ✅ Faithful | `proper_reachableMode_absorbing_exercise` ([Mbse/TextbookExercises/Ch05.lean:1034](Mbse/TextbookExercises/Ch05.lean#L1034)) |
+| `5.167/plan/proper_reachableMode_absorbing_exercise` | `exercise` | Lean anchor `proper_reachableMode_absorbing_exercise` for Exercise 5.167. | ✅ Faithful | `proper_reachableMode_absorbing_exercise` ([Mbse/TextbookExercises/Ch05.lean:1034](Mbse/TextbookExercises/Ch05.lean#L1034)) |
 
 ### `textbook/exercise5.168` — Exercise 5.168
 
@@ -2249,8 +2249,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.168/source/exercise` | `exercise` | Source Exercise 5.168. An isolated system mode is absorbing. | ✅ Faithful | `isolated_isAbsorbing_exercise` ([Mbse/TextbookExercises/Ch05.lean:1045](Mbse/TextbookExercises/Ch05.lean#L1045)) |
-| `5.168/plan/isolated_isAbsorbing_exercise` | `exercise` | Lean anchor `isolated_isAbsorbing_exercise` for Exercise 5.168. | ✅ Faithful | `isolated_isAbsorbing_exercise` ([Mbse/TextbookExercises/Ch05.lean:1045](Mbse/TextbookExercises/Ch05.lean#L1045)) |
+| `5.168/source/exercise` | `exercise` | Source Exercise 5.168. An isolated system mode is absorbing. | ✅ Faithful | `isolated_isAbsorbing_exercise` ([Mbse/TextbookExercises/Ch05.lean:1046](Mbse/TextbookExercises/Ch05.lean#L1046)) |
+| `5.168/plan/isolated_isAbsorbing_exercise` | `exercise` | Lean anchor `isolated_isAbsorbing_exercise` for Exercise 5.168. | ✅ Faithful | `isolated_isAbsorbing_exercise` ([Mbse/TextbookExercises/Ch05.lean:1046](Mbse/TextbookExercises/Ch05.lean#L1046)) |
 
 ### `textbook/exercise5.169` — Exercise 5.169
 
@@ -2259,22 +2259,122 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.169/source/exercise` | `exercise` | Source Exercise 5.169. Counterexample: constant input + non-primary need not imply constant time > 1. | ✅ Faithful | `constantInput_nonprimary_not_implies_constantTime` ([Mbse/TextbookExercises/Ch05.lean:1075](Mbse/TextbookExercises/Ch05.lean#L1075)) |
-| `5.169/plan/constantInput_nonprimary_not_implies_constantTime` | `exercise` | Lean anchor `constantInput_nonprimary_not_implies_constantTime` for Exercise 5.169. | ✅ Faithful | `constantInput_nonprimary_not_implies_constantTime` ([Mbse/TextbookExercises/Ch05.lean:1075](Mbse/TextbookExercises/Ch05.lean#L1075)) |
+| `5.169/source/exercise` | `exercise` | Source Exercise 5.169. Counterexample: constant input + non-primary need not imply constant time > 1. | ✅ Faithful | `constantInput_nonprimary_not_implies_constantTime` ([Mbse/TextbookExercises/Ch05.lean:1076](Mbse/TextbookExercises/Ch05.lean#L1076)) |
+| `5.169/plan/constantInput_nonprimary_not_implies_constantTime` | `exercise` | Lean anchor `constantInput_nonprimary_not_implies_constantTime` for Exercise 5.169. | ✅ Faithful | `constantInput_nonprimary_not_implies_constantTime` ([Mbse/TextbookExercises/Ch05.lean:1076](Mbse/TextbookExercises/Ch05.lean#L1076)) |
 
-- Exercise kinds: **28** witness, **40** theorem-proof
+### `textbook/exercise5.170` — Exercise 5.170
+
+- Structured source file: [textbook/exercise5.170.json](textbook/exercise5.170.json)
+- Description: *Exercise 5.170. Fixed-time STZ(CNS) image is a constant-input mode of time s.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.170/source/exercise` | `exercise` | Source Exercise 5.170. Fixed-time STZ(CNS) image is a constant-input mode of time s. | ✅ Faithful | `fixedTimeMode_constant_indices` ([Mbse/TextbookExercises/Ch05.lean:1093](Mbse/TextbookExercises/Ch05.lean#L1093)) |
+| `5.170/plan/fixedTimeMode_constant_indices` | `exercise` | Lean anchor `fixedTimeMode_constant_indices` for Exercise 5.170. | ✅ Faithful | `fixedTimeMode_constant_indices` ([Mbse/TextbookExercises/Ch05.lean:1093](Mbse/TextbookExercises/Ch05.lean#L1093)) |
+
+### `textbook/exercise5.171` — Exercise 5.171
+
+- Structured source file: [textbook/exercise5.171.json](textbook/exercise5.171.json)
+- Description: *Exercise 5.171. Complement of a transient mode is absorbing.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.171/source/exercise` | `exercise` | Source Exercise 5.171. Complement of a transient mode is absorbing. | ✅ Faithful | `transientComplement_isAbsorbing_exercise` ([Mbse/TextbookExercises/Ch05.lean:1109](Mbse/TextbookExercises/Ch05.lean#L1109)) |
+| `5.171/plan/transientComplement_isAbsorbing_exercise` | `exercise` | Lean anchor `transientComplement_isAbsorbing_exercise` for Exercise 5.171. | ✅ Faithful | `transientComplement_isAbsorbing_exercise` ([Mbse/TextbookExercises/Ch05.lean:1109](Mbse/TextbookExercises/Ch05.lean#L1109)) |
+
+### `textbook/exercise5.172` — Exercise 5.172
+
+- Structured source file: [textbook/exercise5.172.json](textbook/exercise5.172.json)
+- Description: *Exercise 5.172. Inevitable transitions admit alternate SMBFs.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.172/source/exercise` | `exercise` | Source Exercise 5.172. Inevitable transitions admit alternate SMBFs. | ✅ Faithful | `inevitable_admits_alternate_SMBF_exercise` ([Mbse/TextbookExercises/Ch05.lean:1121](Mbse/TextbookExercises/Ch05.lean#L1121)) |
+| `5.172/plan/inevitable_admits_alternate_SMBF_exercise` | `exercise` | Lean anchor `inevitable_admits_alternate_SMBF_exercise` for Exercise 5.172. | ✅ Faithful | `inevitable_admits_alternate_SMBF_exercise` ([Mbse/TextbookExercises/Ch05.lean:1121](Mbse/TextbookExercises/Ch05.lean#L1121)) |
+
+### `textbook/exercise5.173` — Exercise 5.173
+
+- Structured source file: [textbook/exercise5.173.json](textbook/exercise5.173.json)
+- Description: *Exercise 5.173. Primary modes have constant output and inevitable transitions.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.173/source/exercise` | `exercise` | Source Exercise 5.173. Primary modes have constant output and inevitable transitions. | ✅ Faithful | `primary_constOutput_inevitable_exercise` ([Mbse/TextbookExercises/Ch05.lean:1139](Mbse/TextbookExercises/Ch05.lean#L1139)) |
+| `5.173/plan/primary_constOutput_inevitable_exercise` | `exercise` | Lean anchor `primary_constOutput_inevitable_exercise` for Exercise 5.173. | ✅ Faithful | `primary_constOutput_inevitable_exercise` ([Mbse/TextbookExercises/Ch05.lean:1139](Mbse/TextbookExercises/Ch05.lean#L1139)) |
+
+### `textbook/exercise5.174` — Exercise 5.174
+
+- Structured source file: [textbook/exercise5.174.json](textbook/exercise5.174.json)
+- Description: *Exercise 5.174. Time elaboration implements via a constant-index mode.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.174/source/exercise` | `exercise` | Source Exercise 5.174. Time elaboration implements via a constant-index mode. | ✅ Faithful | `timeElaborate_implements_exercise` ([Mbse/TextbookExercises/Ch05.lean:1152](Mbse/TextbookExercises/Ch05.lean#L1152)) |
+| `5.174/plan/timeElaborate_implements_exercise` | `exercise` | Lean anchor `timeElaborate_implements_exercise` for Exercise 5.174. | ✅ Faithful | `timeElaborate_implements_exercise` ([Mbse/TextbookExercises/Ch05.lean:1152](Mbse/TextbookExercises/Ch05.lean#L1152)) |
+
+### `textbook/exercise5.175` — Exercise 5.175
+
+- Structured source file: [textbook/exercise5.175.json](textbook/exercise5.175.json)
+- Description: *Exercise 5.175. Primary system-mode relation is reflexive.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.175/source/exercise` | `exercise` | Source Exercise 5.175. Primary system-mode relation is reflexive. | ✅ Faithful | `primaryMode_reflexive_exercise` ([Mbse/TextbookExercises/Ch05.lean:1171](Mbse/TextbookExercises/Ch05.lean#L1171)) |
+| `5.175/plan/primaryMode_reflexive_exercise` | `exercise` | Lean anchor `primaryMode_reflexive_exercise` for Exercise 5.175. | ✅ Faithful | `primaryMode_reflexive_exercise` ([Mbse/TextbookExercises/Ch05.lean:1171](Mbse/TextbookExercises/Ch05.lean#L1171)) |
+
+### `textbook/exercise5.176` — Exercise 5.176
+
+- Structured source file: [textbook/exercise5.176.json](textbook/exercise5.176.json)
+- Description: *Exercise 5.176. Primary system-mode relation is transitive.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.176/source/exercise` | `exercise` | Source Exercise 5.176. Primary system-mode relation is transitive. | ✅ Faithful | `primaryMode_transitive_exercise` ([Mbse/TextbookExercises/Ch05.lean:1182](Mbse/TextbookExercises/Ch05.lean#L1182)) |
+| `5.176/plan/primaryMode_transitive_exercise` | `exercise` | Lean anchor `primaryMode_transitive_exercise` for Exercise 5.176. | ✅ Faithful | `primaryMode_transitive_exercise` ([Mbse/TextbookExercises/Ch05.lean:1182](Mbse/TextbookExercises/Ch05.lean#L1182)) |
+
+### `textbook/exercise5.177` — Exercise 5.177
+
+- Structured source file: [textbook/exercise5.177.json](textbook/exercise5.177.json)
+- Description: *Exercise 5.177. Mode, HIMSY, or iso yields Implements.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.177/source/exercise` | `exercise` | Source Exercise 5.177. Mode, HIMSY, or iso yields Implements. | ✅ Faithful | `implements_of_mode_hom_iso_exercise` ([Mbse/TextbookExercises/Ch05.lean:1194](Mbse/TextbookExercises/Ch05.lean#L1194)) |
+| `5.177/plan/implements_of_mode_hom_iso_exercise` | `exercise` | Lean anchor `implements_of_mode_hom_iso_exercise` for Exercise 5.177. | ✅ Faithful | `implements_of_mode_hom_iso_exercise` ([Mbse/TextbookExercises/Ch05.lean:1194](Mbse/TextbookExercises/Ch05.lean#L1194)) |
+
+### `textbook/exercise5.178` — Exercise 5.178
+
+- Structured source file: [textbook/exercise5.178.json](textbook/exercise5.178.json)
+- Description: *Exercise 5.178. IIMPSY is a system parameterization.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.178/source/exercise` | `exercise` | Source Exercise 5.178. IIMPSY is a system parameterization. | ✅ Faithful | `iimpsys_isSystemParameterization` ([Mbse/TextbookExercises/Ch05.lean:1207](Mbse/TextbookExercises/Ch05.lean#L1207)) |
+| `5.178/plan/iimpsys_isSystemParameterization` | `exercise` | Lean anchor `iimpsys_isSystemParameterization` for Exercise 5.178. | ✅ Faithful | `iimpsys_isSystemParameterization` ([Mbse/TextbookExercises/Ch05.lean:1207](Mbse/TextbookExercises/Ch05.lean#L1207)) |
+
+### `textbook/exercise5.179` — Exercise 5.179
+
+- Structured source file: [textbook/exercise5.179.json](textbook/exercise5.179.json)
+- Description: *Exercise 5.179. EIMPSY is a system parameterization (exact implementation).*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.179/source/exercise` | `exercise` | Source Exercise 5.179. EIMPSY is a system parameterization (exact implementation). | ✅ Faithful | `eimpsys_isSystemParameterization` ([Mbse/TextbookExercises/Ch05.lean:1218](Mbse/TextbookExercises/Ch05.lean#L1218)) |
+| `5.179/plan/eimpsys_isSystemParameterization` | `exercise` | Lean anchor `eimpsys_isSystemParameterization` for Exercise 5.179. | ✅ Faithful | `eimpsys_isSystemParameterization` ([Mbse/TextbookExercises/Ch05.lean:1218](Mbse/TextbookExercises/Ch05.lean#L1218)) |
+
+- Exercise kinds: **38** witness, **40** theorem-proof
 
 ## 3. Completeness & Quality Summary
 
-- **Total Structured JSON Entries**: 208 (140 definitions/theorems, 68 exercises)
+- **Total Structured JSON Entries**: 218 (140 definitions/theorems, 78 exercises)
 - **Definition/Theorem Elements**: 398 (391 faithful)
-- **Exercise Task Elements**: 191 (187 faithful)
-- **Total Individual Requirements/Elements**: 589
-- **Linked Elements (any annotation)**: 585 (585/589)
-- **Faithful Elements (excludes stub/partial)**: 578 (578/589)
+- **Exercise Task Elements**: 211 (207 faithful)
+- **Total Individual Requirements/Elements**: 609
+- **Linked Elements (any annotation)**: 605 (605/609)
+- **Faithful Elements (excludes stub/partial)**: 598 (598/609)
 - **Stub/Partial Elements**: 7
 - **Annotation Coverage Rate**: **99.3%**
-- **Faithful Coverage Rate**: **98.1%**
+- **Faithful Coverage Rate**: **98.2%**
 
 > Note: *Annotation coverage* counts any tagged link, including placeholders. *Faithful coverage* is the trustworthy figure: it excludes links explicitly marked `|stub` or `|partial`, which indicate the Lean artifact only partially captures (or stands in for) the textbook requirement.
 

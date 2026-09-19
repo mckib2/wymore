@@ -1,0 +1,31 @@
+{
+  "id": "5.176",
+  "kind": "exercise",
+  "name": "Exercise 5.176",
+  "chapter": 5,
+  "description": "Exercise 5.176. Primary system-mode relation is transitive.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.176/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.176. Primary system-mode relation is transitive.",
+      "lean_anchor": "primaryMode_transitive_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.176/plan/primaryMode_transitive_exercise",
+      "type": "exercise",
+      "text": "Lean anchor `primaryMode_transitive_exercise` for Exercise 5.176.",
+      "lean_anchor": "primaryMode_transitive_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

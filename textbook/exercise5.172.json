@@ -1,0 +1,31 @@
+{
+  "id": "5.172",
+  "kind": "exercise",
+  "name": "Exercise 5.172",
+  "chapter": 5,
+  "description": "Exercise 5.172. Inevitable transitions admit alternate SMBFs.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.172/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.172. Inevitable transitions admit alternate SMBFs.",
+      "lean_anchor": "inevitable_admits_alternate_SMBF_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.172/plan/inevitable_admits_alternate_SMBF_exercise",
+      "type": "exercise",
+      "text": "Lean anchor `inevitable_admits_alternate_SMBF_exercise` for Exercise 5.172.",
+      "lean_anchor": "inevitable_admits_alternate_SMBF_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

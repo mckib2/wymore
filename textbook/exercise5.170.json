@@ -1,0 +1,31 @@
+{
+  "id": "5.170",
+  "kind": "exercise",
+  "name": "Exercise 5.170",
+  "chapter": 5,
+  "description": "Exercise 5.170. Fixed-time STZ(CNS) image is a constant-input mode of time s.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.170/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.170. Fixed-time STZ(CNS) image is a constant-input mode of time s.",
+      "lean_anchor": "fixedTimeMode_constant_indices",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.170/plan/fixedTimeMode_constant_indices",
+      "type": "exercise",
+      "text": "Lean anchor `fixedTimeMode_constant_indices` for Exercise 5.170.",
+      "lean_anchor": "fixedTimeMode_constant_indices",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

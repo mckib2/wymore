@@ -1,0 +1,31 @@
+{
+  "id": "5.178",
+  "kind": "exercise",
+  "name": "Exercise 5.178",
+  "chapter": 5,
+  "description": "Exercise 5.178. IIMPSY is a system parameterization.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.178/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.178. IIMPSY is a system parameterization.",
+      "lean_anchor": "iimpsys_isSystemParameterization",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.178/plan/iimpsys_isSystemParameterization",
+      "type": "exercise",
+      "text": "Lean anchor `iimpsys_isSystemParameterization` for Exercise 5.178.",
+      "lean_anchor": "iimpsys_isSystemParameterization",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

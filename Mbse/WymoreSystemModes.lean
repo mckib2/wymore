@@ -1252,4 +1252,326 @@ theorem not_inMode_of_not_manifest_zero
       subst hr
       exact h ⟨Nat.zero_le t, x₁, hx₁⟩
 
+/-! ## Exercise support: fixed-time sample, transient complement, primary props -/
+
+/-- States reachable in exactly `s` steps under a constant input from `S` with inputs in `P`. -/
+def FixedTimeReachable (Z : DiscreteSystem S₂ I₂ O₂) (S : Set S₂) (P : Set I₂)
+    (s : Time) (y : S₂) : Prop :=
+  ∃ x ∈ S, ∃ p ∈ P, generateStateTrajectory Z x (liftInput (fun _ => p)) s = y
+
+theorem FixedTimeReachable_closed_of_start_in_S
+    (Z : DiscreteSystem S₂ I₂ O₂) (S : Set S₂) (P : Set I₂) (s : Time)
+    (hImageSubsetS : ∀ y, FixedTimeReachable Z S P s y → y ∈ S)
+    {y : S₂} (hy : FixedTimeReachable Z S P s y) {p : I₂} (hp : p ∈ P) :
+    FixedTimeReachable Z S P s
+      (generateStateTrajectory Z y (liftInput (fun _ => p)) s) :=
+  ⟨y, hImageSubsetS y hy, p, hp, rfl⟩
+
+/-- Mode system whose states are the fixed-time image (Exercise 5.170). -/
+def fixedTimeModeSystem (Z : DiscreteSystem S₂ I₂ O₂) (S : Set S₂) (P : Set I₂)
+    (s : Time) (_hs : 0 < s) (hS : S.Nonempty) (hP : P.Nonempty)
+    (hImageSubsetS : ∀ y, FixedTimeReachable Z S P s y → y ∈ S) :
+    DiscreteSystem {y // FixedTimeReachable Z S P s y} {p // p ∈ P} O₂ where
+  sz_nonempty := by
+    obtain ⟨x, hx⟩ := hS
+    obtain ⟨p, hp⟩ := hP
+    refine ⟨⟨generateStateTrajectory Z x (liftInput (fun _ => p)) s,
+      x, hx, p, hp, rfl⟩⟩
+  NZ := fun y oi =>
+    match oi with
+    | none => y
+    | some p =>
+      ⟨generateStateTrajectory Z y.val (liftInput (fun _ => p.val)) s,
+        FixedTimeReachable_closed_of_start_in_S Z S P s hImageSubsetS y.property p.property⟩
+  RZ := fun y => Z.RZ y.val
+
+/-- Constant-input / constant-time mode witness for the fixed-time construction. -/
+def fixedTimeMode (Z : DiscreteSystem S₂ I₂ O₂) (S : Set S₂) (P : Set I₂)
+    (s : Time) (hs : 0 < s) (hS : S.Nonempty) (hP : P.Nonempty)
+    (hImageSubsetS : ∀ y, FixedTimeReachable Z S P s y → y ∈ S) :
+    SystemMode (fixedTimeModeSystem Z S P s hs hS hP hImageSubsetS) Z where
+  stateMap := Subtype.val
+  inputMap := Subtype.val
+  outputMap := id
+  stateMap_injective := Subtype.val_injective
+  inputMap_injective := Subtype.val_injective
+  outputMap_injective := Function.injective_id
+  behavior :=
+    { input := fun _ p _ => p.val
+      duration := fun _ _ => s
+      duration_pos := fun _ _ => hs }
+  behavior_initial := fun _ _ => rfl
+  transition := by
+    intro y p
+    simp [fixedTimeModeSystem]
+  readout := fun _ => by simp [fixedTimeModeSystem]
+
+theorem fixedTimeMode_constantInput
+    (Z : DiscreteSystem S₂ I₂ O₂) (S : Set S₂) (P : Set I₂)
+    (s : Time) (hs : 0 < s) (hS : S.Nonempty) (hP : P.Nonempty)
+    (hImageSubsetS : ∀ y, FixedTimeReachable Z S P s y → y ∈ S) :
+    HasConstantInput (fixedTimeMode Z S P s hs hS hP hImageSubsetS) :=
+  fun _ _ _ => rfl
+
+theorem fixedTimeMode_constantTime
+    (Z : DiscreteSystem S₂ I₂ O₂) (S : Set S₂) (P : Set I₂)
+    (s : Time) (hs : 0 < s) (hS : S.Nonempty) (hP : P.Nonempty)
+    (hImageSubsetS : ∀ y, FixedTimeReachable Z S P s y → y ∈ S) :
+    HasConstantTimeIndex (fixedTimeMode Z S P s hs hS hP hImageSubsetS) s :=
+  ⟨hs, fun _ _ => rfl⟩
+
+/-- Outside closedness from the transient “cannot enter” clause. -/
+theorem outside_closed_of_transient (M : SystemMode Z₁ Z₂) (h : IsTransientMode M)
+    {y : S₂} (hy : y ∈ OutsideMode M) (p : I₂) :
+    Z₂.NZ y (some p) ∈ OutsideMode M := by
+  intro x
+  exact h.2.2.2.1 y hy p x
+
+/-- Complement system for a transient mode (Exercise 5.171). -/
+def transientComplementModeSystem (M : SystemMode Z₁ Z₂) (h : IsTransientMode M)
+    (hproper : IsProperMode M) :
+    DiscreteSystem {y // y ∈ OutsideMode M} I₂ O₂ where
+  sz_nonempty := by
+    obtain ⟨y, hy⟩ := OutsideMode_nonempty_of_proper M hproper
+    exact ⟨⟨y, hy⟩⟩
+  NZ := fun x oi =>
+    match oi with
+    | none => x
+    | some p => ⟨Z₂.NZ x.val (some p), outside_closed_of_transient M h x.property p⟩
+  RZ := fun x => Z₂.RZ x.val
+
+def transientComplementMode (M : SystemMode Z₁ Z₂) (h : IsTransientMode M)
+    (hproper : IsProperMode M) :
+    SystemMode (transientComplementModeSystem M h hproper) Z₂ :=
+  primaryModeOfMaps _ _ Subtype.val id id Subtype.val_injective
+    Function.injective_id Function.injective_id (fun _ _ => rfl)
+    (fun _ => by simp [transientComplementModeSystem])
+
+theorem transientComplement_isAbsorbing (M : SystemMode Z₁ Z₂)
+    (h : IsTransientMode M) (hproper : IsProperMode M) :
+    IsAbsorbingMode (transientComplementMode M h hproper) := by
+  refine ⟨⟨Nat.zero_lt_one, fun _ _ => rfl⟩, ?_, fun p => ⟨p, rfl⟩⟩
+  · intro hsurj
+    obtain ⟨x₁⟩ := Z₁.sz_nonempty
+    obtain ⟨y, hy⟩ := hsurj (M.stateMap x₁)
+    exact y.property x₁ hy
+
+/-- Rebuild a mode with an alternate input index under inevitability (Exercise 5.172). -/
+def remodeWithInput (M : SystemMode Z₁ Z₂) (hInev : HasInevitableTransitions M)
+    (input' : S₁ → I₁ → ITZ I₂)
+    (hinit : ∀ x p, input' x p 0 = M.inputMap p) :
+    SystemMode Z₁ Z₂ where
+  stateMap := M.stateMap
+  inputMap := M.inputMap
+  outputMap := M.outputMap
+  stateMap_injective := M.stateMap_injective
+  inputMap_injective := M.inputMap_injective
+  outputMap_injective := M.outputMap_injective
+  behavior :=
+    { input := input'
+      duration := M.timeIndex
+      duration_pos := M.behavior.duration_pos }
+  behavior_initial := hinit
+  transition := by
+    intro x p
+    exact (hInev x p (input' x p) (hinit x p)).symm
+  readout := M.readout
+
+theorem remodeWithInput_isSystemMode (M : SystemMode Z₁ Z₂)
+    (hInev : HasInevitableTransitions M)
+    (input' : S₁ → I₁ → ITZ I₂)
+    (hinit : ∀ x p, input' x p 0 = M.inputMap p) :
+    IsSystemMode Z₁ Z₂ :=
+  ⟨remodeWithInput M hInev input' hinit⟩
+
+/-- Under inevitable transitions, every alternate SMBF with the same durations and
+initial inputs yields a system mode (Exercise 5.172). -/
+theorem inevitable_admits_alternate_SMBF (M : SystemMode Z₁ Z₂)
+    (hInev : HasInevitableTransitions M)
+    (input' : S₁ → I₁ → ITZ I₂)
+    (hinit : ∀ x p, input' x p 0 = M.inputMap p) :
+    ∃ M' : SystemMode Z₁ Z₂,
+      (∀ x p, M'.timeIndex x p = M.timeIndex x p) ∧
+        (∀ x p, M'.inputIndex x p 0 = M.inputMap p) ∧
+        M'.stateMap = M.stateMap :=
+  ⟨remodeWithInput M hInev input' hinit, fun _ _ => rfl, hinit, rfl⟩
+
+/-- Primary modes have inevitable transitions (Exercise 5.173). -/
+theorem primary_hasInevitableTransitions (M : SystemMode Z₁ Z₂)
+    (h : IsPrimaryMode M) : HasInevitableTransitions M := by
+  intro x p g hg
+  have hdur : M.timeIndex x p = 1 := h.2 x p
+  rw [hdur, generateStateTrajectory_succ, generateStateTrajectory_zero]
+  change Z₂.NZ (M.stateMap x) (some (g 0)) = M.stateMap (Z₁.NZ x (some p))
+  rw [hg, primary_preserves_transition M h x p]
+
+theorem primary_hasConstantOutput_and_inevitable (M : SystemMode Z₁ Z₂)
+    (h : IsPrimaryMode M) :
+    HasConstantOutput (primaryConstantInputMode M h) ∧
+      HasInevitableTransitions M :=
+  ⟨primaryConstantInputMode_constantOutput M h, primary_hasInevitableTransitions M h⟩
+
+/-- Primary mode relation is reflexive (Exercise 5.175). -/
+def primarySelfMode (Z : DiscreteSystem S₁ I₁ O₁) : SystemMode Z Z :=
+  primaryModeOfMaps Z Z id id id Function.injective_id Function.injective_id
+    Function.injective_id (fun _ _ => rfl) (fun _ => by simp)
+
+theorem primaryMode_reflexive (Z : DiscreteSystem S₁ I₁ O₁) :
+    IsPrimaryMode (primarySelfMode Z) :=
+  ⟨Nat.zero_lt_one, fun _ _ => rfl⟩
+
+/-- Primary mode relation is transitive (Exercise 5.176). -/
+theorem primaryMode_transitive (M₁₂ : SystemMode Z₁ Z₂) (M₂₃ : SystemMode Z₂ Z₃)
+    (h₁₂ : IsPrimaryMode M₁₂) (h₂₃ : IsPrimaryMode M₂₃) :
+    IsPrimaryMode (M₁₂.trans M₂₃) := by
+  refine ⟨Nat.zero_lt_one, fun x p => ?_⟩
+  change compiledElapsed M₂₃ (M₁₂.stateMap x) (M₁₂.inputIndex x p) (M₁₂.timeIndex x p) = 1
+  have h1 : M₁₂.timeIndex x p = 1 := h₁₂.2 x p
+  rw [h1]
+  -- compiledElapsed for one step is the duration of the second mode at the first input
+  simp only [compiledElapsed]
+  have h2 : M₂₃.timeIndex (M₁₂.stateMap x) (M₁₂.inputIndex x p 0) = 1 := h₂₃.2 _ _
+  simpa [generateStateTrajectory_zero] using h2
+
+/-! ## Time elaboration (Exercise 5.174) -/
+
+/--
+Time-elaborated system: states are `(x, phase)` with `phase : Fin n`, advancing
+phase until wrap-around applies `NZ₁`.  Book index `IJS[1,n]` is `Fin n` with
+phase `0` corresponding to `PJN2 = 1`.
+-/
+def timeElaborate (Z : DiscreteSystem S₁ I₁ O₁) (n : Nat) (hn : 1 < n) :
+    DiscreteSystem (S₁ × Fin n) I₁ O₁ where
+  sz_nonempty := by
+    obtain ⟨x⟩ := Z.sz_nonempty
+    exact ⟨(x, ⟨0, Nat.zero_lt_of_lt hn⟩)⟩
+  NZ := fun xp oi =>
+    let x := xp.1
+    let i := xp.2
+    match oi with
+    | none => xp
+    | some p =>
+      if h : i.val + 1 < n then
+        (x, ⟨i.val + 1, h⟩)
+      else
+        (Z.NZ x (some p), ⟨0, Nat.zero_lt_of_lt hn⟩)
+  RZ := fun xp => Z.RZ xp.1
+
+/-- Embedding of the original system as the phase-0 slice of a time elaboration. -/
+def timeElaborateSliceEmbed (_Z : DiscreteSystem S₁ I₁ O₁) (n : Nat) (hn : 1 < n) :
+    S₁ → S₁ × Fin n :=
+  fun x => (x, ⟨0, Nat.zero_lt_of_lt hn⟩)
+
+/--
+Mode system on phase-0 states: one mode step runs `n` elaborated steps under CNS.
+-/
+def timeElaborateModeSystem (Z : DiscreteSystem S₁ I₁ O₁) (n : Nat) (hn : 1 < n) :
+    DiscreteSystem S₁ I₁ O₁ where
+  sz_nonempty := Z.sz_nonempty
+  NZ := fun x oi =>
+    match oi with
+    | none => Z.NZ x none
+    | some p =>
+      (generateStateTrajectory (timeElaborate Z n hn)
+        (timeElaborateSliceEmbed Z n hn x)
+        (liftInput (fun _ => p)) n).1
+  RZ := Z.RZ
+
+/-- After `k < n` steps from phase 0 under CNS, phase is `k` and state is unchanged. -/
+theorem timeElaborate_phase_lt (Z : DiscreteSystem S₁ I₁ O₁) (n : Nat) (hn : 1 < n)
+    (x : S₁) (p : I₁) (k : Nat) (hk : k < n) :
+    generateStateTrajectory (timeElaborate Z n hn)
+        (timeElaborateSliceEmbed Z n hn x) (liftInput (fun _ => p)) k =
+      (x, ⟨k, hk⟩) := by
+  induction k with
+  | zero =>
+    apply Prod.ext
+    · rfl
+    · exact Fin.ext rfl
+  | succ k ih =>
+    have hk' : k < n := Nat.lt_of_succ_lt hk
+    rw [generateStateTrajectory_succ, ih hk']
+    dsimp [timeElaborate, liftInput]
+    have hlt : k + 1 < n := hk
+    simp [hlt]
+
+/-- After exactly `n` steps from phase 0, state is `NZ x (some p)` at phase 0. -/
+theorem timeElaborate_full_cycle (Z : DiscreteSystem S₁ I₁ O₁) (n : Nat) (hn : 1 < n)
+    (x : S₁) (p : I₁) :
+    generateStateTrajectory (timeElaborate Z n hn)
+        (timeElaborateSliceEmbed Z n hn x) (liftInput (fun _ => p)) n =
+      timeElaborateSliceEmbed Z n hn (Z.NZ x (some p)) := by
+  have hnpred : n - 1 < n := Nat.sub_lt (Nat.zero_lt_of_lt hn) Nat.zero_lt_one
+  have hpre := timeElaborate_phase_lt Z n hn x p (n - 1) hnpred
+  have hstep :
+      generateStateTrajectory (timeElaborate Z n hn)
+        (timeElaborateSliceEmbed Z n hn x) (liftInput (fun _ => p)) ((n - 1) + 1) =
+      timeElaborateSliceEmbed Z n hn (Z.NZ x (some p)) := by
+    rw [generateStateTrajectory_succ, hpre]
+    dsimp [timeElaborate, liftInput, timeElaborateSliceEmbed]
+    split_ifs with h
+    · exact absurd h (by omega)
+    · rfl
+  rwa [Nat.sub_add_cancel (Nat.one_le_of_lt hn)] at hstep
+
+def timeElaborateMode (Z : DiscreteSystem S₁ I₁ O₁) (n : Nat) (hn : 1 < n) :
+    SystemMode (timeElaborateModeSystem Z n hn) (timeElaborate Z n hn) where
+  stateMap := timeElaborateSliceEmbed Z n hn
+  inputMap := id
+  outputMap := id
+  stateMap_injective := fun a b h => congrArg Prod.fst h
+  inputMap_injective := Function.injective_id
+  outputMap_injective := Function.injective_id
+  behavior :=
+    { input := fun _ p _ => p
+      duration := fun _ _ => n
+      duration_pos := fun _ _ => Nat.zero_lt_of_lt hn }
+  behavior_initial := fun _ _ => rfl
+  transition := by
+    intro x p
+    show timeElaborateSliceEmbed Z n hn
+        (generateStateTrajectory (timeElaborate Z n hn)
+          (timeElaborateSliceEmbed Z n hn x) (liftInput (fun _ => p)) n).1 =
+      generateStateTrajectory (timeElaborate Z n hn)
+        (timeElaborateSliceEmbed Z n hn x) (liftInput (fun _ => p)) n
+    rw [timeElaborate_full_cycle]
+    rfl
+  readout := by
+    intro x
+    change (Z.RZ x).map id = Z.RZ x
+    simp
+
+theorem timeElaborateMode_constantInput (Z : DiscreteSystem S₁ I₁ O₁)
+    (n : Nat) (hn : 1 < n) :
+    HasConstantInput (timeElaborateMode Z n hn) := fun _ _ _ => rfl
+
+theorem timeElaborateMode_constantTime (Z : DiscreteSystem S₁ I₁ O₁)
+    (n : Nat) (hn : 1 < n) :
+    HasConstantTimeIndex (timeElaborateMode Z n hn) n :=
+  ⟨Nat.zero_lt_of_lt hn, fun _ _ => rfl⟩
+
+theorem timeElaborateMode_constantOutput (Z : DiscreteSystem S₁ I₁ O₁)
+    (n : Nat) (hn : 1 < n) :
+    HasConstantOutput (timeElaborateMode Z n hn) := by
+  intro x p s hs
+  have hs' : s < n := by simpa [timeElaborateMode] using hs
+  have hp := timeElaborate_phase_lt Z n hn x p s hs'
+  dsimp [HasConstantOutput, HasConstantOutputOn, timeElaborateMode]
+  simp only [generateOutputTrajectory]
+  rw [hp]
+  dsimp [timeElaborate, timeElaborateSliceEmbed]
+
+theorem timeElaborateMode_CNS_realizes_transition (Z : DiscreteSystem S₁ I₁ O₁)
+    (n : Nat) (hn : 1 < n) (x : S₁) (p : I₁) :
+    generateStateTrajectory (timeElaborate Z n hn)
+        (timeElaborateSliceEmbed Z n hn x) (liftInput (fun _ => p)) n =
+      timeElaborateSliceEmbed Z n hn
+        ((timeElaborateModeSystem Z n hn).NZ x (some p)) := by
+  change _ = timeElaborateSliceEmbed Z n hn
+    (generateStateTrajectory (timeElaborate Z n hn)
+      (timeElaborateSliceEmbed Z n hn x) (liftInput (fun _ => p)) n).1
+  rw [timeElaborate_full_cycle]
+  rfl
+
+
 end WymoreSystemModes

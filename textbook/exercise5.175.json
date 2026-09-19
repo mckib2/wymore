@@ -1,0 +1,31 @@
+{
+  "id": "5.175",
+  "kind": "exercise",
+  "name": "Exercise 5.175",
+  "chapter": 5,
+  "description": "Exercise 5.175. Primary system-mode relation is reflexive.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.175/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.175. Primary system-mode relation is reflexive.",
+      "lean_anchor": "primaryMode_reflexive_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.175/plan/primaryMode_reflexive_exercise",
+      "type": "exercise",
+      "text": "Lean anchor `primaryMode_reflexive_exercise` for Exercise 5.175.",
+      "lean_anchor": "primaryMode_reflexive_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

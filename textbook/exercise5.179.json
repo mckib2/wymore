@@ -1,0 +1,31 @@
+{
+  "id": "5.179",
+  "kind": "exercise",
+  "name": "Exercise 5.179",
+  "chapter": 5,
+  "description": "Exercise 5.179. EIMPSY is a system parameterization (exact implementation).",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.179/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.179. EIMPSY is a system parameterization (exact implementation).",
+      "lean_anchor": "eimpsys_isSystemParameterization",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.179/plan/eimpsys_isSystemParameterization",
+      "type": "exercise",
+      "text": "Lean anchor `eimpsys_isSystemParameterization` for Exercise 5.179.",
+      "lean_anchor": "eimpsys_isSystemParameterization",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

@@ -1,0 +1,31 @@
+{
+  "id": "5.177",
+  "kind": "exercise",
+  "name": "Exercise 5.177",
+  "chapter": 5,
+  "description": "Exercise 5.177. Mode, HIMSY, or iso yields Implements.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.177/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.177. Mode, HIMSY, or iso yields Implements.",
+      "lean_anchor": "implements_of_mode_hom_iso_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.177/plan/implements_of_mode_hom_iso_exercise",
+      "type": "exercise",
+      "text": "Lean anchor `implements_of_mode_hom_iso_exercise` for Exercise 5.177.",
+      "lean_anchor": "implements_of_mode_hom_iso_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}
