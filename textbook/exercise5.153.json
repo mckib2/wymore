@@ -1,0 +1,31 @@
+{
+  "id": "5.153",
+  "kind": "exercise",
+  "name": "Exercise 5.153",
+  "chapter": 5,
+  "description": "Exercise 5.153. Counterexample: cycleSampledMode and cycleExhibitor are mutual modes but unequal (+2 vs +1).",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.153/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.153. Counterexample: cycleSampledMode and cycleExhibitor are mutual modes but unequal (+2 vs +1).",
+      "lean_anchor": "mutual_modes_not_equal_counterexample",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.153/plan/mutual_modes_not_equal_counterexample",
+      "type": "exercise",
+      "text": "Lean anchor `mutual_modes_not_equal_counterexample` for Exercise 5.153.",
+      "lean_anchor": "mutual_modes_not_equal_counterexample",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

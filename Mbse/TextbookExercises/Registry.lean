@@ -75,7 +75,16 @@ def registry : List ExerciseEntry :=
   , ⟨"5.142", 5, .theoremProof, "qualified", "Ch05.exercise5_142_unconditional"⟩
   , ⟨"5.146", 5, .theoremProof, "solved", "Ch05.selfMode_constantTime_iterate"⟩
   , ⟨"5.147", 5, .theoremProof, "solved", "Ch05.constantMode_state_at_mul"⟩
-  , ⟨"5.148", 5, .theoremProof, "qualified", "Ch05.variableTime_constantInput_state_at_accumulatedTime"⟩
+  , ⟨"5.148", 5, .theoremProof, "solved", "Ch05.variableTime_constantInput_state_at_accumulatedTime"⟩
+  , ⟨"5.149", 5, .theoremProof, "solved", "Ch05.constantMode_compose_indices"⟩
+  , ⟨"5.150", 5, .theoremProof, "solved", "Ch05.variableTime_compose_isSystemMode"⟩
+  , ⟨"5.151", 5, .theoremProof, "solved", "Ch05.mutual_constantMode_self_d_sq_indices"⟩
+  , ⟨"5.152", 5, .theoremProof, "qualified", "Ch05.mutual_primary_modes_isomorphic"⟩
+  , ⟨"5.153", 5, .theoremProof, "solved", "Ch05.mutual_modes_not_equal_counterexample"⟩
+  , ⟨"5.156", 5, .theoremProof, "solved", "Ch05.not_manifest_zero_not_inMode"⟩
+  , ⟨"5.157", 5, .theoremProof, "solved", "Ch05.primary_has_CNS_SMBF"⟩
+  , ⟨"5.158", 5, .theoremProof, "solved", "Ch05.primary_NZ_RZ_restriction"⟩
+  , ⟨"5.159", 5, .theoremProof, "solved", "Ch05.primary_manifest_persists"⟩
   ]
 
 def solvedCount : Nat :=

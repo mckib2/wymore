@@ -847,4 +847,76 @@ theorem systemMode_transitive
   rcases h₂₃ with ⟨M₂₃⟩
   exact ⟨M₁₂.trans M₂₃⟩
 
+/-- Constant time index makes compiled elapsed time a product. -/
+theorem compiledElapsed_constantTime
+    (M : SystemMode Z₁ Z₂) (d : Time) (htime : HasConstantTimeIndex M d)
+    (x : S₁) (f : ITZ I₁) :
+    ∀ n, compiledElapsed M x f n = d * n := by
+  intro n
+  induction n with
+  | zero => rfl
+  | succ n ih =>
+      simp only [compiledElapsed, Nat.mul_succ, ih, htime.2]
+
+/-- Constant input makes every value of a compiled trajectory the embedded input. -/
+theorem compiledInput_constant
+    (M : SystemMode Z₁ Z₂) (hinput : HasConstantInput M)
+    (x : S₁) (p : I₁) :
+    ∀ n t, compiledInput M x (fun _ => p) n t = M.inputMap p := by
+  intro n
+  induction n with
+  | zero =>
+      intro t
+      exact hinput x p t
+  | succ n ih =>
+      intro t
+      simp only [compiledInput]
+      unfold concatenate
+      split
+      · exact ih t
+      · apply hinput
+
+/--
+Composite of two constant-input, constant-time modes: time index multiplies and
+the composite remains constant-input.
+-/
+theorem SystemMode.trans_constant
+    (M₁₂ : SystemMode Z₁ Z₂) (M₂₃ : SystemMode Z₂ Z₃)
+    (hIn₁₂ : HasConstantInput M₁₂) (e : Time) (hE : HasConstantTimeIndex M₁₂ e)
+    (hIn₂₃ : HasConstantInput M₂₃) (d : Time) (hD : HasConstantTimeIndex M₂₃ d) :
+    HasConstantInput (M₁₂.trans M₂₃) ∧
+      HasConstantTimeIndex (M₁₂.trans M₂₃) (e * d) := by
+  refine ⟨?_, ?_⟩
+  · intro x p t
+    change compiledInput M₂₃ (M₁₂.stateMap x) (M₁₂.inputIndex x p)
+        (M₁₂.timeIndex x p) t =
+      (M₂₃.inputMap ∘ M₁₂.inputMap) p
+    have hfun : M₁₂.inputIndex x p = fun _ => M₁₂.inputMap p := by
+      funext u; exact hIn₁₂ x p u
+    have hdur : M₁₂.timeIndex x p = e := hE.2 x p
+    rw [hfun, hdur]
+    simpa [Function.comp_apply] using compiledInput_constant M₂₃ hIn₂₃
+      (M₁₂.stateMap x) (M₁₂.inputMap p) e t
+  · refine ⟨Nat.mul_pos hE.1 hD.1, fun x p => ?_⟩
+    change compiledElapsed M₂₃ (M₁₂.stateMap x) (M₁₂.inputIndex x p)
+        (M₁₂.timeIndex x p) = e * d
+    have hfun : M₁₂.inputIndex x p = fun _ => M₁₂.inputMap p := by
+      funext u; exact hIn₁₂ x p u
+    have hdur : M₁₂.timeIndex x p = e := hE.2 x p
+    rw [hfun, hdur, compiledElapsed_constantTime M₂₃ d hD]
+    rw [Nat.mul_comm]
+
+/-- Not manifest at time 0 implies not in-mode at time 0. -/
+theorem not_inMode_of_not_manifest_zero
+    (M : SystemMode Z₁ Z₂) (f : ITZW I₂) (x : S₂) (t : Time)
+    (h : ¬ ManifestAt M f x t 0) : ¬ InModeAt M f x t 0 := by
+  intro hin
+  cases hin with
+  | inl hM => exact h hM
+  | inr hway =>
+      rcases hway with ⟨r, x₁, p₁, hr0, _, hx₁, _, _, _⟩
+      have hr : r = 0 := Nat.eq_zero_of_le_zero hr0
+      subst hr
+      exact h ⟨Nat.zero_le t, x₁, hx₁⟩
+
 end WymoreSystemModes

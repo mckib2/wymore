@@ -1,0 +1,31 @@
+{
+  "id": "5.156",
+  "kind": "exercise",
+  "name": "Exercise 5.156",
+  "chapter": 5,
+  "description": "Exercise 5.156. Not manifest at time 0 implies not in-mode at time 0.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.156/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.156. Not manifest at time 0 implies not in-mode at time 0.",
+      "lean_anchor": "not_manifest_zero_not_inMode",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.156/plan/not_manifest_zero_not_inMode",
+      "type": "exercise",
+      "text": "Lean anchor `not_manifest_zero_not_inMode` for Exercise 5.156.",
+      "lean_anchor": "not_manifest_zero_not_inMode",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

@@ -1,0 +1,31 @@
+{
+  "id": "5.150",
+  "kind": "exercise",
+  "name": "Exercise 5.150",
+  "chapter": 5,
+  "description": "Exercise 5.150. Variable-time constant-input composition via compiledElapsed TI (SystemMode.trans).",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.150/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.150. Variable-time constant-input composition via compiledElapsed TI (SystemMode.trans).",
+      "lean_anchor": "variableTime_compose_isSystemMode",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.150/plan/variableTime_compose_isSystemMode",
+      "type": "exercise",
+      "text": "Lean anchor `variableTime_compose_isSystemMode` for Exercise 5.150.",
+      "lean_anchor": "variableTime_compose_isSystemMode",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

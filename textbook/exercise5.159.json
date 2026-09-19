@@ -1,0 +1,31 @@
+{
+  "id": "5.159",
+  "kind": "exercise",
+  "name": "Exercise 5.159",
+  "chapter": 5,
+  "description": "Exercise 5.159. Primary mode stays manifest while inputs remain in the mode input image.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.159/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.159. Primary mode stays manifest while inputs remain in the mode input image.",
+      "lean_anchor": "primary_manifest_persists",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.159/plan/primary_manifest_persists",
+      "type": "exercise",
+      "text": "Lean anchor `primary_manifest_persists` for Exercise 5.159.",
+      "lean_anchor": "primary_manifest_persists",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

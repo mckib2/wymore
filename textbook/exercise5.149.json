@@ -1,0 +1,31 @@
+{
+  "id": "5.149",
+  "kind": "exercise",
+  "name": "Exercise 5.149",
+  "chapter": 5,
+  "description": "Exercise 5.149. Constant-input modes of times e and d compose to constant-input time e*d.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.149/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.149. Constant-input modes of times e and d compose to constant-input time e*d.",
+      "lean_anchor": "constantMode_compose_indices",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.149/plan/constantMode_compose_indices",
+      "type": "exercise",
+      "text": "Lean anchor `constantMode_compose_indices` for Exercise 5.149.",
+      "lean_anchor": "constantMode_compose_indices",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

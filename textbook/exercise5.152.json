@@ -1,0 +1,31 @@
+{
+  "id": "5.152",
+  "kind": "exercise",
+  "name": "Exercise 5.152",
+  "chapter": 5,
+  "description": "Exercise 5.152. Literal Z1=Z2 is too strong across types; prove isomorphism from mutual primary modes with inverse embeddings (autonomous stutter).",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.152/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.152. Corrected: mutual primary modes with inverse embeddings yield IsIsomorphicTo, not type equality.",
+      "lean_anchor": "mutual_primary_modes_isomorphic",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.152/plan/mutual_primary_modes_isomorphic",
+      "type": "exercise",
+      "text": "Lean anchor `mutual_primary_modes_isomorphic` (qualified registry status).",
+      "lean_anchor": "mutual_primary_modes_isomorphic",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

@@ -12,8 +12,8 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `4.59/proof/copy_witness` | `proof` | When every component homomorphism is 1TO1, the product state map and the portwise input and output maps are 1TO1 as well. | ✅ Faithful | `elabResultantCopyWitness` ([Mbse/CouplingIsomorphism.lean:474](Mbse/CouplingIsomorphism.lean#L474)) |
-| `4.59/theorem/resultant_copy` | `theorem` | RSY(SCR) is a copy of RSY(SCR$). | ✅ Faithful | `cor4_59_resultant_copy` ([Mbse/CouplingIsomorphism.lean:499](Mbse/CouplingIsomorphism.lean#L499))<br>`cor4_59_resultant_copy` ([Mbse/TextbookExercises/Ch04.lean:377](Mbse/TextbookExercises/Ch04.lean#L377)) |
+| `4.59/proof/copy_witness` | `proof` | When every component homomorphism is 1TO1, the product state map and the portwise input and output maps are 1TO1 as well. | ✅ Faithful | `elabResultantCopyWitness` ([Mbse/CouplingIsomorphism.lean:404](Mbse/CouplingIsomorphism.lean#L404)) |
+| `4.59/theorem/resultant_copy` | `theorem` | RSY(SCR) is a copy of RSY(SCR$). | ✅ Faithful | `cor4_59_resultant_copy` ([Mbse/CouplingIsomorphism.lean:429](Mbse/CouplingIsomorphism.lean#L429))<br>`cor4_59_resultant_copy` ([Mbse/TextbookExercises/Ch04.lean:377](Mbse/TextbookExercises/Ch04.lean#L377)) |
 
 ### `textbook/corollary5.136` — Corollary 5.136
 
@@ -22,8 +22,8 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.136/source/corollary` | `theorem` | Corollary 5.136, the duration-one case of Theorem 5.134. | ✅ Faithful | `hologenic_of_primary_modes` ([Mbse/WymoreModeCoupling.lean:824](Mbse/WymoreModeCoupling.lean#L824)) |
-| `5.136/lean/hologenic_of_primary_modes` | `theorem` | Primary component modes induce a primary resultant mode. | ✅ Faithful | `hologenic_of_primary_modes` ([Mbse/WymoreModeCoupling.lean:824](Mbse/WymoreModeCoupling.lean#L824)) |
+| `5.136/source/corollary` | `theorem` | Corollary 5.136, the duration-one case of Theorem 5.134. | ✅ Faithful | `hologenic_of_primary_modes` ([Mbse/WymoreModeCoupling.lean:789](Mbse/WymoreModeCoupling.lean#L789)) |
+| `5.136/lean/hologenic_of_primary_modes` | `theorem` | Primary component modes induce a primary resultant mode. | ✅ Faithful | `hologenic_of_primary_modes` ([Mbse/WymoreModeCoupling.lean:789](Mbse/WymoreModeCoupling.lean#L789)) |
 | `5.136/paragraph/primary_constant_behavior` | `theorem` | Paragraph 5.135: replacing a primary behavior by the one-step constant input preserves the mode equations, and constant output on [0, 1) is the initial readout. | ✅ Faithful | `primaryConstantInputMode` ([Mbse/WymoreSystemModes.lean:191](Mbse/WymoreSystemModes.lean#L191)) |
 
 ### `textbook/definition2.11` — Finite System and Order Vector
@@ -314,26 +314,26 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.47/definition/rsy` | `component` | RSY = {(SCR, Z): SCR is a system coupling recipe; Z is the resultant system with feedback wiring via CSCR and external I/O on UISCR/UOSCR.} | ✅ Faithful | `rsy` ([Mbse/Wymore.lean:1057](Mbse/Wymore.lean#L1057)) |
-| `3.47/definition/sz` | `component` | SZ = ⅹ (SZ1, ..., SZn), the product of component state spaces. | ✅ Faithful | `rsy_SZ` ([Mbse/Wymore.lean:961](Mbse/Wymore.lean#L961)) |
-| `3.47/definition/iz` | `component` | IZ = ⅹ (A1, ..., Aa) where {A1, ..., Aa} = UISCR. | ✅ Faithful | `rsy_IZ` ([Mbse/Wymore.lean:947](Mbse/Wymore.lean#L947)) |
-| `3.47/definition/oz` | `component` | OZ = ⅹ (B1, ..., Bb) where {B1, ..., Bb} = UOSCR. | ✅ Faithful | `rsy_OZ` ([Mbse/Wymore.lean:954](Mbse/Wymore.lean#L954)) |
-| `3.47/definition/nz` | `component` | NZ applies each component next-state function on inputs resolved from external inputs and feedback connections in CSCR. | ✅ Faithful | `rsy_NZ` ([Mbse/Wymore.lean:1040](Mbse/Wymore.lean#L1040)) |
-| `3.47/definition/rz` | `component` | RZ projects component readouts onto unconnected output ports UOSCR. | ✅ Faithful | `rsy_RZ` ([Mbse/Wymore.lean:1049](Mbse/Wymore.lean#L1049)) |
-| `3.47/definition/unconnected_input_port` | `component` | Unconnected input ports are elements of UISCR. | ✅ Faithful | `UnconnInPort` ([Mbse/Wymore.lean:933](Mbse/Wymore.lean#L933)) |
-| `3.47/definition/unconnected_output_port` | `component` | Unconnected output ports are elements of UOSCR. | ✅ Faithful | `UnconnOutPort` ([Mbse/Wymore.lean:940](Mbse/Wymore.lean#L940)) |
-| `3.47/definition/connected_output` | `component` | For a connected input port, the feeding output port is determined by CSCR. | ✅ Faithful | `connectedOutput` ([Mbse/Wymore.lean:977](Mbse/Wymore.lean#L977)) |
-| `3.47/definition/component_input` | `component` | Component input functions combine external inputs on UISCR with feedback values from connected outputs. | ✅ Faithful | `rsy_component_input_fun` ([Mbse/Wymore.lean:1002](Mbse/Wymore.lean#L1002)) |
-| `3.47/definition/ip_map` | `component` | IP@(SCR, Z) maps resultant input ports to unconnected component input ports. | ✅ Faithful | `rsy_IP_map` ([Mbse/Wymore.lean:1087](Mbse/Wymore.lean#L1087)) |
-| `3.47/definition/inip_map` | `component` | INIP@(SCR, Z) is the inverse of IP@(SCR, Z). | ✅ Faithful | `rsy_INIP_map` ([Mbse/Wymore.lean:1094](Mbse/Wymore.lean#L1094)) |
-| `3.47/definition/is_map` | `component` | IS@(SCR, Z) gives input port value types on resultant input ports. | ✅ Faithful | `rsy_IS_map` ([Mbse/Wymore.lean:1101](Mbse/Wymore.lean#L1101)) |
-| `3.47/definition/op_map` | `component` | OP@(SCR, Z) maps resultant output ports to unconnected component output ports. | ✅ Faithful | `rsy_OP_map` ([Mbse/Wymore.lean:1108](Mbse/Wymore.lean#L1108)) |
-| `3.47/definition/inop_map` | `component` | INOP@(SCR, Z) is the inverse of OP@(SCR, Z). | ✅ Faithful | `rsy_INOP_map` ([Mbse/Wymore.lean:1115](Mbse/Wymore.lean#L1115)) |
-| `3.47/definition/os_map` | `component` | OS@(SCR, Z) gives output port value types on resultant output ports. | ✅ Faithful | `rsy_OS_map` ([Mbse/Wymore.lean:1122](Mbse/Wymore.lean#L1122)) |
-| `3.47/definition/open_loop` | `component` | Open-loop system Z& = CSY(VSCR). | ✅ Faithful | `rsy_open_loop_system` ([Mbse/Wymore.lean:1175](Mbse/Wymore.lean#L1175)) |
-| `3.47/definition/closed_loop` | `component` | Closed-loop system Z@ = RSY(SCR). | ✅ Faithful | `rsy_closed_loop_system` ([Mbse/Wymore.lean:1187](Mbse/Wymore.lean#L1187)) |
-| `3.47/definition/rsy_param` | `component` | Parameter bundle (SCR, total component readouts) for the RSY parameterization. | ✅ Faithful | `RSYParam` ([Mbse/Wymore.lean:1071](Mbse/Wymore.lean#L1071)) |
-| `3.47/definition/rsy_relation` | `component` | Relational membership (SCR, Z) ∈ RSY when Z is the resultant of SCR. | ✅ Faithful | `InRSY` ([Mbse/Wymore.lean:1079](Mbse/Wymore.lean#L1079)) |
+| `3.47/definition/rsy` | `component` | RSY = {(SCR, Z): SCR is a system coupling recipe; Z is the resultant system with feedback wiring via CSCR and external I/O on UISCR/UOSCR.} | ✅ Faithful | `rsy` ([Mbse/Wymore.lean:1066](Mbse/Wymore.lean#L1066)) |
+| `3.47/definition/sz` | `component` | SZ = ⅹ (SZ1, ..., SZn), the product of component state spaces. | ✅ Faithful | `rsy_SZ` ([Mbse/Wymore.lean:960](Mbse/Wymore.lean#L960)) |
+| `3.47/definition/iz` | `component` | IZ = ⅹ (A1, ..., Aa) where {A1, ..., Aa} = UISCR. | ✅ Faithful | `rsy_IZ` ([Mbse/Wymore.lean:946](Mbse/Wymore.lean#L946)) |
+| `3.47/definition/oz` | `component` | OZ = ⅹ (B1, ..., Bb) where {B1, ..., Bb} = UOSCR. | ✅ Faithful | `rsy_OZ` ([Mbse/Wymore.lean:953](Mbse/Wymore.lean#L953)) |
+| `3.47/definition/nz` | `component` | NZ applies each component next-state function on inputs resolved from external inputs and feedback connections in CSCR. | ✅ Faithful | `rsy_NZ` ([Mbse/Wymore.lean:1049](Mbse/Wymore.lean#L1049)) |
+| `3.47/definition/rz` | `component` | RZ projects component readouts onto unconnected output ports UOSCR. | ✅ Faithful | `rsy_RZ` ([Mbse/Wymore.lean:1058](Mbse/Wymore.lean#L1058)) |
+| `3.47/definition/unconnected_input_port` | `component` | Unconnected input ports are elements of UISCR. | ✅ Faithful | `UnconnInPort` ([Mbse/Wymore.lean:932](Mbse/Wymore.lean#L932)) |
+| `3.47/definition/unconnected_output_port` | `component` | Unconnected output ports are elements of UOSCR. | ✅ Faithful | `UnconnOutPort` ([Mbse/Wymore.lean:939](Mbse/Wymore.lean#L939)) |
+| `3.47/definition/connected_output` | `component` | For a connected input port, the feeding output port is determined by CSCR. | ✅ Faithful | `connectedOutput` ([Mbse/Wymore.lean:986](Mbse/Wymore.lean#L986)) |
+| `3.47/definition/component_input` | `component` | Component input functions combine external inputs on UISCR with feedback values from connected outputs. | ✅ Faithful | `rsy_component_input_fun` ([Mbse/Wymore.lean:1011](Mbse/Wymore.lean#L1011)) |
+| `3.47/definition/ip_map` | `component` | IP@(SCR, Z) maps resultant input ports to unconnected component input ports. | ✅ Faithful | `rsy_IP_map` ([Mbse/Wymore.lean:1096](Mbse/Wymore.lean#L1096)) |
+| `3.47/definition/inip_map` | `component` | INIP@(SCR, Z) is the inverse of IP@(SCR, Z). | ✅ Faithful | `rsy_INIP_map` ([Mbse/Wymore.lean:1103](Mbse/Wymore.lean#L1103)) |
+| `3.47/definition/is_map` | `component` | IS@(SCR, Z) gives input port value types on resultant input ports. | ✅ Faithful | `rsy_IS_map` ([Mbse/Wymore.lean:1110](Mbse/Wymore.lean#L1110)) |
+| `3.47/definition/op_map` | `component` | OP@(SCR, Z) maps resultant output ports to unconnected component output ports. | ✅ Faithful | `rsy_OP_map` ([Mbse/Wymore.lean:1117](Mbse/Wymore.lean#L1117)) |
+| `3.47/definition/inop_map` | `component` | INOP@(SCR, Z) is the inverse of OP@(SCR, Z). | ✅ Faithful | `rsy_INOP_map` ([Mbse/Wymore.lean:1124](Mbse/Wymore.lean#L1124)) |
+| `3.47/definition/os_map` | `component` | OS@(SCR, Z) gives output port value types on resultant output ports. | ✅ Faithful | `rsy_OS_map` ([Mbse/Wymore.lean:1131](Mbse/Wymore.lean#L1131)) |
+| `3.47/definition/open_loop` | `component` | Open-loop system Z& = CSY(VSCR). | ✅ Faithful | `rsy_open_loop_system` ([Mbse/Wymore.lean:1184](Mbse/Wymore.lean#L1184)) |
+| `3.47/definition/closed_loop` | `component` | Closed-loop system Z@ = RSY(SCR). | ✅ Faithful | `rsy_closed_loop_system` ([Mbse/Wymore.lean:1196](Mbse/Wymore.lean#L1196)) |
+| `3.47/definition/rsy_param` | `component` | Parameter bundle (SCR, total component readouts) for the RSY parameterization. | ✅ Faithful | `RSYParam` ([Mbse/Wymore.lean:1080](Mbse/Wymore.lean#L1080)) |
+| `3.47/definition/rsy_relation` | `component` | Relational membership (SCR, Z) ∈ RSY when Z is the resultant of SCR. | ✅ Faithful | `InRSY` ([Mbse/Wymore.lean:1088](Mbse/Wymore.lean#L1088)) |
 
 ### `textbook/definition3.68` — Coupling Function CFSCR
 
@@ -342,8 +342,8 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.68/definition/coupling_function` | `definition` | Constructive coupling function `cfscr` on closed-loop experiments. | ✅ Faithful | `cfscr` ([Mbse/WymoreCouplingDynamic.lean:261](Mbse/WymoreCouplingDynamic.lean#L261)) |
-| `3.68/definition/coupling_function_scr` | `definition` | Relational coupling-function specification `CouplingFunctionSCR`. | ✅ Faithful | `CouplingFunctionSCR` ([Mbse/WymoreCouplingDynamic.lean:365](Mbse/WymoreCouplingDynamic.lean#L365)) |
+| `3.68/definition/coupling_function` | `definition` | Constructive coupling function `cfscr` on closed-loop experiments. | ✅ Faithful | `cfscr` ([Mbse/WymoreCouplingDynamic.lean:260](Mbse/WymoreCouplingDynamic.lean#L260)) |
+| `3.68/definition/coupling_function_scr` | `definition` | Relational coupling-function specification `CouplingFunctionSCR`. | ✅ Faithful | `CouplingFunctionSCR` ([Mbse/WymoreCouplingDynamic.lean:364](Mbse/WymoreCouplingDynamic.lean#L364)) |
 
 ### `textbook/definition3.7` — System Connectivity
 
@@ -395,12 +395,12 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `4.10/definition/himsy` | `definition` | HIMSY = {((Z2, HS, HI, HO), Z1): Z2 ∈ DSYSTEMS; HS, HI, HO are functions with DMN(HS)=SZ2, DMN(HI)=IZ2, DMN(HO)=OZ2; consistency side-conditions on HS, HI, HO; Z1 = (SZ1, IZ1, OZ1, NZ1, RZ1) with SZ1=RNG(HS), IZ1=RNG(HI), OZ1=RNG(HO), NZ1 and RZ1 induced from Z2 via HS, HI, HO}. | ✅ Faithful | `HimsyWellDefined` ([Mbse/Homomorphism.lean:115](Mbse/Homomorphism.lean#L115))<br>`himsy` ([Mbse/Homomorphism.lean:154](Mbse/Homomorphism.lean#L154)) |
-| `4.10/component/sz1` | `component` | SZ1 = RNG(HS). | ✅ Faithful | `himsy` ([Mbse/Homomorphism.lean:154](Mbse/Homomorphism.lean#L154)) |
-| `4.10/component/iz1` | `component` | IZ1 = RNG(HI). | ✅ Faithful | `himsy` ([Mbse/Homomorphism.lean:154](Mbse/Homomorphism.lean#L154)) |
-| `4.10/component/oz1` | `component` | OZ1 = RNG(HO). | ✅ Faithful | `himsy` ([Mbse/Homomorphism.lean:154](Mbse/Homomorphism.lean#L154)) |
-| `4.10/component/nz1` | `component` | NZ1 induced from Z2 via HS, HI, HO and next-state consistency. | ✅ Faithful | `himsy` ([Mbse/Homomorphism.lean:154](Mbse/Homomorphism.lean#L154)) |
-| `4.10/component/rz1` | `component` | RZ1 induced from Z2 via HS, HO and readout consistency. | ✅ Faithful | `himsy` ([Mbse/Homomorphism.lean:154](Mbse/Homomorphism.lean#L154)) |
+| `4.10/definition/himsy` | `definition` | HIMSY = {((Z2, HS, HI, HO), Z1): Z2 ∈ DSYSTEMS; HS, HI, HO are functions with DMN(HS)=SZ2, DMN(HI)=IZ2, DMN(HO)=OZ2; consistency side-conditions on HS, HI, HO; Z1 = (SZ1, IZ1, OZ1, NZ1, RZ1) with SZ1=RNG(HS), IZ1=RNG(HI), OZ1=RNG(HO), NZ1 and RZ1 induced from Z2 via HS, HI, HO}. | ✅ Faithful | `HimsyWellDefined` ([Mbse/Homomorphism.lean:199](Mbse/Homomorphism.lean#L199))<br>`himsy` ([Mbse/Homomorphism.lean:238](Mbse/Homomorphism.lean#L238)) |
+| `4.10/component/sz1` | `component` | SZ1 = RNG(HS). | ✅ Faithful | `himsy` ([Mbse/Homomorphism.lean:238](Mbse/Homomorphism.lean#L238)) |
+| `4.10/component/iz1` | `component` | IZ1 = RNG(HI). | ✅ Faithful | `himsy` ([Mbse/Homomorphism.lean:238](Mbse/Homomorphism.lean#L238)) |
+| `4.10/component/oz1` | `component` | OZ1 = RNG(HO). | ✅ Faithful | `himsy` ([Mbse/Homomorphism.lean:238](Mbse/Homomorphism.lean#L238)) |
+| `4.10/component/nz1` | `component` | NZ1 induced from Z2 via HS, HI, HO and next-state consistency. | ✅ Faithful | `himsy` ([Mbse/Homomorphism.lean:238](Mbse/Homomorphism.lean#L238)) |
+| `4.10/component/rz1` | `component` | RZ1 induced from Z2 via HS, HO and readout consistency. | ✅ Faithful | `himsy` ([Mbse/Homomorphism.lean:238](Mbse/Homomorphism.lean#L238)) |
 
 ### `textbook/definition4.27` — Port-preserving homomorphisms
 
@@ -421,14 +421,14 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `4.3/definition/homomorphic_image` | `definition` | Z1 is a homomorphic image of Z2 with respect to HS, HI, HO if and only if (i) HS ∈ FNS(SZ2, ONTO, SZ1), (ii) HI ∈ FNS(IZ2, ONTO, IZ1), (iii) HO ∈ FNS(OZ2, ONTO, OZ1), (iv) HS(NZ2(x,p)) = NZ1(HS(x), HI(p)) for all x ∈ SZ2 and p ∈ IZ2, and (v) HO(RZ2(x)) = RZ1(HS(x)) for all x ∈ SZ2. | ✅ Faithful | `HomomorphicImageWitness` ([Mbse/Homomorphism.lean:34](Mbse/Homomorphism.lean#L34))<br>`IsHomomorphicImage` ([Mbse/Homomorphism.lean:58](Mbse/Homomorphism.lean#L58)) |
+| `4.3/definition/homomorphic_image` | `definition` | Z1 is a homomorphic image of Z2 with respect to HS, HI, HO if and only if (i) HS ∈ FNS(SZ2, ONTO, SZ1), (ii) HI ∈ FNS(IZ2, ONTO, IZ1), (iii) HO ∈ FNS(OZ2, ONTO, OZ1), (iv) HS(NZ2(x,p)) = NZ1(HS(x), HI(p)) for all x ∈ SZ2 and p ∈ IZ2, and (v) HO(RZ2(x)) = RZ1(HS(x)) for all x ∈ SZ2. | ✅ Faithful | `HomomorphicImageWitness` ([Mbse/Homomorphism.lean:34](Mbse/Homomorphism.lean#L34))<br>`IsHomomorphicImage` ([Mbse/Homomorphism.lean:142](Mbse/Homomorphism.lean#L142)) |
 | `4.3/requirement/next_state_consistency` | `constraint` | Condition (iv) is the next-state consistency requirement. | ✅ Faithful | `HomomorphicImageWitness.preserves_transition` ([Mbse/Homomorphism.lean:52](Mbse/Homomorphism.lean#L52)) |
 | `4.3/requirement/readout_consistency` | `constraint` | Condition (v) is the readout consistency requirement. | ✅ Faithful | `HomomorphicImageWitness.preserves_readout` ([Mbse/Homomorphism.lean:55](Mbse/Homomorphism.lean#L55)) |
 | `4.3/component/state_homomorphism` | `component` | HS is the state homomorphism. | ✅ Faithful | `HomomorphicImageWitness.HS` ([Mbse/Homomorphism.lean:43](Mbse/Homomorphism.lean#L43)) |
 | `4.3/component/input_homomorphism` | `component` | HI is the input homomorphism. | ✅ Faithful | `HomomorphicImageWitness.HI` ([Mbse/Homomorphism.lean:45](Mbse/Homomorphism.lean#L45)) |
 | `4.3/component/output_homomorphism` | `component` | HO is the output homomorphism. | ✅ Faithful | `HomomorphicImageWitness.HO` ([Mbse/Homomorphism.lean:47](Mbse/Homomorphism.lean#L47)) |
-| `4.3/implication/consistent_simplification` | `implication` | If Z1 is a homomorphic image of Z2, then Z1 is a consistent simplification of Z2 and Z2 is a consistent elaboration of Z1. | ✅ Faithful | `homomorphic_image_consistent_simplification` ([Mbse/Homomorphism.lean:101](Mbse/Homomorphism.lean#L101)) |
-| `4.3/implication/functional_capability` | `implication` | If Z1 is a homomorphic image of Z2, then Z2 has the functional capability of Z1. | ✅ Faithful | `homomorphic_image_functional_capability` ([Mbse/Homomorphism.lean:89](Mbse/Homomorphism.lean#L89)) |
+| `4.3/implication/consistent_simplification` | `implication` | If Z1 is a homomorphic image of Z2, then Z1 is a consistent simplification of Z2 and Z2 is a consistent elaboration of Z1. | ✅ Faithful | `homomorphic_image_consistent_simplification` ([Mbse/Homomorphism.lean:185](Mbse/Homomorphism.lean#L185)) |
+| `4.3/implication/functional_capability` | `implication` | If Z1 is a homomorphic image of Z2, then Z2 has the functional capability of Z1. | ✅ Faithful | `homomorphic_image_functional_capability` ([Mbse/Homomorphism.lean:173](Mbse/Homomorphism.lean#L173)) |
 
 ### `textbook/definition4.33` — System isomorphisms
 
@@ -544,8 +544,8 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.23/source/definition` | `definition` | Source Definition 5.23, lines 77–86. Corrected traceability decision: Correct `Nz2` to `NZ2`; reachable states are those attained from `S`; expose state closure, inherited input/readout/transition. | ✅ Faithful | `reachableModeSystem` ([Mbse/WymoreSystemModes.lean:283](Mbse/WymoreSystemModes.lean#L283)) |
-| `5.23/lean/reachableSystemMode` | `definition` | Lean anchor `reachableSystemMode` for this corrected reading. Status: corrected. | ✅ Faithful | `reachableModeSystem` ([Mbse/WymoreSystemModes.lean:283](Mbse/WymoreSystemModes.lean#L283)) |
+| `5.23/source/definition` | `definition` | Source Definition 5.23, lines 77–86. Corrected traceability decision: Correct `Nz2` to `NZ2`; reachable states are those attained from `S`; expose state closure, inherited input/readout/transition. | ✅ Faithful | `reachableModeSystem` ([Mbse/WymoreSystemModes.lean:294](Mbse/WymoreSystemModes.lean#L294)) |
+| `5.23/lean/reachableSystemMode` | `definition` | Lean anchor `reachableSystemMode` for this corrected reading. Status: corrected. | ✅ Faithful | `reachableModeSystem` ([Mbse/WymoreSystemModes.lean:294](Mbse/WymoreSystemModes.lean#L294)) |
 
 ### `textbook/definition5.26` — Definition 5.26
 
@@ -554,8 +554,8 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.26/source/definition` | `definition` | Source Definition 5.26, lines 90–94. Corrected traceability decision: Literal reading; “outside cannot enter” is a separate element. | ✅ Faithful | `IsIsolatedMode` ([Mbse/WymoreSystemModes.lean:328](Mbse/WymoreSystemModes.lean#L328)) |
-| `5.26/lean/SystemMode_IsIsolated` | `definition` | Lean anchor `SystemMode.IsIsolated` for this corrected reading. Status: exact; fidelity: faithful. | ✅ Faithful | `IsIsolatedMode` ([Mbse/WymoreSystemModes.lean:328](Mbse/WymoreSystemModes.lean#L328)) |
+| `5.26/source/definition` | `definition` | Source Definition 5.26, lines 90–94. Corrected traceability decision: Literal reading; “outside cannot enter” is a separate element. | ✅ Faithful | `IsIsolatedMode` ([Mbse/WymoreSystemModes.lean:339](Mbse/WymoreSystemModes.lean#L339)) |
+| `5.26/lean/SystemMode_IsIsolated` | `definition` | Lean anchor `SystemMode.IsIsolated` for this corrected reading. Status: exact; fidelity: faithful. | ✅ Faithful | `IsIsolatedMode` ([Mbse/WymoreSystemModes.lean:339](Mbse/WymoreSystemModes.lean#L339)) |
 
 ### `textbook/definition5.30` — Definition 5.30
 
@@ -564,9 +564,9 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.30/source/definition` | `definition` | Source Definition 5.30, lines 97–109. Corrected traceability decision: Correct “there exist s p'” to “there exists `p'`”; separate transient mode and transient state. Clause (v) is eventual exit, not inevitable exit. | ✅ Faithful | `IsTransientMode` ([Mbse/WymoreSystemModes.lean:336](Mbse/WymoreSystemModes.lean#L336)) |
-| `5.30/lean/SystemMode_IsTransient` | `definition` | Lean anchor `SystemMode.IsTransient` for this corrected reading. Status: corrected. | ✅ Faithful | `IsTransientMode` ([Mbse/WymoreSystemModes.lean:336](Mbse/WymoreSystemModes.lean#L336)) |
-| `5.30/lean/System_IsTransientState` | `definition` | Lean anchor `System.IsTransientState` for this corrected reading. Status: corrected. | ✅ Faithful | `IsTransientState` ([Mbse/WymoreSystemModes.lean:347](Mbse/WymoreSystemModes.lean#L347)) |
+| `5.30/source/definition` | `definition` | Source Definition 5.30, lines 97–109. Corrected traceability decision: Correct “there exist s p'” to “there exists `p'`”; separate transient mode and transient state. Clause (v) is eventual exit, not inevitable exit. | ✅ Faithful | `IsTransientMode` ([Mbse/WymoreSystemModes.lean:347](Mbse/WymoreSystemModes.lean#L347)) |
+| `5.30/lean/SystemMode_IsTransient` | `definition` | Lean anchor `SystemMode.IsTransient` for this corrected reading. Status: corrected. | ✅ Faithful | `IsTransientMode` ([Mbse/WymoreSystemModes.lean:347](Mbse/WymoreSystemModes.lean#L347)) |
+| `5.30/lean/System_IsTransientState` | `definition` | Lean anchor `System.IsTransientState` for this corrected reading. Status: corrected. | ✅ Faithful | `IsTransientState` ([Mbse/WymoreSystemModes.lean:358](Mbse/WymoreSystemModes.lean#L358)) |
 
 ### `textbook/definition5.34` — Definition 5.34
 
@@ -575,9 +575,9 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.34/source/definition` | `definition` | Source Definition 5.34, lines 113–117. Corrected traceability decision: Literal reading; note that the mode definition only gives primary, proper, and full input set, while closure follows from primary/restricted transition. | ✅ Faithful | `IsAbsorbingMode` ([Mbse/WymoreSystemModes.lean:309](Mbse/WymoreSystemModes.lean#L309)) |
-| `5.34/lean/SystemMode_IsAbsorbing` | `definition` | Lean anchor `SystemMode.IsAbsorbing` for this corrected reading. Status: corrected. | ✅ Faithful | `IsAbsorbingMode` ([Mbse/WymoreSystemModes.lean:309](Mbse/WymoreSystemModes.lean#L309)) |
-| `5.34/lean/System_IsAbsorbingState` | `definition` | Lean anchor `System.IsAbsorbingState` for this corrected reading. Status: corrected. | ✅ Faithful | `IsAbsorbingState` ([Mbse/WymoreSystemModes.lean:353](Mbse/WymoreSystemModes.lean#L353)) |
+| `5.34/source/definition` | `definition` | Source Definition 5.34, lines 113–117. Corrected traceability decision: Literal reading; note that the mode definition only gives primary, proper, and full input set, while closure follows from primary/restricted transition. | ✅ Faithful | `IsAbsorbingMode` ([Mbse/WymoreSystemModes.lean:320](Mbse/WymoreSystemModes.lean#L320)) |
+| `5.34/lean/SystemMode_IsAbsorbing` | `definition` | Lean anchor `SystemMode.IsAbsorbing` for this corrected reading. Status: corrected. | ✅ Faithful | `IsAbsorbingMode` ([Mbse/WymoreSystemModes.lean:320](Mbse/WymoreSystemModes.lean#L320)) |
+| `5.34/lean/System_IsAbsorbingState` | `definition` | Lean anchor `System.IsAbsorbingState` for this corrected reading. Status: corrected. | ✅ Faithful | `IsAbsorbingState` ([Mbse/WymoreSystemModes.lean:364](Mbse/WymoreSystemModes.lean#L364)) |
 
 ### `textbook/definition5.40` — Definition 5.40
 
@@ -618,9 +618,9 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.49/source/definition` | `definition` | Source Definition 5.49, lines 164–167. Corrected traceability decision: Interpret port projection pointwise; retain half-open interval so transition endpoint may change output. | ✅ Faithful | `HasConstantOutputOn` ([Mbse/WymoreSystemModes.lean:487](Mbse/WymoreSystemModes.lean#L487)) |
-| `5.49/lean/SystemMode_HasConstantOutputOn` | `definition` | Lean anchor `SystemMode.HasConstantOutputOn` for this corrected reading. Status: corrected. | ✅ Faithful | `HasConstantOutputOn` ([Mbse/WymoreSystemModes.lean:487](Mbse/WymoreSystemModes.lean#L487)) |
-| `5.49/lean/SystemMode_HasConstantOutput` | `definition` | Lean anchor `SystemMode.HasConstantOutput` for this corrected reading. Status: corrected. | ✅ Faithful | `HasConstantOutput` ([Mbse/WymoreSystemModes.lean:499](Mbse/WymoreSystemModes.lean#L499)) |
+| `5.49/source/definition` | `definition` | Source Definition 5.49, lines 164–167. Corrected traceability decision: Interpret port projection pointwise; retain half-open interval so transition endpoint may change output. | ✅ Faithful | `HasConstantOutputOn` ([Mbse/WymoreSystemModes.lean:498](Mbse/WymoreSystemModes.lean#L498)) |
+| `5.49/lean/SystemMode_HasConstantOutputOn` | `definition` | Lean anchor `SystemMode.HasConstantOutputOn` for this corrected reading. Status: corrected. | ✅ Faithful | `HasConstantOutputOn` ([Mbse/WymoreSystemModes.lean:498](Mbse/WymoreSystemModes.lean#L498)) |
+| `5.49/lean/SystemMode_HasConstantOutput` | `definition` | Lean anchor `SystemMode.HasConstantOutput` for this corrected reading. Status: corrected. | ✅ Faithful | `HasConstantOutput` ([Mbse/WymoreSystemModes.lean:510](Mbse/WymoreSystemModes.lean#L510)) |
 
 ### `textbook/definition5.57` — Definition 5.57
 
@@ -629,9 +629,9 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.57/source/definition` | `definition` | Source Definition 5.57, lines 180. Corrected traceability decision: Correct “if the system” to “of the system”; expose input/output constriction separately. | ✅ Faithful | `HasInputPortConstriction` ([Mbse/WymoreSystemModes.lean:516](Mbse/WymoreSystemModes.lean#L516)) |
-| `5.57/lean/SystemMode_ConstrictsInputs` | `definition` | Lean anchor `SystemMode.ConstrictsInputs` for this corrected reading. Status: qualified. | ✅ Faithful | `HasInputPortConstriction` ([Mbse/WymoreSystemModes.lean:516](Mbse/WymoreSystemModes.lean#L516)) |
-| `5.57/lean/SystemMode_ConstrictsOutputs` | `definition` | Lean anchor `SystemMode.ConstrictsOutputs` for this corrected reading. Status: qualified. | ✅ Faithful | `HasOutputPortConstriction` ([Mbse/WymoreSystemModes.lean:527](Mbse/WymoreSystemModes.lean#L527)) |
+| `5.57/source/definition` | `definition` | Source Definition 5.57, lines 180. Corrected traceability decision: Correct “if the system” to “of the system”; expose input/output constriction separately. | ✅ Faithful | `HasInputPortConstriction` ([Mbse/WymoreSystemModes.lean:527](Mbse/WymoreSystemModes.lean#L527)) |
+| `5.57/lean/SystemMode_ConstrictsInputs` | `definition` | Lean anchor `SystemMode.ConstrictsInputs` for this corrected reading. Status: qualified. | ✅ Faithful | `HasInputPortConstriction` ([Mbse/WymoreSystemModes.lean:527](Mbse/WymoreSystemModes.lean#L527)) |
+| `5.57/lean/SystemMode_ConstrictsOutputs` | `definition` | Lean anchor `SystemMode.ConstrictsOutputs` for this corrected reading. Status: qualified. | ✅ Faithful | `HasOutputPortConstriction` ([Mbse/WymoreSystemModes.lean:538](Mbse/WymoreSystemModes.lean#L538)) |
 
 ### `textbook/definition5.6` — Definition 5.6
 
@@ -652,9 +652,9 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.64/source/definition` | `definition` | Source Definition 5.64, lines 210–225. Corrected traceability decision: Correct range to positive times as required by 5.6; require state closure after each behavior segment; expose `SYSMO` constructor fields. | ✅ Faithful | `SysmoData` ([Mbse/WymoreSystemModes.lean:724](Mbse/WymoreSystemModes.lean#L724)) |
-| `5.64/lean/systemModeOfBehavior` | `definition` | Lean anchor `systemModeOfBehavior` for this corrected reading. Status: corrected. | ✅ Faithful | `SysmoData` ([Mbse/WymoreSystemModes.lean:724](Mbse/WymoreSystemModes.lean#L724)) |
-| `5.64/lean/sysmo` | `definition` | Lean anchor `sysmo` for this corrected reading. Status: corrected. | ✅ Faithful | `sysmoSystem` ([Mbse/WymoreSystemModes.lean:753](Mbse/WymoreSystemModes.lean#L753)) |
+| `5.64/source/definition` | `definition` | Source Definition 5.64, lines 210–225. Corrected traceability decision: Correct range to positive times as required by 5.6; require state closure after each behavior segment; expose `SYSMO` constructor fields. | ✅ Faithful | `SysmoData` ([Mbse/WymoreSystemModes.lean:735](Mbse/WymoreSystemModes.lean#L735)) |
+| `5.64/lean/systemModeOfBehavior` | `definition` | Lean anchor `systemModeOfBehavior` for this corrected reading. Status: corrected. | ✅ Faithful | `SysmoData` ([Mbse/WymoreSystemModes.lean:735](Mbse/WymoreSystemModes.lean#L735)) |
+| `5.64/lean/sysmo` | `definition` | Lean anchor `sysmo` for this corrected reading. Status: corrected. | ✅ Faithful | `sysmoSystem` ([Mbse/WymoreSystemModes.lean:764](Mbse/WymoreSystemModes.lean#L764)) |
 
 ### `textbook/definition5.71` — Definition 5.71
 
@@ -704,8 +704,8 @@
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
 | `5.89/source/definition` | `definition` | Source Definition 5.89, lines 252–267. Corrected traceability decision: Treat `HI^-1` as nonempty fibers and `CHI` as a choice function; correct `HI^-2` to preimage; define lifted behavior and restricted readout explicitly. | ✅ Faithful | `ModePreservesAutonomous` ([Mbse/WymoreImplementation.lean:130](Mbse/WymoreImplementation.lean#L130)) |
-| `5.89/lean/homomorphicInverseImageMode` | `definition` | Lean anchor `homomorphicInverseImageMode` for this corrected reading. Status: qualified. | ✅ Faithful | `ModePreservesAutonomous` ([Mbse/WymoreImplementation.lean:130](Mbse/WymoreImplementation.lean#L130))<br>`homomorphicInverseImageMode` ([Mbse/WymoreImplementation.lean:308](Mbse/WymoreImplementation.lean#L308)) |
-| `5.89/lean/hiisysmo` | `definition` | Lean anchor `hiisysmo` for this corrected reading. Status: qualified. | ✅ Faithful | `inverseImageSystemMode` ([Mbse/WymoreImplementation.lean:324](Mbse/WymoreImplementation.lean#L324)) |
+| `5.89/lean/homomorphicInverseImageMode` | `definition` | Lean anchor `homomorphicInverseImageMode` for this corrected reading. Status: qualified. | ✅ Faithful | `ModePreservesAutonomous` ([Mbse/WymoreImplementation.lean:130](Mbse/WymoreImplementation.lean#L130))<br>`homomorphicInverseImageMode` ([Mbse/WymoreImplementation.lean:311](Mbse/WymoreImplementation.lean#L311)) |
+| `5.89/lean/hiisysmo` | `definition` | Lean anchor `hiisysmo` for this corrected reading. Status: qualified. | ✅ Faithful | `inverseImageSystemMode` ([Mbse/WymoreImplementation.lean:327](Mbse/WymoreImplementation.lean#L327)) |
 
 ### `textbook/definition_a1.155` — Function Specification (FNS)
 
@@ -807,7 +807,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.76/lemma/coupling_function_projection` | `implication` | Component inputs and open/closed state trajectories align under `cfscr`. | ✅ Faithful | `coupling_function_projection_lemma` ([Mbse/WymoreCouplingDynamic.lean:519](Mbse/WymoreCouplingDynamic.lean#L519)) |
+| `3.76/lemma/coupling_function_projection` | `implication` | Component inputs and open/closed state trajectories align under `cfscr`. | ✅ Faithful | `coupling_function_projection_lemma` ([Mbse/WymoreCouplingDynamic.lean:518](Mbse/WymoreCouplingDynamic.lean#L518)) |
 
 ### `textbook/scholium3.73` — Coupling Function Characterization
 
@@ -816,8 +816,8 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.73/theorem/characterization` | `implication` | `cfscr` satisfies the coupling-function equations. | ✅ Faithful | `scholium_3_73_characterization` ([Mbse/WymoreCouplingDynamic.lean:391](Mbse/WymoreCouplingDynamic.lean#L391)) |
-| `3.73/theorem/uniqueness` | `implication` | Any solution `g` equals `cfscr`. | ✅ Faithful | `scholium_3_73_uniqueness` ([Mbse/WymoreCouplingDynamic.lean:420](Mbse/WymoreCouplingDynamic.lean#L420)) |
+| `3.73/theorem/characterization` | `implication` | `cfscr` satisfies the coupling-function equations. | ✅ Faithful | `scholium_3_73_characterization` ([Mbse/WymoreCouplingDynamic.lean:390](Mbse/WymoreCouplingDynamic.lean#L390)) |
+| `3.73/theorem/uniqueness` | `implication` | Any solution `g` equals `cfscr`. | ✅ Faithful | `scholium_3_73_uniqueness` ([Mbse/WymoreCouplingDynamic.lean:419](Mbse/WymoreCouplingDynamic.lean#L419)) |
 
 ### `textbook/theorem2.121` — State Trajectory as Composition
 
@@ -1036,10 +1036,10 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.62/theorem/rsy_parameterization` | `implication` | RSY is a system parameterization. | ✅ Faithful | `rsy_parameterization` ([Mbse/Wymore.lean:1195](Mbse/Wymore.lean#L1195)) |
-| `3.62/proof/dsystems` | `component` | The resultant system Z belongs to DSYSTEMS, verifying state, input, output, and transition/readout function conditions. | ✅ Faithful | `rsy_parameterization` ([Mbse/Wymore.lean:1195](Mbse/Wymore.lean#L1195))<br>`rsy_parameterization_membership` ([Mbse/Wymore.lean:1209](Mbse/Wymore.lean#L1209)) |
-| `3.62/proof/existence` | `component` | For every system coupling recipe SCR, there exists Z ∈ DSYSTEMS such that (SCR, Z) ∈ RSY. | ✅ Faithful | `rsy_parameterization` ([Mbse/Wymore.lean:1195](Mbse/Wymore.lean#L1195))<br>`rsy_parameterization_exists` ([Mbse/Wymore.lean:1217](Mbse/Wymore.lean#L1217)) |
-| `3.62/proof/uniqueness` | `component` | If (SCR, Z1) ∈ RSY and (SCR, Z2) ∈ RSY, then Z1 = Z2. | ✅ Faithful | `rsy_parameterization` ([Mbse/Wymore.lean:1195](Mbse/Wymore.lean#L1195))<br>`rsy_parameterization_unique` ([Mbse/Wymore.lean:1225](Mbse/Wymore.lean#L1225)) |
+| `3.62/theorem/rsy_parameterization` | `implication` | RSY is a system parameterization. | ✅ Faithful | `rsy_parameterization` ([Mbse/Wymore.lean:1204](Mbse/Wymore.lean#L1204)) |
+| `3.62/proof/dsystems` | `component` | The resultant system Z belongs to DSYSTEMS, verifying state, input, output, and transition/readout function conditions. | ✅ Faithful | `rsy_parameterization` ([Mbse/Wymore.lean:1204](Mbse/Wymore.lean#L1204))<br>`rsy_parameterization_membership` ([Mbse/Wymore.lean:1218](Mbse/Wymore.lean#L1218)) |
+| `3.62/proof/existence` | `component` | For every system coupling recipe SCR, there exists Z ∈ DSYSTEMS such that (SCR, Z) ∈ RSY. | ✅ Faithful | `rsy_parameterization` ([Mbse/Wymore.lean:1204](Mbse/Wymore.lean#L1204))<br>`rsy_parameterization_exists` ([Mbse/Wymore.lean:1226](Mbse/Wymore.lean#L1226)) |
+| `3.62/proof/uniqueness` | `component` | If (SCR, Z1) ∈ RSY and (SCR, Z2) ∈ RSY, then Z1 = Z2. | ✅ Faithful | `rsy_parameterization` ([Mbse/Wymore.lean:1204](Mbse/Wymore.lean#L1204))<br>`rsy_parameterization_unique` ([Mbse/Wymore.lean:1234](Mbse/Wymore.lean#L1234)) |
 
 ### `textbook/theorem3.64` — Open-Loop / Closed-Loop Feedback Reclosure
 
@@ -1048,10 +1048,10 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.64/theorem/open_loop_conjunctive_rsy` | `implication` | Z& is the resultant of the conjunctive coupling recipe (VSCR, ∅). | ✅ Faithful | `open_loop_is_conjunctive_rsy` ([Mbse/Wymore.lean:2026](Mbse/Wymore.lean#L2026)) |
-| `3.64/theorem/feedback_scr_pure` | `implication` | SCR$ is a pure feedback coupling recipe. | ✅ Faithful | `feedbackSCR_is_pure_feedback` ([Mbse/Wymore.lean:1951](Mbse/Wymore.lean#L1951)) |
-| `3.64/theorem/closed_loop_eq_feedback` | `implication` | Closed-loop equality Z@ = Z@$ on shared product state and external I/O (next-state and readout on unconnected ports). | ✅ Faithful | `closed_loop_eq_feedback_closed_loop` ([Mbse/Wymore.lean:2213](Mbse/Wymore.lean#L2213)) |
-| `3.64/theorem/open_loop_closed_loop` | `implication` | Theorem 3.64 for non-conjunctive recipes: conjunctive open-loop membership, pure feedback SCR$, and closed-loop equality. | ✅ Faithful | `open_loop_closed_loop_theorem` ([Mbse/Wymore.lean:2225](Mbse/Wymore.lean#L2225)) |
+| `3.64/theorem/open_loop_conjunctive_rsy` | `implication` | Z& is the resultant of the conjunctive coupling recipe (VSCR, ∅). | ✅ Faithful | `open_loop_is_conjunctive_rsy` ([Mbse/Wymore.lean:2035](Mbse/Wymore.lean#L2035)) |
+| `3.64/theorem/feedback_scr_pure` | `implication` | SCR$ is a pure feedback coupling recipe. | ✅ Faithful | `feedbackSCR_is_pure_feedback` ([Mbse/Wymore.lean:1960](Mbse/Wymore.lean#L1960)) |
+| `3.64/theorem/closed_loop_eq_feedback` | `implication` | Closed-loop equality Z@ = Z@$ on shared product state and external I/O (next-state and readout on unconnected ports). | ✅ Faithful | `closed_loop_eq_feedback_closed_loop` ([Mbse/Wymore.lean:2222](Mbse/Wymore.lean#L2222)) |
+| `3.64/theorem/open_loop_closed_loop` | `implication` | Theorem 3.64 for non-conjunctive recipes: conjunctive open-loop membership, pure feedback SCR$, and closed-loop equality. | ✅ Faithful | `open_loop_closed_loop_theorem` ([Mbse/Wymore.lean:2234](Mbse/Wymore.lean#L2234)) |
 
 ### `textbook/theorem3.71` — Coupling Function Existence
 
@@ -1060,8 +1060,8 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.71/theorem/coupling_function_exists` | `implication` | A coupling function exists for each closed-loop experiment. | ✅ Faithful | `coupling_function_exists` ([Mbse/WymoreCouplingDynamic.lean:439](Mbse/WymoreCouplingDynamic.lean#L439)) |
-| `3.71/theorem/coupling_function_in_FNS` | `implication` | The coupling-function map is total and single-valued (FNS). | ✅ Faithful | `coupling_function_in_FNS` ([Mbse/WymoreCouplingDynamic.lean:449](Mbse/WymoreCouplingDynamic.lean#L449)) |
+| `3.71/theorem/coupling_function_exists` | `implication` | A coupling function exists for each closed-loop experiment. | ✅ Faithful | `coupling_function_exists` ([Mbse/WymoreCouplingDynamic.lean:438](Mbse/WymoreCouplingDynamic.lean#L438)) |
+| `3.71/theorem/coupling_function_in_FNS` | `implication` | The coupling-function map is total and single-valued (FNS). | ✅ Faithful | `coupling_function_in_FNS` ([Mbse/WymoreCouplingDynamic.lean:448](Mbse/WymoreCouplingDynamic.lean#L448)) |
 
 ### `textbook/theorem3.75` — Coupling Function Translation
 
@@ -1070,7 +1070,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.75/theorem/cfscr_translate` | `implication` | `cfscr` commutes with time translation. | ✅ Faithful | `cfscr_translate` ([Mbse/WymoreCouplingDynamic.lean:474](Mbse/WymoreCouplingDynamic.lean#L474)) |
+| `3.75/theorem/cfscr_translate` | `implication` | `cfscr` commutes with time translation. | ✅ Faithful | `cfscr_translate` ([Mbse/WymoreCouplingDynamic.lean:473](Mbse/WymoreCouplingDynamic.lean#L473)) |
 
 ### `textbook/theorem3.78` — Second Open-Loop Closed-Loop Theorem
 
@@ -1079,7 +1079,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.78/theorem/second_open_loop_closed_loop` | `implication` | State and output trajectories match for `cfscr`. | ✅ Faithful | `second_open_loop_closed_loop_theorem` ([Mbse/WymoreCouplingDynamic.lean:560](Mbse/WymoreCouplingDynamic.lean#L560)) |
+| `3.78/theorem/second_open_loop_closed_loop` | `implication` | State and output trajectories match for `cfscr`. | ✅ Faithful | `second_open_loop_closed_loop_theorem` ([Mbse/WymoreCouplingDynamic.lean:559](Mbse/WymoreCouplingDynamic.lean#L559)) |
 
 ### `textbook/theorem3.80` — Resultant Behavior from Open Loop
 
@@ -1088,7 +1088,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.80/theorem/resultant_behavior_from_open_loop` | `implication` | Existence of open-loop `g` reproducing closed-loop state trajectories. | ✅ Faithful | `resultant_behavior_from_open_loop` ([Mbse/WymoreCouplingDynamic.lean:580](Mbse/WymoreCouplingDynamic.lean#L580)) |
+| `3.80/theorem/resultant_behavior_from_open_loop` | `implication` | Existence of open-loop `g` reproducing closed-loop state trajectories. | ✅ Faithful | `resultant_behavior_from_open_loop` ([Mbse/WymoreCouplingDynamic.lean:579](Mbse/WymoreCouplingDynamic.lean#L579)) |
 
 ### `textbook/theorem3.81` — Output Component Decomposition
 
@@ -1097,7 +1097,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.81/theorem/resultant_output_component_decomposition` | `implication` | Unconnected output ports follow component output trajectories. | ✅ Faithful | `resultant_output_component_decomposition` ([Mbse/WymoreCouplingDynamic.lean:595](Mbse/WymoreCouplingDynamic.lean#L595)) |
+| `3.81/theorem/resultant_output_component_decomposition` | `implication` | Unconnected output ports follow component output trajectories. | ✅ Faithful | `resultant_output_component_decomposition` ([Mbse/WymoreCouplingDynamic.lean:594](Mbse/WymoreCouplingDynamic.lean#L594)) |
 
 ### `textbook/theorem3.85` — Nonsingular Conjunctive Uniqueness
 
@@ -1134,7 +1134,7 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `4.13/theorem/himsy_parameterization` | `theorem` | HIMSY is a system parameterization. | ✅ Faithful | `HimsyParam` ([Mbse/Homomorphism.lean:406](Mbse/Homomorphism.lean#L406))<br>`himsy_parameterization` ([Mbse/Homomorphism.lean:423](Mbse/Homomorphism.lean#L423)) |
+| `4.13/theorem/himsy_parameterization` | `theorem` | HIMSY is a system parameterization. | ✅ Faithful | `HimsyParam` ([Mbse/Homomorphism.lean:490](Mbse/Homomorphism.lean#L490))<br>`himsy_parameterization` ([Mbse/Homomorphism.lean:507](Mbse/Homomorphism.lean#L507)) |
 
 ### `textbook/theorem4.15` — Fundamental Theorem of System Homomorphisms
 
@@ -1143,9 +1143,9 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `4.15/theorem/fundamental_iff` | `theorem` | Z1 = HIMSY(Z2, HS, HI, HO) if and only if {Z1, Z2} ⊆ DSYSTEMS and Z1 is a homomorphic image of Z2 with respect to HS, HI, and HO. | ✅ Faithful | `fundamental_theorem_homomorphism_iff` ([Mbse/Homomorphism.lean:249](Mbse/Homomorphism.lean#L249)) |
-| `4.15/proof/forward` | `component` | If Z1 = HIMSY(Z2, HS, HI, HO), then Z1 is a homomorphic image of Z2. | ✅ Faithful | `homomorphic_image_eq_himsy` ([Mbse/Homomorphism.lean:204](Mbse/Homomorphism.lean#L204)) |
-| `4.15/proof/reverse` | `component` | If Z1 is a homomorphic image of Z2 with respect to HS, HI, HO, then Z1 = HIMSY(Z2, HS, HI, HO). | ✅ Faithful | `himsy_is_homomorphic_image` ([Mbse/Homomorphism.lean:263](Mbse/Homomorphism.lean#L263)) |
+| `4.15/theorem/fundamental_iff` | `theorem` | Z1 = HIMSY(Z2, HS, HI, HO) if and only if {Z1, Z2} ⊆ DSYSTEMS and Z1 is a homomorphic image of Z2 with respect to HS, HI, and HO. | ✅ Faithful | `fundamental_theorem_homomorphism_iff` ([Mbse/Homomorphism.lean:333](Mbse/Homomorphism.lean#L333)) |
+| `4.15/proof/forward` | `component` | If Z1 = HIMSY(Z2, HS, HI, HO), then Z1 is a homomorphic image of Z2. | ✅ Faithful | `homomorphic_image_eq_himsy` ([Mbse/Homomorphism.lean:288](Mbse/Homomorphism.lean#L288)) |
+| `4.15/proof/reverse` | `component` | If Z1 is a homomorphic image of Z2 with respect to HS, HI, HO, then Z1 = HIMSY(Z2, HS, HI, HO). | ✅ Faithful | `himsy_is_homomorphic_image` ([Mbse/Homomorphism.lean:347](Mbse/Homomorphism.lean#L347)) |
 
 ### `textbook/theorem4.22` — Experiments on a system determine experiments on its homomorphisms
 
@@ -1197,18 +1197,18 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `4.56/definition/componentwise_elaboration` | `definition` | The hypotheses of Theorem 4.56 bundled: elaborated components over the same port skeleton, the port-preserving homomorphisms, and the matching condition on connected pairs. | ✅ Faithful | `ComponentwiseElaboration` ([Mbse/CouplingIsomorphism.lean:274](Mbse/CouplingIsomorphism.lean#L274)) |
-| `4.56/component/elaborated_components` | `component` | The components Z$1,...,Z$n of VSCR$. | ✅ Faithful | `ComponentwiseElaboration.Z` ([Mbse/CouplingIsomorphism.lean:291](Mbse/CouplingIsomorphism.lean#L291)) |
-| `4.56/component/component_homomorphism` | `component` | Zi = HIMSY(Z$i, HSi, HIi, HOi) for every i. | ✅ Faithful | `ComponentwiseElaboration.hom` ([Mbse/CouplingIsomorphism.lean:296](Mbse/CouplingIsomorphism.lean#L296)) |
-| `4.56/component/shis` | `component` | SHISi = {HIij}: HIi acts portwise on the input ports of Z$i. | ✅ Faithful | `ComponentwiseElaboration.inPorts` ([Mbse/CouplingIsomorphism.lean:298](Mbse/CouplingIsomorphism.lean#L298)) |
-| `4.56/component/shos` | `component` | SHOSi = {HOik}: HOi acts portwise on the output ports of Z$i. | ✅ Faithful | `ComponentwiseElaboration.outPorts` ([Mbse/CouplingIsomorphism.lean:300](Mbse/CouplingIsomorphism.lean#L300)) |
-| `4.56/requirement/matched_port_homomorphisms` | `component` | If (OiZ$j, IkZ$m) ∈ CSCR then HOji = HImk. | ✅ Faithful | `ComponentwiseElaboration.matched` ([Mbse/CouplingIsomorphism.lean:305](Mbse/CouplingIsomorphism.lean#L305)) |
-| `4.56/definition/elaborated_vector` | `definition` | VSCR$ = (Z$1,...,Z$n). | ✅ Faithful | `elabVector` ([Mbse/CouplingIsomorphism.lean:309](Mbse/CouplingIsomorphism.lean#L309)) |
-| `4.56/definition/elaborated_recipe` | `definition` | SCR$ = (VSCR$, CSCR$) with CSCR$ = CSCR. | ✅ Faithful | `elabRecipe` ([Mbse/CouplingIsomorphism.lean:320](Mbse/CouplingIsomorphism.lean#L320)) |
-| `4.56/theorem/uiscr_preserved` | `theorem` | UISCR$ = UISCR. | ✅ Faithful | `elabRecipe_uiscr` ([Mbse/CouplingIsomorphism.lean:333](Mbse/CouplingIsomorphism.lean#L333)) |
-| `4.56/theorem/uoscr_preserved` | `theorem` | UOSCR$ = UOSCR. | ✅ Faithful | `elabRecipe_uoscr` ([Mbse/CouplingIsomorphism.lean:337](Mbse/CouplingIsomorphism.lean#L337)) |
-| `4.56/proof/resultant_homomorphism` | `proof` | HS is the product of the HSi and HI, HO act portwise on the external ports; the matching condition makes the feedback wiring commute. | ✅ Faithful | `elabResultantWitness` ([Mbse/CouplingIsomorphism.lean:401](Mbse/CouplingIsomorphism.lean#L401)) |
-| `4.56/theorem/resultant_port_preserving_homomorphism` | `theorem` | RSY(SCR) is a port-preserving homomorphic image of RSY(SCR$). | ✅ Faithful | `thm4_56_resultant_homomorphic_image` ([Mbse/CouplingIsomorphism.lean:457](Mbse/CouplingIsomorphism.lean#L457))<br>`thm4_56_resultant_homomorphic_image` ([Mbse/TextbookExercises/Ch04.lean:367](Mbse/TextbookExercises/Ch04.lean#L367)) |
+| `4.56/definition/componentwise_elaboration` | `definition` | The hypotheses of Theorem 4.56 bundled: elaborated components over the same port skeleton, the port-preserving homomorphisms, and the matching condition on connected pairs. | ✅ Faithful | `ComponentwiseElaboration` ([Mbse/CouplingIsomorphism.lean:237](Mbse/CouplingIsomorphism.lean#L237)) |
+| `4.56/component/elaborated_components` | `component` | The components Z$1,...,Z$n of VSCR$. | ✅ Faithful | `ComponentwiseElaboration.Z` ([Mbse/CouplingIsomorphism.lean:254](Mbse/CouplingIsomorphism.lean#L254)) |
+| `4.56/component/component_homomorphism` | `component` | Zi = HIMSY(Z$i, HSi, HIi, HOi) for every i. | ✅ Faithful | `ComponentwiseElaboration.hom` ([Mbse/CouplingIsomorphism.lean:259](Mbse/CouplingIsomorphism.lean#L259)) |
+| `4.56/component/shis` | `component` | SHISi = {HIij}: HIi acts portwise on the input ports of Z$i. | ✅ Faithful | `ComponentwiseElaboration.inPorts` ([Mbse/CouplingIsomorphism.lean:261](Mbse/CouplingIsomorphism.lean#L261)) |
+| `4.56/component/shos` | `component` | SHOSi = {HOik}: HOi acts portwise on the output ports of Z$i. | ✅ Faithful | `ComponentwiseElaboration.outPorts` ([Mbse/CouplingIsomorphism.lean:263](Mbse/CouplingIsomorphism.lean#L263)) |
+| `4.56/requirement/matched_port_homomorphisms` | `component` | If (OiZ$j, IkZ$m) ∈ CSCR then HOji = HImk. | ✅ Faithful | `ComponentwiseElaboration.matched` ([Mbse/CouplingIsomorphism.lean:268](Mbse/CouplingIsomorphism.lean#L268)) |
+| `4.56/definition/elaborated_vector` | `definition` | VSCR$ = (Z$1,...,Z$n). | ✅ Faithful | `elabVector` ([Mbse/CouplingIsomorphism.lean:272](Mbse/CouplingIsomorphism.lean#L272)) |
+| `4.56/definition/elaborated_recipe` | `definition` | SCR$ = (VSCR$, CSCR$) with CSCR$ = CSCR. | ✅ Faithful | `elabRecipe` ([Mbse/CouplingIsomorphism.lean:283](Mbse/CouplingIsomorphism.lean#L283)) |
+| `4.56/theorem/uiscr_preserved` | `theorem` | UISCR$ = UISCR. | ✅ Faithful | `elabRecipe_uiscr` ([Mbse/CouplingIsomorphism.lean:296](Mbse/CouplingIsomorphism.lean#L296)) |
+| `4.56/theorem/uoscr_preserved` | `theorem` | UOSCR$ = UOSCR. | ✅ Faithful | `elabRecipe_uoscr` ([Mbse/CouplingIsomorphism.lean:300](Mbse/CouplingIsomorphism.lean#L300)) |
+| `4.56/proof/resultant_homomorphism` | `proof` | HS is the product of the HSi and HI, HO act portwise on the external ports; the matching condition makes the feedback wiring commute. | ✅ Faithful | `elabResultantWitness` ([Mbse/CouplingIsomorphism.lean:331](Mbse/CouplingIsomorphism.lean#L331)) |
+| `4.56/theorem/resultant_port_preserving_homomorphism` | `theorem` | RSY(SCR) is a port-preserving homomorphic image of RSY(SCR$). | ✅ Faithful | `thm4_56_resultant_homomorphic_image` ([Mbse/CouplingIsomorphism.lean:387](Mbse/CouplingIsomorphism.lean#L387))<br>`thm4_56_resultant_homomorphic_image` ([Mbse/TextbookExercises/Ch04.lean:367](Mbse/TextbookExercises/Ch04.lean#L367)) |
 
 ### `textbook/theorem4.58` — Replacing an output port by an equivalent set yields a copy
 
@@ -1230,12 +1230,12 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `4.8/theorem/csy_component_homomorphic` | `theorem` | If SCR is a conjunctive system coupling recipe, Z& = CSY(VSCR), and Z$ ∈ VSCR, then Z$ is a homomorphic image of Z& with respect to PJN(SZ$), PJN(IPZ$), and PJN(OPZ$). | ✅ Faithful | `csy_component_homomorphic_image` ([Mbse/Homomorphism.lean:356](Mbse/Homomorphism.lean#L356)) |
-| `4.8/proof/state_homomorphism` | `component` | HS = PJN(SZ$) ∈ FNS(SZ&, ONTO, SZ$) by theorem A1.176. | ✅ Faithful | `csy_state_proj` ([Mbse/Homomorphism.lean:290](Mbse/Homomorphism.lean#L290)) |
-| `4.8/proof/input_homomorphism` | `component` | HI = PJN(IPZ$) ∈ FNS(IZ&, ONTO, IZ$) by theorem A1.176. | ✅ Faithful | `csy_input_proj` ([Mbse/Homomorphism.lean:295](Mbse/Homomorphism.lean#L295)) |
-| `4.8/proof/output_homomorphism` | `component` | HO = PJN(OPZ$) ∈ FNS(OZ&, ONTO, OZ$) by theorem A1.176. | ✅ Faithful | `csy_output_proj` ([Mbse/Homomorphism.lean:301](Mbse/Homomorphism.lean#L301)) |
-| `4.8/proof/next_state_consistency` | `component` | Next-state consistency follows from the CSY definition at 3.40. | ✅ Faithful | `csy_component_homomorphic_image` ([Mbse/Homomorphism.lean:356](Mbse/Homomorphism.lean#L356)) |
-| `4.8/proof/readout_consistency` | `component` | Readout consistency follows from the CSY definition at 3.40. | ✅ Faithful | `csy_component_homomorphic_image` ([Mbse/Homomorphism.lean:356](Mbse/Homomorphism.lean#L356)) |
+| `4.8/theorem/csy_component_homomorphic` | `theorem` | If SCR is a conjunctive system coupling recipe, Z& = CSY(VSCR), and Z$ ∈ VSCR, then Z$ is a homomorphic image of Z& with respect to PJN(SZ$), PJN(IPZ$), and PJN(OPZ$). | ✅ Faithful | `csy_component_homomorphic_image` ([Mbse/Homomorphism.lean:440](Mbse/Homomorphism.lean#L440)) |
+| `4.8/proof/state_homomorphism` | `component` | HS = PJN(SZ$) ∈ FNS(SZ&, ONTO, SZ$) by theorem A1.176. | ✅ Faithful | `csy_state_proj` ([Mbse/Homomorphism.lean:374](Mbse/Homomorphism.lean#L374)) |
+| `4.8/proof/input_homomorphism` | `component` | HI = PJN(IPZ$) ∈ FNS(IZ&, ONTO, IZ$) by theorem A1.176. | ✅ Faithful | `csy_input_proj` ([Mbse/Homomorphism.lean:379](Mbse/Homomorphism.lean#L379)) |
+| `4.8/proof/output_homomorphism` | `component` | HO = PJN(OPZ$) ∈ FNS(OZ&, ONTO, OZ$) by theorem A1.176. | ✅ Faithful | `csy_output_proj` ([Mbse/Homomorphism.lean:385](Mbse/Homomorphism.lean#L385)) |
+| `4.8/proof/next_state_consistency` | `component` | Next-state consistency follows from the CSY definition at 3.40. | ✅ Faithful | `csy_component_homomorphic_image` ([Mbse/Homomorphism.lean:440](Mbse/Homomorphism.lean#L440)) |
+| `4.8/proof/readout_consistency` | `component` | Readout consistency follows from the CSY definition at 3.40. | ✅ Faithful | `csy_component_homomorphic_image` ([Mbse/Homomorphism.lean:440](Mbse/Homomorphism.lean#L440)) |
 
 ### `textbook/theorem5.119` — Theorem 5.119
 
@@ -1244,8 +1244,8 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.119/source/theorem` | `theorem` | Theorem 5.119, composed from hologenicity and the resultant homomorphism theorem. | ✅ Faithful | `resultant_implements_of_componentwise` ([Mbse/WymoreModeCoupling.lean:1008](Mbse/WymoreModeCoupling.lean#L1008)) |
-| `5.119/lean/resultant_implements_of_componentwise` | `theorem` | Component implementations and hologenicity lift to an implementation of the resultants. | ✅ Faithful | `resultant_implements_of_componentwise` ([Mbse/WymoreModeCoupling.lean:1008](Mbse/WymoreModeCoupling.lean#L1008)) |
+| `5.119/source/theorem` | `theorem` | Theorem 5.119, composed from hologenicity and the resultant homomorphism theorem. | ✅ Faithful | `resultant_implements_of_componentwise` ([Mbse/WymoreModeCoupling.lean:932](Mbse/WymoreModeCoupling.lean#L932)) |
+| `5.119/lean/resultant_implements_of_componentwise` | `theorem` | Component implementations and hologenicity lift to an implementation of the resultants. | ✅ Faithful | `resultant_implements_of_componentwise` ([Mbse/WymoreModeCoupling.lean:932](Mbse/WymoreModeCoupling.lean#L932)) |
 
 ### `textbook/theorem5.134` — Theorem 5.134
 
@@ -1254,9 +1254,9 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.134/source/theorem` | `theorem` | Theorem 5.134, derived by simultaneous induction on resolved component inputs. | ✅ Faithful | `hologenic_of_constant_input_output_time` ([Mbse/WymoreModeCoupling.lean:684](Mbse/WymoreModeCoupling.lean#L684)) |
-| `5.134/lean/hologenic_of_constant_input_output_time` | `theorem` | The resultant of constant-input, constant-output, constant-time component modes is hologenic. | ✅ Faithful | `hologenic_of_constant_input_output_time` ([Mbse/WymoreModeCoupling.lean:684](Mbse/WymoreModeCoupling.lean#L684)) |
-| `5.134/proof/resolved_input` | `theorem` | Under the constant external input, the coupling function resolves each component input to that component's constant mode input on the half-open interval before d. | ✅ Faithful | `resolved_input_constant` ([Mbse/WymoreModeCoupling.lean:428](Mbse/WymoreModeCoupling.lean#L428)) |
+| `5.134/source/theorem` | `theorem` | Theorem 5.134, derived by simultaneous induction on resolved component inputs. | ✅ Faithful | `hologenic_of_constant_input_output_time` ([Mbse/WymoreModeCoupling.lean:665](Mbse/WymoreModeCoupling.lean#L665)) |
+| `5.134/lean/hologenic_of_constant_input_output_time` | `theorem` | The resultant of constant-input, constant-output, constant-time component modes is hologenic. | ✅ Faithful | `hologenic_of_constant_input_output_time` ([Mbse/WymoreModeCoupling.lean:665](Mbse/WymoreModeCoupling.lean#L665)) |
+| `5.134/proof/resolved_input` | `theorem` | Under the constant external input, the coupling function resolves each component input to that component's constant mode input on the half-open interval before d. | ✅ Faithful | `resolved_input_constant` ([Mbse/WymoreModeCoupling.lean:402](Mbse/WymoreModeCoupling.lean#L402)) |
 
 ### `textbook/theorem5.138` — Theorem 5.138
 
@@ -1265,8 +1265,8 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.138/source/theorem` | `theorem` | Theorem 5.138, derived from the time-zero port calculation and component inevitability. | ✅ Faithful | `hologenic_of_inevitable_constantTime` ([Mbse/WymoreModeCoupling.lean:964](Mbse/WymoreModeCoupling.lean#L964)) |
-| `5.138/lean/hologenic_of_inevitable_constantTime` | `theorem` | Inevitable constant-time component modes induce an inevitable resultant mode of the same duration. | ✅ Faithful | `hologenic_of_inevitable_constantTime` ([Mbse/WymoreModeCoupling.lean:964](Mbse/WymoreModeCoupling.lean#L964)) |
+| `5.138/source/theorem` | `theorem` | Theorem 5.138, derived from the time-zero port calculation and component inevitability. | ✅ Faithful | `hologenic_of_inevitable_constantTime` ([Mbse/WymoreModeCoupling.lean:899](Mbse/WymoreModeCoupling.lean#L899)) |
+| `5.138/lean/hologenic_of_inevitable_constantTime` | `theorem` | Inevitable constant-time component modes induce an inevitable resultant mode of the same duration. | ✅ Faithful | `hologenic_of_inevitable_constantTime` ([Mbse/WymoreModeCoupling.lean:899](Mbse/WymoreModeCoupling.lean#L899)) |
 
 ### `textbook/theorem5.139` — Open question 5.139
 
@@ -1275,9 +1275,9 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.139/source/open_question` | `open_question` | Research question remains open. Probed: empty CSCR, duration one, source-only output; 5.138 already weakens under inevitability. Blocked: cascade-only, unequal durations, drop constant input without inevitability. | ⚠️ Stub/Partial | `chapter5_openQuestion_5_139` ([Mbse/WymoreModeCoupling.lean:1046](Mbse/WymoreModeCoupling.lean#L1046)) _(partial)_ |
-| `5.139/lean/chapter5_openQuestion_5_139` | `open_question` | Documentation marker plus recorded probes. | ⚠️ Stub/Partial | `chapter5_openQuestion_5_139` ([Mbse/WymoreModeCoupling.lean:1046](Mbse/WymoreModeCoupling.lean#L1046)) _(partial)_ |
-| `5.139/policy/remains_open` | `open_question` | Policy: remain open; do not invent axioms. | ⚠️ Stub/Partial | `chapter5_openQuestion_5_139` ([Mbse/WymoreModeCoupling.lean:1046](Mbse/WymoreModeCoupling.lean#L1046)) _(partial)_ |
+| `5.139/source/open_question` | `open_question` | Research question remains open. Probed: empty CSCR, duration one, source-only output; 5.138 already weakens under inevitability. Blocked: cascade-only, unequal durations, drop constant input without inevitability. | ⚠️ Stub/Partial | `chapter5_openQuestion_5_139` ([Mbse/WymoreModeCoupling.lean:970](Mbse/WymoreModeCoupling.lean#L970)) _(partial)_ |
+| `5.139/lean/chapter5_openQuestion_5_139` | `open_question` | Documentation marker plus recorded probes. | ⚠️ Stub/Partial | `chapter5_openQuestion_5_139` ([Mbse/WymoreModeCoupling.lean:970](Mbse/WymoreModeCoupling.lean#L970)) _(partial)_ |
+| `5.139/policy/remains_open` | `open_question` | Policy: remain open; do not invent axioms. | ⚠️ Stub/Partial | `chapter5_openQuestion_5_139` ([Mbse/WymoreModeCoupling.lean:970](Mbse/WymoreModeCoupling.lean#L970)) _(partial)_ |
 
 ### `textbook/theorem5.20` — Theorem 5.20
 
@@ -1287,7 +1287,7 @@
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
 | `5.20/source/theorem` | `theorem` | Source Theorem 5.20, lines 66–73. Corrected traceability decision: Read `NZ1 ⊆ NZ2` as agreement/restriction on the smaller domain. Implemented as a necessary direction plus a corrected existential converse. | ✅ Faithful | `primary_preserves_transition` ([Mbse/WymoreSystemModes.lean:170](Mbse/WymoreSystemModes.lean#L170)) |
-| `5.20/lean/primary_iff_componentwise_subset` | `theorem` | Lean anchor `primary_iff_componentwise_subset` for this corrected reading. Status: corrected. | ✅ Faithful | `primary_preserves_transition` ([Mbse/WymoreSystemModes.lean:170](Mbse/WymoreSystemModes.lean#L170))<br>`primaryModeOfMaps` ([Mbse/WymoreSystemModes.lean:224](Mbse/WymoreSystemModes.lean#L224)) |
+| `5.20/lean/primary_iff_componentwise_subset` | `theorem` | Lean anchor `primary_iff_componentwise_subset` for this corrected reading. Status: corrected. | ✅ Faithful | `primary_preserves_transition` ([Mbse/WymoreSystemModes.lean:170](Mbse/WymoreSystemModes.lean#L170))<br>`primaryModeOfMaps` ([Mbse/WymoreSystemModes.lean:246](Mbse/WymoreSystemModes.lean#L246)) |
 
 ### `textbook/theorem5.36` — Statement 5.36
 
@@ -1296,8 +1296,8 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.36/source/statement` | `statement` | Informal prose, not a theorem. The related fact that one mode is not both transient and absorbing is proved separately. | ⚠️ Stub/Partial | `transient_not_absorbing` ([Mbse/WymoreSystemModes.lean:358](Mbse/WymoreSystemModes.lean#L358)) _(partial)_ |
-| `5.36/lean/transient_not_absorbing` | `theorem` | One mode cannot be both transient and absorbing. This is not a counterexample to Statement 5.36. | ⚠️ Stub/Partial | `transient_not_absorbing` ([Mbse/WymoreSystemModes.lean:358](Mbse/WymoreSystemModes.lean#L358)) _(partial)_ |
+| `5.36/source/statement` | `statement` | Informal prose, not a theorem. The related fact that one mode is not both transient and absorbing is proved separately. | ⚠️ Stub/Partial | `transient_not_absorbing` ([Mbse/WymoreSystemModes.lean:369](Mbse/WymoreSystemModes.lean#L369)) _(partial)_ |
+| `5.36/lean/transient_not_absorbing` | `theorem` | One mode cannot be both transient and absorbing. This is not a counterexample to Statement 5.36. | ⚠️ Stub/Partial | `transient_not_absorbing` ([Mbse/WymoreSystemModes.lean:369](Mbse/WymoreSystemModes.lean#L369)) _(partial)_ |
 
 ### `textbook/theorem5.37` — Statement 5.37
 
@@ -1306,8 +1306,8 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.37/source/statement` | `statement` | Source Statement 5.37, lines 123. Corrected traceability decision: Formalize the defensible claim: a proper reachable mode generated by nonempty `S` is absorbing, using reachability closure and inherited full inputs. | ✅ Faithful | `proper_reachableMode_absorbing` ([Mbse/WymoreSystemModes.lean:315](Mbse/WymoreSystemModes.lean#L315)) |
-| `5.37/lean/reachableSystemMode_isAbsorbing` | `theorem` | Lean anchor `reachableSystemMode_isAbsorbing` for this corrected reading. Status: corrected. | ✅ Faithful | `proper_reachableMode_absorbing` ([Mbse/WymoreSystemModes.lean:315](Mbse/WymoreSystemModes.lean#L315)) |
+| `5.37/source/statement` | `statement` | Source Statement 5.37, lines 123. Corrected traceability decision: Formalize the defensible claim: a proper reachable mode generated by nonempty `S` is absorbing, using reachability closure and inherited full inputs. | ✅ Faithful | `proper_reachableMode_absorbing` ([Mbse/WymoreSystemModes.lean:326](Mbse/WymoreSystemModes.lean#L326)) |
+| `5.37/lean/reachableSystemMode_isAbsorbing` | `theorem` | Lean anchor `reachableSystemMode_isAbsorbing` for this corrected reading. Status: corrected. | ✅ Faithful | `proper_reachableMode_absorbing` ([Mbse/WymoreSystemModes.lean:326](Mbse/WymoreSystemModes.lean#L326)) |
 
 ### `textbook/theorem5.44` — Theorem 5.44
 
@@ -1316,8 +1316,8 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.44/source/theorem` | `theorem` | Source Theorem 5.44, lines 135–143. Corrected traceability decision: Correct malformed timing hypothesis to `(k+1)*d ≤ t`; use `k` as a nonnegative mode-step index; constant input on `[k*d,(k+1)*d)`. | ✅ Faithful | `manifestation_next_of_constant` ([Mbse/WymoreSystemModes.lean:377](Mbse/WymoreSystemModes.lean#L377)) |
-| `5.44/lean/manifest_next_of_constant_input_time` | `theorem` | Lean anchor `manifest_next_of_constant_input_time` for this corrected reading. Status: corrected. | ✅ Faithful | `manifestation_next_of_constant` ([Mbse/WymoreSystemModes.lean:377](Mbse/WymoreSystemModes.lean#L377)) |
+| `5.44/source/theorem` | `theorem` | Source Theorem 5.44, lines 135–143. Corrected traceability decision: Correct malformed timing hypothesis to `(k+1)*d ≤ t`; use `k` as a nonnegative mode-step index; constant input on `[k*d,(k+1)*d)`. | ✅ Faithful | `manifestation_next_of_constant` ([Mbse/WymoreSystemModes.lean:388](Mbse/WymoreSystemModes.lean#L388)) |
+| `5.44/lean/manifest_next_of_constant_input_time` | `theorem` | Lean anchor `manifest_next_of_constant_input_time` for this corrected reading. Status: corrected. | ✅ Faithful | `manifestation_next_of_constant` ([Mbse/WymoreSystemModes.lean:388](Mbse/WymoreSystemModes.lean#L388)) |
 
 ### `textbook/theorem5.47` — Theorem 5.47
 
@@ -1326,9 +1326,9 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.47/source/theorem` | `theorem` | Source Theorem 5.47, lines 154–159. Corrected traceability decision: Correct “and every Z2 is in Z1” to “and Z2 is in Z1 at every `r`”; use the duration attached to the manifested state/input and require the endpoint to be within the experiment. | ✅ Faithful | `inevitable_next_manifestation_total` ([Mbse/WymoreSystemModes.lean:411](Mbse/WymoreSystemModes.lean#L411)) |
-| `5.47/lean/manifest_at_behavior_deadline` | `theorem` | Lean anchor `manifest_at_behavior_deadline` for this corrected reading. Status: qualified. | ✅ Faithful | `inevitable_next_manifestation_total` ([Mbse/WymoreSystemModes.lean:411](Mbse/WymoreSystemModes.lean#L411)) |
-| `5.47/lean/inMode_until_behavior_deadline` | `theorem` | Lean anchor `inMode_until_behavior_deadline` for this corrected reading. Status: qualified. | ✅ Faithful | `inevitable_inMode_interval` ([Mbse/WymoreSystemModes.lean:429](Mbse/WymoreSystemModes.lean#L429)) |
+| `5.47/source/theorem` | `theorem` | Source Theorem 5.47, lines 154–159. Corrected traceability decision: Correct “and every Z2 is in Z1” to “and Z2 is in Z1 at every `r`”; use the duration attached to the manifested state/input and require the endpoint to be within the experiment. | ✅ Faithful | `inevitable_next_manifestation_total` ([Mbse/WymoreSystemModes.lean:422](Mbse/WymoreSystemModes.lean#L422)) |
+| `5.47/lean/manifest_at_behavior_deadline` | `theorem` | Lean anchor `manifest_at_behavior_deadline` for this corrected reading. Status: qualified. | ✅ Faithful | `inevitable_next_manifestation_total` ([Mbse/WymoreSystemModes.lean:422](Mbse/WymoreSystemModes.lean#L422)) |
+| `5.47/lean/inMode_until_behavior_deadline` | `theorem` | Lean anchor `inMode_until_behavior_deadline` for this corrected reading. Status: qualified. | ✅ Faithful | `inevitable_inMode_interval` ([Mbse/WymoreSystemModes.lean:440](Mbse/WymoreSystemModes.lean#L440)) |
 
 ### `textbook/theorem5.48` — Statement 5.48
 
@@ -1337,9 +1337,9 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.48/source/statement` | `statement` | Source Statement 5.48, lines 162. Corrected traceability decision: Preserve existential reading (“may be infinitely many”), not a universal infinitude claim; formalize non-uniqueness and an infinite-family example. | ✅ Faithful | `stutterModeAt` ([Mbse/WymoreSystemModes.lean:458](Mbse/WymoreSystemModes.lean#L458)) |
-| `5.48/lean/behaviorFunction_not_unique_example` | `theorem` | Lean anchor `behaviorFunction_not_unique_example` for this corrected reading. Status: corrected. | ✅ Faithful | `stutterModeAt` ([Mbse/WymoreSystemModes.lean:458](Mbse/WymoreSystemModes.lean#L458)) |
-| `5.48/lean/behaviorFunction_infinite_family_example` | `theorem` | Lean anchor `behaviorFunction_infinite_family_example` for this corrected reading. Status: corrected. | ✅ Faithful | `stutterModeAt_injective` ([Mbse/WymoreSystemModes.lean:477](Mbse/WymoreSystemModes.lean#L477)) |
+| `5.48/source/statement` | `statement` | Source Statement 5.48, lines 162. Corrected traceability decision: Preserve existential reading (“may be infinitely many”), not a universal infinitude claim; formalize non-uniqueness and an infinite-family example. | ✅ Faithful | `stutterModeAt` ([Mbse/WymoreSystemModes.lean:469](Mbse/WymoreSystemModes.lean#L469)) |
+| `5.48/lean/behaviorFunction_not_unique_example` | `theorem` | Lean anchor `behaviorFunction_not_unique_example` for this corrected reading. Status: corrected. | ✅ Faithful | `stutterModeAt` ([Mbse/WymoreSystemModes.lean:469](Mbse/WymoreSystemModes.lean#L469)) |
+| `5.48/lean/behaviorFunction_infinite_family_example` | `theorem` | Lean anchor `behaviorFunction_infinite_family_example` for this corrected reading. Status: corrected. | ✅ Faithful | `stutterModeAt_injective` ([Mbse/WymoreSystemModes.lean:488](Mbse/WymoreSystemModes.lean#L488)) |
 
 ### `textbook/theorem5.54` — Theorem 5.54
 
@@ -1348,10 +1348,10 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.54/source/theorem` | `theorem` | Theorem 5.54 and paragraph 5.55: unequal finite port-index sets are not equivalent. | ✅ Faithful | `theorem5_54_fin2_not_equiv_fin3` ([Mbse/WymoreSystemModes.lean:561](Mbse/WymoreSystemModes.lean#L561)) |
-| `5.54/lean/systemMode_inputPort_card` | `theorem` | There is no equivalence Fin 2 ≃ Fin 3. | ✅ Faithful | `theorem5_54_fin2_not_equiv_fin3` ([Mbse/WymoreSystemModes.lean:561](Mbse/WymoreSystemModes.lean#L561)) |
-| `5.54/lean/systemMode_outputPort_card` | `theorem` | The same port-index obstruction applies to output ports. | ✅ Faithful | `theorem5_54_fin2_not_equiv_fin3` ([Mbse/WymoreSystemModes.lean:561](Mbse/WymoreSystemModes.lean#L561)) |
-| `5.54/lean/systemMode_port_subset` | `theorem` | Paragraph 5.59: equal port counts mean PreservesPorts along the identity equivalence. | ✅ Faithful | `paragraph5_59_portwise` ([Mbse/WymoreSystemModes.lean:575](Mbse/WymoreSystemModes.lean#L575)) |
+| `5.54/source/theorem` | `theorem` | Theorem 5.54 and paragraph 5.55: unequal finite port-index sets are not equivalent. | ✅ Faithful | `theorem5_54_fin2_not_equiv_fin3` ([Mbse/WymoreSystemModes.lean:572](Mbse/WymoreSystemModes.lean#L572)) |
+| `5.54/lean/systemMode_inputPort_card` | `theorem` | There is no equivalence Fin 2 ≃ Fin 3. | ✅ Faithful | `theorem5_54_fin2_not_equiv_fin3` ([Mbse/WymoreSystemModes.lean:572](Mbse/WymoreSystemModes.lean#L572)) |
+| `5.54/lean/systemMode_outputPort_card` | `theorem` | The same port-index obstruction applies to output ports. | ✅ Faithful | `theorem5_54_fin2_not_equiv_fin3` ([Mbse/WymoreSystemModes.lean:572](Mbse/WymoreSystemModes.lean#L572)) |
+| `5.54/lean/systemMode_port_subset` | `theorem` | Paragraph 5.59: equal port counts mean PreservesPorts along the identity equivalence. | ✅ Faithful | `paragraph5_59_portwise` ([Mbse/WymoreSystemModes.lean:586](Mbse/WymoreSystemModes.lean#L586)) |
 
 ### `textbook/theorem5.61` — Theorem 5.61
 
@@ -1360,10 +1360,10 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.61/source/theorem` | `theorem` | Source Theorem 5.61, lines 184–191. Corrected traceability decision: Repair `K/k` and the malformed set comprehension: `f2` is the block-stuttering lift of `f1`, constant on each length-`d` block. State/output equalities are at `t2=d*t1`. | ✅ Faithful | `expandConstantInput` ([Mbse/WymoreSystemModes.lean:655](Mbse/WymoreSystemModes.lean#L655)) |
-| `5.61/lean/liftExperiment_constantInputTime` | `theorem` | Lean anchor `liftExperiment_constantInputTime` for this corrected reading. Status: corrected. | ✅ Faithful | `expandConstantInput` ([Mbse/WymoreSystemModes.lean:655](Mbse/WymoreSystemModes.lean#L655)) |
-| `5.61/lean/liftExperiment_constantInputTime_state` | `theorem` | Lean anchor `liftExperiment_constantInputTime_state` for this corrected reading. Status: corrected. | ✅ Faithful | `constant_compiled_state` ([Mbse/WymoreSystemModes.lean:664](Mbse/WymoreSystemModes.lean#L664)) |
-| `5.61/lean/liftExperiment_constantInputTime_output` | `theorem` | Lean anchor `liftExperiment_constantInputTime_output` for this corrected reading. Status: corrected. | ✅ Faithful | `constant_compiled_output` ([Mbse/WymoreSystemModes.lean:710](Mbse/WymoreSystemModes.lean#L710)) |
+| `5.61/source/theorem` | `theorem` | Source Theorem 5.61, lines 184–191. Corrected traceability decision: Repair `K/k` and the malformed set comprehension: `f2` is the block-stuttering lift of `f1`, constant on each length-`d` block. State/output equalities are at `t2=d*t1`. | ✅ Faithful | `expandConstantInput` ([Mbse/WymoreSystemModes.lean:666](Mbse/WymoreSystemModes.lean#L666)) |
+| `5.61/lean/liftExperiment_constantInputTime` | `theorem` | Lean anchor `liftExperiment_constantInputTime` for this corrected reading. Status: corrected. | ✅ Faithful | `expandConstantInput` ([Mbse/WymoreSystemModes.lean:666](Mbse/WymoreSystemModes.lean#L666)) |
+| `5.61/lean/liftExperiment_constantInputTime_state` | `theorem` | Lean anchor `liftExperiment_constantInputTime_state` for this corrected reading. Status: corrected. | ✅ Faithful | `constant_compiled_state` ([Mbse/WymoreSystemModes.lean:675](Mbse/WymoreSystemModes.lean#L675)) |
+| `5.61/lean/liftExperiment_constantInputTime_output` | `theorem` | Lean anchor `liftExperiment_constantInputTime_output` for this corrected reading. Status: corrected. | ✅ Faithful | `constant_compiled_output` ([Mbse/WymoreSystemModes.lean:721](Mbse/WymoreSystemModes.lean#L721)) |
 
 ### `textbook/theorem5.62` — Theorem 5.62
 
@@ -1372,10 +1372,10 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.62/source/theorem` | `theorem` | Source Theorem 5.62, lines 194–207. Corrected traceability decision: Replace self-referential comprehension by finite concatenation of SMBF trajectory segments; duration is the sum of segment times (zero for `t1=0`). | ✅ Faithful | `compiledInput` ([Mbse/WymoreSystemModes.lean:596](Mbse/WymoreSystemModes.lean#L596)) |
-| `5.62/lean/liftExperiment_systemMode` | `theorem` | Lean anchor `liftExperiment_systemMode` for this corrected reading. Status: corrected. | ✅ Faithful | `compiledInput` ([Mbse/WymoreSystemModes.lean:596](Mbse/WymoreSystemModes.lean#L596)) |
-| `5.62/lean/liftExperiment_systemMode_state` | `theorem` | Lean anchor `liftExperiment_systemMode_state` for this corrected reading. Status: corrected. | ✅ Faithful | `compiled_state` ([Mbse/WymoreSystemModes.lean:627](Mbse/WymoreSystemModes.lean#L627)) |
-| `5.62/lean/liftExperiment_systemMode_output` | `theorem` | Lean anchor `liftExperiment_systemMode_output` for this corrected reading. Status: corrected. | ✅ Faithful | `compiled_output` ([Mbse/WymoreSystemModes.lean:646](Mbse/WymoreSystemModes.lean#L646)) |
+| `5.62/source/theorem` | `theorem` | Source Theorem 5.62, lines 194–207. Corrected traceability decision: Replace self-referential comprehension by finite concatenation of SMBF trajectory segments; duration is the sum of segment times (zero for `t1=0`). | ✅ Faithful | `compiledInput` ([Mbse/WymoreSystemModes.lean:607](Mbse/WymoreSystemModes.lean#L607)) |
+| `5.62/lean/liftExperiment_systemMode` | `theorem` | Lean anchor `liftExperiment_systemMode` for this corrected reading. Status: corrected. | ✅ Faithful | `compiledInput` ([Mbse/WymoreSystemModes.lean:607](Mbse/WymoreSystemModes.lean#L607)) |
+| `5.62/lean/liftExperiment_systemMode_state` | `theorem` | Lean anchor `liftExperiment_systemMode_state` for this corrected reading. Status: corrected. | ✅ Faithful | `compiled_state` ([Mbse/WymoreSystemModes.lean:638](Mbse/WymoreSystemModes.lean#L638)) |
+| `5.62/lean/liftExperiment_systemMode_output` | `theorem` | Lean anchor `liftExperiment_systemMode_output` for this corrected reading. Status: corrected. | ✅ Faithful | `compiled_output` ([Mbse/WymoreSystemModes.lean:657](Mbse/WymoreSystemModes.lean#L657)) |
 
 ### `textbook/theorem5.67` — Theorem 5.67
 
@@ -1384,8 +1384,8 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.67/source/theorem` | `theorem` | Source Theorem 5.67, lines 228. Corrected traceability decision: Composition must concatenate/retime the outer behavior segments; use a constructed composite SMBF, not bare relational transitivity. | ✅ Faithful | `SystemMode` ([Mbse/WymoreSystemModes.lean:788](Mbse/WymoreSystemModes.lean#L788)) |
-| `5.67/lean/SystemMode_trans` | `theorem` | Lean anchor `SystemMode.trans` for this corrected reading. Status: exact; fidelity: faithful. | ✅ Faithful | `SystemMode` ([Mbse/WymoreSystemModes.lean:788](Mbse/WymoreSystemModes.lean#L788)) |
+| `5.67/source/theorem` | `theorem` | Source Theorem 5.67, lines 228. Corrected traceability decision: Composition must concatenate/retime the outer behavior segments; use a constructed composite SMBF, not bare relational transitivity. | ✅ Faithful | `SystemMode` ([Mbse/WymoreSystemModes.lean:799](Mbse/WymoreSystemModes.lean#L799)) |
+| `5.67/lean/SystemMode_trans` | `theorem` | Lean anchor `SystemMode.trans` for this corrected reading. Status: exact; fidelity: faithful. | ✅ Faithful | `SystemMode` ([Mbse/WymoreSystemModes.lean:799](Mbse/WymoreSystemModes.lean#L799)) |
 
 ### `textbook/theorem5.92` — Theorem 5.92
 
@@ -1394,8 +1394,8 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.92/source/theorem` | `theorem` | Source Theorem 5.92, lines 270. Corrected traceability decision: Formalize closure/typing of the parameterization; no stronger mode theorem is folded into this item. | ✅ Faithful | `hiisysmo` ([Mbse/WymoreImplementation.lean:432](Mbse/WymoreImplementation.lean#L432)) |
-| `5.92/lean/hiisysmo_isSystemParameterization` | `theorem` | Lean anchor `hiisysmo_isSystemParameterization` for this corrected reading. Status: qualified. | ✅ Faithful | `hiisysmo` ([Mbse/WymoreImplementation.lean:432](Mbse/WymoreImplementation.lean#L432)) |
+| `5.92/source/theorem` | `theorem` | Source Theorem 5.92, lines 270. Corrected traceability decision: Formalize closure/typing of the parameterization; no stronger mode theorem is folded into this item. | ✅ Faithful | `hiisysmo` ([Mbse/WymoreImplementation.lean:435](Mbse/WymoreImplementation.lean#L435)) |
+| `5.92/lean/hiisysmo_isSystemParameterization` | `theorem` | Lean anchor `hiisysmo_isSystemParameterization` for this corrected reading. Status: qualified. | ✅ Faithful | `hiisysmo` ([Mbse/WymoreImplementation.lean:435](Mbse/WymoreImplementation.lean#L435)) |
 
 ### `textbook/theorem5.93` — Theorem 5.93
 
@@ -1404,8 +1404,8 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.93/source/theorem` | `theorem` | Source Theorem 5.93, lines 273–277. Corrected traceability decision: Use the lifted SMBF from 5.89 and prove equality with the `SYSMO` construction. | ✅ Faithful | `homomorphicInverseImage_isSystemMode` ([Mbse/WymoreImplementation.lean:455](Mbse/WymoreImplementation.lean#L455)) |
-| `5.93/lean/homomorphicInverseImage_isSystemMode` | `theorem` | Lean anchor `homomorphicInverseImage_isSystemMode` for this corrected reading. Status: qualified. | ✅ Faithful | `homomorphicInverseImage_isSystemMode` ([Mbse/WymoreImplementation.lean:455](Mbse/WymoreImplementation.lean#L455)) |
+| `5.93/source/theorem` | `theorem` | Source Theorem 5.93, lines 273–277. Corrected traceability decision: Use the lifted SMBF from 5.89 and prove equality with the `SYSMO` construction. | ✅ Faithful | `homomorphicInverseImage_isSystemMode` ([Mbse/WymoreImplementation.lean:458](Mbse/WymoreImplementation.lean#L458)) |
+| `5.93/lean/homomorphicInverseImage_isSystemMode` | `theorem` | Lean anchor `homomorphicInverseImage_isSystemMode` for this corrected reading. Status: qualified. | ✅ Faithful | `homomorphicInverseImage_isSystemMode` ([Mbse/WymoreImplementation.lean:458](Mbse/WymoreImplementation.lean#L458)) |
 
 ### `textbook/theorem5.95` — Theorem 5.95
 
@@ -1414,8 +1414,8 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.95/source/theorem` | `theorem` | Source Theorem 5.95, lines 281–285. Corrected traceability decision: Restrict all three homomorphisms to inverse-image mode carriers; prove the original mode is their homomorphic image. | ✅ Faithful | `mode_isHomomorphicImage_of_inverseImage` ([Mbse/WymoreImplementation.lean:469](Mbse/WymoreImplementation.lean#L469)) |
-| `5.95/lean/mode_isHomomorphicImage_of_inverseImage` | `theorem` | Lean anchor `mode_isHomomorphicImage_of_inverseImage` for this corrected reading. Status: qualified. | ✅ Faithful | `inverseImageHom` ([Mbse/WymoreImplementation.lean:366](Mbse/WymoreImplementation.lean#L366))<br>`mode_isHomomorphicImage_of_inverseImage` ([Mbse/WymoreImplementation.lean:469](Mbse/WymoreImplementation.lean#L469)) |
+| `5.95/source/theorem` | `theorem` | Source Theorem 5.95, lines 281–285. Corrected traceability decision: Restrict all three homomorphisms to inverse-image mode carriers; prove the original mode is their homomorphic image. | ✅ Faithful | `mode_isHomomorphicImage_of_inverseImage` ([Mbse/WymoreImplementation.lean:472](Mbse/WymoreImplementation.lean#L472)) |
+| `5.95/lean/mode_isHomomorphicImage_of_inverseImage` | `theorem` | Lean anchor `mode_isHomomorphicImage_of_inverseImage` for this corrected reading. Status: qualified. | ✅ Faithful | `inverseImageHom` ([Mbse/WymoreImplementation.lean:369](Mbse/WymoreImplementation.lean#L369))<br>`mode_isHomomorphicImage_of_inverseImage` ([Mbse/WymoreImplementation.lean:472](Mbse/WymoreImplementation.lean#L472)) |
 
 ### `textbook/theorem5.97` — Theorem 5.97
 
@@ -1424,8 +1424,8 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.97/source/theorem` | `theorem` | Source Theorem 5.97, lines 289–298. Corrected traceability decision: Compose implementation through a chosen inverse-image mode; make dependence on `SMBF2s` and `CHI` explicit. | ✅ Faithful | `Implements` ([Mbse/WymoreImplementation.lean:484](Mbse/WymoreImplementation.lean#L484)) |
-| `5.97/lean/implements_trans` | `theorem` | Lean anchor `implements_trans` for this corrected reading. Status: qualified. | ✅ Faithful | `Implements` ([Mbse/WymoreImplementation.lean:484](Mbse/WymoreImplementation.lean#L484)) |
+| `5.97/source/theorem` | `theorem` | Source Theorem 5.97, lines 289–298. Corrected traceability decision: Compose implementation through a chosen inverse-image mode; make dependence on `SMBF2s` and `CHI` explicit. | ✅ Faithful | `Implements` ([Mbse/WymoreImplementation.lean:487](Mbse/WymoreImplementation.lean#L487)) |
+| `5.97/lean/implements_trans` | `theorem` | Lean anchor `implements_trans` for this corrected reading. Status: qualified. | ✅ Faithful | `Implements` ([Mbse/WymoreImplementation.lean:487](Mbse/WymoreImplementation.lean#L487)) |
 
 ### `textbook/theorem5.99` — Theorem 5.99
 
@@ -1434,10 +1434,10 @@
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.99/source/theorem` | `theorem` | Source Theorem 5.99, lines 302–323. Corrected traceability decision: Correct `\cric` to pointwise chosen lift, use `x2s` (not `x1`) in mode trajectories, repair `t1 0 1` to `t1-1`, and define exhibitor input by segment concatenation as in 5.62. | ✅ Faithful | `implementedExperiment_lift` ([Mbse/WymoreImplementation.lean:549](Mbse/WymoreImplementation.lean#L549)) |
-| `5.99/lean/implementedExperiment_lift` | `theorem` | Lean anchor `implementedExperiment_lift` for this corrected reading. Status: corrected. | ✅ Faithful | `implementedExperiment_lift` ([Mbse/WymoreImplementation.lean:549](Mbse/WymoreImplementation.lean#L549)) |
-| `5.99/lean/implementedExperiment_state` | `theorem` | Lean anchor `implementedExperiment_state` for this corrected reading. Status: corrected. | ✅ Faithful | `implementedExperiment_state` ([Mbse/WymoreImplementation.lean:565](Mbse/WymoreImplementation.lean#L565)) |
-| `5.99/lean/implementedExperiment_output` | `theorem` | Lean anchor `implementedExperiment_output` for this corrected reading. Status: corrected. | ✅ Faithful | `implementedExperiment_output` ([Mbse/WymoreImplementation.lean:601](Mbse/WymoreImplementation.lean#L601)) |
+| `5.99/source/theorem` | `theorem` | Source Theorem 5.99, lines 302–323. Corrected traceability decision: Correct `\cric` to pointwise chosen lift, use `x2s` (not `x1`) in mode trajectories, repair `t1 0 1` to `t1-1`, and define exhibitor input by segment concatenation as in 5.62. | ✅ Faithful | `implementedExperiment_lift` ([Mbse/WymoreImplementation.lean:552](Mbse/WymoreImplementation.lean#L552)) |
+| `5.99/lean/implementedExperiment_lift` | `theorem` | Lean anchor `implementedExperiment_lift` for this corrected reading. Status: corrected. | ✅ Faithful | `implementedExperiment_lift` ([Mbse/WymoreImplementation.lean:552](Mbse/WymoreImplementation.lean#L552)) |
+| `5.99/lean/implementedExperiment_state` | `theorem` | Lean anchor `implementedExperiment_state` for this corrected reading. Status: corrected. | ✅ Faithful | `implementedExperiment_state` ([Mbse/WymoreImplementation.lean:568](Mbse/WymoreImplementation.lean#L568)) |
+| `5.99/lean/implementedExperiment_output` | `theorem` | Lean anchor `implementedExperiment_output` for this corrected reading. Status: corrected. | ✅ Faithful | `implementedExperiment_output` ([Mbse/WymoreImplementation.lean:604](Mbse/WymoreImplementation.lean#L604)) |
 
 ### `textbook/theorem_a1.163` — Equality of Functions (Extensionality)
 
@@ -1720,12 +1720,12 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.121/theorem/resultant_input_port_map` | `theorem` | IP@(SCR,Z) ∈ FNS(IPZ, 1TO1, ONTO, UISCR). | ✅ Faithful | `rsy_IP_map_inFNS1TO1Onto` ([Mbse/Wymore.lean:1129](Mbse/Wymore.lean#L1129)) |
-| `3.121/theorem/resultant_inverse_input_port_map` | `theorem` | INIP@(SCR,Z) ∈ FNS(UISCR, 1TO1, ONTO, IPZ). | ✅ Faithful | `rsy_INIP_map_inFNS1TO1Onto` ([Mbse/Wymore.lean:1137](Mbse/Wymore.lean#L1137)) |
-| `3.121/theorem/resultant_input_port_structure` | `theorem` | IS@(SCR,Z) = ISZ on resultant input ports. | ✅ Faithful | `rsy_IS_map_eq` ([Mbse/Wymore.lean:1145](Mbse/Wymore.lean#L1145)) |
-| `3.121/theorem/resultant_output_port_map` | `theorem` | OP@(SCR,Z) ∈ FNS(OPZ, 1TO1, ONTO, UOSCR). | ✅ Faithful | `rsy_OP_map_inFNS1TO1Onto` ([Mbse/Wymore.lean:1152](Mbse/Wymore.lean#L1152)) |
-| `3.121/theorem/resultant_inverse_output_port_map` | `theorem` | INOP@(SCR,Z) ∈ FNS(UOSCR, 1TO1, ONTO, OPZ). | ✅ Faithful | `rsy_INOP_map_inFNS1TO1Onto` ([Mbse/Wymore.lean:1160](Mbse/Wymore.lean#L1160)) |
-| `3.121/theorem/resultant_output_port_structure` | `theorem` | OS@(SCR,Z) = OSZ on resultant output ports. | ✅ Faithful | `rsy_OS_map_eq` ([Mbse/Wymore.lean:1168](Mbse/Wymore.lean#L1168)) |
+| `3.121/theorem/resultant_input_port_map` | `theorem` | IP@(SCR,Z) ∈ FNS(IPZ, 1TO1, ONTO, UISCR). | ✅ Faithful | `rsy_IP_map_inFNS1TO1Onto` ([Mbse/Wymore.lean:1138](Mbse/Wymore.lean#L1138)) |
+| `3.121/theorem/resultant_inverse_input_port_map` | `theorem` | INIP@(SCR,Z) ∈ FNS(UISCR, 1TO1, ONTO, IPZ). | ✅ Faithful | `rsy_INIP_map_inFNS1TO1Onto` ([Mbse/Wymore.lean:1146](Mbse/Wymore.lean#L1146)) |
+| `3.121/theorem/resultant_input_port_structure` | `theorem` | IS@(SCR,Z) = ISZ on resultant input ports. | ✅ Faithful | `rsy_IS_map_eq` ([Mbse/Wymore.lean:1154](Mbse/Wymore.lean#L1154)) |
+| `3.121/theorem/resultant_output_port_map` | `theorem` | OP@(SCR,Z) ∈ FNS(OPZ, 1TO1, ONTO, UOSCR). | ✅ Faithful | `rsy_OP_map_inFNS1TO1Onto` ([Mbse/Wymore.lean:1161](Mbse/Wymore.lean#L1161)) |
+| `3.121/theorem/resultant_inverse_output_port_map` | `theorem` | INOP@(SCR,Z) ∈ FNS(UOSCR, 1TO1, ONTO, OPZ). | ✅ Faithful | `rsy_INOP_map_inFNS1TO1Onto` ([Mbse/Wymore.lean:1169](Mbse/Wymore.lean#L1169)) |
+| `3.121/theorem/resultant_output_port_structure` | `theorem` | OS@(SCR,Z) = OSZ on resultant output ports. | ✅ Faithful | `rsy_OS_map_eq` ([Mbse/Wymore.lean:1177](Mbse/Wymore.lean#L1177)) |
 | `3.121/theorem/resultant_port_functions` | `theorem` | Aggregate RSY port-map FNS and structure equalities. | ✅ Faithful | `ex3_121_resultant_port_functions` ([Mbse/TextbookExercises/Ch03.lean:314](Mbse/TextbookExercises/Ch03.lean#L314)) |
 
 ### `textbook/exercise3.122` — Every system is a resultant
@@ -1735,9 +1735,9 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.122/definition/singular_scr` | `definition` | Singular coupling recipe (V, ∅) for a one-component connectable vector. | ✅ Faithful | `singularSCR` ([Mbse/Wymore.lean:1364](Mbse/Wymore.lean#L1364)) |
-| `3.122/definition/port_vector_of_system` | `definition` | Embed a port-encoded discrete system as a PortSystemVector 1. | ✅ Faithful | `portVectorOfSystem` ([Mbse/Wymore.lean:1395](Mbse/Wymore.lean#L1395)) |
-| `3.122/theorem/every_system_is_resultant` | `theorem` | Z = RSY(Z, ∅) for port-encoded systems: singular recipe, InRSY, NZ and readout alignment. | ✅ Faithful | `every_port_system_is_resultant` ([Mbse/Wymore.lean:1746](Mbse/Wymore.lean#L1746))<br>`ex3_122_every_system_is_resultant` ([Mbse/TextbookExercises/Ch03.lean:331](Mbse/TextbookExercises/Ch03.lean#L331)) |
+| `3.122/definition/singular_scr` | `definition` | Singular coupling recipe (V, ∅) for a one-component connectable vector. | ✅ Faithful | `singularSCR` ([Mbse/Wymore.lean:1373](Mbse/Wymore.lean#L1373)) |
+| `3.122/definition/port_vector_of_system` | `definition` | Embed a port-encoded discrete system as a PortSystemVector 1. | ✅ Faithful | `portVectorOfSystem` ([Mbse/Wymore.lean:1404](Mbse/Wymore.lean#L1404)) |
+| `3.122/theorem/every_system_is_resultant` | `theorem` | Z = RSY(Z, ∅) for port-encoded systems: singular recipe, InRSY, NZ and readout alignment. | ✅ Faithful | `every_port_system_is_resultant` ([Mbse/Wymore.lean:1755](Mbse/Wymore.lean#L1755))<br>`ex3_122_every_system_is_resultant` ([Mbse/TextbookExercises/Ch03.lean:331](Mbse/TextbookExercises/Ch03.lean#L331)) |
 
 ### `textbook/exercise3.123` — Conjunctive RSY equals CSY
 
@@ -1746,9 +1746,9 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.123/definition/unconn_input_equiv` | `definition` | UnconnInPort ≃ tagged input port union on conjunctive recipes. | ✅ Faithful | `unconnInPortEquiv` ([Mbse/Wymore.lean:1334](Mbse/Wymore.lean#L1334)) |
-| `3.123/definition/unconn_output_equiv` | `definition` | UnconnOutPort ≃ tagged output port union on conjunctive recipes. | ✅ Faithful | `unconnOutPortEquiv` ([Mbse/Wymore.lean:1345](Mbse/Wymore.lean#L1345)) |
-| `3.123/theorem/conjunctive_rsy_eq_csy` | `theorem` | InRSY plus pointwise NZ and readout agreement between RSY(SCR) and CSY(VSCR). | ✅ Faithful | `conjunctive_rsy_eq_csy` ([Mbse/Wymore.lean:1728](Mbse/Wymore.lean#L1728))<br>`ex3_123_conjunctive_rsy_eq_csy` ([Mbse/TextbookExercises/Ch03.lean:343](Mbse/TextbookExercises/Ch03.lean#L343)) |
+| `3.123/definition/unconn_input_equiv` | `definition` | UnconnInPort ≃ tagged input port union on conjunctive recipes. | ✅ Faithful | `unconnInPortEquiv` ([Mbse/Wymore.lean:1343](Mbse/Wymore.lean#L1343)) |
+| `3.123/definition/unconn_output_equiv` | `definition` | UnconnOutPort ≃ tagged output port union on conjunctive recipes. | ✅ Faithful | `unconnOutPortEquiv` ([Mbse/Wymore.lean:1354](Mbse/Wymore.lean#L1354)) |
+| `3.123/theorem/conjunctive_rsy_eq_csy` | `theorem` | InRSY plus pointwise NZ and readout agreement between RSY(SCR) and CSY(VSCR). | ✅ Faithful | `conjunctive_rsy_eq_csy` ([Mbse/Wymore.lean:1737](Mbse/Wymore.lean#L1737))<br>`ex3_123_conjunctive_rsy_eq_csy` ([Mbse/TextbookExercises/Ch03.lean:343](Mbse/TextbookExercises/Ch03.lean#L343)) |
 
 ### `textbook/exercise3.124` — Simple cascade RSY
 
@@ -1787,8 +1787,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.127/theorem/resultant_conjunctive_readout` | `theorem` | rsyOutAt SCR hOut x op = csyOut SCR.VSCR hOut x op when SCR is conjunctive. | ✅ Faithful | `conjunctive_rsy_readout_eq_csy_readout` ([Mbse/Wymore.lean:1693](Mbse/Wymore.lean#L1693))<br>`ex3_127_resultant_conjunctive_readout` ([Mbse/TextbookExercises/Ch03.lean:999](Mbse/TextbookExercises/Ch03.lean#L999)) |
-| `3.127/theorem/rsy_RZ_eq_csy_readout_fun` | `theorem` | Full resultant readout function on UnconnOutPort equals CSY readout at each unconnected output tag. | ✅ Faithful | `conjunctive_rsy_RZ_eq_csy_readout_fun` ([Mbse/Wymore.lean:1704](Mbse/Wymore.lean#L1704))<br>`ex3_127_rsy_RZ_eq_csy_readout_fun` ([Mbse/TextbookExercises/Ch03.lean:1008](Mbse/TextbookExercises/Ch03.lean#L1008)) |
+| `3.127/theorem/resultant_conjunctive_readout` | `theorem` | rsyOutAt SCR hOut x op = csyOut SCR.VSCR hOut x op when SCR is conjunctive. | ✅ Faithful | `conjunctive_rsy_readout_eq_csy_readout` ([Mbse/Wymore.lean:1702](Mbse/Wymore.lean#L1702))<br>`ex3_127_resultant_conjunctive_readout` ([Mbse/TextbookExercises/Ch03.lean:999](Mbse/TextbookExercises/Ch03.lean#L999)) |
+| `3.127/theorem/rsy_RZ_eq_csy_readout_fun` | `theorem` | Full resultant readout function on UnconnOutPort equals CSY readout at each unconnected output tag. | ✅ Faithful | `conjunctive_rsy_RZ_eq_csy_readout_fun` ([Mbse/Wymore.lean:1713](Mbse/Wymore.lean#L1713))<br>`ex3_127_rsy_RZ_eq_csy_readout_fun` ([Mbse/TextbookExercises/Ch03.lean:1008](Mbse/TextbookExercises/Ch03.lean#L1008)) |
 
 ### `textbook/exercise3.128` — System determining a nonsingular coupling recipe
 
@@ -1835,8 +1835,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.132/theorem/singular_cfscr_eq_closed_loop` | `theorem` | cfscr on singularSCR equals conjunctiveClosedLoopAsOpenLoop f. | ✅ Faithful | `singular_cfscr_eq_closed_loop_trajectory` ([Mbse/WymoreCouplingDynamic.lean:653](Mbse/WymoreCouplingDynamic.lean#L653))<br>`ex3_132_singular_cfscr_eq_closed_loop` ([Mbse/TextbookExercises/Ch03.lean:1292](Mbse/TextbookExercises/Ch03.lean#L1292)) |
-| `3.132/theorem/singular_rsy_eq_component` | `theorem` | InRSY and NZ/RZ agreement between rsy singularSCR and V.Z 0. | ✅ Faithful | `singular_scr_rsy_agrees_component` ([Mbse/WymoreCouplingDynamic.lean:670](Mbse/WymoreCouplingDynamic.lean#L670)) |
+| `3.132/theorem/singular_cfscr_eq_closed_loop` | `theorem` | cfscr on singularSCR equals conjunctiveClosedLoopAsOpenLoop f. | ✅ Faithful | `singular_cfscr_eq_closed_loop_trajectory` ([Mbse/WymoreCouplingDynamic.lean:652](Mbse/WymoreCouplingDynamic.lean#L652))<br>`ex3_132_singular_cfscr_eq_closed_loop` ([Mbse/TextbookExercises/Ch03.lean:1292](Mbse/TextbookExercises/Ch03.lean#L1292)) |
+| `3.132/theorem/singular_rsy_eq_component` | `theorem` | InRSY and NZ/RZ agreement between rsy singularSCR and V.Z 0. | ✅ Faithful | `singular_scr_rsy_agrees_component` ([Mbse/WymoreCouplingDynamic.lean:669](Mbse/WymoreCouplingDynamic.lean#L669)) |
 
 ### `textbook/exercise3.133` — Conjunctive SCR coupling function
 
@@ -1845,8 +1845,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `3.133/theorem/conjunctive_cfscr_eq_closed_loop` | `theorem` | cfscr SCR hOut f x = conjunctiveClosedLoopAsOpenLoop SCR h f. | ✅ Faithful | `conjunctive_cfscr_eq_closed_loop_trajectory` ([Mbse/WymoreCouplingDynamic.lean:627](Mbse/WymoreCouplingDynamic.lean#L627))<br>`ex3_133_conjunctive_cfscr_eq_closed_loop` ([Mbse/TextbookExercises/Ch03.lean:1313](Mbse/TextbookExercises/Ch03.lean#L1313)) |
-| `3.133/theorem/conjunctive_rsy_eq_csy` | `theorem` | Pointwise NZ and readout agreement between rsy SCR and csy SCR.VSCR. | ✅ Faithful | `conjunctive_rsy_agrees_csy` ([Mbse/WymoreCouplingDynamic.lean:640](Mbse/WymoreCouplingDynamic.lean#L640))<br>`ex3_133_conjunctive_rsy_eq_csy` ([Mbse/TextbookExercises/Ch03.lean:1323](Mbse/TextbookExercises/Ch03.lean#L1323)) |
+| `3.133/theorem/conjunctive_cfscr_eq_closed_loop` | `theorem` | cfscr SCR hOut f x = conjunctiveClosedLoopAsOpenLoop SCR h f. | ✅ Faithful | `conjunctive_cfscr_eq_closed_loop_trajectory` ([Mbse/WymoreCouplingDynamic.lean:626](Mbse/WymoreCouplingDynamic.lean#L626))<br>`ex3_133_conjunctive_cfscr_eq_closed_loop` ([Mbse/TextbookExercises/Ch03.lean:1313](Mbse/TextbookExercises/Ch03.lean#L1313)) |
+| `3.133/theorem/conjunctive_rsy_eq_csy` | `theorem` | Pointwise NZ and readout agreement between rsy SCR and csy SCR.VSCR. | ✅ Faithful | `conjunctive_rsy_agrees_csy` ([Mbse/WymoreCouplingDynamic.lean:639](Mbse/WymoreCouplingDynamic.lean#L639))<br>`ex3_133_conjunctive_rsy_eq_csy` ([Mbse/TextbookExercises/Ch03.lean:1323](Mbse/TextbookExercises/Ch03.lean#L1323)) |
 
 ### `textbook/exercise4.66` — Eliminating the components of null order yields a homomorphic image
 
@@ -1855,18 +1855,18 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `4.66/definition/retained_components` | `definition` | M = {Z$ : Z$ in VSCR; Z$ is not of null order for SCR}, enumerated as Zi1,...,Zim with distinct indices i1,...,im in IJS[1, n]. | ✅ Faithful | `NullOrderElimination` ([Mbse/CouplingIsomorphism.lean:518](Mbse/CouplingIsomorphism.lean#L518)) |
-| `4.66/definition/reduced_vector` | `definition` | VSCR$ = (Zi1,...,Zim) is a subvector of VSCR. | ✅ Faithful | `elimVector` ([Mbse/CouplingIsomorphism.lean:579](Mbse/CouplingIsomorphism.lean#L579)) |
-| `4.66/definition/reduced_connectivity` | `definition` | CSCR$ = {(B, A) : (B, A) in CSCR; there exists Z$ in VSCR$ such that the port belongs to Z$}. | ✅ Faithful | `elimCSCR` ([Mbse/CouplingIsomorphism.lean:632](Mbse/CouplingIsomorphism.lean#L632)) |
-| `4.66/definition/reduced_recipe` | `definition` | SCR$ = (VSCR$, CSCR$). | ✅ Faithful | `elimRecipe` ([Mbse/CouplingIsomorphism.lean:665](Mbse/CouplingIsomorphism.lean#L665)) |
-| `4.66/proof/order_propagates` | `proof` | A component coupled to a component of some order is itself of some order, so no connection of CSCR joins a deleted component to a retained one. | ✅ Faithful | `hasOrder_of_mem_cscr` ([Mbse/CouplingIsomorphism.lean:557](Mbse/CouplingIsomorphism.lean#L557)) |
-| `4.66/theorem/uiscr_preserved` | `theorem` | IZ@$ = IZ@: every unconnected input port of SCR belongs to a component of order 0, hence is retained, and stays unconnected in SCR$. | ✅ Faithful | `elim_mem_uiscr` ([Mbse/CouplingIsomorphism.lean:696](Mbse/CouplingIsomorphism.lean#L696)) |
-| `4.66/theorem/uoscr_preserved` | `theorem` | OZ@$ = OZ@: every unconnected output port of SCR belongs to a component of order 0, hence is retained, and stays unconnected in SCR$. | ✅ Faithful | `elim_mem_uoscr` ([Mbse/CouplingIsomorphism.lean:702](Mbse/CouplingIsomorphism.lean#L702)) |
-| `4.66/component/HS` | `component` | HS = PJN({SZ$ : Z$ in VSCR$}), the projection of the resultant state onto the retained components. | ✅ Faithful | `elimHS` ([Mbse/CouplingIsomorphism.lean:731](Mbse/CouplingIsomorphism.lean#L731)) |
-| `4.66/component/HI` | `component` | HI = ID(IZ@). | ✅ Faithful | `elimHI` ([Mbse/CouplingIsomorphism.lean:735](Mbse/CouplingIsomorphism.lean#L735)) |
-| `4.66/component/HO` | `component` | HO = ID(OZ@). | ✅ Faithful | `elimHO` ([Mbse/CouplingIsomorphism.lean:740](Mbse/CouplingIsomorphism.lean#L740)) |
-| `4.66/proof/homomorphism_witness` | `proof` | Z@$ = HIMSY(Z@, PJN({SZ$ : Z$ in VSCR$}), ID(IZ@), ID(OZ@)). | ✅ Faithful | `elimHomWitness` ([Mbse/CouplingIsomorphism.lean:813](Mbse/CouplingIsomorphism.lean#L813)) |
-| `4.66/theorem/null_order_elimination` | `theorem` | There exists Z@$ in DSYSTEMS with Z@$ = RSY(SCR$) and Z@$ = HIMSY(Z@, PJN({SZ$ : Z$ in VSCR$}), ID(IZ@), ID(OZ@)). | ✅ Faithful | `ex4_66_null_order_elimination` ([Mbse/CouplingIsomorphism.lean:845](Mbse/CouplingIsomorphism.lean#L845))<br>`ex4_66_null_order_elimination` ([Mbse/TextbookExercises/Ch04.lean:398](Mbse/TextbookExercises/Ch04.lean#L398)) |
+| `4.66/definition/retained_components` | `definition` | M = {Z$ : Z$ in VSCR; Z$ is not of null order for SCR}, enumerated as Zi1,...,Zim with distinct indices i1,...,im in IJS[1, n]. | ✅ Faithful | `NullOrderElimination` ([Mbse/CouplingIsomorphism.lean:448](Mbse/CouplingIsomorphism.lean#L448)) |
+| `4.66/definition/reduced_vector` | `definition` | VSCR$ = (Zi1,...,Zim) is a subvector of VSCR. | ✅ Faithful | `elimVector` ([Mbse/CouplingIsomorphism.lean:509](Mbse/CouplingIsomorphism.lean#L509)) |
+| `4.66/definition/reduced_connectivity` | `definition` | CSCR$ = {(B, A) : (B, A) in CSCR; there exists Z$ in VSCR$ such that the port belongs to Z$}. | ✅ Faithful | `elimCSCR` ([Mbse/CouplingIsomorphism.lean:562](Mbse/CouplingIsomorphism.lean#L562)) |
+| `4.66/definition/reduced_recipe` | `definition` | SCR$ = (VSCR$, CSCR$). | ✅ Faithful | `elimRecipe` ([Mbse/CouplingIsomorphism.lean:595](Mbse/CouplingIsomorphism.lean#L595)) |
+| `4.66/proof/order_propagates` | `proof` | A component coupled to a component of some order is itself of some order, so no connection of CSCR joins a deleted component to a retained one. | ✅ Faithful | `hasOrder_of_mem_cscr` ([Mbse/CouplingIsomorphism.lean:487](Mbse/CouplingIsomorphism.lean#L487)) |
+| `4.66/theorem/uiscr_preserved` | `theorem` | IZ@$ = IZ@: every unconnected input port of SCR belongs to a component of order 0, hence is retained, and stays unconnected in SCR$. | ✅ Faithful | `elim_mem_uiscr` ([Mbse/CouplingIsomorphism.lean:626](Mbse/CouplingIsomorphism.lean#L626)) |
+| `4.66/theorem/uoscr_preserved` | `theorem` | OZ@$ = OZ@: every unconnected output port of SCR belongs to a component of order 0, hence is retained, and stays unconnected in SCR$. | ✅ Faithful | `elim_mem_uoscr` ([Mbse/CouplingIsomorphism.lean:632](Mbse/CouplingIsomorphism.lean#L632)) |
+| `4.66/component/HS` | `component` | HS = PJN({SZ$ : Z$ in VSCR$}), the projection of the resultant state onto the retained components. | ✅ Faithful | `elimHS` ([Mbse/CouplingIsomorphism.lean:661](Mbse/CouplingIsomorphism.lean#L661)) |
+| `4.66/component/HI` | `component` | HI = ID(IZ@). | ✅ Faithful | `elimHI` ([Mbse/CouplingIsomorphism.lean:665](Mbse/CouplingIsomorphism.lean#L665)) |
+| `4.66/component/HO` | `component` | HO = ID(OZ@). | ✅ Faithful | `elimHO` ([Mbse/CouplingIsomorphism.lean:670](Mbse/CouplingIsomorphism.lean#L670)) |
+| `4.66/proof/homomorphism_witness` | `proof` | Z@$ = HIMSY(Z@, PJN({SZ$ : Z$ in VSCR$}), ID(IZ@), ID(OZ@)). | ✅ Faithful | `elimHomWitness` ([Mbse/CouplingIsomorphism.lean:743](Mbse/CouplingIsomorphism.lean#L743)) |
+| `4.66/theorem/null_order_elimination` | `theorem` | There exists Z@$ in DSYSTEMS with Z@$ = RSY(SCR$) and Z@$ = HIMSY(Z@, PJN({SZ$ : Z$ in VSCR$}), ID(IZ@), ID(OZ@)). | ✅ Faithful | `ex4_66_null_order_elimination` ([Mbse/CouplingIsomorphism.lean:775](Mbse/CouplingIsomorphism.lean#L775))<br>`ex4_66_null_order_elimination` ([Mbse/TextbookExercises/Ch04.lean:398](Mbse/TextbookExercises/Ch04.lean#L398)) |
 
 ### `textbook/exercise4.69` — Finite homomorphic images of non-finite systems
 
@@ -1990,12 +1990,12 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `4.85/definition/rearranged_vector` | `definition` | VSCR$ = (ZF(1),...,ZF(n)). | ✅ Faithful | `reindexVector` ([Mbse/CouplingIsomorphism.lean:37](Mbse/CouplingIsomorphism.lean#L37)) |
-| `4.85/definition/rearranged_connectivity` | `definition` | CSCR$ = CSCR, read through the renaming of tagged ports induced by F. | ✅ Faithful | `reindexCSCR` ([Mbse/CouplingIsomorphism.lean:58](Mbse/CouplingIsomorphism.lean#L58)) |
-| `4.85/definition/rearranged_recipe` | `definition` | SCR$ = (VSCR$, CSCR$). | ✅ Faithful | `reindexRecipe` ([Mbse/CouplingIsomorphism.lean:92](Mbse/CouplingIsomorphism.lean#L92)) |
-| `4.85/theorem/uiscr_preserved` | `theorem` | UISCR = UISCR$ under the renaming induced by F. | ✅ Faithful | `reindexUnconnIn` ([Mbse/CouplingIsomorphism.lean:135](Mbse/CouplingIsomorphism.lean#L135)) |
-| `4.85/theorem/uoscr_preserved` | `theorem` | UOSCR = UOSCR$ under the renaming induced by F. | ✅ Faithful | `reindexUnconnOut` ([Mbse/CouplingIsomorphism.lean:140](Mbse/CouplingIsomorphism.lean#L140)) |
-| `4.85/theorem/rearrangement_isomorphic` | `theorem` | RSY(SCR$) is isomorphic to RSY(SCR) via HS(x)i = x(F(i)) and the induced renamings on external ports. | ✅ Faithful | `ex4_85_rearrangement_isomorphic` ([Mbse/CouplingIsomorphism.lean:254](Mbse/CouplingIsomorphism.lean#L254))<br>`ex4_85_rearrangement_isomorphic` ([Mbse/TextbookExercises/Ch04.lean:390](Mbse/TextbookExercises/Ch04.lean#L390)) |
+| `4.85/definition/rearranged_vector` | `definition` | VSCR$ = (ZF(1),...,ZF(n)). | ✅ Faithful | `reindexVector` ([Mbse/CouplingIsomorphism.lean:27](Mbse/CouplingIsomorphism.lean#L27)) |
+| `4.85/definition/rearranged_connectivity` | `definition` | CSCR$ = CSCR, read through the renaming of tagged ports induced by F. | ✅ Faithful | `reindexCSCR` ([Mbse/CouplingIsomorphism.lean:48](Mbse/CouplingIsomorphism.lean#L48)) |
+| `4.85/definition/rearranged_recipe` | `definition` | SCR$ = (VSCR$, CSCR$). | ✅ Faithful | `reindexRecipe` ([Mbse/CouplingIsomorphism.lean:82](Mbse/CouplingIsomorphism.lean#L82)) |
+| `4.85/theorem/uiscr_preserved` | `theorem` | UISCR = UISCR$ under the renaming induced by F. | ✅ Faithful | `reindexUnconnIn` ([Mbse/CouplingIsomorphism.lean:125](Mbse/CouplingIsomorphism.lean#L125)) |
+| `4.85/theorem/uoscr_preserved` | `theorem` | UOSCR = UOSCR$ under the renaming induced by F. | ✅ Faithful | `reindexUnconnOut` ([Mbse/CouplingIsomorphism.lean:130](Mbse/CouplingIsomorphism.lean#L130)) |
+| `4.85/theorem/rearrangement_isomorphic` | `theorem` | RSY(SCR$) is isomorphic to RSY(SCR) via HS(x)i = x(F(i)) and the induced renamings on external ports. | ✅ Faithful | `ex4_85_rearrangement_isomorphic` ([Mbse/CouplingIsomorphism.lean:222](Mbse/CouplingIsomorphism.lean#L222))<br>`ex4_85_rearrangement_isomorphic` ([Mbse/TextbookExercises/Ch04.lean:390](Mbse/TextbookExercises/Ch04.lean#L390)) |
 
 ### `textbook/exercise4.86` — Coupling components of components yields an isomorphic resultant
 
@@ -2026,9 +2026,9 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.141/source/exercise` | `exercise` | Source Exercise 5.141, lines 416. The universal claim is refuted unconditionally: `IsSubsystemOf loneSystem pairSystem` and `¬ IsSystemMode loneSystem pairSystem`. | ✅ Faithful | `subsystem_isSystemMode_or_counterexample` ([Mbse/TextbookExercises/Ch05.lean:265](Mbse/TextbookExercises/Ch05.lean#L265)) |
-| `5.141/plan/subsystem_isSystemMode_or_counterexample` | `exercise` | Lean theorem `subsystem_isSystemMode_or_counterexample`. Status: counterexample; fidelity: faithful. No extra hypotheses. | ✅ Faithful | `subsystem_isSystemMode_or_counterexample` ([Mbse/TextbookExercises/Ch05.lean:265](Mbse/TextbookExercises/Ch05.lean#L265)) |
-| `5.141/counterexample/literal_claim` | `counterexample` | Unconditional finite counterexample: a subsystem whose readout separates two states cannot be a mode of a cascade whose external readout is constant. | ✅ Faithful | `subsystem_isSystemMode_or_counterexample` ([Mbse/TextbookExercises/Ch05.lean:265](Mbse/TextbookExercises/Ch05.lean#L265)) |
+| `5.141/source/exercise` | `exercise` | Source Exercise 5.141, lines 416. The universal claim is refuted unconditionally: `IsSubsystemOf loneSystem pairSystem` and `¬ IsSystemMode loneSystem pairSystem`. | ✅ Faithful | `subsystem_isSystemMode_or_counterexample` ([Mbse/TextbookExercises/Ch05.lean:266](Mbse/TextbookExercises/Ch05.lean#L266)) |
+| `5.141/plan/subsystem_isSystemMode_or_counterexample` | `exercise` | Lean theorem `subsystem_isSystemMode_or_counterexample`. Status: counterexample; fidelity: faithful. No extra hypotheses. | ✅ Faithful | `subsystem_isSystemMode_or_counterexample` ([Mbse/TextbookExercises/Ch05.lean:266](Mbse/TextbookExercises/Ch05.lean#L266)) |
+| `5.141/counterexample/literal_claim` | `counterexample` | Unconditional finite counterexample: a subsystem whose readout separates two states cannot be a mode of a cascade whose external readout is constant. | ✅ Faithful | `subsystem_isSystemMode_or_counterexample` ([Mbse/TextbookExercises/Ch05.lean:266](Mbse/TextbookExercises/Ch05.lean#L266)) |
 
 ### `textbook/exercise5.142` — Exercise 5.142
 
@@ -2037,10 +2037,10 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.142/source/exercise` | `exercise` | Unconditional counterexample shape: IsSystemMode plus recipe cardinality obstruction 2 ∤ 3. | ⚠️ Stub/Partial | `exercise5_142_unconditional` ([Mbse/TextbookExercises/Ch05.lean:402](Mbse/TextbookExercises/Ch05.lean#L402)) _(partial)_ |
-| `5.142/plan/exercise5_142_unconditional` | `exercise` | Primary unconditional answer to Exercise 5.142. | ⚠️ Stub/Partial | `exercise5_142_unconditional` ([Mbse/TextbookExercises/Ch05.lean:402](Mbse/TextbookExercises/Ch05.lean#L402)) _(partial)_ |
-| `5.142/plan/systemMode_not_subsystem_counterexample` | `exercise` | Conditional ¬ IsSubsystemOf under DiscreteSystemStateReflection. | ⚠️ Stub/Partial | `systemMode_not_subsystem_counterexample` ([Mbse/TextbookExercises/Ch05.lean:423](Mbse/TextbookExercises/Ch05.lean#L423)) _(partial)_ |
-| `5.142/counterexample/literal_claim` | `counterexample` | Full ¬ IsSubsystemOf needs DiscreteSystemStateReflection; unconditional content is exercise5_142_unconditional. | ⚠️ Stub/Partial | `systemMode_not_subsystem_counterexample` ([Mbse/TextbookExercises/Ch05.lean:423](Mbse/TextbookExercises/Ch05.lean#L423)) _(partial)_ |
+| `5.142/source/exercise` | `exercise` | Unconditional counterexample shape: IsSystemMode plus recipe cardinality obstruction 2 ∤ 3. | ⚠️ Stub/Partial | `exercise5_142_unconditional` ([Mbse/TextbookExercises/Ch05.lean:405](Mbse/TextbookExercises/Ch05.lean#L405)) _(partial)_ |
+| `5.142/plan/exercise5_142_unconditional` | `exercise` | Primary unconditional answer to Exercise 5.142. | ⚠️ Stub/Partial | `exercise5_142_unconditional` ([Mbse/TextbookExercises/Ch05.lean:405](Mbse/TextbookExercises/Ch05.lean#L405)) _(partial)_ |
+| `5.142/plan/systemMode_not_subsystem_counterexample` | `exercise` | Conditional ¬ IsSubsystemOf under DiscreteSystemStateReflection. | ⚠️ Stub/Partial | `systemMode_not_subsystem_counterexample` ([Mbse/TextbookExercises/Ch05.lean:426](Mbse/TextbookExercises/Ch05.lean#L426)) _(partial)_ |
+| `5.142/counterexample/literal_claim` | `counterexample` | Full ¬ IsSubsystemOf needs DiscreteSystemStateReflection; unconditional content is exercise5_142_unconditional. | ⚠️ Stub/Partial | `systemMode_not_subsystem_counterexample` ([Mbse/TextbookExercises/Ch05.lean:426](Mbse/TextbookExercises/Ch05.lean#L426)) _(partial)_ |
 
 ### `textbook/exercise5.146` — Exercise 5.146
 
@@ -2049,8 +2049,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.146/source/exercise` | `exercise` | Source Exercise 5.146, lines 420. Corrected traceability decision: Strongest reading is provable: from `T^d=T` under constant input, derive `T^(k*(d-1)+1)=T`; retain `k≥1`. | ✅ Faithful | `selfMode_constantTime_iterate` ([Mbse/TextbookExercises/Ch05.lean:458](Mbse/TextbookExercises/Ch05.lean#L458)) |
-| `5.146/plan/selfMode_constantTime_iterate` | `exercise` | Lean anchor `selfMode_constantTime_iterate` for this corrected reading. Status: solved; fidelity: faithful. | ✅ Faithful | `selfMode_constantTime_iterate` ([Mbse/TextbookExercises/Ch05.lean:458](Mbse/TextbookExercises/Ch05.lean#L458)) |
+| `5.146/source/exercise` | `exercise` | Source Exercise 5.146, lines 420. Corrected traceability decision: Strongest reading is provable: from `T^d=T` under constant input, derive `T^(k*(d-1)+1)=T`; retain `k≥1`. | ✅ Faithful | `selfMode_constantTime_iterate` ([Mbse/TextbookExercises/Ch05.lean:461](Mbse/TextbookExercises/Ch05.lean#L461)) |
+| `5.146/plan/selfMode_constantTime_iterate` | `exercise` | Lean anchor `selfMode_constantTime_iterate` for this corrected reading. Status: solved; fidelity: faithful. | ✅ Faithful | `selfMode_constantTime_iterate` ([Mbse/TextbookExercises/Ch05.lean:461](Mbse/TextbookExercises/Ch05.lean#L461)) |
 
 ### `textbook/exercise5.147` — Exercise 5.147
 
@@ -2059,8 +2059,8 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.147/source/exercise` | `exercise` | Exercise 5.147: the state after m constant mode steps is the exhibitor state after d * m steps. | ✅ Faithful | `constantMode_state_at_mul` ([Mbse/TextbookExercises/Ch05.lean:560](Mbse/TextbookExercises/Ch05.lean#L560)) |
-| `5.147/plan/constantMode_state_at_mul` | `exercise` | Proved multiplication law constantMode_state_at_mul. | ✅ Faithful | `constantMode_state_at_mul` ([Mbse/TextbookExercises/Ch05.lean:560](Mbse/TextbookExercises/Ch05.lean#L560)) |
+| `5.147/source/exercise` | `exercise` | Exercise 5.147: the state after m constant mode steps is the exhibitor state after d * m steps. | ✅ Faithful | `constantMode_state_at_mul` ([Mbse/TextbookExercises/Ch05.lean:563](Mbse/TextbookExercises/Ch05.lean#L563)) |
+| `5.147/plan/constantMode_state_at_mul` | `exercise` | Proved multiplication law constantMode_state_at_mul. | ✅ Faithful | `constantMode_state_at_mul` ([Mbse/TextbookExercises/Ch05.lean:563](Mbse/TextbookExercises/Ch05.lean#L563)) |
 
 ### `textbook/exercise5.148` — Exercise 5.148
 
@@ -2069,22 +2069,112 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
-| `5.148/source/exercise` | `exercise` | Source Exercise 5.148, lines 424–428. Corrected traceability decision: Correct `timex` to `×`, bind `t`, and interpret `CNSp` as the appropriately typed constant trajectory; prove by induction using accumulated duration `H`. | ✅ Faithful | `variableTime_constantInput_state_at_accumulatedTime` ([Mbse/TextbookExercises/Ch05.lean:610](Mbse/TextbookExercises/Ch05.lean#L610)) |
-| `5.148/plan/variableTime_constantInput_state_at_accumulatedTime` | `exercise` | Lean anchor `variableTime_constantInput_state_at_accumulatedTime` for this corrected reading. Status: corrected. | ✅ Faithful | `variableTime_constantInput_state_at_accumulatedTime` ([Mbse/TextbookExercises/Ch05.lean:610](Mbse/TextbookExercises/Ch05.lean#L610)) |
+| `5.148/source/exercise` | `exercise` | Source Exercise 5.148, lines 424–428. Corrected traceability decision: Correct `timex` to `×`, bind `t`, and interpret `CNSp` as the appropriately typed constant trajectory; prove by induction using accumulated duration `H`. | ✅ Faithful | `variableTime_constantInput_state_at_accumulatedTime` ([Mbse/TextbookExercises/Ch05.lean:613](Mbse/TextbookExercises/Ch05.lean#L613)) |
+| `5.148/plan/variableTime_constantInput_state_at_accumulatedTime` | `exercise` | Lean anchor `variableTime_constantInput_state_at_accumulatedTime` for this corrected reading. Status: corrected. | ✅ Faithful | `variableTime_constantInput_state_at_accumulatedTime` ([Mbse/TextbookExercises/Ch05.lean:613](Mbse/TextbookExercises/Ch05.lean#L613)) |
 
-- Exercise kinds: **9** witness, **40** theorem-proof
+### `textbook/exercise5.149` — Exercise 5.149
+
+- Structured source file: [textbook/exercise5.149.json](textbook/exercise5.149.json)
+- Description: *Exercise 5.149. Constant-input modes of times e and d compose to constant-input time e*d.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.149/source/exercise` | `exercise` | Source Exercise 5.149. Constant-input modes of times e and d compose to constant-input time e*d. | ✅ Faithful | `constantMode_compose` ([Mbse/TextbookExercises/Ch05.lean:640](Mbse/TextbookExercises/Ch05.lean#L640)) |
+| `5.149/plan/constantMode_compose_indices` | `exercise` | Lean anchor `constantMode_compose_indices` for Exercise 5.149. | ❌ Untraced | *None (Coverage Gap)* |
+
+### `textbook/exercise5.150` — Exercise 5.150
+
+- Structured source file: [textbook/exercise5.150.json](textbook/exercise5.150.json)
+- Description: *Exercise 5.150. Variable-time constant-input composition via compiledElapsed TI (SystemMode.trans).*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.150/source/exercise` | `exercise` | Source Exercise 5.150. Variable-time constant-input composition via compiledElapsed TI (SystemMode.trans). | ✅ Faithful | `variableTime_compose` ([Mbse/TextbookExercises/Ch05.lean:665](Mbse/TextbookExercises/Ch05.lean#L665)) |
+| `5.150/plan/variableTime_compose_isSystemMode` | `exercise` | Lean anchor `variableTime_compose_isSystemMode` for Exercise 5.150. | ❌ Untraced | *None (Coverage Gap)* |
+
+### `textbook/exercise5.151` — Exercise 5.151
+
+- Structured source file: [textbook/exercise5.151.json](textbook/exercise5.151.json)
+- Description: *Exercise 5.151. Mutual constant modes of duration d yield round-trip self-modes at d*d.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.151/source/exercise` | `exercise` | Source Exercise 5.151. Mutual constant modes of duration d yield round-trip self-modes at d*d. | ✅ Faithful | `mutual_constantMode_self_d_sq` ([Mbse/TextbookExercises/Ch05.lean:715](Mbse/TextbookExercises/Ch05.lean#L715)) |
+| `5.151/plan/mutual_constantMode_self_d_sq_indices` | `exercise` | Lean anchor `mutual_constantMode_self_d_sq_indices` for Exercise 5.151. | ❌ Untraced | *None (Coverage Gap)* |
+
+### `textbook/exercise5.152` — Exercise 5.152
+
+- Structured source file: [textbook/exercise5.152.json](textbook/exercise5.152.json)
+- Description: *Exercise 5.152. Literal Z1=Z2 is too strong across types; prove isomorphism from mutual primary modes with inverse embeddings (autonomous stutter).*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.152/source/exercise` | `exercise` | Source Exercise 5.152. Corrected: mutual primary modes with inverse embeddings yield IsIsomorphicTo, not type equality. | ✅ Faithful | `mutual_primary_modes_isomorphism` ([Mbse/TextbookExercises/Ch05.lean:744](Mbse/TextbookExercises/Ch05.lean#L744)) |
+| `5.152/plan/mutual_primary_modes_isomorphic` | `exercise` | Lean anchor `mutual_primary_modes_isomorphic` (qualified registry status). | ✅ Faithful | `mutual_primary_modes_isomorphism` ([Mbse/TextbookExercises/Ch05.lean:744](Mbse/TextbookExercises/Ch05.lean#L744)) |
+
+### `textbook/exercise5.153` — Exercise 5.153
+
+- Structured source file: [textbook/exercise5.153.json](textbook/exercise5.153.json)
+- Description: *Exercise 5.153. Counterexample: cycleSampledMode and cycleExhibitor are mutual modes but unequal (+2 vs +1).*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.153/source/exercise` | `exercise` | Source Exercise 5.153. Counterexample: cycleSampledMode and cycleExhibitor are mutual modes but unequal (+2 vs +1). | ✅ Faithful | `mutual_modes_not_equal_counterexample` ([Mbse/TextbookExercises/Ch05.lean:816](Mbse/TextbookExercises/Ch05.lean#L816)) |
+| `5.153/plan/mutual_modes_not_equal_counterexample` | `exercise` | Lean anchor `mutual_modes_not_equal_counterexample` for Exercise 5.153. | ✅ Faithful | `mutual_modes_not_equal_counterexample` ([Mbse/TextbookExercises/Ch05.lean:816](Mbse/TextbookExercises/Ch05.lean#L816)) |
+
+### `textbook/exercise5.156` — Exercise 5.156
+
+- Structured source file: [textbook/exercise5.156.json](textbook/exercise5.156.json)
+- Description: *Exercise 5.156. Not manifest at time 0 implies not in-mode at time 0.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.156/source/exercise` | `exercise` | Source Exercise 5.156. Not manifest at time 0 implies not in-mode at time 0. | ✅ Faithful | `not_manifest_zero_not_inMode` ([Mbse/TextbookExercises/Ch05.lean:831](Mbse/TextbookExercises/Ch05.lean#L831)) |
+| `5.156/plan/not_manifest_zero_not_inMode` | `exercise` | Lean anchor `not_manifest_zero_not_inMode` for Exercise 5.156. | ✅ Faithful | `not_manifest_zero_not_inMode` ([Mbse/TextbookExercises/Ch05.lean:831](Mbse/TextbookExercises/Ch05.lean#L831)) |
+
+### `textbook/exercise5.157` — Exercise 5.157
+
+- Structured source file: [textbook/exercise5.157.json](textbook/exercise5.157.json)
+- Description: *Exercise 5.157. Primary mode admits canonical CNS duration-one SMBF.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.157/source/exercise` | `exercise` | Source Exercise 5.157. Primary mode admits canonical CNS duration-one SMBF. | ✅ Faithful | `primary_has_CNS_SMBF` ([Mbse/TextbookExercises/Ch05.lean:844](Mbse/TextbookExercises/Ch05.lean#L844)) |
+| `5.157/plan/primary_has_CNS_SMBF` | `exercise` | Lean anchor `primary_has_CNS_SMBF` for Exercise 5.157. | ✅ Faithful | `primary_has_CNS_SMBF` ([Mbse/TextbookExercises/Ch05.lean:844](Mbse/TextbookExercises/Ch05.lean#L844)) |
+
+### `textbook/exercise5.158` — Exercise 5.158
+
+- Structured source file: [textbook/exercise5.158.json](textbook/exercise5.158.json)
+- Description: *Exercise 5.158. Typed RSN reading of primary NZ and RZ restrictions.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.158/source/exercise` | `exercise` | Source Exercise 5.158. Typed RSN reading of primary NZ and RZ restrictions. | ✅ Faithful | `primary_NZ_RZ_restriction` ([Mbse/TextbookExercises/Ch05.lean:860](Mbse/TextbookExercises/Ch05.lean#L860)) |
+| `5.158/plan/primary_NZ_RZ_restriction` | `exercise` | Lean anchor `primary_NZ_RZ_restriction` for Exercise 5.158. | ✅ Faithful | `primary_NZ_RZ_restriction` ([Mbse/TextbookExercises/Ch05.lean:860](Mbse/TextbookExercises/Ch05.lean#L860)) |
+
+### `textbook/exercise5.159` — Exercise 5.159
+
+- Structured source file: [textbook/exercise5.159.json](textbook/exercise5.159.json)
+- Description: *Exercise 5.159. Primary mode stays manifest while inputs remain in the mode input image.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.159/source/exercise` | `exercise` | Source Exercise 5.159. Primary mode stays manifest while inputs remain in the mode input image. | ✅ Faithful | `primary_manifest_persists` ([Mbse/TextbookExercises/Ch05.lean:874](Mbse/TextbookExercises/Ch05.lean#L874)) |
+| `5.159/plan/primary_manifest_persists` | `exercise` | Lean anchor `primary_manifest_persists` for Exercise 5.159. | ✅ Faithful | `primary_manifest_persists` ([Mbse/TextbookExercises/Ch05.lean:874](Mbse/TextbookExercises/Ch05.lean#L874)) |
+
+- Exercise kinds: **18** witness, **40** theorem-proof
 
 ## 3. Completeness & Quality Summary
 
-- **Total Structured JSON Entries**: 189 (140 definitions/theorems, 49 exercises)
+- **Total Structured JSON Entries**: 198 (140 definitions/theorems, 58 exercises)
 - **Definition/Theorem Elements**: 398 (391 faithful)
-- **Exercise Task Elements**: 153 (149 faithful)
-- **Total Individual Requirements/Elements**: 551
-- **Linked Elements (any annotation)**: 549 (549/551)
-- **Faithful Elements (excludes stub/partial)**: 540 (540/551)
+- **Exercise Task Elements**: 171 (164 faithful)
+- **Total Individual Requirements/Elements**: 569
+- **Linked Elements (any annotation)**: 564 (564/569)
+- **Faithful Elements (excludes stub/partial)**: 555 (555/569)
 - **Stub/Partial Elements**: 9
-- **Annotation Coverage Rate**: **99.6%**
-- **Faithful Coverage Rate**: **98.0%**
+- **Annotation Coverage Rate**: **99.1%**
+- **Faithful Coverage Rate**: **97.5%**
 
 > Note: *Annotation coverage* counts any tagged link, including placeholders. *Faithful coverage* is the trustworthy figure: it excludes links explicitly marked `|stub` or `|partial`, which indicate the Lean artifact only partially captures (or stands in for) the textbook requirement.
 

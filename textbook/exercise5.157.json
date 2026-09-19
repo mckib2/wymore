@@ -1,0 +1,31 @@
+{
+  "id": "5.157",
+  "kind": "exercise",
+  "name": "Exercise 5.157",
+  "chapter": 5,
+  "description": "Exercise 5.157. Primary mode admits canonical CNS duration-one SMBF.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.157/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.157. Primary mode admits canonical CNS duration-one SMBF.",
+      "lean_anchor": "primary_has_CNS_SMBF",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.157/plan/primary_has_CNS_SMBF",
+      "type": "exercise",
+      "text": "Lean anchor `primary_has_CNS_SMBF` for Exercise 5.157.",
+      "lean_anchor": "primary_has_CNS_SMBF",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

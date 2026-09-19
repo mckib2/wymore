@@ -1,0 +1,31 @@
+{
+  "id": "5.158",
+  "kind": "exercise",
+  "name": "Exercise 5.158",
+  "chapter": 5,
+  "description": "Exercise 5.158. Typed RSN reading of primary NZ and RZ restrictions.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.158/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.158. Typed RSN reading of primary NZ and RZ restrictions.",
+      "lean_anchor": "primary_NZ_RZ_restriction",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.158/plan/primary_NZ_RZ_restriction",
+      "type": "exercise",
+      "text": "Lean anchor `primary_NZ_RZ_restriction` for Exercise 5.158.",
+      "lean_anchor": "primary_NZ_RZ_restriction",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

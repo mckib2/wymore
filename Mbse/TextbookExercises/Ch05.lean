@@ -1,10 +1,11 @@
 import Mbse.WymoreSystemModes
 import Mbse.WymoreCouplingStructure
+import Mbse.Isomorphism
 
 /-!
 # Chapter 5 — system-mode exercises
 
-Exercises 5.141, 5.142, 5.146, 5.147, and 5.148.
+Exercises 5.141, 5.142, 5.146–5.153, and 5.156–5.159.
 
 Two different relations meet here.  `Mbse.Wymore.IsSubsystemOf` is *recipe based*:
 it asserts the existence of coupling recipes, an injective component embedding,
@@ -630,5 +631,295 @@ theorem variableTime_constantInput_state_at_accumulatedTime
     exact compiledInput_eq_constant_of_constantInput M hinput x p t u
   rw [hfun, ← accumulatedModeTime_eq_compiledElapsed M x p t] at hcompiled
   exact hcompiled.symm
+
+/-! ## Exercise 5.149 -/
+
+variable {S₃ I₃ O₃ : Type}
+variable {Z₃ : DiscreteSystem S₃ I₃ O₃}
+
+/-- Constant-input modes compose via `SystemMode.trans`. -/
+def constantMode_compose
+    (M₁₂ : SystemMode Z₁ Z₂) (M₂₃ : SystemMode Z₂ Z₃)
+    (_hIn₁₂ : HasConstantInput M₁₂) (_e : Time) (_hE : HasConstantTimeIndex M₁₂ _e)
+    (_hIn₂₃ : HasConstantInput M₂₃) (_d : Time) (_hD : HasConstantTimeIndex M₂₃ _d) :
+    SystemMode Z₁ Z₃ :=
+  M₁₂.trans M₂₃
+
+/--
+  [textbook/exercise5.149/source/exercise]
+  [textbook/exercise5.149/plan/constantMode_compose_indices]
+
+Constant-input modes of times `e` and `d` compose to a constant-input mode of
+time `e * d`.
+-/
+theorem constantMode_compose_indices
+    (M₁₂ : SystemMode Z₁ Z₂) (M₂₃ : SystemMode Z₂ Z₃)
+    (hIn₁₂ : HasConstantInput M₁₂) (e : Time) (hE : HasConstantTimeIndex M₁₂ e)
+    (hIn₂₃ : HasConstantInput M₂₃) (d : Time) (hD : HasConstantTimeIndex M₂₃ d) :
+    HasConstantInput (constantMode_compose M₁₂ M₂₃ hIn₁₂ e hE hIn₂₃ d hD) ∧
+      HasConstantTimeIndex (constantMode_compose M₁₂ M₂₃ hIn₁₂ e hE hIn₂₃ d hD)
+        (e * d) :=
+  SystemMode.trans_constant M₁₂ M₂₃ hIn₁₂ e hE hIn₂₃ d hD
+
+/-! ## Exercise 5.150 -/
+
+/-- Variable-time composition spine (`SystemMode.trans`). -/
+def variableTime_compose
+    (M₁₂ : SystemMode Z₁ Z₂) (M₂₃ : SystemMode Z₂ Z₃)
+    (_hIn₁₂ : HasConstantInput M₁₂) (_hIn₂₃ : HasConstantInput M₂₃) :
+    SystemMode Z₁ Z₃ :=
+  M₁₂.trans M₂₃
+
+/--
+  [textbook/exercise5.150/source/exercise]
+  [textbook/exercise5.150/plan/variableTime_compose_isSystemMode]
+
+Variable-time constant-input composition: the composite duration is the
+compiled elapsed time `TI` of the second mode along the first mode's constant
+trajectory (the book's sum).
+-/
+theorem variableTime_compose_isSystemMode
+    (M₁₂ : SystemMode Z₁ Z₂) (M₂₃ : SystemMode Z₂ Z₃)
+    (hIn₁₂ : HasConstantInput M₁₂) (hIn₂₃ : HasConstantInput M₂₃) :
+    IsSystemMode Z₁ Z₃ :=
+  ⟨variableTime_compose M₁₂ M₂₃ hIn₁₂ hIn₂₃⟩
+
+theorem variableTime_compose_TI
+    (M₁₂ : SystemMode Z₁ Z₂) (M₂₃ : SystemMode Z₂ Z₃)
+    (hIn₁₂ : HasConstantInput M₁₂) (hIn₂₃ : HasConstantInput M₂₃)
+    (x : S₁) (p : I₁) :
+    (variableTime_compose M₁₂ M₂₃ hIn₁₂ hIn₂₃).timeIndex x p =
+      compiledElapsed M₂₃ (M₁₂.stateMap x) (fun _ => M₁₂.inputMap p)
+        (M₁₂.timeIndex x p) := by
+  change compiledElapsed M₂₃ (M₁₂.stateMap x) (M₁₂.inputIndex x p)
+      (M₁₂.timeIndex x p) = _
+  congr 1
+  funext u
+  exact hIn₁₂ x p u
+
+theorem variableTime_compose_constantInput
+    (M₁₂ : SystemMode Z₁ Z₂) (M₂₃ : SystemMode Z₂ Z₃)
+    (hIn₁₂ : HasConstantInput M₁₂) (hIn₂₃ : HasConstantInput M₂₃) :
+    HasConstantInput (variableTime_compose M₁₂ M₂₃ hIn₁₂ hIn₂₃) := by
+  intro x p t
+  change compiledInput M₂₃ (M₁₂.stateMap x) (M₁₂.inputIndex x p)
+      (M₁₂.timeIndex x p) t = (M₂₃.inputMap ∘ M₁₂.inputMap) p
+  have hfun : M₁₂.inputIndex x p = fun _ => M₁₂.inputMap p := by
+    funext u; exact hIn₁₂ x p u
+  rw [hfun]
+  simpa [Function.comp_apply] using
+    compiledInput_constant M₂₃ hIn₂₃ (M₁₂.stateMap x) (M₁₂.inputMap p)
+      (M₁₂.timeIndex x p) t
+
+/-! ## Exercise 5.151 -/
+
+/-- Round-trip self-mode at `d * d` from mutual constant modes. -/
+def mutual_constantMode_self_d_sq
+    (M₁₂ : SystemMode Z₁ Z₂) (M₂₁ : SystemMode Z₂ Z₁)
+    (hIn₁₂ : HasConstantInput M₁₂) (hIn₂₁ : HasConstantInput M₂₁)
+    (d : Time) (h₁₂ : HasConstantTimeIndex M₁₂ d)
+    (h₂₁ : HasConstantTimeIndex M₂₁ d) :
+    SystemMode Z₁ Z₁ :=
+  constantMode_compose M₁₂ M₂₁ hIn₁₂ d h₁₂ hIn₂₁ d h₂₁
+
+/--
+  [textbook/exercise5.151/source/exercise]
+  [textbook/exercise5.151/plan/mutual_constantMode_self_d_sq_indices]
+
+Mutual constant modes of common duration `d` yield, via 5.149, a self-mode of
+each system at time `d * d` after the round-trip embeddings.
+-/
+theorem mutual_constantMode_self_d_sq_indices
+    (M₁₂ : SystemMode Z₁ Z₂) (M₂₁ : SystemMode Z₂ Z₁)
+    (hIn₁₂ : HasConstantInput M₁₂) (hIn₂₁ : HasConstantInput M₂₁)
+    (d : Time) (h₁₂ : HasConstantTimeIndex M₁₂ d)
+    (h₂₁ : HasConstantTimeIndex M₂₁ d) :
+    HasConstantInput (mutual_constantMode_self_d_sq M₁₂ M₂₁ hIn₁₂ hIn₂₁ d h₁₂ h₂₁) ∧
+      HasConstantTimeIndex
+        (mutual_constantMode_self_d_sq M₁₂ M₂₁ hIn₁₂ hIn₂₁ d h₁₂ h₂₁) (d * d) :=
+  constantMode_compose_indices M₁₂ M₂₁ hIn₁₂ d h₁₂ hIn₂₁ d h₂₁
+
+/-! ## Exercise 5.152 -/
+
+open Homomorphism
+
+/--
+  [textbook/exercise5.152/source/exercise]
+  [textbook/exercise5.152/plan/mutual_primary_modes_isomorphic]
+
+Charitable reading of “Z₁ = Z₂”: mutual primary modes whose embeddings are
+mutual inverses, on systems that stutter autonomously, yield an isomorphism.
+Literal identification of distinct Lean types is not claimed.
+-/
+noncomputable def mutual_primary_modes_isomorphism
+    (M₁₂ : SystemMode Z₁ Z₂) (M₂₁ : SystemMode Z₂ Z₁)
+    (_h₁₂ : IsPrimaryMode M₁₂) (h₂₁ : IsPrimaryMode M₂₁)
+    (hS : Function.LeftInverse M₂₁.stateMap M₁₂.stateMap ∧
+      Function.RightInverse M₂₁.stateMap M₁₂.stateMap)
+    (hI : Function.LeftInverse M₂₁.inputMap M₁₂.inputMap ∧
+      Function.RightInverse M₂₁.inputMap M₁₂.inputMap)
+    (hO : Function.LeftInverse M₂₁.outputMap M₁₂.outputMap ∧
+      Function.RightInverse M₂₁.outputMap M₁₂.outputMap)
+    (hAuto₁ : ∀ x, Z₁.NZ x none = x) (hAuto₂ : ∀ x, Z₂.NZ x none = x) :
+    IsomorphismWitness Z₁ Z₂ where
+  toHomomorphicImageWitness :=
+    { HS := M₂₁.stateMap
+      HI := M₂₁.inputMap
+      HO := M₂₁.outputMap
+      HS_surjective := hS.1.surjective
+      HI_surjective := hI.1.surjective
+      HO_surjective := hO.1.surjective
+      preserves_transition := by
+        intro x oi
+        cases oi with
+        | none =>
+            simp [hAuto₁, hAuto₂]
+        | some p =>
+            exact primary_preserves_transition M₂₁ h₂₁ x p
+      preserves_readout := M₂₁.readout }
+  HS_injective := Function.RightInverse.injective hS.2
+  HI_injective := Function.RightInverse.injective hI.2
+  HO_injective := Function.RightInverse.injective hO.2
+
+theorem mutual_primary_modes_isomorphic
+    (M₁₂ : SystemMode Z₁ Z₂) (M₂₁ : SystemMode Z₂ Z₁)
+    (h₁₂ : IsPrimaryMode M₁₂) (h₂₁ : IsPrimaryMode M₂₁)
+    (hS : Function.LeftInverse M₂₁.stateMap M₁₂.stateMap ∧
+      Function.RightInverse M₂₁.stateMap M₁₂.stateMap)
+    (hI : Function.LeftInverse M₂₁.inputMap M₁₂.inputMap ∧
+      Function.RightInverse M₂₁.inputMap M₁₂.inputMap)
+    (hO : Function.LeftInverse M₂₁.outputMap M₁₂.outputMap ∧
+      Function.RightInverse M₂₁.outputMap M₁₂.outputMap)
+    (hAuto₁ : ∀ x, Z₁.NZ x none = x) (hAuto₂ : ∀ x, Z₂.NZ x none = x) :
+    IsIsomorphicTo Z₁ Z₂ :=
+  ⟨mutual_primary_modes_isomorphism M₁₂ M₂₁ h₁₂ h₂₁ hS hI hO hAuto₁ hAuto₂⟩
+
+/-! ## Exercise 5.153 -/
+
+/--
+Exhibitor as a duration-2 mode of the sampled system: `+1` is two `+2` steps
+on `Fin 3`.
+-/
+def cycleExhibitor_as_mode_of_sampled : SystemMode cycleExhibitor cycleSampledMode where
+  stateMap := id
+  inputMap := id
+  outputMap := id
+  stateMap_injective := Function.injective_id
+  inputMap_injective := Function.injective_id
+  outputMap_injective := Function.injective_id
+  behavior :=
+    { input := fun _ _ _ => ()
+      duration := fun _ _ => 2
+      duration_pos := fun _ _ => by decide }
+  behavior_initial := fun _ _ => rfl
+  transition := by decide
+  readout := by decide
+
+/--
+  [textbook/exercise5.153/source/exercise]
+  [textbook/exercise5.153/plan/mutual_modes_not_equal_counterexample]
+
+Counterexample: `cycleSampledMode` and `cycleExhibitor` are mutual system modes
+(duration 2 each way) but are unequal as systems (`+2` vs `+1`).
+-/
+theorem mutual_modes_not_equal_counterexample :
+    IsSystemMode cycleSampledMode cycleExhibitor ∧
+      IsSystemMode cycleExhibitor cycleSampledMode ∧
+      cycleSampledMode.NZ 0 (some ()) ≠ cycleExhibitor.NZ 0 (some ()) :=
+  ⟨⟨cycleSampledModeWitness⟩, ⟨cycleExhibitor_as_mode_of_sampled⟩, by decide⟩
+
+/-! ## Exercise 5.156 -/
+
+/--
+  [textbook/exercise5.156/source/exercise]
+  [textbook/exercise5.156/plan/not_manifest_zero_not_inMode]
+
+If the mode is not manifest at time 0, the exhibitor is not in the mode at 0.
+-/
+theorem not_manifest_zero_not_inMode
+    (M : SystemMode Z₁ Z₂) (f : ITZW I₂) (x : S₂) (t : Time)
+    (h : ¬ ManifestAt M f x t 0) : ¬ InModeAt M f x t 0 :=
+  not_inMode_of_not_manifest_zero M f x t h
+
+/-! ## Exercise 5.157 -/
+
+/--
+  [textbook/exercise5.157/source/exercise]
+  [textbook/exercise5.157/plan/primary_has_CNS_SMBF]
+
+A primary mode admits the canonical constant-input duration-one SMBF.
+-/
+theorem primary_has_CNS_SMBF (M : SystemMode Z₁ Z₂) (h : IsPrimaryMode M) :
+    IsPrimaryMode (primaryConstantInputMode M h) ∧
+      HasConstantInput (primaryConstantInputMode M h) ∧
+      HasConstantTimeIndex (primaryConstantInputMode M h) 1 :=
+  ⟨⟨Nat.zero_lt_one, fun _ _ => rfl⟩,
+    primaryConstantInputMode_constantInput M h,
+    primaryConstantInputMode_time M h⟩
+
+/-! ## Exercise 5.158 -/
+
+/--
+  [textbook/exercise5.158/source/exercise]
+  [textbook/exercise5.158/plan/primary_NZ_RZ_restriction]
+
+Typed reading of `NZ₁ = RSN(NZ₂, SZ₁ × IZ₁)` and `RZ₁ = RSN(RZ₂, SZ₁)`.
+-/
+theorem primary_NZ_RZ_restriction (M : SystemMode Z₁ Z₂) (h : IsPrimaryMode M) :
+    (∀ x p, M.stateMap (Z₁.NZ x (some p)) =
+      Z₂.NZ (M.stateMap x) (some (M.inputMap p))) ∧
+      (∀ x, (Z₁.RZ x).map M.outputMap = Z₂.RZ (M.stateMap x)) :=
+  ⟨primary_preserves_transition M h, M.readout⟩
+
+/-! ## Exercise 5.159 -/
+
+/--
+  [textbook/exercise5.159/source/exercise]
+  [textbook/exercise5.159/plan/primary_manifest_persists]
+
+A primary mode remains manifest while exhibitor inputs stay in the image of the
+mode input embedding.
+-/
+theorem primary_manifest_persists
+    (M : SystemMode Z₁ Z₂) (h : IsPrimaryMode M)
+    (f : ITZW I₂) (x : S₂) (t s : Time)
+    (hmanifest : ManifestAt M f x t s)
+    (r : Time) (hr : s + r ≤ t)
+    (hseg : ∀ u, u < r → ∃ p : I₁, f (s + u) = some (M.inputMap p)) :
+    ManifestAt M f x t (s + r) := by
+  induction r generalizing s with
+  | zero =>
+      simpa using hmanifest
+  | succ r ih =>
+      rcases hmanifest with ⟨_, x₁, hx₁⟩
+      obtain ⟨p, hp⟩ := hseg 0 (Nat.zero_lt_succ r)
+      have hfs : f s = some (M.inputMap p) := by
+        simpa only [Nat.add_zero] using hp
+      have hstep :
+          generateStateTrajectory Z₂ x f (s + 1) =
+            M.stateMap (Z₁.NZ x₁ (some p)) := by
+        rw [generateStateTrajectory_succ, hx₁, hfs]
+        exact (primary_preserves_transition M h x₁ p).symm
+      have hle' : s + 1 ≤ t := by
+        have h1 : s + 1 ≤ s + (r + 1) := Nat.succ_le_succ (Nat.le_add_right s r)
+        have h2 : s + (r + 1) ≤ t := hr
+        exact Nat.le_trans h1 h2
+      have hmanifest1 : ManifestAt M f x t (s + 1) := ⟨hle', _, hstep⟩
+      have hseg' : ∀ u, u < r → ∃ p : I₁, f ((s + 1) + u) = some (M.inputMap p) := by
+        intro u hu
+        obtain ⟨p', hp'⟩ := hseg (u + 1) (Nat.succ_lt_succ hu)
+        refine ⟨p', ?_⟩
+        have : (s + 1) + u = s + (u + 1) := by
+          rw [Nat.add_assoc, Nat.add_comm 1 u]
+        rwa [this]
+      have hr' : (s + 1) + r ≤ t := by
+        have : (s + 1) + r = s + (r + 1) := by
+          rw [Nat.add_assoc, Nat.add_comm 1 r]
+        rwa [this]
+      have ihout := ih (s + 1) hmanifest1 hr' hseg'
+      have : s + (r + 1) = (s + 1) + r := by
+        rw [Nat.add_assoc, Nat.add_comm 1 r]
+      rw [this]
+      exact ihout
 
 end Mbse.TextbookExercises.Ch05

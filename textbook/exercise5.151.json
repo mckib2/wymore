@@ -1,0 +1,31 @@
+{
+  "id": "5.151",
+  "kind": "exercise",
+  "name": "Exercise 5.151",
+  "chapter": 5,
+  "description": "Exercise 5.151. Mutual constant modes of duration d yield round-trip self-modes at d*d.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.151/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.151. Mutual constant modes of duration d yield round-trip self-modes at d*d.",
+      "lean_anchor": "mutual_constantMode_self_d_sq_indices",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.151/plan/mutual_constantMode_self_d_sq_indices",
+      "type": "exercise",
+      "text": "Lean anchor `mutual_constantMode_self_d_sq_indices` for Exercise 5.151.",
+      "lean_anchor": "mutual_constantMode_self_d_sq_indices",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}
