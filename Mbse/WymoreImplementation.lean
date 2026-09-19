@@ -133,6 +133,9 @@ def ExactlyImplements.toImplements
   Autonomous enrichment of a system mode: the state embedding preserves
   `none`-input steps.  Systems that stutter on autonomous steps
   (`DiscreteSystem.ofTotal`) satisfy it automatically.
+
+  This is the mode-side counterpart of
+  `Homomorphism.StepPreservingMaps.preserves_autonomous`.
 -/
 def ModePreservesAutonomous
     {SM IM OM S₁ I₁ O₁ : Type}

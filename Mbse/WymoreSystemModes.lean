@@ -221,6 +221,28 @@ theorem primaryConstantInputMode_time (M : SystemMode Z₁ Z₂) (h : IsPrimaryM
     HasConstantTimeIndex (primaryConstantInputMode M h) 1 :=
   ⟨Nat.zero_lt_one, fun _ _ => rfl⟩
 
+/-- Primary mode from the shared step/readout core plus injectivity. -/
+def primaryModeOfStepReadout {Z₁ : DiscreteSystem S₁ I₁ O₁} {Z₂ : DiscreteSystem S₂ I₂ O₂}
+    (M : Homomorphism.StepReadoutMaps Z₁ Z₂)
+    (hS : Function.Injective M.HS) (hI : Function.Injective M.HI)
+    (hO : Function.Injective M.HO) :
+    SystemMode Z₁ Z₂ where
+  stateMap := M.HS
+  inputMap := M.HI
+  outputMap := M.HO
+  stateMap_injective := hS
+  inputMap_injective := hI
+  outputMap_injective := hO
+  behavior :=
+    { input := fun _ p _ => M.HI p
+      duration := fun _ _ => 1
+      duration_pos := fun _ _ => Nat.zero_lt_one }
+  behavior_initial := fun _ _ => rfl
+  transition := by
+    intro x p
+    simpa [generateStateTrajectory_succ] using M.preserves_step_some x p
+  readout := M.preserves_readout
+
 /--
   [textbook/theorem5.20/lean/primary_iff_componentwise_subset]
 Corrected converse of 5.20: explicit embeddings preserving transition and
@@ -232,22 +254,11 @@ def primaryModeOfMaps (Z₁ : DiscreteSystem S₁ I₁ O₁) (Z₂ : DiscreteSys
     (hO : Function.Injective eO)
     (hN : ∀ x p, eS (Z₁.NZ x (some p)) = Z₂.NZ (eS x) (some (eI p)))
     (hR : ∀ x, (Z₁.RZ x).map eO = Z₂.RZ (eS x)) :
-    SystemMode Z₁ Z₂ where
-  stateMap := eS
-  inputMap := eI
-  outputMap := eO
-  stateMap_injective := hS
-  inputMap_injective := hI
-  outputMap_injective := hO
-  behavior :=
-    { input := fun _ p _ => eI p
-      duration := fun _ _ => 1
-      duration_pos := fun _ _ => Nat.zero_lt_one }
-  behavior_initial := fun _ _ => rfl
-  transition := by
-    intro x p
-    simpa [generateStateTrajectory_succ] using hN x p
-  readout := hR
+    SystemMode Z₁ Z₂ :=
+  primaryModeOfStepReadout
+    { HS := eS, HI := eI, HO := eO
+      preserves_step_some := hN, preserves_readout := hR }
+    hS hI hO
 
 theorem primaryModeOfMaps_isPrimary
     (hS : Function.Injective (eS : S₁ → S₂))

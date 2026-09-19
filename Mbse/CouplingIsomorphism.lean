@@ -1,5 +1,4 @@
-import Mbse.Isomorphism
-import Mbse.WymoreCouplingStructure
+import Mbse.CouplingPortMaps
 
 /-!
 # Chapter 4: isomorphisms between system resultants
@@ -15,22 +14,13 @@ homomorphism/copy algebra of [`Mbse.Isomorphism`](Isomorphism.lean):
 * Corollary 4.59 — the same statement with "copy" in place of "homomorphic image".
 * Exercise 4.66 — deleting the components of null order from a coupling recipe leaves `UISCR` and
   `UOSCR` unchanged and makes the new resultant a homomorphic image of the original one.
+
+Shared port-skeleton transport lives in [`Mbse.CouplingPortMaps`](CouplingPortMaps.lean).
 -/
 
 namespace Homomorphism
 
 open Homomorphism Mbse.Wymore
-
-/-- Transport along two proofs of the same type equality agrees (definitional proof irrelevance). -/
-lemma eq_rec_proof_irrel {A B : Type} {h1 h2 : A = B} (a : A) : h1 ▸ a = h2 ▸ a := by
-  subst h1; rfl
-
-/-- The connected output feeding an input port is unique, so `connectedOutput` is determined. -/
-lemma connectedOutput_eq {n : Nat} (SCR : SystemCouplingRecipe n)
-    (ip : Σ (i : Fin n), SCR.VSCR.Port i) (hC : ip ∈ CISCR SCR)
-    (op : Σ (i : Fin n), SCR.VSCR.OutPort i) (hop : (op, ip) ∈ SCR.CSCR) :
-    connectedOutput SCR ip hC = op :=
-  SCR.connectivity.1.2 _ _ _ (connectedOutput_spec SCR ip hC) hop
 
 /-! ## Rearranging a connectable vector -/
 
@@ -166,28 +156,6 @@ theorem reindexHO_eq {n : Nat} (SCR : SystemCouplingRecipe n) (F : Fin n ≃ Fin
       (Equiv.piCongrLeft (fun jp : UnconnOutPort SCR => SCR.VSCR.OutPortVal jp.val.1 jp.val.2)
         (reindexUnconnOut SCR F)).symm := rfl
 
-/-- Transporting the readout of a *named* connected output port along its compatibility proof. -/
-lemma conn_cast_congr {n : Nat} (SCR : SystemCouplingRecipe n)
-    (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k)) (x : rsy_SZ SCR) (i : Fin n)
-    (port : SCR.VSCR.Port i) (op1 op2 : Σ j, SCR.VSCR.OutPort j) (h : op1 = op2)
-    (h1 : SCR.VSCR.OutPortVal op1.1 op1.2 = SCR.VSCR.PortVal i port)
-    (h2 : SCR.VSCR.OutPortVal op2.1 op2.2 = SCR.VSCR.PortVal i port) :
-    h1 ▸ rsyOutAt SCR hOut x op1 = h2 ▸ rsyOutAt SCR hOut x op2 := by
-  subst h
-  exact eq_rec_proof_irrel _
-
-/-- Connected-port form of `rsy_component_input_fun` with the feeding output port named. -/
-lemma rsy_component_input_of_conn {n : Nat} (SCR : SystemCouplingRecipe n)
-    (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k)) (i : Fin n) (extIn : rsy_IZ SCR)
-    (x : rsy_SZ SCR) (port : SCR.VSCR.Port i) (op : Σ j, SCR.VSCR.OutPort j)
-    (hop : (op, (⟨i, port⟩ : Σ j, SCR.VSCR.Port j)) ∈ SCR.CSCR)
-    (hty : SCR.VSCR.OutPortVal op.1 op.2 = SCR.VSCR.PortVal i port) :
-    rsy_component_input_fun SCR hOut i extIn x port = hty ▸ rsyOutAt SCR hOut x op := by
-  classical
-  have hC : (⟨i, port⟩ : Σ j, SCR.VSCR.Port j) ∈ CISCR SCR := ⟨op, hop⟩
-  rw [rsy_component_input_ciscr _ _ _ _ _ _ hC]
-  exact conn_cast_congr SCR hOut x i port _ op (connectedOutput_eq SCR _ hC op hop) _ hty
-
 theorem reindex_component_input {n : Nat} (SCR : SystemCouplingRecipe n) (F : Fin n ≃ Fin n)
     (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k)) (i : Fin n) (extIn : rsy_IZ SCR)
     (x : rsy_SZ SCR) (port : (reindexRecipe SCR F).VSCR.Port i) :
@@ -201,8 +169,8 @@ theorem reindex_component_input {n : Nat} (SCR : SystemCouplingRecipe n) (F : Fi
     rw [rsy_component_input_uiscr _ _ _ _ _ _ hU, rsy_component_input_uiscr _ _ _ _ _ _ hU']
     rfl
   · have hC : (⟨i, port⟩ : Σ j, (reindexRecipe SCR F).VSCR.Port j) ∈
-        CISCR (reindexRecipe SCR F) := by
-      simpa [UISCR, Set.mem_compl_iff] using hU
+        CISCR (reindexRecipe SCR F) :=
+      (not_mem_uiscr_iff_mem_ciscr (reindexRecipe SCR F) _).mp hU
     set op1 := connectedOutput (reindexRecipe SCR F) ⟨i, port⟩ hC with hop1def
     have hspec : (op1, (⟨i, port⟩ : Σ j, (reindexRecipe SCR F).VSCR.Port j)) ∈
         (reindexRecipe SCR F).CSCR := connectedOutput_spec (reindexRecipe SCR F) ⟨i, port⟩ hC
@@ -265,11 +233,6 @@ theorem ex4_85_rearrangement_isomorphic {n : Nat} (SCR : SystemCouplingRecipe n)
     ⟨reindexIsomorphismWitness SCR F hOut⟩⟩
 
 /-! ## Theorem 4.56: componentwise port-preserving homomorphisms lift to the resultant -/
-
-/-- Transporting an application across a heterogeneous equality of functions. -/
-lemma heq_fun_apply {A A' B B' : Type} (hA : A = A') (hB : B = B') {f : A → B} {g : A' → B'}
-    (h : HEq f g) (v : A) : hB ▸ f v = g (hA ▸ v) := by
-  subst hA; subst hB; cases h; rfl
 
 /--
   [textbook/theorem4.56/definition/componentwise_elaboration]
@@ -345,23 +308,10 @@ theorem elab_readout {n : Nat} {SCR : SystemCouplingRecipe n} (E : Componentwise
     (y : rsy_SZ (elabRecipe E)) (op : Σ i, SCR.VSCR.OutPort i) :
     (E.outPorts op.1).port op.2 (rsyOutAt (elabRecipe E) hOut2 y op) =
       rsyOutAt SCR hOut1 (fun i => (E.hom i).HS (y i)) op := by
-  classical
   obtain ⟨i, q⟩ := op
-  have h2 : (E.Z i).RZ (y i) = some (Classical.choose (hOut2 i (y i))) :=
-    Classical.choose_spec (hOut2 i (y i))
-  have h1 : (SCR.VSCR.Z i).RZ ((E.hom i).HS (y i)) =
-      some (Classical.choose (hOut1 i ((E.hom i).HS (y i)))) :=
-    Classical.choose_spec (hOut1 i ((E.hom i).HS (y i)))
-  have hmap := (E.hom i).preserves_readout (y i)
-  rw [h2, h1] at hmap
-  have hval : (E.hom i).HO (Classical.choose (hOut2 i (y i))) =
-      Classical.choose (hOut1 i ((E.hom i).HS (y i))) := Option.some.inj hmap
-  have hproj : (E.hom i).HO (Classical.choose (hOut2 i (y i))) q =
-      (E.outPorts i).port q (Classical.choose (hOut2 i (y i)) q) :=
-    (E.outPorts i).proj _ q
-  show (E.outPorts i).port q (Classical.choose (hOut2 i (y i)) q) = _
-  rw [← hproj, hval]
-  rfl
+  simpa [rsyOutAt_eq_componentReadoutAt] using
+    alwaysOutputs_port_readout (SCR.VSCR.Z i) (E.Z i) (E.hom i).HS (E.hom i).HO
+      (E.outPorts i) (hOut1 i) (hOut2 i) (E.hom i).preserves_readout (y i) q
 
 /-- Componentwise resolved inputs intertwine with the port homomorphisms. -/
 theorem elab_component_input {n : Nat} {SCR : SystemCouplingRecipe n}
@@ -372,31 +322,11 @@ theorem elab_component_input {n : Nat} {SCR : SystemCouplingRecipe n}
     (E.hom i).HI (rsy_component_input_fun (elabRecipe E) hOut2 i e y) =
       rsy_component_input_fun SCR hOut1 i
         (fun ip => (E.inPorts ip.val.1).port ip.val.2 (e ip))
-        (fun k => (E.hom k).HS (y k)) := by
-  classical
-  funext port
-  have hproj : (E.hom i).HI (rsy_component_input_fun (elabRecipe E) hOut2 i e y) port =
-      (E.inPorts i).port port (rsy_component_input_fun (elabRecipe E) hOut2 i e y port) :=
-    (E.inPorts i).proj _ port
-  rw [hproj]
-  by_cases hU : (⟨i, port⟩ : Σ j, SCR.VSCR.Port j) ∈ UISCR SCR
-  · rw [rsy_component_input_uiscr (elabRecipe E) hOut2 i e y port hU,
-      rsy_component_input_uiscr SCR hOut1 i _ _ port hU]
-    rfl
-  · have hC : (⟨i, port⟩ : Σ j, SCR.VSCR.Port j) ∈ CISCR SCR := by
-      simpa [UISCR, Set.mem_compl_iff] using hU
-    set op := connectedOutput SCR ⟨i, port⟩ hC with hopdef
-    have hspec : (op, (⟨i, port⟩ : Σ j, SCR.VSCR.Port j)) ∈ SCR.CSCR :=
-      connectedOutput_spec SCR ⟨i, port⟩ hC
-    have htyE : (elabRecipe E).VSCR.OutPortVal op.1 op.2 =
-        (elabRecipe E).VSCR.PortVal i port := E.compat op ⟨i, port⟩ hspec
-    have htyS : SCR.VSCR.OutPortVal op.1 op.2 = SCR.VSCR.PortVal i port :=
-      SCR.connectivity.2.2.2 op ⟨i, port⟩ hspec
-    rw [rsy_component_input_of_conn (elabRecipe E) hOut2 i e y port op hspec htyE,
-      rsy_component_input_of_conn SCR hOut1 i _ _ port op hspec htyS]
-    rw [← elab_readout E hOut1 hOut2 y op]
-    exact (heq_fun_apply htyE htyS (E.matched op ⟨i, port⟩ hspec)
-      (rsyOutAt (elabRecipe E) hOut2 y op)).symm
+        (fun k => (E.hom k).HS (y k)) :=
+  sharedSkeleton_component_input E.Z E.distinct E.compat
+    (fun i => (E.hom i).HS) (fun i => (E.hom i).HI) (fun i => (E.hom i).HO)
+    E.inPorts E.outPorts E.matched
+    (fun i y => (E.hom i).preserves_readout y) hOut1 hOut2 i e y
 
 /--
   [textbook/theorem4.56/proof/resultant_homomorphism]

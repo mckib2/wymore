@@ -55,6 +55,90 @@ structure HomomorphicImageWitness
   /-- [textbook/definition4.3/requirement/readout_consistency] Condition (v). -/
   preserves_readout : ∀ x, (Z_elab.RZ x).map HO = Z_img.RZ (HS x)
 
+/-! ## Shared step/readout core (modes ↔ homs) -/
+
+/--
+Forward maps that intertwine non-autonomous steps and readout.  This is the
+common core of primary system modes (`primaryModeOfMaps`) and homomorphic
+images (`HomomorphicImageWitness`), before injectivity/surjectivity and before
+autonomous enrichment (`ModePreservesAutonomous`).
+
+Maps run from `Z_src` to `Z_tgt` (elaboration → image for homs; mode → exhibitor
+for modes).
+-/
+structure StepReadoutMaps
+    {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    (Z_src : DiscreteSystem SZ1 IZ1 OZ1)
+    (Z_tgt : DiscreteSystem SZ2 IZ2 OZ2) where
+  HS : SZ1 → SZ2
+  HI : IZ1 → IZ2
+  HO : OZ1 → OZ2
+  preserves_step_some :
+    ∀ x p, HS (Z_src.NZ x (some p)) = Z_tgt.NZ (HS x) (some (HI p))
+  preserves_readout : ∀ x, (Z_src.RZ x).map HO = Z_tgt.RZ (HS x)
+
+/--
+Step/readout maps that also preserve autonomous (`none`) steps.  A
+`HomomorphicImageWitness` is exactly this core plus surjectivity of the three
+maps; `ModePreservesAutonomous` is the same autonomous clause on a `SystemMode`.
+-/
+structure StepPreservingMaps
+    {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    (Z_src : DiscreteSystem SZ1 IZ1 OZ1)
+    (Z_tgt : DiscreteSystem SZ2 IZ2 OZ2)
+    extends StepReadoutMaps Z_src Z_tgt where
+  preserves_autonomous :
+    ∀ x, HS (Z_src.NZ x none) = Z_tgt.NZ (HS x) none
+
+theorem StepPreservingMaps.preserves_transition
+    {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z_src : DiscreteSystem SZ1 IZ1 OZ1} {Z_tgt : DiscreteSystem SZ2 IZ2 OZ2}
+    (M : StepPreservingMaps Z_src Z_tgt) (x : SZ1) (oi : Option IZ1) :
+    M.HS (Z_src.NZ x oi) = Z_tgt.NZ (M.HS x) (oi.map M.HI) := by
+  cases oi with
+  | none => exact M.preserves_autonomous x
+  | some p => exact M.preserves_step_some x p
+
+/-- Trajectory intertwining for `StepPreservingMaps` (shared by HIISYSMO / Implements). -/
+theorem StepPreservingMaps.preserves_state_trajectory
+    {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z_src : DiscreteSystem SZ1 IZ1 OZ1} {Z_tgt : DiscreteSystem SZ2 IZ2 OZ2}
+    (M : StepPreservingMaps Z_src Z_tgt) (s0 : SZ1) (f : ITZW IZ1) :
+    ∀ t, M.HS (generateStateTrajectory Z_src s0 f t) =
+         generateStateTrajectory Z_tgt (M.HS s0) (fun τ => (f τ).map M.HI) t :=
+  map_preserves_state_trajectory Z_src Z_tgt M.HS (fun oi => oi.map M.HI)
+    M.preserves_transition s0 f
+
+def HomomorphicImageWitness.toStepPreservingMaps
+    {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z_img : DiscreteSystem SZ1 IZ1 OZ1} {Z_elab : DiscreteSystem SZ2 IZ2 OZ2}
+    (h : HomomorphicImageWitness Z_img Z_elab) :
+    StepPreservingMaps Z_elab Z_img where
+  HS := h.HS
+  HI := h.HI
+  HO := h.HO
+  preserves_step_some := fun x p => by
+    simpa using h.preserves_transition x (some p)
+  preserves_readout := h.preserves_readout
+  preserves_autonomous := fun x => by
+    simpa using h.preserves_transition x none
+
+def HomomorphicImageWitness.ofStepPreservingMaps
+    {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
+    {Z_img : DiscreteSystem SZ1 IZ1 OZ1} {Z_elab : DiscreteSystem SZ2 IZ2 OZ2}
+    (M : StepPreservingMaps Z_elab Z_img)
+    (hS : Function.Surjective M.HS) (hI : Function.Surjective M.HI)
+    (hO : Function.Surjective M.HO) :
+    HomomorphicImageWitness Z_img Z_elab where
+  HS := M.HS
+  HI := M.HI
+  HO := M.HO
+  HS_surjective := hS
+  HI_surjective := hI
+  HO_surjective := hO
+  preserves_transition := M.preserves_transition
+  preserves_readout := M.preserves_readout
+
 /--
   [textbook/definition4.3/definition/homomorphic_image]
   Prop-level packaging: a homomorphic image witness exists.
@@ -456,4 +540,5 @@ end Homomorphism
 export Homomorphism (HomomorphicImageWitness IsHomomorphicImage himsy HimsyWellDefined
   homomorphic_image_eq_himsy himsy_is_homomorphic_image csy_component_homomorphic_image
   himsy_parameterization homomorphicImage_preserves_state_trajectory
-  homomorphicImage_preserves_output_trajectory homomorphicImage_of_morphism)
+  homomorphicImage_preserves_output_trajectory homomorphicImage_of_morphism
+  StepReadoutMaps StepPreservingMaps)

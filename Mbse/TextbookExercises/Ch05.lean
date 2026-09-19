@@ -346,8 +346,10 @@ theorem twoStateMode_transition_not_restriction :
 /--
 Injectivity of the `DiscreteSystem` type former in its state argument.
 
-This is the exact principle the recipe-based subsystem relation needs and Lean
-does not supply.  `HEq Z (rsy SCR hOut)` yields only equality of the two
+This is the named Prop package for Def 3.97 `HEq` packaging (see also
+[`Homomorphism.DiscreteSystemStateReflectionDoc`] in `CouplingPortMaps.lean`):
+not a new axiom, but a reusable hypothesis for subsystem arguments such as
+Exercise 5.142.  `HEq Z (rsy SCR hOut)` yields only equality of the two
 `DiscreteSystem` *applications*, and Lean proves no injectivity for type
 formers, so the state type of `Z` cannot otherwise be identified with
 `rsy_SZ SCR`.  Nor can cardinality substitute for it: a recipe whose components

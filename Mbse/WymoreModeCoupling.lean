@@ -183,6 +183,18 @@ theorem sysmoscr_component {n : Nat} {SCR : SystemCouplingRecipe n}
     (sysmoscr D).VSCR.Z i = D.modeSystem i := by
   rfl
 
+/-- Projection of the mode resultant step through `resultantStateMap`. -/
+@[simp, wymore] theorem resultantStateMap_NZ {n : Nat} {SCR : SystemCouplingRecipe n}
+    (D : InducedSystemModeRecipe SCR)
+    (hModeOut : ∀ k, AlwaysOutputs ((sysmoscr D).VSCR.Z k))
+    (y : rsy_SZ (sysmoscr D)) (e : rsy_IZ (sysmoscr D)) (i : Fin n) :
+    resultantStateMap D ((rsy (sysmoscr D) hModeOut).NZ y (some e)) i =
+      (D.componentMode i).stateMap
+        ((D.modeSystem i).NZ (y i)
+          (some (rsy_component_input_fun (sysmoscr D) hModeOut i e y))) := by
+  simp [resultantStateMap, rsy, rsy_NZ, sysmoscr_component]
+  rfl
+
 /-! ## Portwise injectivity of a non-constricting inclusion -/
 
 /--
@@ -251,27 +263,11 @@ theorem mode_readout {n : Nat} {SCR : SystemCouplingRecipe n}
     (y : rsy_SZ (sysmoscr D)) (op : Σ i, SCR.VSCR.OutPort i) :
     (D.outputPorts op.1).port op.2 (rsyOutAt (sysmoscr D) hModeOut y op) =
       rsyOutAt SCR hOut (resultantStateMap D y) op := by
-  classical
   obtain ⟨i, q⟩ := op
-  have hmode : (D.modeSystem i).RZ (y i) =
-      some (Classical.choose (hModeOut i (y i))) := by
-    simpa [sysmoscr_component] using Classical.choose_spec (hModeOut i (y i))
-  have hexh : (SCR.VSCR.Z i).RZ ((D.componentMode i).stateMap (y i)) =
-      some (Classical.choose (hOut i ((D.componentMode i).stateMap (y i)))) :=
-    Classical.choose_spec (hOut i ((D.componentMode i).stateMap (y i)))
-  have hmap := (D.componentMode i).readout (y i)
-  rw [hmode, hexh] at hmap
-  have hval :
-      (D.componentMode i).outputMap (Classical.choose (hModeOut i (y i))) =
-        Classical.choose (hOut i ((D.componentMode i).stateMap (y i))) :=
-    Option.some_injective _ hmap
-  have hproj :
-      (D.componentMode i).outputMap (Classical.choose (hModeOut i (y i))) q =
-        (D.outputPorts i).port q (Classical.choose (hModeOut i (y i)) q) :=
-    (D.outputPorts i).proj _ q
-  show (D.outputPorts i).port q (Classical.choose (hModeOut i (y i)) q) = _
-  rw [← hproj, hval]
-  rfl
+  simpa [rsyOutAt_eq_componentReadoutAt, resultantStateMap, sysmoscr_component] using
+    alwaysOutputs_port_readout (SCR.VSCR.Z i) (D.modeSystem i)
+      (D.componentMode i).stateMap (D.componentMode i).outputMap
+      (D.outputPorts i) (hOut i) (hModeOut i) (D.componentMode i).readout (y i) q
 
 /--
 At the initial state, the exhibitor coupling resolves each component input to
@@ -287,36 +283,14 @@ theorem mode_component_input {n : Nat} {SCR : SystemCouplingRecipe n}
         (rsy_component_input_fun (sysmoscr D) hModeOut i e y) =
       rsy_component_input_fun SCR hOut i (resultantInputMap D e)
         (resultantStateMap D y) := by
-  classical
-  funext port
-  have hproj :
-      (D.componentMode i).inputMap
-          (rsy_component_input_fun (sysmoscr D) hModeOut i e y) port =
-        (D.inputPorts i).port port
-          (rsy_component_input_fun (sysmoscr D) hModeOut i e y port) :=
-    (D.inputPorts i).proj _ port
-  rw [hproj]
-  by_cases hU : (⟨i, port⟩ : Σ j, SCR.VSCR.Port j) ∈ UISCR SCR
-  · rw [rsy_component_input_uiscr (sysmoscr D) hModeOut i e y port hU,
-      rsy_component_input_uiscr SCR hOut i (resultantInputMap D e)
-        (resultantStateMap D y) port hU]
-    rfl
-  · have hC : (⟨i, port⟩ : Σ j, SCR.VSCR.Port j) ∈ CISCR SCR := by
-      simpa [UISCR, CISCR, Set.mem_compl_iff] using hU
-    set op := connectedOutput SCR ⟨i, port⟩ hC with hopdef
-    have hspec : (op, (⟨i, port⟩ : Σ j, SCR.VSCR.Port j)) ∈ SCR.CSCR :=
-      connectedOutput_spec SCR ⟨i, port⟩ hC
-    have htyM : (sysmoscr D).VSCR.OutPortVal op.1 op.2 =
-        (sysmoscr D).VSCR.PortVal i port :=
-      D.inducedCompatibility op ⟨i, port⟩ hspec
-    have htyS : SCR.VSCR.OutPortVal op.1 op.2 = SCR.VSCR.PortVal i port :=
-      SCR.connectivity.2.2.2 op ⟨i, port⟩ hspec
-    rw [rsy_component_input_of_conn (sysmoscr D) hModeOut i e y port op hspec htyM,
-      rsy_component_input_of_conn SCR hOut i (resultantInputMap D e)
-        (resultantStateMap D y) port op hspec htyS]
-    rw [← mode_readout D hOut hModeOut y op]
-    exact (heq_fun_apply htyM htyS (D.matched op ⟨i, port⟩ hspec)
-      (rsyOutAt (sysmoscr D) hModeOut y op)).symm
+  have h :=
+    sharedSkeleton_component_input D.modeSystem D.distinct D.inducedCompatibility
+      (fun i => (D.componentMode i).stateMap)
+      (fun i => (D.componentMode i).inputMap)
+      (fun i => (D.componentMode i).outputMap)
+      D.inputPorts D.outputPorts D.matched
+      (fun i y => (D.componentMode i).readout y) hOut hModeOut i e y
+  simpa [resultantInputMap, resultantStateMap] using h
 
 /-- Resultant readout inclusion, reduced to the owning component. -/
 theorem resultant_readout_inclusion {n : Nat} {SCR : SystemCouplingRecipe n}
@@ -472,8 +446,8 @@ theorem resolved_input_constant {n : Nat} {SCR : SystemCouplingRecipe n}
     rw [rsy_component_input_uiscr SCR hOut j (resultantInputMap D e)
       (resultantStateMap D y) port hU] at hstatic
     exact hstatic.symm
-  · have hC : (⟨j, port⟩ : Σ k, SCR.VSCR.Port k) ∈ CISCR SCR := by
-      simpa [UISCR, CISCR, Set.mem_compl_iff] using hU
+  · have hC : (⟨j, port⟩ : Σ k, SCR.VSCR.Port k) ∈ CISCR SCR :=
+      (not_mem_uiscr_iff_mem_ciscr SCR _).mp hU
     set op := connectedOutput SCR ⟨j, port⟩ hC
     have hop : (op, (⟨j, port⟩ : Σ k, SCR.VSCR.Port k)) ∈ SCR.CSCR :=
       connectedOutput_spec SCR ⟨j, port⟩ hC
@@ -552,7 +526,7 @@ theorem HasConstantOutputOnSources.of_all {n : Nat} {SCR : SystemCouplingRecipe 
     (h : ∀ i, HasConstantOutput (D.componentMode i)) : HasConstantOutputOnSources D :=
   fun i _ => h i
 
-/-- Lemma 3.77 lifts the constant component steps to the resultant state at time `d`. -/
+/-- Lemma 3.77 lifts constant component steps once resolved inputs match on `[0, d)`. -/
 theorem resultant_state_at_duration {n : Nat} {SCR : SystemCouplingRecipe n}
     (D : InducedSystemModeRecipe SCR)
     (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k))
@@ -560,20 +534,18 @@ theorem resultant_state_at_duration {n : Nat} {SCR : SystemCouplingRecipe n}
     {d : Time}
     (hinput : ∀ i, HasConstantInput (D.componentMode i))
     (htime : ∀ i x p, (D.componentMode i).timeIndex x p = d)
-    (houtput : HasConstantOutputOnSources D)
-    (e : rsy_IZ (sysmoscr D)) (y : rsy_SZ (sysmoscr D)) :
+    (e : rsy_IZ (sysmoscr D)) (y : rsy_SZ (sysmoscr D))
+    (hresolved : ∀ t, t < d → ∀ i,
+      rsy_component_input_at SCR hOut i (constantExternalInput D e)
+          (resultantStateMap D y) t =
+        (D.componentMode i).inputMap
+          (rsy_component_input_fun (sysmoscr D) hModeOut i e y)) :
     resultantStateMap D ((rsy (sysmoscr D) hModeOut).NZ y (some e)) =
       generateStateTrajectory (rsy SCR hOut) (resultantStateMap D y)
         (liftInput (constantExternalInput D e)) d := by
   funext i
   let modeIn := rsy_component_input_fun (sysmoscr D) hModeOut i e y
-  have hleft :
-      resultantStateMap D ((rsy (sysmoscr D) hModeOut).NZ y (some e)) i =
-        (D.componentMode i).stateMap
-          ((D.modeSystem i).NZ (y i) (some (rsy_component_input_fun (sysmoscr D) hModeOut i e y))) := by
-    simp [resultantStateMap, rsy, rsy_NZ, sysmoscr_component]
-    rfl
-  rw [hleft, (D.componentMode i).transition (y i) modeIn]
+  rw [resultantStateMap_NZ, (D.componentMode i).transition (y i) modeIn]
   have hdur : (D.componentMode i).behavior.duration (y i) modeIn = d :=
     htime i (y i) modeIn
   rw [hdur]
@@ -586,8 +558,22 @@ theorem resultant_state_at_duration {n : Nat} {SCR : SystemCouplingRecipe n}
   rw [rsn_eq_iff]
   intro t ht
   simp only [rsy_component_input_trajectory, liftInput]
-  exact congrArg some
-    (resolved_input_constant D hOut hModeOut hinput htime houtput e y t ht i).symm
+  exact congrArg some (hresolved t ht i).symm
+
+theorem resultant_state_at_duration_of_sources {n : Nat} {SCR : SystemCouplingRecipe n}
+    (D : InducedSystemModeRecipe SCR)
+    (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k))
+    (hModeOut : ∀ k, AlwaysOutputs ((sysmoscr D).VSCR.Z k))
+    {d : Time}
+    (hinput : ∀ i, HasConstantInput (D.componentMode i))
+    (htime : ∀ i x p, (D.componentMode i).timeIndex x p = d)
+    (houtput : HasConstantOutputOnSources D)
+    (e : rsy_IZ (sysmoscr D)) (y : rsy_SZ (sysmoscr D)) :
+    resultantStateMap D ((rsy (sysmoscr D) hModeOut).NZ y (some e)) =
+      generateStateTrajectory (rsy SCR hOut) (resultantStateMap D y)
+        (liftInput (constantExternalInput D e)) d :=
+  resultant_state_at_duration D hOut hModeOut hinput htime e y
+    (fun t ht i => resolved_input_constant D hOut hModeOut hinput htime houtput e y t ht i)
 
 theorem resultant_state_at_duration_empty_cscr {n : Nat} {SCR : SystemCouplingRecipe n}
     (hEmpty : SCR.CSCR = ∅)
@@ -600,30 +586,32 @@ theorem resultant_state_at_duration_empty_cscr {n : Nat} {SCR : SystemCouplingRe
     (e : rsy_IZ (sysmoscr D)) (y : rsy_SZ (sysmoscr D)) :
     resultantStateMap D ((rsy (sysmoscr D) hModeOut).NZ y (some e)) =
       generateStateTrajectory (rsy SCR hOut) (resultantStateMap D y)
-        (liftInput (constantExternalInput D e)) d := by
-  funext i
-  let modeIn := rsy_component_input_fun (sysmoscr D) hModeOut i e y
-  have hleft :
-      resultantStateMap D ((rsy (sysmoscr D) hModeOut).NZ y (some e)) i =
-        (D.componentMode i).stateMap
-          ((D.modeSystem i).NZ (y i) (some (rsy_component_input_fun (sysmoscr D) hModeOut i e y))) := by
-    simp [resultantStateMap, rsy, rsy_NZ, sysmoscr_component]
-    rfl
-  rw [hleft, (D.componentMode i).transition (y i) modeIn]
-  have hdur : (D.componentMode i).behavior.duration (y i) modeIn = d :=
-    htime i (y i) modeIn
-  rw [hdur]
-  have hidx : (D.componentMode i).behavior.input (y i) modeIn =
-      fun _ => (D.componentMode i).inputMap modeIn := by
-    funext t
-    exact hinput i (y i) modeIn t
-  rw [hidx, rsy_state_trajectory]
-  apply stateTrajectory_nonanticipatory
-  rw [rsn_eq_iff]
-  intro t ht
-  simp only [rsy_component_input_trajectory, liftInput]
-  exact congrArg some
-    (resolved_input_constant_empty_cscr hEmpty D hOut hModeOut hinput htime e y t ht i).symm
+        (liftInput (constantExternalInput D e)) d :=
+  resultant_state_at_duration D hOut hModeOut hinput htime e y
+    (fun t ht i =>
+      resolved_input_constant_empty_cscr hEmpty D hOut hModeOut hinput htime e y t ht i)
+
+/-- Constant external input of duration `d` with a supplied transition proof. -/
+def mkConstantResultantCompat {n : Nat} {SCR : SystemCouplingRecipe n}
+    (D : InducedSystemModeRecipe SCR)
+    (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i))
+    (hModeOut : ∀ i, AlwaysOutputs ((sysmoscr D).VSCR.Z i))
+    {d : Time} (hd : 0 < d)
+    (htrans : ∀ y e,
+      resultantStateMap D ((rsy (sysmoscr D) hModeOut).NZ y (some e)) =
+        generateStateTrajectory (rsy SCR hOut) (resultantStateMap D y)
+          (liftInput (constantExternalInput D e)) d)
+    [∀ i p, Nonempty (D.ModePortVal i p)]
+    [∀ i q, Nonempty (D.ModeOutPortVal i q)] :
+    ResultantModeCompatibility D hOut hModeOut where
+  ports := resultantPorts D
+  behavior :=
+    { input := fun _ e _ => resultantInputMap D e
+      duration := fun _ _ => d
+      duration_pos := fun _ _ => hd }
+  behavior_initial := fun _ _ => rfl
+  transition := htrans
+  readout := fun y => resultant_readout_inclusion D hOut hModeOut y
 
 /-- Each external resultant output port belongs to one component, constant on `[0, d)`. -/
 theorem resultant_output_constant {n : Nat} {SCR : SystemCouplingRecipe n}
@@ -669,17 +657,10 @@ def constantResultantCompatibility {n : Nat} {SCR : SystemCouplingRecipe n}
     {d : Time} (components : ConstantComponentModeData D d)
     [∀ i p, Nonempty (D.ModePortVal i p)]
     [∀ i q, Nonempty (D.ModeOutPortVal i q)] :
-    ResultantModeCompatibility D hOut hModeOut where
-  ports := resultantPorts D
-  behavior :=
-    { input := fun _ e _ => resultantInputMap D e
-      duration := fun _ _ => d
-      duration_pos := fun _ _ => components.pos }
-  behavior_initial := fun _ _ => rfl
-  transition := fun y e =>
-    resultant_state_at_duration D hOut hModeOut components.input components.time
+    ResultantModeCompatibility D hOut hModeOut :=
+  mkConstantResultantCompat D hOut hModeOut components.pos fun y e =>
+    resultant_state_at_duration_of_sources D hOut hModeOut components.input components.time
       (HasConstantOutputOnSources.of_all D components.output) e y
-  readout := fun y => resultant_readout_inclusion D hOut hModeOut y
 
 /--
   [textbook/theorem5.134/source/theorem]
@@ -730,17 +711,9 @@ theorem hologenic_of_constant_input_source_output
     IsSystemModeHologenic D hOut hModeOut ∧
       ∃ M : SystemMode (rsy (sysmoscr D) hModeOut) (rsy SCR hOut),
         HasConstantInput M ∧ HasConstantTimeIndex M d := by
-  let C : ResultantModeCompatibility D hOut hModeOut :=
-    { ports := resultantPorts D
-      behavior :=
-        { input := fun _ e _ => resultantInputMap D e
-          duration := fun _ _ => d
-          duration_pos := fun _ _ => components.pos }
-      behavior_initial := fun _ _ => rfl
-      transition := fun y e =>
-        resultant_state_at_duration D hOut hModeOut components.input components.time
-          components.sources e y
-      readout := fun y => resultant_readout_inclusion D hOut hModeOut y }
+  let C := mkConstantResultantCompat D hOut hModeOut components.pos fun y e =>
+    resultant_state_at_duration_of_sources D hOut hModeOut components.input components.time
+      components.sources e y
   exact ⟨⟨C⟩, C.mode, fun _ _ _ => rfl, ⟨components.pos, fun _ _ => rfl⟩⟩
 
 /-- Empty connectivity: constant input and common duration suffice (no constant output). -/
@@ -762,17 +735,9 @@ theorem hologenic_of_constant_input_empty_cscr
     IsSystemModeHologenic D hOut hModeOut ∧
       ∃ M : SystemMode (rsy (sysmoscr D) hModeOut) (rsy SCR hOut),
         HasConstantInput M ∧ HasConstantTimeIndex M d := by
-  let C : ResultantModeCompatibility D hOut hModeOut :=
-    { ports := resultantPorts D
-      behavior :=
-        { input := fun _ e _ => resultantInputMap D e
-          duration := fun _ _ => d
-          duration_pos := fun _ _ => components.pos }
-      behavior_initial := fun _ _ => rfl
-      transition := fun y e =>
-        resultant_state_at_duration_empty_cscr components.empty D hOut hModeOut
-          components.input components.time e y
-      readout := fun y => resultant_readout_inclusion D hOut hModeOut y }
+  let C := mkConstantResultantCompat D hOut hModeOut components.pos fun y e =>
+    resultant_state_at_duration_empty_cscr components.empty D hOut hModeOut
+      components.input components.time e y
   exact ⟨⟨C⟩, C.mode, fun _ _ _ => rfl, ⟨components.pos, fun _ _ => rfl⟩⟩
 
 /-- Duration one: constant output is automatic, so only constant input is required. -/
@@ -840,37 +805,21 @@ theorem hologenic_of_primary_modes
       ∃ M : SystemMode (rsy (sysmoscr D) hModeOut) (rsy SCR hOut),
         IsPrimaryMode M ∧ HasConstantInput M ∧ HasConstantOutput M := by
   classical
-  let C : ResultantModeCompatibility D hOut hModeOut :=
-    { ports := resultantPorts D
-      behavior :=
-        { input := fun _ e _ => resultantInputMap D e
-          duration := fun _ _ => 1
-          duration_pos := fun _ _ => Nat.zero_lt_one }
-      behavior_initial := fun _ _ => rfl
-      transition := by
-        intro y e
-        funext i
-        have hleft :
-            resultantStateMap D ((rsy (sysmoscr D) hModeOut).NZ y (some e)) i =
-              (D.componentMode i).stateMap
-                ((D.modeSystem i).NZ (y i)
-                  (some (rsy_component_input_fun (sysmoscr D) hModeOut i e y))) := by
-          simp [resultantStateMap, rsy, rsy_NZ, sysmoscr_component]
-          rfl
-        rw [hleft, primary_preserves_transition (D.componentMode i) (hP i) (y i)
-          (rsy_component_input_fun (sysmoscr D) hModeOut i e y)]
-        have hrhs :
-            generateStateTrajectory (rsy SCR hOut) (resultantStateMap D y)
-                (liftInput (fun _ => resultantInputMap D e)) 1 i =
-              (SCR.VSCR.Z i).NZ ((D.componentMode i).stateMap (y i))
-                (some (rsy_component_input_fun SCR hOut i (resultantInputMap D e)
-                  (resultantStateMap D y))) := by
-          rw [generateStateTrajectory_succ, generateStateTrajectory_zero]
-          simp [rsy, rsy_NZ, liftInput, resultantStateMap]
-        rw [hrhs]
-        exact congrArg (fun p => (SCR.VSCR.Z i).NZ ((D.componentMode i).stateMap (y i)) (some p))
-          (mode_component_input D hOut hModeOut i e y)
-      readout := fun y => resultant_readout_inclusion D hOut hModeOut y }
+  let C := mkConstantResultantCompat D hOut hModeOut Nat.zero_lt_one (d := 1) fun y e => by
+    funext i
+    rw [resultantStateMap_NZ, primary_preserves_transition (D.componentMode i) (hP i) (y i)
+      (rsy_component_input_fun (sysmoscr D) hModeOut i e y)]
+    have hrhs :
+        generateStateTrajectory (rsy SCR hOut) (resultantStateMap D y)
+            (liftInput (constantExternalInput D e)) 1 i =
+          (SCR.VSCR.Z i).NZ ((D.componentMode i).stateMap (y i))
+            (some (rsy_component_input_fun SCR hOut i (resultantInputMap D e)
+              (resultantStateMap D y))) := by
+      rw [generateStateTrajectory_succ, generateStateTrajectory_zero]
+      simp [rsy, rsy_NZ, liftInput, resultantStateMap, constantExternalInput]
+    rw [hrhs]
+    exact congrArg (fun p => (SCR.VSCR.Z i).NZ ((D.componentMode i).stateMap (y i)) (some p))
+      (mode_component_input D hOut hModeOut i e y)
   refine ⟨⟨C⟩, C.mode, ⟨Nat.zero_lt_one, fun _ _ => rfl⟩, ?_, ?_⟩
   · intro _ _ _
     rfl
@@ -917,14 +866,7 @@ theorem resultant_inevitable_step {n : Nat} {SCR : SystemCouplingRecipe n}
       resultantStateMap D ((rsy (sysmoscr D) hModeOut).NZ y (some e)) := by
   funext i
   let modeIn := rsy_component_input_fun (sysmoscr D) hModeOut i e y
-  rw [rsy_state_trajectory]
-  have hleft :
-      resultantStateMap D ((rsy (sysmoscr D) hModeOut).NZ y (some e)) i =
-        (D.componentMode i).stateMap
-          ((D.modeSystem i).NZ (y i) (some (rsy_component_input_fun (sysmoscr D) hModeOut i e y))) := by
-    simp [resultantStateMap, rsy, rsy_NZ, sysmoscr_component]
-    rfl
-  rw [hleft]
+  rw [rsy_state_trajectory, resultantStateMap_NZ]
   let gcomp : ITZ ((p : SCR.VSCR.Port i) → SCR.VSCR.PortVal i p) :=
     fun t => rsy_component_input_at SCR hOut i g (resultantStateMap D y) t
   have hg0 : gcomp 0 = (D.componentMode i).inputMap modeIn :=
@@ -949,17 +891,10 @@ def inevitableResultantCompatibility {n : Nat} {SCR : SystemCouplingRecipe n}
     (hinevit : ∀ i, HasInevitableTransitions (D.componentMode i))
     [∀ i p, Nonempty (D.ModePortVal i p)]
     [∀ i q, Nonempty (D.ModeOutPortVal i q)] :
-    ResultantModeCompatibility D hOut hModeOut where
-  ports := resultantPorts D
-  behavior :=
-    { input := fun _ e _ => resultantInputMap D e
-      duration := fun _ _ => d
-      duration_pos := fun _ _ => hd }
-  behavior_initial := fun _ _ => rfl
-  transition := fun y e =>
+    ResultantModeCompatibility D hOut hModeOut :=
+  mkConstantResultantCompat D hOut hModeOut hd fun y e =>
     (resultant_inevitable_step D hOut hModeOut htime hinevit e y
       (constantExternalInput D e) rfl).symm
-  readout := fun y => resultant_readout_inclusion D hOut hModeOut y
 
 /--
   [textbook/theorem5.138/source/theorem]
@@ -993,17 +928,6 @@ theorem hologenic_of_inevitable_constantTime
       hinevit e y g hg
 
 /-! ## Theorem 5.119 -/
-
-noncomputable def moveResultantHom {n : Nat} {Sf If Of : Type}
-    {Zfun : DiscreteSystem Sf If Of}
-    {SCR1 SCR2 : SystemCouplingRecipe n}
-    (h : SCR1 = SCR2)
-    (h1 : ∀ i, AlwaysOutputs (SCR1.VSCR.Z i))
-    (h2 : ∀ i, AlwaysOutputs (SCR2.VSCR.Z i))
-    (hom : HomomorphicImageWitness Zfun (rsy SCR1 h1)) :
-    HomomorphicImageWitness Zfun (rsy SCR2 h2) := by
-  subst h
-  exact hom
 
 /--
   [textbook/theorem5.119/source/theorem]

@@ -902,12 +902,11 @@ theorem csy_state_trajectory {n : Nat} (VSCR : PortSystemVector n)
     (f : ITZW ((ip : Σ i, VSCR.Port i) → VSCR.PortVal ip.1 ip.2)) (t : Time) (i : Fin n) :
     (generateStateTrajectory (csy VSCR hOut) x f t i) =
     generateStateTrajectory (VSCR.Z i) (x i) (fun τ => (f τ).map (fun full port => full ⟨i, port⟩)) t := by
-  induction t generalizing i with
-  | zero => simp [generateStateTrajectory_zero]
-  | succ t ih =>
-    rw [generateStateTrajectory_succ]
-    simp only [csy]
-    exact congr_arg (fun s => (VSCR.Z i).NZ s ((f t).map (fun full port => full ⟨i, port⟩))) (ih i)
+  wymore_trajectory_induction generalizing i
+  rename_i t ih
+  rw [generateStateTrajectory_succ]
+  simp only [csy]
+  exact congr_arg (fun s => (VSCR.Z i).NZ s ((f t).map (fun full port => full ⟨i, port⟩))) (ih i)
 
 theorem csy_output_trajectory {n : Nat} (VSCR : PortSystemVector n)
     (hOut : ∀ i, AlwaysOutputs (VSCR.Z i)) (x : (i : Fin n) → VSCR.SZ i)
@@ -974,6 +973,16 @@ lemma mem_uiscr_iff {n : Nat} (SCR : SystemCouplingRecipe n)
     ip ∈ UISCR SCR ↔ ip ∉ CISCR SCR := by
   simp [UISCR]
 
+@[wymore] lemma not_mem_uiscr_iff_mem_ciscr {n : Nat} (SCR : SystemCouplingRecipe n)
+    (ip : Σ (i : Fin n), SCR.VSCR.Port i) :
+    ip ∉ UISCR SCR ↔ ip ∈ CISCR SCR := by
+  simp [UISCR]
+
+@[wymore] lemma mem_ciscr_of_not_mem_uiscr {n : Nat} (SCR : SystemCouplingRecipe n)
+    (ip : Σ (i : Fin n), SCR.VSCR.Port i) (h : ip ∉ UISCR SCR) :
+    ip ∈ CISCR SCR :=
+  (not_mem_uiscr_iff_mem_ciscr SCR ip).mp h
+
 /--
   [textbook/definition3.47/definition/connected_output]
   The output port feeding a connected input port `ip` via `CSCR`.
@@ -993,7 +1002,7 @@ noncomputable def rsyOutAt {n : Nat} (SCR : SystemCouplingRecipe n)
     (op : Σ (i : Fin n), SCR.VSCR.OutPort i) : SCR.VSCR.OutPortVal op.1 op.2 :=
   csyOut SCR.VSCR hOut x op
 
-lemma rsyOutAt_eq_componentReadoutAt {n : Nat} (SCR : SystemCouplingRecipe n)
+@[wymore] lemma rsyOutAt_eq_componentReadoutAt {n : Nat} (SCR : SystemCouplingRecipe n)
     (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i)) (i : Fin n)
     (op : SCR.VSCR.OutPort i) (x : rsy_SZ SCR) :
     rsyOutAt SCR hOut x ⟨i, op⟩ = componentReadoutAt (SCR.VSCR.Z i) (hOut i) op (x i) := by
@@ -1011,13 +1020,13 @@ noncomputable def rsy_component_input_fun {n : Nat} (SCR : SystemCouplingRecipe 
   let ip : Σ (j : Fin n), SCR.VSCR.Port j := ⟨i, port⟩
   by_cases hU : ip ∈ UISCR SCR
   · exact extIn ⟨ip, hU⟩
-  · have hC : ip ∈ CISCR SCR := by simpa [UISCR, Set.mem_compl_iff] using hU
+  · have hC : ip ∈ CISCR SCR := (not_mem_uiscr_iff_mem_ciscr SCR ip).mp hU
     let op := connectedOutput SCR ip hC
     have hop : (op, ip) ∈ SCR.CSCR := connectedOutput_spec SCR ip hC
     have hcomp := SCR.connectivity.2.2.2 op ip hop
     exact hcomp ▸ rsyOutAt SCR hOut x op
 
-lemma rsy_component_input_uiscr {n : Nat} (SCR : SystemCouplingRecipe n)
+@[wymore] lemma rsy_component_input_uiscr {n : Nat} (SCR : SystemCouplingRecipe n)
     (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k)) (i : Fin n) (extIn : rsy_IZ SCR)
     (x : rsy_SZ SCR) (port : SCR.VSCR.Port i) (hU : ⟨i, port⟩ ∈ UISCR SCR) :
     rsy_component_input_fun SCR hOut i extIn x port = extIn ⟨⟨i, port⟩, hU⟩ := by

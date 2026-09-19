@@ -125,14 +125,13 @@ theorem rsy_state_trajectory {n : Nat} (SCR : SystemCouplingRecipe n)
     (generateStateTrajectory (rsy SCR hOut) x (rsyClosedLoopLiftInput SCR f) t i) =
       generateStateTrajectory (SCR.VSCR.Z i) (x i)
         (rsy_component_input_trajectory SCR hOut i f x) t := by
-  induction t generalizing i with
-  | zero => simp [generateStateTrajectory_zero]
-  | succ t ih =>
-    rw [generateStateTrajectory_succ]
-    simp only [rsy, rsy_NZ, rsyClosedLoopLiftInput, liftInput]
-    exact congr_arg (fun s =>
-      (SCR.VSCR.Z i).NZ s (some (rsy_component_input_fun SCR hOut i (f t)
-        (generateStateTrajectory (rsy SCR hOut) x (rsyClosedLoopLiftInput SCR f) t)))) (ih i)
+  wymore_trajectory_induction generalizing i
+  rename_i t ih
+  rw [generateStateTrajectory_succ]
+  simp only [rsy, rsy_NZ, rsyClosedLoopLiftInput, liftInput]
+  exact congr_arg (fun s =>
+    (SCR.VSCR.Z i).NZ s (some (rsy_component_input_fun SCR hOut i (f t)
+      (generateStateTrajectory (rsy SCR hOut) x (rsyClosedLoopLiftInput SCR f) t)))) (ih i)
 
 theorem rsyOutAt_eq_component_output_trajectory {n : Nat} (SCR : SystemCouplingRecipe n)
     (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k)) (x : rsyClosedLoopSZ SCR)
@@ -248,7 +247,7 @@ noncomputable def cfscrInputAt {n : Nat} (SCR : SystemCouplingRecipe n)
     if hU : ip ∈ UISCR SCR then
       f t ⟨⟨ip.1, ip.2⟩, hU⟩
     else
-      have hC : ip ∈ CISCR SCR := by simpa [UISCR, CISCR, Set.mem_compl_iff] using hU
+      have hC : ip ∈ CISCR SCR := (not_mem_uiscr_iff_mem_ciscr SCR ip).mp hU
       couplingFunctionCiscrInputAt SCR hOut f x t ip hC
 
 /-- State built from `CFSCR` inputs (matches closed-loop state trajectory). -/

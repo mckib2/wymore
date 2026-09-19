@@ -9,14 +9,21 @@ See [`LTLTactics`](LTLTactics.lean) for clause-satisfaction helpers.
 
 open Lean Parser Tactic
 
-/-- `wymore_trajectory_induction` runs standard induction on trajectory time. -/
-syntax (name := wymoreTrajectoryInduction) "wymore_trajectory_induction" : tactic
+/--
+`wymore_trajectory_induction` inducts on the time variable `t` already in the
+goal context.  Optional `generalizing x y …` is forwarded to `induction`.
+The zero case is discharged by `simp [generateStateTrajectory_zero]`; the
+successor case is left for the caller (needed by `rsy_state_trajectory`).
+-/
+syntax (name := wymoreTrajectoryInduction)
+  "wymore_trajectory_induction" ("generalizing" (colGt ident)+)? : tactic
 
+set_option hygiene false in
 macro_rules
   | `(tactic| wymore_trajectory_induction) =>
-    `(tactic| intro t; induction t with
-      | zero => simp [generateStateTrajectory_zero]
-      | succ n ih => simp [generateStateTrajectory_succ])
+    `(tactic| induction t; · simp [generateStateTrajectory_zero])
+  | `(tactic| wymore_trajectory_induction generalizing $xs*) =>
+    `(tactic| induction t generalizing $xs*; · simp [generateStateTrajectory_zero])
 
 /-- `wymore_output_of_state h` rewrites an output goal using a state trajectory lemma. -/
 syntax (name := wymoreOutputOfState) "wymore_output_of_state " rwRule : tactic
@@ -38,6 +45,18 @@ syntax (name := wymoreSimp) "wymore_simp" : tactic
 macro_rules
   | `(tactic| wymore_simp) =>
     `(tactic| simp only [wymore])
+
+/--
+`rsy_port_cases SCR, ip with hU` case-splits `ip` on `UISCR SCR`.
+In the connected branch use `(not_mem_uiscr_iff_mem_ciscr SCR ip).mp hU`.
+-/
+syntax (name := rsyPortCases)
+  "rsy_port_cases " term ", " term " with " ident : tactic
+
+set_option hygiene false in
+macro_rules
+  | `(tactic| rsy_port_cases $SCR:term, $ip:term with $hU:ident) =>
+    `(tactic| by_cases $hU:ident : ($ip) ∈ UISCR $SCR)
 
 set_option hygiene false
 
