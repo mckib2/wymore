@@ -5,7 +5,7 @@ import Mbse.Isomorphism
 /-!
 # Chapter 5 — system-mode exercises
 
-Exercises 5.141, 5.142, 5.146–5.153, and 5.156–5.159.
+Exercises 5.141, 5.142, 5.146–5.153, and 5.156–5.169.
 
 Two different relations meet here.  `Mbse.Wymore.IsSubsystemOf` is *recipe based*:
 it asserts the existence of coupling recipes, an injective component embedding,
@@ -921,5 +921,167 @@ theorem primary_manifest_persists
         rw [Nat.add_assoc, Nat.add_comm 1 r]
       rw [this]
       exact ihout
+
+/-! ## Exercise 5.160 — `RSYSMO` is a system parameterization -/
+
+/--
+  [textbook/exercise5.160/source/exercise]
+  [textbook/exercise5.160/plan/rsysmo_isSystemParameterization]
+  Exercise 5.160: `RSYSMO` is a `DiscreteSystemParameterization`.
+-/
+theorem rsysmo_isSystemParameterization (p : ReachableModeParam) :
+    rsysmo p = reachableModeSystem p.Z p.A p.hA :=
+  rsysmo_eq p
+
+/-! ## Exercise 5.161 — reachable mode is primary -/
+
+/--
+  [textbook/exercise5.161/source/exercise]
+  [textbook/exercise5.161/plan/reachableMode_isPrimary_exercise]
+  Exercise 5.161: the reachable system mode is primary.
+-/
+theorem reachableMode_isPrimary_exercise (Z : DiscreteSystem S₂ I₂ O₂)
+    (A : Set S₂) (hA : A.Nonempty) :
+    IsPrimaryMode (reachableMode Z A hA) :=
+  reachableMode_isPrimary Z A hA
+
+/-! ## Exercise 5.162 — complement of an isolated mode is isolated -/
+
+/--
+  [textbook/exercise5.162/source/exercise]
+  [textbook/exercise5.162/plan/complement_isolated_isIsolated]
+  Exercise 5.162: the complement of an isolated mode's state set carries another
+  isolated mode.
+-/
+theorem complement_isolated_isIsolated (M : SystemMode Z₁ Z₂)
+    (h : IsIsolatedMode M) (hproper : IsProperMode M) :
+    IsIsolatedMode (complementMode M h hproper) :=
+  complementMode_isIsolated M h hproper
+
+/-! ## Exercise 5.163 — stay in an isolated mode throughout an experiment -/
+
+/--
+  [textbook/exercise5.163/source/exercise]
+  [textbook/exercise5.163/plan/isolated_throughout_iff_start]
+  Exercise 5.163: under total exhibitor inputs, an isolated mode is occupied
+  throughout an experiment iff the start state lies in the mode.
+-/
+theorem isolated_throughout_iff_start (M : SystemMode Z₁ Z₂)
+    (h : IsIsolatedMode M) (f : ITZ I₂) (x : S₂) (t : Time) :
+    (∀ s ≤ t, InModeAt M (liftInput f) x t s) ↔ ∃ x₁, x = M.stateMap x₁ :=
+  isolated_throughout_iff M h f x t
+
+/-! ## Exercise 5.164 — transient vs isolated differences -/
+
+/--
+  [textbook/exercise5.164/source/exercise]
+  [textbook/exercise5.164/plan/transient_vs_isolated_exercise]
+  Exercise 5.164: typed input and closure differences between transient and
+  isolated modes (exhibitor autonomous stutter assumed).
+-/
+theorem transient_vs_isolated_exercise (M : SystemMode Z₁ Z₂)
+    (haut : ∀ y : S₂, Z₂.NZ y none = y) :
+    (IsTransientMode M →
+      ¬ Function.Surjective M.inputMap ∧
+        ∃ (x : S₁) (p : I₂), ∀ x' : S₁, Z₂.NZ (M.stateMap x) (some p) ≠ M.stateMap x') ∧
+    (IsIsolatedMode M →
+      Function.Surjective M.inputMap ∧
+        ∀ (x : S₁) (p : I₂), ∃ x' : S₁, Z₂.NZ (M.stateMap x) (some p) = M.stateMap x') :=
+  transient_vs_isolated_differences M haut
+
+/-! ## Exercise 5.165 — transient state generates a transient mode -/
+
+/--
+  [textbook/exercise5.165/source/exercise]
+  [textbook/exercise5.165/plan/transientState_generates_transientMode_exercise]
+  Exercise 5.165: a transient state with nonempty stay-input set generates a
+  transient singleton mode.
+-/
+theorem transientState_generates_transientMode_exercise
+    (Z : DiscreteSystem S₂ I₂ O₂) (x' : S₂)
+    (htrans : IsTransientState Z x')
+    (hne : Nonempty (StayInput Z x'))
+    (hproper : ∃ y : S₂, y ≠ x') :
+    IsTransientMode (transientStateMode Z x' hne) :=
+  transientState_generates_transientMode Z x' htrans hne hproper
+
+/-! ## Exercise 5.166 — absorbing state generates absorbing trivial `RSYSMO` -/
+
+/--
+  [textbook/exercise5.166/source/exercise]
+  [textbook/exercise5.166/plan/absorbingState_generates_absorbing_rsysmo]
+  Exercise 5.166: an absorbing state generates an absorbing trivial reachable
+  mode `RSYSMO(Z, {x'})`, and the explicit singleton mode is likewise absorbing
+  and trivial.
+-/
+theorem absorbingState_generates_absorbing_rsysmo
+    (Z : DiscreteSystem S₂ I₂ O₂) (x' : S₂)
+    (habs : IsAbsorbingState Z x') (haut : Z.NZ x' none = x')
+    (hproper : ∃ y : S₂, y ≠ x') :
+    IsAbsorbingMode (reachableMode Z ({x'} : Set S₂) ⟨x', rfl⟩) ∧
+      IsTrivialMode (reachableMode Z ({x'} : Set S₂) ⟨x', rfl⟩) ∧
+      IsAbsorbingMode (absorbingStateMode Z x' habs) ∧
+      IsTrivialMode (absorbingStateMode Z x' habs) ∧
+      (∀ y, ReachableFromSet Z {x'} y ↔ y = x') := by
+  have hR := absorbing_reachableMode_properties Z x' habs haut hproper
+  exact ⟨hR.1, hR.2, absorbingStateMode_isAbsorbing Z x' habs hproper,
+    absorbingStateMode_isTrivial Z x' habs,
+    fun y => reachableFromSet_of_absorbing Z x' habs haut y⟩
+
+/-! ## Exercise 5.167 — proper reachable mode is absorbing -/
+
+/--
+  [textbook/exercise5.167/source/exercise]
+  [textbook/exercise5.167/plan/proper_reachableMode_absorbing_exercise]
+  Exercise 5.167: export of Theorem 5.37.
+-/
+theorem proper_reachableMode_absorbing_exercise (Z : DiscreteSystem S₂ I₂ O₂)
+    (A : Set S₂) (hA : A.Nonempty) (hproper : IsProperMode (reachableMode Z A hA)) :
+    IsAbsorbingMode (reachableMode Z A hA) :=
+  proper_reachableMode_absorbing Z A hA hproper
+
+/-! ## Exercise 5.168 — isolated mode is absorbing -/
+
+/--
+  [textbook/exercise5.168/source/exercise]
+  [textbook/exercise5.168/plan/isolated_isAbsorbing_exercise]
+  Exercise 5.168: an isolated mode is absorbing.
+-/
+theorem isolated_isAbsorbing_exercise (M : SystemMode Z₁ Z₂)
+    (h : IsIsolatedMode M) : IsAbsorbingMode M :=
+  isolated_isAbsorbing M h
+
+/-! ## Exercise 5.169 — counterexample: constant input + non-primary ↛ constant time > 1 -/
+
+lemma twoStateMode_constantInput : HasConstantInput twoStateModeWitness :=
+  fun _ _ _ => rfl
+
+lemma twoStateMode_not_primary : ¬ IsPrimaryMode twoStateModeWitness := by
+  intro h
+  have hdur := h.2 (1 : Fin 2) ()
+  -- duration is `x.val + 1`, so at state 1 it equals 2, not 1
+  change (1 : Fin 2).val + 1 = 1 at hdur
+  simp at hdur
+
+lemma twoStateMode_variableTime : HasVariableTimeIndex twoStateModeWitness := by
+  intro ⟨d, hd⟩
+  have h0 := hd.2 (0 : Fin 2) ()
+  have h1 := hd.2 (1 : Fin 2) ()
+  change (0 : Fin 2).val + 1 = d at h0
+  change (1 : Fin 2).val + 1 = d at h1
+  simp at h0 h1
+  omega
+
+/--
+  [textbook/exercise5.169/source/exercise]
+  [textbook/exercise5.169/plan/constantInput_nonprimary_not_implies_constantTime]
+  Exercise 5.169 counterexample: constant input and non-primary need not imply
+  constant time index greater than 1 (`twoStateModeWitness` has variable time).
+-/
+theorem constantInput_nonprimary_not_implies_constantTime :
+    HasConstantInput twoStateModeWitness ∧
+      ¬ IsPrimaryMode twoStateModeWitness ∧
+      HasVariableTimeIndex twoStateModeWitness :=
+  ⟨twoStateMode_constantInput, twoStateMode_not_primary, twoStateMode_variableTime⟩
 
 end Mbse.TextbookExercises.Ch05

@@ -1,0 +1,31 @@
+{
+  "id": "5.162",
+  "kind": "exercise",
+  "name": "Exercise 5.162",
+  "chapter": 5,
+  "description": "Exercise 5.162. Complement of an isolated mode is isolated.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.162/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.162. Complement of an isolated mode is isolated.",
+      "lean_anchor": "complement_isolated_isIsolated",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.162/plan/complement_isolated_isIsolated",
+      "type": "exercise",
+      "text": "Lean anchor `complement_isolated_isIsolated` for Exercise 5.162.",
+      "lean_anchor": "complement_isolated_isIsolated",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

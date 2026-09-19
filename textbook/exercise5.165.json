@@ -1,0 +1,31 @@
+{
+  "id": "5.165",
+  "kind": "exercise",
+  "name": "Exercise 5.165",
+  "chapter": 5,
+  "description": "Exercise 5.165. A transient state generates a transient singleton mode.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.165/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.165. A transient state generates a transient singleton mode.",
+      "lean_anchor": "transientState_generates_transientMode_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.165/plan/transientState_generates_transientMode_exercise",
+      "type": "exercise",
+      "text": "Lean anchor `transientState_generates_transientMode_exercise` for Exercise 5.165.",
+      "lean_anchor": "transientState_generates_transientMode_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

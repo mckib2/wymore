@@ -85,6 +85,16 @@ def registry : List ExerciseEntry :=
   , ⟨"5.157", 5, .theoremProof, "solved", "Ch05.primary_has_CNS_SMBF"⟩
   , ⟨"5.158", 5, .theoremProof, "solved", "Ch05.primary_NZ_RZ_restriction"⟩
   , ⟨"5.159", 5, .theoremProof, "solved", "Ch05.primary_manifest_persists"⟩
+  , ⟨"5.160", 5, .theoremProof, "solved", "Ch05.rsysmo_isSystemParameterization"⟩
+  , ⟨"5.161", 5, .theoremProof, "solved", "Ch05.reachableMode_isPrimary_exercise"⟩
+  , ⟨"5.162", 5, .theoremProof, "solved", "Ch05.complement_isolated_isIsolated"⟩
+  , ⟨"5.163", 5, .theoremProof, "solved", "Ch05.isolated_throughout_iff_start"⟩
+  , ⟨"5.164", 5, .theoremProof, "solved", "Ch05.transient_vs_isolated_exercise"⟩
+  , ⟨"5.165", 5, .theoremProof, "solved", "Ch05.transientState_generates_transientMode_exercise"⟩
+  , ⟨"5.166", 5, .theoremProof, "solved", "Ch05.absorbingState_generates_absorbing_rsysmo"⟩
+  , ⟨"5.167", 5, .theoremProof, "solved", "Ch05.proper_reachableMode_absorbing_exercise"⟩
+  , ⟨"5.168", 5, .theoremProof, "solved", "Ch05.isolated_isAbsorbing_exercise"⟩
+  , ⟨"5.169", 5, .theoremProof, "solved", "Ch05.constantInput_nonprimary_not_implies_constantTime"⟩
   ]
 
 def solvedCount : Nat :=

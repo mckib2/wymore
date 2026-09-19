@@ -1,0 +1,31 @@
+{
+  "id": "5.167",
+  "kind": "exercise",
+  "name": "Exercise 5.167",
+  "chapter": 5,
+  "description": "Exercise 5.167. A proper reachable system mode is absorbing.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.167/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.167. A proper reachable system mode is absorbing.",
+      "lean_anchor": "proper_reachableMode_absorbing_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.167/plan/proper_reachableMode_absorbing_exercise",
+      "type": "exercise",
+      "text": "Lean anchor `proper_reachableMode_absorbing_exercise` for Exercise 5.167.",
+      "lean_anchor": "proper_reachableMode_absorbing_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

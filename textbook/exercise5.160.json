@@ -1,0 +1,31 @@
+{
+  "id": "5.160",
+  "kind": "exercise",
+  "name": "Exercise 5.160",
+  "chapter": 5,
+  "description": "Exercise 5.160. RSYSMO is a DiscreteSystemParameterization.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.160/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.160. RSYSMO is a DiscreteSystemParameterization.",
+      "lean_anchor": "rsysmo_isSystemParameterization",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.160/plan/rsysmo_isSystemParameterization",
+      "type": "exercise",
+      "text": "Lean anchor `rsysmo_isSystemParameterization` for Exercise 5.160.",
+      "lean_anchor": "rsysmo_isSystemParameterization",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

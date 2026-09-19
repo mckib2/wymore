@@ -1,0 +1,31 @@
+{
+  "id": "5.163",
+  "kind": "exercise",
+  "name": "Exercise 5.163",
+  "chapter": 5,
+  "description": "Exercise 5.163. Isolated mode occupied throughout iff start state in mode.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.163/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.163. Isolated mode occupied throughout iff start state in mode.",
+      "lean_anchor": "isolated_throughout_iff_start",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.163/plan/isolated_throughout_iff_start",
+      "type": "exercise",
+      "text": "Lean anchor `isolated_throughout_iff_start` for Exercise 5.163.",
+      "lean_anchor": "isolated_throughout_iff_start",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

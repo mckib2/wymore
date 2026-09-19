@@ -1,0 +1,31 @@
+{
+  "id": "5.164",
+  "kind": "exercise",
+  "name": "Exercise 5.164",
+  "chapter": 5,
+  "description": "Exercise 5.164. Differences between transient and isolated modes.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.164/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.164. Differences between transient and isolated modes.",
+      "lean_anchor": "transient_vs_isolated_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.164/plan/transient_vs_isolated_exercise",
+      "type": "exercise",
+      "text": "Lean anchor `transient_vs_isolated_exercise` for Exercise 5.164.",
+      "lean_anchor": "transient_vs_isolated_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

@@ -1,0 +1,31 @@
+{
+  "id": "5.168",
+  "kind": "exercise",
+  "name": "Exercise 5.168",
+  "chapter": 5,
+  "description": "Exercise 5.168. An isolated system mode is absorbing.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.168/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.168. An isolated system mode is absorbing.",
+      "lean_anchor": "isolated_isAbsorbing_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.168/plan/isolated_isAbsorbing_exercise",
+      "type": "exercise",
+      "text": "Lean anchor `isolated_isAbsorbing_exercise` for Exercise 5.168.",
+      "lean_anchor": "isolated_isAbsorbing_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

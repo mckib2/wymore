@@ -1,0 +1,31 @@
+{
+  "id": "5.166",
+  "kind": "exercise",
+  "name": "Exercise 5.166",
+  "chapter": 5,
+  "description": "Exercise 5.166. An absorbing state generates absorbing trivial RSYSMO.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.166/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.166. An absorbing state generates absorbing trivial RSYSMO.",
+      "lean_anchor": "absorbingState_generates_absorbing_rsysmo",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.166/plan/absorbingState_generates_absorbing_rsysmo",
+      "type": "exercise",
+      "text": "Lean anchor `absorbingState_generates_absorbing_rsysmo` for Exercise 5.166.",
+      "lean_anchor": "absorbingState_generates_absorbing_rsysmo",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}
