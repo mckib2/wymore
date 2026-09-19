@@ -10,11 +10,12 @@ import Mbse.FiniteWymore
 -/
 
 /-
-  [textbook/definition2.5/entity/Zxk]
-  [textbook/definition2.5/entity/dsystems]
+  [textbook/definition2.5/entity/Zxk|partial]
+  [textbook/definition2.5/entity/dsystems|partial]
   Definition of the discrete system Zx2. (A doc-comment cannot precede the custom
   `wymore_system` command, so the textbook tags live in this block comment; the Definition 2.5
   proof obligations are discharged as named theorems below.)
+  Gallery claim “all k ∈ [1,168]” is permanent partial — only Zx1–Zx10 are formalized (Ch.2 audit).
 -/
 wymore_system Zx2 = (SZx2, IZx2, OZx2, NZx2, RZx2) where
   SZx2 = {1, 2},

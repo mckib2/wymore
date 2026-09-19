@@ -6,12 +6,19 @@
     {
       "id": "2.11/definition/finite_system",
       "type": "component",
-      "text": "The system Z is finite if and only if SZ, IZ, and OZ are finite sets."
+      "text": "The system Z is finite if and only if SZ, IZ, and OZ are finite sets.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.11/definition/order_vector",
       "type": "component",
-      "text": "The system Z is finite with order vector (k, m, n) if and only if (k, m, n) ∈ IJS+^3 and #SZ = k, #IZ = m, #OZ = n."
+      "text": "The system Z is finite with order vector (k, m, n) if and only if (k, m, n) ∈ IJS+^3 and #SZ = k, #IZ = m, #OZ = n.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 2
 }

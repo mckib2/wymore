@@ -3,9 +3,17 @@ import Mbse.Wymore
 import Mbse.TextbookExercises.Predicates
 
 /-!
-# Chapter 2 — selected textbook exercises
+# Chapter 2 — curated textbook exercises
 
-Curated exercise solutions with textbook traceability tags.
+Curated Registry band (all `solved`): **2.116–2.118**, **2.121–2.122**, **2.138**, **2.142**,
+**2.146**, **2.148–2.150**.
+
+Encoding / honesty notes (see [wymore_chapter2_audit.md](wymore_chapter2_audit.md)):
+
+* Option Def 2.4 / `ITZW` trajectories — faithful policy in [`WymoreCore.lean`](../WymoreCore.lean).
+* Ex 2.118 uses pinned pairwise NZ-distinctness; literal unpinned `∀` is impossible
+  (`ex2_118_literal_quantification_impossible`).
+* Absent from this curated dump: 2.119–2.120, 2.123–2.137, 2.139–2.141, 2.143–2.145, 2.147.
 -/
 
 namespace Mbse.TextbookExercises.Ch02

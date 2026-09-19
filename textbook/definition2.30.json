@@ -6,7 +6,12 @@
     {
       "id": "2.30/definition/output_trajectory_composition",
       "type": "component",
-      "text": "OTZ(f, x) = RZ ∘ STZ(f, x) (where composition is defined in Definition A1.268)."
+      "text": "OTZ(f, x) = RZ ∘ STZ(f, x) (where composition is defined in Definition A1.268).",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 2
 }

@@ -7,22 +7,32 @@
     {
       "id": "2.116/part/i_rng_nz_eq_sz",
       "type": "task",
-      "text": "(i) RNG(NZ) = SZ"
+      "text": "(i) RNG(NZ) = SZ",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "2.116/part/ii_rng_nz_ne_sz",
       "type": "task",
-      "text": "(ii) RNG(NZ) ≠ SZ"
+      "text": "(ii) RNG(NZ) ≠ SZ",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "2.116/part/iii_rng_rz_eq_oz",
       "type": "task",
-      "text": "(iii) RNG(RZ) = OZ"
+      "text": "(iii) RNG(RZ) = OZ",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "2.116/part/iv_rng_rz_ne_oz",
       "type": "task",
-      "text": "(iv) RNG(RZ) ≠ OZ"
+      "text": "(iv) RNG(RZ) ≠ OZ",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

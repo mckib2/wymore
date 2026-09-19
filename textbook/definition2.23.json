@@ -6,12 +6,19 @@
     {
       "id": "2.23/definition/input_trajectory",
       "type": "component",
-      "text": "An input trajectory for the system Z is any nonempty string of elements of IZ (referencing Definition A1.185)."
+      "text": "An input trajectory for the system Z is any nonempty string of elements of IZ (referencing Definition A1.185).",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.23/definition/complete_input_trajectory",
       "type": "component",
-      "text": "The set of complete input trajectories of the discrete system Z is denoted ITZ and is defined as follows: ITZ = FNS(TZ, IZ)."
+      "text": "The set of complete input trajectories of the discrete system Z is denoted ITZ and is defined as follows: ITZ = FNS(TZ, IZ).",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 2
 }

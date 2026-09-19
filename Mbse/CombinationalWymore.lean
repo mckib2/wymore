@@ -186,11 +186,12 @@ theorem outputTrajectory_unique (C : CombinationalSystem IZ OZ) (f : ITZ IZ) (h 
 
 /-! ## System-Theoretic Properties -/
 
-/-- [textbook/definition2.51/definition/reachable]
+/-- [textbook/definition2.51/definition/reachable|partial]
     Reachability in a combinational system, mirroring the base file: `s` is reachable from
     `s_init` if some input trajectory drives the (singleton) state trajectory to `s` at some time.
     Degenerate: on a singleton state space every state is reachable from every state at time 0
-    (`reachable_always`); this predicate carries no distinguishing information. -/
+    (`reachable_always`); this predicate carries no distinguishing information.
+    Base Def 2.51 is also `|partial` (`ITZW` vs finite `InputTrajectory`; Ch.2 audit). -/
 def Reachable (C : CombinationalSystem IZ OZ) (s_init s : SingletonState) : Prop :=
   ∃ (f : ITZ IZ) (t : Time), generateStateTrajectory C s_init f t = s
 

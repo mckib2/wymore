@@ -177,6 +177,11 @@ theorem rsn_agree_lt {B : Type} (f g : Time → B) (t : Time)
     RSN f {i | i < t} = RSN g {i | i < t} :=
   (rsn_eq_iff f g {i | i < t}).2 (fun i hi => h i hi)
 
+/--
+  [textbook/theorem2.48/theorem/nonanticipatory]
+  State at time `t` depends only on the input restriction `RSN f {i | i < t}`
+  (proof_comparison §5; primary Ch.2 anchor — DPDA has a layer mirror).
+-/
 theorem stateTrajectory_nonanticipatory
     (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f g : ITZW IZ) (t : Time)
     (h_agree : RSN f {i | i < t} = RSN g {i | i < t}) :

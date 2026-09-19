@@ -6,17 +6,26 @@
     {
       "id": "2.97/theorem/output_value",
       "type": "implication",
-      "text": "If Z = FCNSY(F, 1) and (f, x, t) \u2208 EXZ, then OTZ(f, x)(t + 1) = F(f(t))."
+      "text": "If Z = FCNSY(F, 1) and (f, x, t) ∈ EXZ, then OTZ(f, x)(t + 1) = F(f(t)).",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.97/proof/t_zero",
       "type": "component",
-      "text": "OTZ(f, x)(1) = RZ(STZ(f, x)(1)) = STZ(f, x)(1) = NZ(x, f(0)) = F(f(0))."
+      "text": "OTZ(f, x)(1) = RZ(STZ(f, x)(1)) = STZ(f, x)(1) = NZ(x, f(0)) = F(f(0)).",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.97/proof/arbitrary_t",
       "type": "component",
-      "text": "The assertion holds for arbitrary t by applying the Time Invariance Theorem (Theorem 2.46)."
+      "text": "The assertion holds for arbitrary t by applying the Time Invariance Theorem (Theorem 2.46).",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 2
 }

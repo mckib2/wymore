@@ -6,22 +6,33 @@
     {
       "id": "2.70/definition/state_factor_sets",
       "type": "component",
-      "text": "The set of factor sets of the state set of the system Z is SFZ: {S1Z, ..., SnZ} if SZ is a product, or {SZ} otherwise."
+      "text": "The set of factor sets of the state set of the system Z is SFZ: {S1Z, ..., SnZ} if SZ is a product, or {SZ} otherwise.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.70/definition/state_factor_structure",
       "type": "component",
-      "text": "The state factor set structure FSZ is {(S1Z, S1), ..., (SnZ, Sn)} if SZ is a product, or {(SZ, SZ)} otherwise."
+      "text": "The state factor set structure FSZ is {(S1Z, S1), ..., (SnZ, Sn)} if SZ is a product, or {(SZ, SZ)} otherwise.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.70/definition/factor_next_state",
       "type": "component",
-      "text": "NjZ = PJNj ∘ NZ is the jth component of the next state function."
+      "text": "NjZ = PJNj ∘ NZ is the jth component of the next state function.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.70/definition/factor_state_trajectory",
       "type": "component",
-      "text": "STjZ(f, x) = PJNj ∘ STZ(f, x) is the jth component of the state trajectory."
+      "text": "STjZ(f, x) = PJNj ∘ STZ(f, x) is the jth component of the state trajectory.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 2
 }

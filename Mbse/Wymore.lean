@@ -152,6 +152,10 @@ theorem reachableBy_concatenate
 
 def EXZ (SZ IZ : Type) := ITZW IZ × SZ × Time
 
+/--
+  [textbook/theorem2.48/theorem/nonanticipatory]
+  Alias of [`Trajectory.stateTrajectory_nonanticipatory`](Trajectory.lean).
+-/
 theorem stateTrajectory_nonanticipatory
     (Z : DiscreteSystem SZ IZ OZ) (x : SZ) (f g : ITZW IZ) (t : Time)
     (h_agree : RSN f {i | i < t} = RSN g {i | i < t}) :

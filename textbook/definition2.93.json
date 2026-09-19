@@ -6,7 +6,12 @@
     {
       "id": "2.93/definition/fcnsy",
       "type": "component",
-      "text": "FCNSY(F, n) is the system Z with SZ = RNG(F), IZ = DMN(F), OZ = RNG(F)^n, NZ(x, p) = F(p), and RZ(x) = (x, ..., x)."
+      "text": "FCNSY(F, n) is the system Z with SZ = RNG(F), IZ = DMN(F), OZ = RNG(F)^n, NZ(x, p) = F(p), and RZ(x) = (x, ..., x).",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 2
 }

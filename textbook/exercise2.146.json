@@ -8,7 +8,11 @@
     {
       "id": "2.146/theorem/osz_eq_fsz",
       "type": "theorem",
-      "text": "OSZ(OiZ) = FSZ(SjZ) under projective readout with RiZ = PJN(SZ, SjZ)."
+      "text": "OSZ(OiZ) = FSZ(SjZ) under projective readout with RiZ = PJN(SZ, SjZ).",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

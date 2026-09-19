@@ -6,22 +6,33 @@
     {
       "id": "2.82/definition/system_parameterization",
       "type": "component",
-      "text": "A system parameterization is a function F such that RNG(F) ⊆ DSYSTEMS."
+      "text": "A system parameterization is a function F such that RNG(F) ⊆ DSYSTEMS.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.82/definition/parameter_instance",
       "type": "component",
-      "text": "If F is a system parameterization, r ∈ DMN(F) and Z = F(r), then Z is an instance of F."
+      "text": "If F is a system parameterization, r ∈ DMN(F) and Z = F(r), then Z is an instance of F.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.82/definition/multiple_parameters",
       "type": "component",
-      "text": "F has n parameters if DMN(F) is a subset of a Cartesian product P1 × ... × Pn."
+      "text": "F has n parameters if DMN(F) is a subset of a Cartesian product P1 × ... × Pn.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.82/definition/one_parameter",
       "type": "component",
-      "text": "F has one parameter if DMN(F) is not a subset of a Cartesian product."
+      "text": "F has one parameter if DMN(F) is not a subset of a Cartesian product.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 2
 }

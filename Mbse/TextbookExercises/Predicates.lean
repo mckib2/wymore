@@ -23,6 +23,7 @@ def alwaysActiveTransition (Z : DiscreteSystem SZ IZ OZ) : Prop :=
   Intended reading of Exercise 2.118: for every *distinct* states and every input,
   the next state depends on the current state (`NZ(x1, p) ≠ NZ(x2, p)`).
   Links to Def 2.14 (i) but strengthened from existence to all distinct pairs.
+  Faithful charitable reading (Ch.2 audit); literal unpinned `∀` is impossible below.
 -/
 def pairwiseStateDependentTransition (Z : DiscreteSystem SZ IZ OZ) : Prop :=
   ∀ (x1 x2 : SZ) (p : IZ), x1 ≠ x2 → Z.NZ x1 (some p) ≠ Z.NZ x2 (some p)

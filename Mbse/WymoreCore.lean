@@ -18,6 +18,11 @@ finiteness is a derived predicate (`IsFinite`), not a construction rule.
 
 Open Moore machines use `DiscreteSystem.ofTotal`. For finite Moore development (Def 2.11, Ch. 3,
 `Z2`, `csy`), see [`FiniteWymore`](FiniteWymore.lean).
+
+Encoding policy (faithful-with-notes; see [wymore_chapter2_audit.md](wymore_chapter2_audit.md)
+and [proof_comparison_report.md](proof_comparison_report.md) §15): Option NZ/RZ and complete
+`ITZW`/`OTZ` trajectories are intentional. `Reachable` quantifies over `ITZW` (permanent
+`|partial` vs finite textbook `InputTrajectory`).
 -/
 
 /--
@@ -163,7 +168,8 @@ abbrev DMN {A B : Type} (_f : A → B) : Type := A
   3. Varying output: the readout takes at least two distinct values.
 
   Clause (iii) is stated without `Fintype` so it applies on infinite state spaces. The finite
-  `#RNG(RZ) > 1` formulation lives in `FiniteWymore.FSM.IsNontrivial`.
+  `#RNG(RZ) > 1` formulation lives in `FiniteWymore.FSM.IsNontrivial`
+  (existential↔card bridge: proof_comparison §14; Ch.2 audit).
 -/
 def IsNontrivial {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) : Prop :=
   (∃ (x1 x2 : SZ) (p : IZ), Z.NZ x1 (some p) ≠ Z.NZ x2 (some p)) ∧
@@ -276,6 +282,7 @@ def generateOutputTrajectory (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) (f : ITZW I
 /--
   [textbook/theorem2.32/theorem/trajectory_value]
   The output at time `t` equals the readout of the state at time `t`.
+  Textbook citation of A1.249/250 is an erratum; Lean proves composition (proof_comparison §3).
 -/
 theorem generateOutputTrajectory_val (Z : DiscreteSystem SZ IZ OZ) (s0 : SZ) (f : ITZW IZ) (t : Time) :
     generateOutputTrajectory Z s0 f t = Z.RZ (generateStateTrajectory Z s0 f t) := rfl
@@ -421,11 +428,17 @@ theorem outputTrajectory_unique (Z : DiscreteSystem SZ IZ OZ) (g : STZ SZ) (h : 
     ∀ t, h t = Z.RZ (g t) :=
   h_valid
 
+/--
+  [textbook/definition2.51/definition/reachable|partial]
+  State `s` is reachable from `s0` if some complete input trajectory `f : ITZW` and time `t`
+  satisfy `generateStateTrajectory Z s0 f t = s`.
+  Permanent partial vs textbook finite `InputTrajectory` / `ITZ` (see Ch.2 audit).
+-/
 def Reachable (Z : DiscreteSystem SZ IZ OZ) (s0 s : SZ) : Prop :=
   ∃ (f : ITZW IZ) (t : Time), generateStateTrajectory Z s0 f t = s
 
 /--
-  [textbook/definition2.51/terminology/by_means_of]
+  [textbook/definition2.51/terminology/by_means_of|partial]
   State `s` is reachable from `s0` by means of input trajectory `f` at time `t`.
 -/
 def ReachableBy (Z : DiscreteSystem SZ IZ OZ) (s0 s : SZ) (f : ITZW IZ) (t : Time) : Prop :=

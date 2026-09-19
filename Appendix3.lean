@@ -16,4 +16,7 @@ Aggregates the ten worked Wymore systems `Zx1`–`Zx10` so they are built (and t
 validated) as part of the default `lake build`. Each module defines a concrete system via the
 `wymore_system` macro and proves properties about it, including the Definition 2.5 membership
 obligations (see `Appendix3/Zx2.lean`).
+
+**Def 2.5 gallery (permanent partial):** the textbook claims Zxk for every k ∈ [1, 168];
+this repo formalizes **10** systems only. See [wymore_chapter2_audit.md](wymore_chapter2_audit.md).
 -/

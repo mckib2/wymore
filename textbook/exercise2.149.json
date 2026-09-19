@@ -8,12 +8,18 @@
     {
       "id": "2.149/theorem/sz_eq_oz",
       "type": "theorem",
-      "text": "SZ = OZ under non-product state and properly aligned projective readout."
+      "text": "SZ = OZ under non-product state and properly aligned projective readout.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "2.149/theorem/state_readout",
       "type": "theorem",
-      "text": "RZ = ID(SZ) (state readout) under the same hypotheses."
+      "text": "RZ = ID(SZ) (state readout) under the same hypotheses.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

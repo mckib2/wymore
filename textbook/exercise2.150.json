@@ -8,12 +8,18 @@
     {
       "id": "2.150/theorem/oz_eq_s1z",
       "type": "theorem",
-      "text": "OZ = S1Z in the first-factor branch."
+      "text": "OZ = S1Z in the first-factor branch.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "2.150/theorem/readout_dichotomy",
       "type": "theorem",
-      "text": "Either state readout or first-factor projection readout."
+      "text": "Either state readout or first-factor projection readout.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

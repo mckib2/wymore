@@ -6,7 +6,13 @@
     {
       "id": "2.48/theorem/nonanticipatory",
       "type": "implication",
-      "text": "If Z ∈ DSYSTEMS, {(f, x, t), (g, x, t)} ⊆ EXZ and RSN(f, TZ[0, t)) = RSN(g, TZ[0, t)), then STZ(f, x)(t) = STZ(g, x)(t)."
+      "text": "If Z ∈ DSYSTEMS, {(f, x, t), (g, x, t)} ⊆ EXZ and RSN(f, TZ[0, t)) = RSN(g, TZ[0, t)), then STZ(f, x)(t) = STZ(g, x)(t).",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 2,
+  "fidelity_note": "RSN on {i | i < t}; faithful — proof_comparison §5."
 }

@@ -7,7 +7,11 @@
     {
       "id": "2.117/task/trivial_infinite_always_active",
       "type": "task",
-      "text": "Z is trivial, SZ and OZ are infinite, and NZ(x, p) ≠ x for every x ∈ SZ and p ∈ IZ."
+      "text": "Z is trivial, SZ and OZ are infinite, and NZ(x, p) ≠ x for every x ∈ SZ and p ∈ IZ.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

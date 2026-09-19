@@ -6,22 +6,33 @@
     {
       "id": "2.76/theorem/equal_readout",
       "type": "implication",
-      "text": "If Z1 and Z2 are systems with properly aligned projective readout, SZ1 = SZ2 and OZ1 = OZ2, then RZ1 = RZ2."
+      "text": "If Z1 and Z2 are systems with properly aligned projective readout, SZ1 = SZ2 and OZ1 = OZ2, then RZ1 = RZ2.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.76/proof/pointwise_projection",
       "type": "component",
-      "text": "PJNi(RZ1(x)) = RiZ1(x) = PJNi(x) = RiZ2(x) = PJNi(RZ2(x)) for every state x and output port i."
+      "text": "PJNi(RZ1(x)) = RiZ1(x) = PJNi(x) = RiZ2(x) = PJNi(RZ2(x)) for every state x and output port i.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.76/proof/vector_equality",
       "type": "component",
-      "text": "RZ1(x) = RZ2(x) for every state x by Theorem A1.178."
+      "text": "RZ1(x) = RZ2(x) for every state x by Theorem A1.178.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.76/proof/function_equality",
       "type": "component",
-      "text": "RZ1 = RZ2 by Theorem A1.163."
+      "text": "RZ1 = RZ2 by Theorem A1.163.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 2
 }

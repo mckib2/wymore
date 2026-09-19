@@ -6,7 +6,12 @@
     {
       "id": "2.33/definition/system_experiments",
       "type": "component",
-      "text": "EXZ = ITZ × SZ × TZ."
+      "text": "EXZ = ITZ × SZ × TZ.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 2
 }

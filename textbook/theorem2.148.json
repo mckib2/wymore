@@ -6,12 +6,19 @@
     {
       "id": "2.148/theorem/sfz_card_ge_opz",
       "type": "theorem",
-      "text": "If RZ is properly aligned, then #SFZ >= #OPZ."
+      "text": "If RZ is properly aligned, then #SFZ >= #OPZ.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.148/theorem/osz_eq_fsz",
       "type": "theorem",
-      "text": "If RZ is properly aligned, then OSZ(OiZ) = FSZ(SiZ) for each output port i."
+      "text": "If RZ is properly aligned, then OSZ(OiZ) = FSZ(SiZ) for each output port i.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 2
 }

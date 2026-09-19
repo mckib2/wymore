@@ -6,12 +6,20 @@
     {
       "id": "2.32/theorem/trajectory_fns",
       "type": "implication",
-      "text": "OTZ(f, x) ∈ FNS(TZ, OZ)."
+      "text": "OTZ(f, x) ∈ FNS(TZ, OZ).",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.32/theorem/trajectory_value",
       "type": "implication",
-      "text": "OTZ(f, x)(t) = RZ(STZ(f, x)(t)) for any t ∈ TZ."
+      "text": "OTZ(f, x)(t) = RZ(STZ(f, x)(t)) for any t ∈ TZ.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 2,
+  "fidelity_note": "Lean OTZ=RZ∘STZ; textbook citation A1.249/250 is an erratum — proof_comparison §3."
 }

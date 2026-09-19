@@ -8,7 +8,11 @@
     {
       "id": "2.138/theorem/time_invariance_concatenation",
       "type": "theorem",
-      "text": "STZ(g, STZ(f, x)(s))(t) = STZ(CTN(f, s, g), x)(s + t) for f, g in ITZ and s, t in TZ."
+      "text": "STZ(g, STZ(f, x)(s))(t) = STZ(CTN(f, s, g), x)(s + t) for f, g in ITZ and s, t in TZ.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

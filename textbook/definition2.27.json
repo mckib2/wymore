@@ -6,12 +6,19 @@
     {
       "id": "2.27/definition/state_trajectory_recurrence",
       "type": "component",
-      "text": "STZ(f, x) = {(t, y): t ∈ TZ, y ∈ SZ, y = x if t = 0; y = NZ(STZ(f, x)(t-1), f(t-1)) if t ≠ 0}."
+      "text": "STZ(f, x) = {(t, y): t ∈ TZ, y ∈ SZ, y = x if t = 0; y = NZ(STZ(f, x)(t-1), f(t-1)) if t ≠ 0}.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.27/definition/state_at_time_t",
       "type": "component",
-      "text": "STZ(f, x)(t) is interpreted as the state of the system Z at time t given input f and initial state x."
+      "text": "STZ(f, x)(t) is interpreted as the state of the system Z at time t given input f and initial state x.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 2
 }

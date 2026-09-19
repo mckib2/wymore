@@ -6,7 +6,12 @@
     {
       "id": "2.122/theorem/state_trajectory_loops",
       "type": "theorem",
-      "text": "If Z is finite, f in ITZ, and x in SZ, then there exist t1, t2 subset TZ[0, #SZ] such that t1 < t2 and STZ(f, x)(t1) = STZ(f, x)(t2)."
+      "text": "If Z is finite, f in ITZ, and x in SZ, then there exist t1, t2 subset TZ[0, #SZ] such that t1 < t2 and STZ(f, x)(t1) = STZ(f, x)(t2).",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 2
 }

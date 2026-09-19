@@ -6,7 +6,12 @@
     {
       "id": "2.65/definition/output_port_structure",
       "type": "component",
-      "text": "OSZ = {(O1Z, B1), ..., (OnZ, Bn)} if OZ is a product, or {(OZ, OZ)} otherwise."
+      "text": "OSZ = {(O1Z, B1), ..., (OnZ, Bn)} if OZ is a product, or {(OZ, OZ)} otherwise.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 2
 }

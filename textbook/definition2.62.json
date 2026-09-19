@@ -6,17 +6,26 @@
     {
       "id": "2.62/definition/output_ports",
       "type": "component",
-      "text": "The set of output ports of the system Z is denoted OPZ: {O1Z, ..., OnZ} if OZ is a product, or {OZ} otherwise."
+      "text": "The set of output ports of the system Z is denoted OPZ: {O1Z, ..., OnZ} if OZ is a product, or {OZ} otherwise.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.62/definition/port_readout",
       "type": "component",
-      "text": "If #OPZ > 1 and j ∈ IJS[1, #OPZ], the readout to the jth output port is RjZ = PJN(OjZ) ∘ RZ."
+      "text": "If #OPZ > 1 and j ∈ IJS[1, #OPZ], the readout to the jth output port is RjZ = PJN(OjZ) ∘ RZ.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.62/definition/port_output_trajectory",
       "type": "component",
-      "text": "If #OPZ > 1, f ∈ ITZ, x ∈ SZ and j ∈ IJS[1, #OPZ], then the OjZ output port trajectory is OTjZ(f, x) = PJN(OjZ) ∘ OTZ(f, x)."
+      "text": "If #OPZ > 1, f ∈ ITZ, x ∈ SZ and j ∈ IJS[1, #OPZ], then the OjZ output port trajectory is OTjZ(f, x) = PJN(OjZ) ∘ OTZ(f, x).",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 2
 }

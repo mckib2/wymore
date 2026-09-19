@@ -6,27 +6,41 @@
     {
       "id": "2.14/definition/nontrivial_system",
       "type": "component",
-      "text": "The system Z is nontrivial if and only if conditions (i), (ii), and (iii) are satisfied."
+      "text": "The system Z is nontrivial if and only if conditions (i), (ii), and (iii) are satisfied.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.14/requirement/state_dependent_transition",
       "type": "constraint",
-      "text": "(i) there exist x1 ∈ SZ, x2 ∈ SZ, and p ∈ IZ, such that NZ(x1, p) ≠ NZ(x2, p) (the transition is state-dependent)."
+      "text": "(i) there exist x1 ∈ SZ, x2 ∈ SZ, and p ∈ IZ, such that NZ(x1, p) ≠ NZ(x2, p) (the transition is state-dependent).",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.14/requirement/active_transition",
       "type": "constraint",
-      "text": "(ii) there exist x ∈ SZ and p ∈ IZ such that NZ(x, p) ≠ x (the state is not constant under all transitions)."
+      "text": "(ii) there exist x ∈ SZ and p ∈ IZ such that NZ(x, p) ≠ x (the state is not constant under all transitions).",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.14/requirement/varying_output",
       "type": "constraint",
-      "text": "(iii) #RNG(RZ) > 1 (the readout function is not constant, having a range size greater than 1)."
+      "text": "(iii) #RNG(RZ) > 1 (the readout function is not constant, having a range size greater than 1).",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.14/implication/trivial_system",
       "type": "implication",
-      "text": "Z is trivial if Z is not nontrivial."
+      "text": "Z is trivial if Z is not nontrivial.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 2,
+  "fidelity_note": "Base IsNontrivial existential; finite #RNG bridge; combinational/DPDA layer partials separate."
 }

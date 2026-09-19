@@ -6,12 +6,20 @@
     {
       "id": "2.51/definition/reachable",
       "type": "component",
-      "text": "The state y ∈ SZ is reachable from x ∈ SZ iff there exists f ∈ ITZ and t ∈ TZ such that y = STZ(f, x)(t)."
+      "text": "The state y ∈ SZ is reachable from x ∈ SZ iff there exists f ∈ ITZ and t ∈ TZ such that y = STZ(f, x)(t).",
+      "fidelity": "partial",
+      "status": "proved"
     },
     {
       "id": "2.51/terminology/by_means_of",
       "type": "component",
-      "text": "y is reachable from x by means of the input trajectory f at time t."
+      "text": "y is reachable from x by means of the input trajectory f at time t.",
+      "fidelity": "partial",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "partial",
+  "status": "proved",
+  "chapter": 2,
+  "fidelity_note": "Permanent partial: Reachable quantifies over ITZW, not finite InputTrajectory."
 }

@@ -6,7 +6,12 @@
     {
       "id": "2.138/theorem/time_invariance_concatenation",
       "type": "theorem",
-      "text": "If Z in DSYSTEMS, x in SZ, {f, g} subset ITZ, and {s, t} subset TZ, then STZ(g, STZ(f, x)(s))(t) = STZ(CTN(f, s, g), x)(s + t)."
+      "text": "If Z in DSYSTEMS, x in SZ, {f, g} subset ITZ, and {s, t} subset TZ, then STZ(g, STZ(f, x)(s))(t) = STZ(CTN(f, s, g), x)(s + t).",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 2
 }

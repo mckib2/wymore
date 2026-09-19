@@ -6,17 +6,26 @@
     {
       "id": "2.73/definition/state_readout",
       "type": "component",
-      "text": "The system Z has state readout iff OSZ(B) = SZ and PJNB ∘ ID(SZ) for every output port B (i.e., output is the state)."
+      "text": "The system Z has state readout iff OSZ(B) = SZ and PJNB ∘ ID(SZ) for every output port B (i.e., output is the state).",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.73/definition/projective_readout",
       "type": "component",
-      "text": "The readout RZ is projective iff for every i, there exists j such that RiZ = PJN(SZ, SjZ)."
+      "text": "The readout RZ is projective iff for every i, there exists j such that RiZ = PJN(SZ, SjZ).",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.73/definition/properly_aligned_readout",
       "type": "component",
-      "text": "The projective readout RZ is properly aligned iff for every i, RiZ = PJN(SZ, SiZ)."
+      "text": "The projective readout RZ is properly aligned iff for every i, RiZ = PJN(SZ, SiZ).",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 2
 }

@@ -7,12 +7,19 @@
     {
       "id": "2.118/task/trivial_infinite_pairwise_state_dependent",
       "type": "task",
-      "text": "Z is trivial, SZ and OZ are infinite, and NZ(x1, p) ≠ NZ(x2, p) for every distinct x1, x2 ∈ SZ and every p ∈ IZ."
+      "text": "Z is trivial, SZ and OZ are infinite, and NZ(x1, p) ≠ NZ(x2, p) for every distinct x1, x2 ∈ SZ and every p ∈ IZ.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "2.118/note/literal_quantification_impossible",
       "type": "note",
-      "text": "Literal ∀x1,x2,p without x1 ≠ x2 forces NZ(x,p) ≠ NZ(x,p); no discrete system satisfies this."
+      "text": "Literal ∀x1,x2,p without x1 ≠ x2 forces NZ(x,p) ≠ NZ(x,p); no discrete system satisfies this.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved",
+  "fidelity_note": "Pinned pairwise NZ-distinct; literal unpinned ∀ is impossible (note theorem)."
 }

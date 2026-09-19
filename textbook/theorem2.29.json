@@ -6,22 +6,33 @@
     {
       "id": "2.29/theorem/trajectory_fns",
       "type": "implication",
-      "text": "STZ(f, x) ∈ FNS(TZ, SZ) for any f ∈ ITZ and x ∈ SZ."
+      "text": "STZ(f, x) ∈ FNS(TZ, SZ) for any f ∈ ITZ and x ∈ SZ.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.29/proof/subset",
       "type": "implication",
-      "text": "Deduction (i): STZ(f, x) ⊆ TZ × SZ."
+      "text": "Deduction (i): STZ(f, x) ⊆ TZ × SZ.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.29/proof/totality",
       "type": "implication",
-      "text": "Deduction (ii): For all t ∈ TZ, there exists y ∈ SZ such that (t, y) ∈ STZ(f, x)."
+      "text": "Deduction (ii): For all t ∈ TZ, there exists y ∈ SZ such that (t, y) ∈ STZ(f, x).",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "2.29/proof/single_valuedness",
       "type": "implication",
-      "text": "Deduction (iii): If (t1, y1) ∈ STZ(f, x) and (t2, y2) ∈ STZ(f, x) and t1 = t2, then y1 = y2 (induction proof)."
+      "text": "Deduction (iii): If (t1, y1) ∈ STZ(f, x) and (t2, y2) ∈ STZ(f, x) and t1 = t2, then y1 = y2 (induction proof).",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 2
 }
