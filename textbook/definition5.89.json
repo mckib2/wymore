@@ -3,7 +3,7 @@
   "kind": "traceability",
   "name": "Definition 5.89",
   "chapter": 5,
-  "description": "Definition 5.89. Treat `HI^-1` as nonempty fibers and `CHI` as a choice function; correct `HI^-2` to preimage; define lifted behavior and restricted readout explicitly.",
+  "description": "Definition 5.89. Treat `HI^-1` as nonempty fibers and `CHI` as a choice function; correct `HI^-2` to preimage; define lifted behavior and restricted readout explicitly. Partial: ModePreservesAutonomous enrichment is intentional.",
   "source": {
     "file": "wymore-defs-n-proofs.txt",
     "lines": "252\u2013267"

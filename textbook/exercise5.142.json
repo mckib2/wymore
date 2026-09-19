@@ -3,7 +3,7 @@
   "kind": "exercise",
   "name": "Exercise 5.142",
   "chapter": 5,
-  "description": "Exercise 5.142. The claim is false. Unconditional answer: a two-state sampled mode of a three-cycle is a system mode, and no injective subrecipe with matching component cards can realize resultant cards 2 and 3. Conditional packaging: ¬ IsSubsystemOf under DiscreteSystemStateReflection.",
+  "description": "Exercise 5.142. The claim is false. Unconditional answer: a two-state sampled mode of a three-cycle is a system mode, and no injective subrecipe with matching component cards can realize resultant cards 2 and 3. Conditional packaging: \u00ac IsSubsystemOf under DiscreteSystemStateReflection.",
   "source": {
     "file": "wymore-defs-n-proofs.txt",
     "lines": "418"
@@ -13,7 +13,7 @@
     {
       "id": "5.142/source/exercise",
       "type": "exercise",
-      "text": "Unconditional counterexample shape: IsSystemMode plus recipe cardinality obstruction 2 ∤ 3.",
+      "text": "Unconditional counterexample shape: IsSystemMode plus recipe cardinality obstruction 2 \u2224 3.",
       "lean_anchor": "exercise5_142_unconditional",
       "status": "qualified",
       "fidelity": "partial"
@@ -29,7 +29,7 @@
     {
       "id": "5.142/plan/systemMode_not_subsystem_counterexample",
       "type": "exercise",
-      "text": "Conditional ¬ IsSubsystemOf under DiscreteSystemStateReflection.",
+      "text": "Conditional \u00ac IsSubsystemOf under DiscreteSystemStateReflection.",
       "lean_anchor": "systemMode_not_subsystem_counterexample",
       "status": "qualified",
       "fidelity": "partial"
@@ -37,7 +37,7 @@
     {
       "id": "5.142/counterexample/literal_claim",
       "type": "counterexample",
-      "text": "Full ¬ IsSubsystemOf needs DiscreteSystemStateReflection; unconditional content is exercise5_142_unconditional.",
+      "text": "Full \u00ac IsSubsystemOf needs DiscreteSystemStateReflection; unconditional content is exercise5_142_unconditional.",
       "status": "qualified",
       "lean_anchor": "systemMode_not_subsystem_counterexample",
       "fidelity": "partial"

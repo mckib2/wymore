@@ -15,7 +15,7 @@
       "type": "exercise",
       "text": "Source Exercise 5.188. Counterexample: inevitable-mode relation is not transitive.",
       "lean_anchor": "inevitable_mode_not_transitive",
-      "status": "solved",
+      "status": "counterexample",
       "fidelity": "faithful"
     },
     {
@@ -23,9 +23,9 @@
       "type": "exercise",
       "text": "Lean anchor `inevitable_mode_not_transitive` for Exercise 5.188.",
       "lean_anchor": "inevitable_mode_not_transitive",
-      "status": "solved",
+      "status": "counterexample",
       "fidelity": "faithful"
     }
   ],
-  "status": "solved"
+  "status": "counterexample"
 }

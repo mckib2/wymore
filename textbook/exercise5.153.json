@@ -15,7 +15,7 @@
       "type": "exercise",
       "text": "Source Exercise 5.153. Counterexample: cycleSampledMode and cycleExhibitor are mutual modes but unequal (+2 vs +1).",
       "lean_anchor": "mutual_modes_not_equal_counterexample",
-      "status": "solved",
+      "status": "counterexample",
       "fidelity": "faithful"
     },
     {
@@ -23,9 +23,9 @@
       "type": "exercise",
       "text": "Lean anchor `mutual_modes_not_equal_counterexample` for Exercise 5.153.",
       "lean_anchor": "mutual_modes_not_equal_counterexample",
-      "status": "solved",
+      "status": "counterexample",
       "fidelity": "faithful"
     }
   ],
-  "status": "solved"
+  "status": "counterexample"
 }

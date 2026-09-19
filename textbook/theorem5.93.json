@@ -3,7 +3,7 @@
   "kind": "traceability",
   "name": "Theorem 5.93",
   "chapter": 5,
-  "description": "Theorem 5.93. Use the lifted SMBF from 5.89 and prove equality with the `SYSMO` construction.",
+  "description": "Theorem 5.93. Use the lifted SMBF from 5.89 and prove equality with the `SYSMO` construction. Partial: see element notes (qualified reading).",
   "source": {
     "file": "wymore-defs-n-proofs.txt",
     "lines": "273\u2013277"

@@ -3,7 +3,7 @@
   "kind": "traceability",
   "name": "Theorem 5.95",
   "chapter": 5,
-  "description": "Theorem 5.95. Restrict all three homomorphisms to inverse-image mode carriers; prove the original mode is their homomorphic image.",
+  "description": "Theorem 5.95. Restrict all three homomorphisms to inverse-image mode carriers; prove the original mode is their homomorphic image. Partial: see element notes (qualified reading).",
   "source": {
     "file": "wymore-defs-n-proofs.txt",
     "lines": "281\u2013285"

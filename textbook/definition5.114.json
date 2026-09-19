@@ -3,7 +3,7 @@
   "kind": "traceability",
   "name": "Definition 5.114",
   "chapter": 5,
-  "description": "Definition 5.114. Correct \u201creceipe\u201d; induced recipe replaces every component by a non-constricting mode and preserves corresponding connectivity; retain connectivity well-formedness.",
+  "description": "Definition 5.114. Correct \u201creceipe\u201d; induced recipe replaces every component by a non-constricting mode and preserves corresponding connectivity; retain connectivity well-formedness. Partial: see element notes (qualified reading).",
   "source": {
     "file": "wymore-defs-n-proofs.txt",
     "lines": "326\u2013332"

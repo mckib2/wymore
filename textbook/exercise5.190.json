@@ -15,7 +15,7 @@
       "type": "exercise",
       "text": "Source Exercise 5.190. Counterexample: SMBFs need not coincide without inevitability.",
       "lean_anchor": "smbf_not_unique_without_inevitable",
-      "status": "solved",
+      "status": "counterexample",
       "fidelity": "faithful"
     },
     {
@@ -23,9 +23,9 @@
       "type": "exercise",
       "text": "Lean anchor `smbf_not_unique_without_inevitable` for Exercise 5.190.",
       "lean_anchor": "smbf_not_unique_without_inevitable",
-      "status": "solved",
+      "status": "counterexample",
       "fidelity": "faithful"
     }
   ],
-  "status": "solved"
+  "status": "counterexample"
 }

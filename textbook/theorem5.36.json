@@ -3,7 +3,7 @@
   "kind": "statement",
   "name": "Statement 5.36",
   "chapter": 5,
-  "description": "Statement 5.36 is informal prose: transient and absorbing modes are “always found in pairs.” It is not a theorem. The definitions still imply that one mode cannot be both.",
+  "description": "Statement 5.36 is informal prose (\u201calways found in pairs\u201d). Not a theorem. Related lemma `transient_not_absorbing` (one mode cannot be both transient and absorbing) is tagged as related-only, not a proof of 5.36.",
   "source": {
     "file": "wymore-defs-n-proofs.txt",
     "lines": "120"
@@ -13,15 +13,15 @@
     {
       "id": "5.36/source/statement",
       "type": "statement",
-      "text": "Informal prose, not a theorem. The related fact that one mode is not both transient and absorbing is proved separately.",
-      "lean_anchor": "transient_not_absorbing",
+      "text": "Informal prose, not a theorem.",
+      "lean_anchor": "",
       "status": "prose",
       "fidelity": "partial"
     },
     {
-      "id": "5.36/lean/transient_not_absorbing",
+      "id": "5.36/related/transient_not_absorbing",
       "type": "theorem",
-      "text": "One mode cannot be both transient and absorbing. This is not a counterexample to Statement 5.36.",
+      "text": "Related: one mode cannot be both transient and absorbing. Not a proof of Statement 5.36.",
       "lean_anchor": "transient_not_absorbing",
       "status": "prose",
       "fidelity": "partial"

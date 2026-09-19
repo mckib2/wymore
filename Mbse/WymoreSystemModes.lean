@@ -706,6 +706,11 @@ theorem transient_vs_isolated_differences (M : SystemMode Z₁ Z₂)
   · intro hi
     exact ⟨hi.1.2.2, fun x p => absorbing_closed_under_NZ M hi.1 x p⟩
 
+/--
+  [textbook/theorem5.36/related/transient_not_absorbing]
+  Related to Statement 5.36 (informal prose), not a proof of it: one mode cannot
+  be both transient and absorbing.
+-/
 theorem transient_not_absorbing (M : SystemMode Z₁ Z₂) :
     IsTransientMode M → ¬ IsAbsorbingMode M := by
   intro ht ha
@@ -755,8 +760,8 @@ theorem manifestation_next_of_constant
 /--
   [textbook/theorem5.47/source/theorem]
   [textbook/theorem5.47/lean/manifest_at_behavior_deadline]
-Theorem 5.47 under the charitable total-input hypothesis: the experiment is a
-total trajectory `ITZ`, so every time on the interval carries an input.
+Theorem 5.47 under the total-input (`ITZ`) reading: every time on the
+interval carries an input.
 -/
 theorem inevitable_next_manifestation_total
     (M : SystemMode Z₁ Z₂) (hInev : HasInevitableTransitions M)
@@ -789,6 +794,73 @@ theorem inevitable_inMode_interval
     exact inevitable_next_manifestation_total M hInev f x t s x₁ p hx₁ hat hbound
   · right
     refine ⟨s, x₁, p, hsr, Nat.le_trans hr hbound, hx₁, by simp [hat], ?_, Or.inr (hInev x₁ p)⟩
+    apply (Nat.sub_lt_iff_lt_add hsr).2
+    rw [Nat.add_comm]
+    exact Nat.lt_of_le_of_ne hr heq
+
+/--
+  [textbook/theorem5.47/lean/manifest_at_behavior_deadline_opt]
+Theorem 5.47 for optional-input experiments that are total on the mode segment
+`[s, s + timeIndex)`.
+-/
+theorem inevitable_next_manifestation
+    (M : SystemMode Z₁ Z₂) (hInev : HasInevitableTransitions M)
+    (f : ITZW I₂) (x : S₂) (t s : Time) (x₁ : S₁) (p : I₁)
+    (hx₁ : generateStateTrajectory Z₂ x f s = M.stateMap x₁)
+    (hat : f s = some (M.inputMap p))
+    (hbound : s + M.timeIndex x₁ p ≤ t)
+    (htotal : ∀ u, u < M.timeIndex x₁ p → (f (s + u)).isSome) :
+    ManifestAt M f x t (s + M.timeIndex x₁ p) := by
+  refine ⟨hbound, Z₁.NZ x₁ (some p), ?_⟩
+  rw [← Trajectory.stateTrajectory_time_invariance Z₂ x f s
+    (M.timeIndex x₁ p), hx₁]
+  let g : ITZ I₂ := fun u =>
+    if h : u < M.timeIndex x₁ p then
+      (f (s + u)).get (htotal u h)
+    else
+      M.inputMap p
+  have hg0 : g 0 = M.inputMap p := by
+    have hpos : 0 < M.timeIndex x₁ p := M.behavior.duration_pos x₁ p
+    dsimp [g]
+    rw [dif_pos hpos]
+    apply Option.some_inj.mp
+    rw [Option.some_get]
+    simpa using hat
+  have hagree :
+      generateStateTrajectory Z₂ (M.stateMap x₁) (translate f s) (M.timeIndex x₁ p) =
+        generateStateTrajectory Z₂ (M.stateMap x₁) (liftInput g) (M.timeIndex x₁ p) := by
+    apply stateTrajectory_nonanticipatory
+    rw [rsn_eq_iff]
+    intro u hu
+    change f (u + s) = some (g u)
+    have hu' : u < M.timeIndex x₁ p := hu
+    simp only [g, dif_pos hu']
+    rw [Nat.add_comm]
+    exact (Option.some_get (htotal u hu')).symm
+  rw [hagree]
+  exact hInev x₁ p g hg0
+
+/--
+  [textbook/theorem5.47/lean/inMode_until_behavior_deadline_opt]
+In-mode on the closed interval for optional-input experiments total on the
+mode segment.
+-/
+theorem inevitable_inMode_interval_opt
+    (M : SystemMode Z₁ Z₂) (hInev : HasInevitableTransitions M)
+    (f : ITZW I₂) (x : S₂) (t s : Time) (x₁ : S₁) (p : I₁)
+    (_hs : s ≤ t) (hx₁ : generateStateTrajectory Z₂ x f s = M.stateMap x₁)
+    (hat : f s = some (M.inputMap p))
+    (hbound : s + M.timeIndex x₁ p ≤ t)
+    (htotal : ∀ u, u < M.timeIndex x₁ p → (f (s + u)).isSome) :
+    ∀ r, s ≤ r → r ≤ s + M.timeIndex x₁ p →
+      InModeAt M f x t r := by
+  intro r hsr hr
+  by_cases heq : r = s + M.timeIndex x₁ p
+  · left
+    rw [heq]
+    exact inevitable_next_manifestation M hInev f x t s x₁ p hx₁ hat hbound htotal
+  · right
+    refine ⟨s, x₁, p, hsr, Nat.le_trans hr hbound, hx₁, hat, ?_, Or.inr (hInev x₁ p)⟩
     apply (Nat.sub_lt_iff_lt_add hsr).2
     rw [Nat.add_comm]
     exact Nat.lt_of_le_of_ne hr heq
@@ -1573,7 +1645,208 @@ theorem timeElaborateMode_CNS_realizes_transition (Z : DiscreteSystem S₁ I₁ 
   rw [timeElaborate_full_cycle]
   rfl
 
+/-! ## Latch / CNS time elaboration (full Exercise 5.174) -/
 
+/--
+Latch time elaboration: state is `(x, phase, latch)`. On leaving phase 0 the
+current input is latched; wrap applies `Z.NZ` with the latched entry input.
+This restores `HasInevitableTransitions` while keeping constant output on
+`[0, n)`. The book late-wrap `timeElaborate` is retained as the NZ-faithful
+alternate that cannot satisfy inevitability for non-CNS extensions.
+-/
+def timeElaborateCNS (Z : DiscreteSystem S₁ I₁ O₁) (n : Nat) (hn : 1 < n) :
+    DiscreteSystem (S₁ × Fin n × Option I₁) I₁ O₁ where
+  sz_nonempty := by
+    obtain ⟨x⟩ := Z.sz_nonempty
+    exact ⟨(x, ⟨0, Nat.zero_lt_of_lt hn⟩, none)⟩
+  NZ := fun xl oi =>
+    let x := xl.1
+    let i := xl.2.1
+    let latch := xl.2.2
+    match oi with
+    | none => xl
+    | some p =>
+      if h : i.val + 1 < n then
+        let latch' : Option I₁ := if i.val = 0 then some p else latch
+        (x, ⟨i.val + 1, h⟩, latch')
+      else
+        let p₀ := latch.getD p
+        (Z.NZ x (some p₀), ⟨0, Nat.zero_lt_of_lt hn⟩, none)
+  RZ := fun xl => Z.RZ xl.1
+
+def timeElaborateCNSSliceEmbed (_Z : DiscreteSystem S₁ I₁ O₁) (n : Nat) (hn : 1 < n) :
+    S₁ → S₁ × Fin n × Option I₁ :=
+  fun x => (x, ⟨0, Nat.zero_lt_of_lt hn⟩, none)
+
+def timeElaborateCNSModeSystem (Z : DiscreteSystem S₁ I₁ O₁) (n : Nat) (hn : 1 < n) :
+    DiscreteSystem S₁ I₁ O₁ where
+  sz_nonempty := Z.sz_nonempty
+  NZ := fun x oi =>
+    match oi with
+    | none => Z.NZ x none
+    | some p =>
+      (generateStateTrajectory (timeElaborateCNS Z n hn)
+        (timeElaborateCNSSliceEmbed Z n hn x)
+        (liftInput (fun _ => p)) n).1
+  RZ := Z.RZ
+
+/-- After `k` CNS steps from the phase-0 embed, phase is `k` and latch is
+`none` at `k = 0`, else `some p`. -/
+theorem timeElaborateCNS_phase_lt (Z : DiscreteSystem S₁ I₁ O₁) (n : Nat) (hn : 1 < n)
+    (x : S₁) (p : I₁) (k : Nat) (hk : k < n) :
+    generateStateTrajectory (timeElaborateCNS Z n hn)
+        (timeElaborateCNSSliceEmbed Z n hn x) (liftInput (fun _ => p)) k =
+      (x, ⟨k, hk⟩, if k = 0 then (none : Option I₁) else some p) := by
+  induction k with
+  | zero =>
+    apply Prod.ext
+    · rfl
+    · apply Prod.ext
+      · exact Fin.ext rfl
+      · rfl
+  | succ k ih =>
+    have hk' : k < n := Nat.lt_of_succ_lt hk
+    rw [generateStateTrajectory_succ, ih hk']
+    dsimp [timeElaborateCNS, liftInput, timeElaborateCNSSliceEmbed]
+    have hlt : k + 1 < n := hk
+    simp only [hlt, ↓reduceDIte]
+    by_cases hk0 : k = 0
+    · subst hk0
+      simp
+    · simp [hk0]
+
+theorem timeElaborateCNS_full_cycle (Z : DiscreteSystem S₁ I₁ O₁) (n : Nat) (hn : 1 < n)
+    (x : S₁) (p : I₁) :
+    generateStateTrajectory (timeElaborateCNS Z n hn)
+        (timeElaborateCNSSliceEmbed Z n hn x) (liftInput (fun _ => p)) n =
+      timeElaborateCNSSliceEmbed Z n hn (Z.NZ x (some p)) := by
+  have hnpred : n - 1 < n := Nat.sub_lt (Nat.zero_lt_of_lt hn) Nat.zero_lt_one
+  have hpre := timeElaborateCNS_phase_lt Z n hn x p (n - 1) hnpred
+  have hn1 : n - 1 ≠ 0 := by omega
+  simp only [hn1, ↓reduceIte] at hpre
+  have hstep :
+      generateStateTrajectory (timeElaborateCNS Z n hn)
+        (timeElaborateCNSSliceEmbed Z n hn x) (liftInput (fun _ => p)) ((n - 1) + 1) =
+      timeElaborateCNSSliceEmbed Z n hn (Z.NZ x (some p)) := by
+    rw [generateStateTrajectory_succ, hpre]
+    dsimp [timeElaborateCNS, liftInput, timeElaborateCNSSliceEmbed]
+    split_ifs with h
+    · exact absurd h (by omega)
+    · simp
+  rwa [Nat.sub_add_cancel (Nat.one_le_of_lt hn)] at hstep
+
+/-- Mid-cycle latch under an arbitrary total experiment with entry input `p`. -/
+theorem timeElaborateCNS_phase_lt_of_entry
+    (Z : DiscreteSystem S₁ I₁ O₁) (n : Nat) (hn : 1 < n)
+    (x : S₁) (p : I₁) (g : ITZ I₁) (hg0 : g 0 = p)
+    (k : Nat) (hk : k < n) :
+    generateStateTrajectory (timeElaborateCNS Z n hn)
+        (timeElaborateCNSSliceEmbed Z n hn x) (liftInput g) k =
+      (x, ⟨k, hk⟩, if k = 0 then (none : Option I₁) else some p) := by
+  induction k with
+  | zero =>
+    apply Prod.ext
+    · rfl
+    · apply Prod.ext
+      · exact Fin.ext rfl
+      · rfl
+  | succ k ih =>
+    have hk' : k < n := Nat.lt_of_succ_lt hk
+    rw [generateStateTrajectory_succ, ih hk']
+    dsimp [timeElaborateCNS, liftInput, timeElaborateCNSSliceEmbed]
+    have hlt : k + 1 < n := hk
+    simp only [hlt, ↓reduceDIte]
+    by_cases hk0 : k = 0
+    · subst hk0
+      simp [hg0]
+    · simp [hk0]
+
+theorem timeElaborateCNS_full_cycle_of_entry
+    (Z : DiscreteSystem S₁ I₁ O₁) (n : Nat) (hn : 1 < n)
+    (x : S₁) (p : I₁) (g : ITZ I₁) (hg0 : g 0 = p) :
+    generateStateTrajectory (timeElaborateCNS Z n hn)
+        (timeElaborateCNSSliceEmbed Z n hn x) (liftInput g) n =
+      timeElaborateCNSSliceEmbed Z n hn (Z.NZ x (some p)) := by
+  have hnpred : n - 1 < n := Nat.sub_lt (Nat.zero_lt_of_lt hn) Nat.zero_lt_one
+  have hpre := timeElaborateCNS_phase_lt_of_entry Z n hn x p g hg0 (n - 1) hnpred
+  have hn1 : n - 1 ≠ 0 := by omega
+  simp only [hn1, ↓reduceIte] at hpre
+  have hstep :
+      generateStateTrajectory (timeElaborateCNS Z n hn)
+        (timeElaborateCNSSliceEmbed Z n hn x) (liftInput g) ((n - 1) + 1) =
+      timeElaborateCNSSliceEmbed Z n hn (Z.NZ x (some p)) := by
+    rw [generateStateTrajectory_succ, hpre]
+    dsimp [timeElaborateCNS, liftInput, timeElaborateCNSSliceEmbed]
+    split_ifs with h
+    · exact absurd h (by omega)
+    · simp
+  rwa [Nat.sub_add_cancel (Nat.one_le_of_lt hn)] at hstep
+
+def timeElaborateCNSMode (Z : DiscreteSystem S₁ I₁ O₁) (n : Nat) (hn : 1 < n) :
+    SystemMode (timeElaborateCNSModeSystem Z n hn) (timeElaborateCNS Z n hn) where
+  stateMap := timeElaborateCNSSliceEmbed Z n hn
+  inputMap := id
+  outputMap := id
+  stateMap_injective := fun a b h => congrArg (fun t => t.1) h
+  inputMap_injective := Function.injective_id
+  outputMap_injective := Function.injective_id
+  behavior :=
+    { input := fun _ p _ => p
+      duration := fun _ _ => n
+      duration_pos := fun _ _ => Nat.zero_lt_of_lt hn }
+  behavior_initial := fun _ _ => rfl
+  transition := by
+    intro x p
+    show timeElaborateCNSSliceEmbed Z n hn
+        (generateStateTrajectory (timeElaborateCNS Z n hn)
+          (timeElaborateCNSSliceEmbed Z n hn x) (liftInput (fun _ => p)) n).1 =
+      generateStateTrajectory (timeElaborateCNS Z n hn)
+        (timeElaborateCNSSliceEmbed Z n hn x) (liftInput (fun _ => p)) n
+    rw [timeElaborateCNS_full_cycle]
+    rfl
+  readout := by
+    intro x
+    change (Z.RZ x).map id = Z.RZ x
+    simp
+
+theorem timeElaborateCNSMode_constantInput (Z : DiscreteSystem S₁ I₁ O₁)
+    (n : Nat) (hn : 1 < n) :
+    HasConstantInput (timeElaborateCNSMode Z n hn) := fun _ _ _ => rfl
+
+theorem timeElaborateCNSMode_constantTime (Z : DiscreteSystem S₁ I₁ O₁)
+    (n : Nat) (hn : 1 < n) :
+    HasConstantTimeIndex (timeElaborateCNSMode Z n hn) n :=
+  ⟨Nat.zero_lt_of_lt hn, fun _ _ => rfl⟩
+
+theorem timeElaborateCNSMode_constantOutput (Z : DiscreteSystem S₁ I₁ O₁)
+    (n : Nat) (hn : 1 < n) :
+    HasConstantOutput (timeElaborateCNSMode Z n hn) := by
+  intro x p s hs
+  have hs' : s < n := by simpa [timeElaborateCNSMode] using hs
+  have hp := timeElaborateCNS_phase_lt Z n hn x p s hs'
+  dsimp [HasConstantOutput, HasConstantOutputOn, timeElaborateCNSMode]
+  simp only [generateOutputTrajectory]
+  rw [hp]
+  dsimp [timeElaborateCNS, timeElaborateCNSSliceEmbed]
+
+theorem timeElaborateCNSMode_inevitable (Z : DiscreteSystem S₁ I₁ O₁)
+    (n : Nat) (hn : 1 < n) :
+    HasInevitableTransitions (timeElaborateCNSMode Z n hn) := by
+  intro x p g hg0
+  change generateStateTrajectory (timeElaborateCNS Z n hn)
+      (timeElaborateCNSSliceEmbed Z n hn x) (liftInput g) n =
+    timeElaborateCNSSliceEmbed Z n hn
+      ((timeElaborateCNSModeSystem Z n hn).NZ x (some p))
+  have hcycle := timeElaborateCNS_full_cycle_of_entry Z n hn x p g hg0
+  have hNZ :
+      (timeElaborateCNSModeSystem Z n hn).NZ x (some p) = Z.NZ x (some p) := by
+    change (generateStateTrajectory (timeElaborateCNS Z n hn)
+        (timeElaborateCNSSliceEmbed Z n hn x) (liftInput (fun _ => p)) n).1 =
+      Z.NZ x (some p)
+    rw [timeElaborateCNS_full_cycle]
+    rfl
+  rw [hNZ]
+  exact hcycle
 
 /-! ## Exercise 5.191: SYSMO functionality / characterization -/
 

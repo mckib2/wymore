@@ -3,7 +3,7 @@
   "kind": "traceability",
   "name": "Theorem 5.92",
   "chapter": 5,
-  "description": "Theorem 5.92. Formalize closure/typing of the parameterization; no stronger mode theorem is folded into this item.",
+  "description": "Theorem 5.92. Formalize closure/typing of the parameterization; no stronger mode theorem is folded into this item. Partial: see element notes (qualified reading).",
   "source": {
     "file": "wymore-defs-n-proofs.txt",
     "lines": "270"

@@ -136,6 +136,8 @@ def ExactlyImplements.toImplements
 
   This is the mode-side counterpart of
   `Homomorphism.StepPreservingMaps.preserves_autonomous`.
+  Intentional enrichment (implementation policy): Def 5.6 constrains only
+  mode inputs (`some p`); `ModePreservesAutonomous` extends embeddings to `none`.
 -/
 def ModePreservesAutonomous
     {SM IM OM S₁ I₁ O₁ : Type}
@@ -430,6 +432,167 @@ noncomputable def inverseImageHom :
           rw [hq, hz] at hh
           exact Option.some_injective _ hh
 
+/-! ### Exercise 5.185 CNS fibre reading (constant input + time) -/
+
+/-- Constant fibre input `CNS(p)` (Exercise 5.185; distinct from Def 5.89 CHI). -/
+def cnsFiberInput (_x : D.State) (p : D.Input) : ITZ I₂ :=
+  fun _ => p.val
+
+theorem cnsFiberInput_maps (hinput : HasConstantInput D.mode)
+    (x : D.State) (p : D.Input) :
+    ∀ t, D.hom.HI (D.cnsFiberInput x p t) =
+      D.mode.inputIndex (D.stateProjection x) (D.inputProjection p) t := by
+  intro t
+  simp only [cnsFiberInput]
+  rw [hinput, ← D.inputProjection_spec]
+
+/-- Next fibre state under `CNS(p)` when the parent mode has constant input. -/
+noncomputable def cnsNextState (hinput : HasConstantInput D.mode)
+    (x : D.State) (p : D.Input) : D.State := by
+  let y := generateStateTrajectory Z₂ x.val (liftInput (D.cnsFiberInput x p))
+    (D.mode.timeIndex (D.stateProjection x) (D.inputProjection p))
+  refine ⟨y, ?_⟩
+  refine ⟨ZM.NZ (D.stateProjection x) (some (D.inputProjection p)), ?_⟩
+  change D.hom.HS y =
+    D.mode.stateMap (ZM.NZ (D.stateProjection x) (some (D.inputProjection p)))
+  rw [D.mode.transition]
+  rw [homomorphicImage_preserves_state_trajectory D.hom x.val
+    (liftInput (D.cnsFiberInput x p))]
+  rw [D.stateProjection_spec]
+  congr 1
+  funext t
+  simp only [liftInput]
+  exact congrArg some (D.cnsFiberInput_maps hinput x p t)
+
+/-- HIISYSMO fibre system with CNS transitions (Exercise 5.185). -/
+noncomputable def homomorphicInverseImageModeCNS (hinput : HasConstantInput D.mode) :
+    DiscreteSystem D.State D.Input D.Output where
+  sz_nonempty := by
+    obtain ⟨s⟩ := ZM.sz_nonempty
+    obtain ⟨x, hx⟩ := D.hom.HS_surjective (D.mode.stateMap s)
+    exact ⟨⟨x, s, hx⟩⟩
+  NZ := fun x op =>
+    match op with
+    | none => D.autonomousNext x
+    | some p => D.cnsNextState hinput x p
+  RZ := D.readout
+
+/-- Inverse-image mode with constant fibre SMBF `CNS(p)`. -/
+noncomputable def inverseImageSystemModeCNS (hinput : HasConstantInput D.mode) :
+    SystemMode (D.homomorphicInverseImageModeCNS hinput) Z₂ where
+  stateMap := Subtype.val
+  inputMap := Subtype.val
+  outputMap := Subtype.val
+  stateMap_injective := Subtype.val_injective
+  inputMap_injective := Subtype.val_injective
+  outputMap_injective := Subtype.val_injective
+  behavior :=
+    { input := fun _ p _ => p.val
+      duration := fun x p =>
+        D.mode.timeIndex (D.stateProjection x) (D.inputProjection p)
+      duration_pos := fun x p =>
+        D.mode.behavior.duration_pos (D.stateProjection x) (D.inputProjection p) }
+  behavior_initial := fun _ _ => rfl
+  transition := by
+    intro x p
+    change (D.cnsNextState hinput x p).val =
+      generateStateTrajectory Z₂ x.val (liftInput (fun _ => p.val))
+        (D.mode.timeIndex (D.stateProjection x) (D.inputProjection p))
+    simp only [cnsNextState]
+    rfl
+  readout := D.readout_map_val
+
+theorem inverseImageCNS_constantInput (hinput : HasConstantInput D.mode) :
+    HasConstantInput (D.inverseImageSystemModeCNS hinput) :=
+  fun _ _ _ => rfl
+
+theorem inverseImageCNS_constantTime (hinput : HasConstantInput D.mode) (d : Time)
+    (htime : HasConstantTimeIndex D.mode d) :
+    HasConstantTimeIndex (D.inverseImageSystemModeCNS hinput) d :=
+  ⟨htime.1, fun x p => htime.2 (D.stateProjection x) (D.inputProjection p)⟩
+
+theorem stateProjection_cnsNext (hinput : HasConstantInput D.mode)
+    (x : D.State) (p : D.Input) :
+    D.stateProjection (D.cnsNextState hinput x p) =
+      ZM.NZ (D.stateProjection x) (some (D.inputProjection p)) := by
+  apply D.mode.stateMap_injective
+  rw [← D.stateProjection_spec]
+  unfold cnsNextState
+  dsimp only
+  rw [D.mode.transition]
+  rw [homomorphicImage_preserves_state_trajectory D.hom x.val
+    (liftInput (D.cnsFiberInput x p))]
+  rw [D.stateProjection_spec]
+  congr 1
+  funext t
+  simp only [liftInput]
+  exact congrArg some (D.cnsFiberInput_maps hinput x p t)
+
+noncomputable def inverseImageHomCNS (hinput : HasConstantInput D.mode) :
+    HomomorphicImageWitness ZM (D.homomorphicInverseImageModeCNS hinput) where
+  HS := D.stateProjection
+  HI := D.inputProjection
+  HO := D.outputProjection
+  HS_surjective := by
+    intro s
+    obtain ⟨x, hx⟩ := D.hom.HS_surjective (D.mode.stateMap s)
+    let xs : D.State := ⟨x, s, hx⟩
+    refine ⟨xs, D.mode.stateMap_injective ?_⟩
+    rw [← D.stateProjection_spec xs]
+    exact hx
+  HI_surjective := by
+    intro i
+    obtain ⟨p, hp⟩ := D.hom.HI_surjective (D.mode.inputMap i)
+    let ps : D.Input := ⟨p, i, hp⟩
+    refine ⟨ps, D.mode.inputMap_injective ?_⟩
+    rw [← D.inputProjection_spec ps]
+    exact hp
+  HO_surjective := by
+    intro o
+    obtain ⟨q, hq⟩ := D.hom.HO_surjective (D.mode.outputMap o)
+    let qs : D.Output := ⟨q, o, hq⟩
+    refine ⟨qs, D.mode.outputMap_injective ?_⟩
+    rw [← D.outputProjection_spec qs]
+    exact hq
+  preserves_transition := by
+    intro x op
+    cases op with
+    | none => exact D.stateProjection_autonomous x
+    | some p => exact D.stateProjection_cnsNext hinput x p
+  preserves_readout := by
+    intro x
+    have hh := D.hom.preserves_readout x.val
+    have hm := D.mode.readout (D.stateProjection x)
+    rw [D.stateProjection_spec] at hh
+    rw [← hm] at hh
+    change (D.readout x).map D.outputProjection =
+      ZM.RZ (D.stateProjection x)
+    unfold readout
+    split
+    · rename_i hnone
+      cases hz : ZM.RZ (D.stateProjection x) with
+      | none => rfl
+      | some o =>
+          rw [hnone, hz] at hh
+          simp at hh
+    · rename_i q hq
+      cases hz : ZM.RZ (D.stateProjection x) with
+      | none =>
+          rw [hq, hz] at hh
+          simp at hh
+      | some o =>
+          simp only [Option.map_some]
+          apply congrArg some
+          apply D.mode.outputMap_injective
+          rw [← D.outputProjection_spec]
+          rw [hq, hz] at hh
+          exact Option.some_injective _ hh
+
+theorem mode_isHomomorphicImage_of_inverseImageCNS
+    (hinput : HasConstantInput D.mode) :
+    IsHomomorphicImage ZM (D.homomorphicInverseImageModeCNS hinput) :=
+  ⟨D.inverseImageHomCNS hinput⟩
+
 end InverseImageModeData
 
 /--
@@ -488,8 +651,8 @@ theorem mode_isHomomorphicImage_of_inverseImage
   [textbook/theorem5.97/source/theorem]
   [textbook/theorem5.97/lean/implements_trans]
   Transitivity through the explicit inverse-image mode.  The additional
-  autonomous hypothesis is exactly the autonomous enrichment for `none` steps described
-  above.
+  autonomous hypothesis is the intentional `ModePreservesAutonomous` enrichment
+  for `none` steps (implementation policy).
 -/
 noncomputable def Implements.trans
     {S₁ I₁ O₁ S₂ I₂ O₂ S₃ I₃ O₃ : Type}
@@ -728,6 +891,41 @@ def timeElaborateImplements
     preserves_readout := fun _ => by simp [timeElaborateModeSystem]
   }
 
+theorem timeElaborateCNSModeSystem_NZ_eq
+    {S I O : Type} (Z : DiscreteSystem S I O) (n : Nat) (hn : 1 < n)
+    (x : S) (p : I) :
+    (timeElaborateCNSModeSystem Z n hn).NZ x (some p) = Z.NZ x (some p) := by
+  change (generateStateTrajectory (timeElaborateCNS Z n hn)
+      (timeElaborateCNSSliceEmbed Z n hn x) (liftInput (fun _ => p)) n).1 = Z.NZ x (some p)
+  rw [timeElaborateCNS_full_cycle]
+  rfl
+
+/-- Full Exercise 5.174 reading: latch CNS elaboration implements with inevitability. -/
+def timeElaborateCNSImplements
+    {S I O : Type} (Z : DiscreteSystem S I O) (n : Nat) (hn : 1 < n) :
+    Implements Z (timeElaborateCNS Z n hn) where
+  ModeState := S
+  ModeInput := I
+  ModeOutput := O
+  modeSystem := timeElaborateCNSModeSystem Z n hn
+  mode := timeElaborateCNSMode Z n hn
+  hom := {
+    HS := id
+    HI := id
+    HO := id
+    HS_surjective := Function.surjective_id
+    HI_surjective := Function.surjective_id
+    HO_surjective := Function.surjective_id
+    preserves_transition := by
+      intro x oi
+      cases oi with
+      | none => rfl
+      | some p =>
+        change (timeElaborateCNSModeSystem Z n hn).NZ x (some p) = Z.NZ x (some p)
+        exact timeElaborateCNSModeSystem_NZ_eq Z n hn x p
+    preserves_readout := fun _ => by simp [timeElaborateCNSModeSystem]
+  }
+
 /-! ## IIMPSY / EIMPSY parameterizations (Exercises 5.178–5.179) -/
 
 /-- Parameters for isomorphic implementation systems `IIMPSY`. -/
@@ -839,7 +1037,7 @@ theorem primary_hiisysmo_properties
     inverseImage_isPrimary_of_primary D h,
     mode_isHomomorphicImage_of_inverseImage D⟩
 
-/-- Constant-time HIISYSMO package (Exercise 5.185; constant-input on fibre not claimed). -/
+/-- Constant-time HIISYSMO package (Exercise 5.185; CHI fibre time only). -/
 theorem constant_hiisysmo_properties
     {SM IM OM S₁ I₁ O₁ S₂ I₂ O₂ : Type}
     {ZM : DiscreteSystem SM IM OM}
@@ -853,6 +1051,26 @@ theorem constant_hiisysmo_properties
   ⟨homomorphicInverseImage_isSystemMode D,
     inverseImage_constantTime_of_constantTime D d htime,
     mode_isHomomorphicImage_of_inverseImage D⟩
+
+/-! ## Exercise 5.185 CNS fibre package -/
+
+/-- Full Exercise 5.185: constant-input + constant-time parent ⇒ CNS fibre mode. -/
+theorem constant_hiisysmo_CNS_properties
+    {SM IM OM S₁ I₁ O₁ S₂ I₂ O₂ : Type}
+    {ZM : DiscreteSystem SM IM OM}
+    {Z₁ : DiscreteSystem S₁ I₁ O₁}
+    {Z₂ : DiscreteSystem S₂ I₂ O₂}
+    (D : InverseImageModeData ZM Z₁ Z₂) (d : Time)
+    (hinput : HasConstantInput D.mode)
+    (htime : HasConstantTimeIndex D.mode d) :
+    IsSystemMode (D.homomorphicInverseImageModeCNS hinput) Z₂ ∧
+      HasConstantInput (D.inverseImageSystemModeCNS hinput) ∧
+      HasConstantTimeIndex (D.inverseImageSystemModeCNS hinput) d ∧
+      IsHomomorphicImage ZM (D.homomorphicInverseImageModeCNS hinput) :=
+  ⟨⟨D.inverseImageSystemModeCNS hinput⟩,
+    D.inverseImageCNS_constantInput hinput,
+    D.inverseImageCNS_constantTime hinput d htime,
+    D.mode_isHomomorphicImage_of_inverseImageCNS hinput⟩
 
 /--
   If Z₂ is a homomorphic image of Z₁ and Z₂ implements Z₃, then Z₁ implements Z₃

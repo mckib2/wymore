@@ -3,29 +3,29 @@
   "kind": "exercise",
   "name": "Exercise 5.185",
   "chapter": 5,
-  "description": "Exercise 5.185. Constant-time HIISYSMO inverse-image modes (constant-input on fibre not claimed).",
+  "description": "Exercise 5.185. Constant-input + constant-time parent modes yield HIISYSMO fibre modes with CNS fibre SMBF (constant input and time). Def 5.89 CHI lift retained separately.",
   "source": {
     "file": "rest-of-chpt-5-exercises.txt",
     "lines": ""
   },
-  "fidelity": "partial",
+  "fidelity": "faithful",
   "elements": [
     {
       "id": "5.185/source/exercise",
       "type": "exercise",
-      "text": "Source Exercise 5.185. Constant-time HIISYSMO inverse-image modes (constant-input on fibre not claimed).",
+      "text": "Source Exercise 5.185. Constant-input + constant-time HIISYSMO fibre mode.",
       "lean_anchor": "constant_hiisysmo_exercise",
-      "status": "qualified",
-      "fidelity": "partial"
+      "status": "solved",
+      "fidelity": "faithful"
     },
     {
       "id": "5.185/plan/constant_hiisysmo_exercise",
       "type": "exercise",
-      "text": "Lean anchor `constant_hiisysmo_exercise` for Exercise 5.185.",
+      "text": "CNS fibre package via constant_hiisysmo_CNS_properties / inverseImageSystemModeCNS.",
       "lean_anchor": "constant_hiisysmo_exercise",
-      "status": "qualified",
-      "fidelity": "partial"
+      "status": "solved",
+      "fidelity": "faithful"
     }
   ],
-  "status": "qualified"
+  "status": "solved"
 }

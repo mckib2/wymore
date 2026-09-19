@@ -15,7 +15,7 @@
       "type": "exercise",
       "text": "Source Exercise 5.169. Counterexample: constant input + non-primary need not imply constant time > 1.",
       "lean_anchor": "constantInput_nonprimary_not_implies_constantTime",
-      "status": "solved",
+      "status": "counterexample",
       "fidelity": "faithful"
     },
     {
@@ -23,9 +23,9 @@
       "type": "exercise",
       "text": "Lean anchor `constantInput_nonprimary_not_implies_constantTime` for Exercise 5.169.",
       "lean_anchor": "constantInput_nonprimary_not_implies_constantTime",
-      "status": "solved",
+      "status": "counterexample",
       "fidelity": "faithful"
     }
   ],
-  "status": "solved"
+  "status": "counterexample"
 }

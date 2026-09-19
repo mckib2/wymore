@@ -3,7 +3,7 @@
   "kind": "traceability",
   "name": "Theorem 5.97",
   "chapter": 5,
-  "description": "Theorem 5.97. Compose implementation through a chosen inverse-image mode; make dependence on `SMBF2s` and `CHI` explicit.",
+  "description": "Theorem 5.97. Compose implementation through a chosen inverse-image mode; make dependence on `SMBF2s` and `CHI` explicit. Partial: Implements.trans requires ModePreservesAutonomous.",
   "source": {
     "file": "wymore-defs-n-proofs.txt",
     "lines": "289\u2013298"

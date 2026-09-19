@@ -3,17 +3,17 @@
   "kind": "traceability",
   "name": "Theorem 5.47",
   "chapter": 5,
-  "description": "Theorem 5.47. Correct \u201cand every Z2 is in Z1\u201d to \u201cand Z2 is in Z1 at every `r`\u201d; use the duration attached to the manifested state/input and require the endpoint to be within the experiment.",
+  "description": "Theorem 5.47. Correct “and every Z2 is in Z1” to “and Z2 is in Z1 at every `r`”; use the duration attached to the manifested state/input and require the endpoint to be within the experiment. Proved for total ITZ and for ITZW experiments that are total on the mode segment.",
   "source": {
     "file": "wymore-defs-n-proofs.txt",
-    "lines": "154\u2013159"
+    "lines": "154–159"
   },
   "fidelity": "faithful",
   "elements": [
     {
       "id": "5.47/source/theorem",
       "type": "theorem",
-      "text": "Source Theorem 5.47, lines 154\u2013159. Corrected traceability decision: Correct \u201cand every Z2 is in Z1\u201d to \u201cand Z2 is in Z1 at every `r`\u201d; use the duration attached to the manifested state/input and require the endpoint to be within the experiment.",
+      "text": "Source Theorem 5.47, lines 154–159. Corrected traceability decision: Correct “and every Z2 is in Z1” to “and Z2 is in Z1 at every `r`”; use the duration attached to the manifested state/input and require the endpoint to be within the experiment.",
       "lean_anchor": "inevitable_next_manifestation_total",
       "status": "proved",
       "fidelity": "faithful"
@@ -21,7 +21,7 @@
     {
       "id": "5.47/lean/manifest_at_behavior_deadline",
       "type": "theorem",
-      "text": "Lean anchor `manifest_at_behavior_deadline` for this corrected reading. Status: qualified.",
+      "text": "Total-input (ITZ) reading of next manifestation.",
       "lean_anchor": "inevitable_next_manifestation_total",
       "status": "proved",
       "fidelity": "faithful"
@@ -29,8 +29,24 @@
     {
       "id": "5.47/lean/inMode_until_behavior_deadline",
       "type": "theorem",
-      "text": "Lean anchor `inMode_until_behavior_deadline` for this corrected reading. Status: qualified.",
+      "text": "Total-input (ITZ) reading of in-mode on the closed interval.",
       "lean_anchor": "inevitable_inMode_interval",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.47/lean/manifest_at_behavior_deadline_opt",
+      "type": "theorem",
+      "text": "ITZW reading with totality on the mode segment [s, s+timeIndex).",
+      "lean_anchor": "inevitable_next_manifestation",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.47/lean/inMode_until_behavior_deadline_opt",
+      "type": "theorem",
+      "text": "ITZW in-mode interval under segment totality.",
+      "lean_anchor": "inevitable_inMode_interval_opt",
       "status": "proved",
       "fidelity": "faithful"
     }

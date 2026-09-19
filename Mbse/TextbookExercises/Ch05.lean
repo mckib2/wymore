@@ -412,6 +412,9 @@ theorem subsystem_state_card_dvd (H : DiscreteSystemStateReflection)
 Unconditional charitable answer to Exercise 5.142: the two-state sampled mode
 of the three-cycle is a system mode, and no injective component embedding with
 matching component state cards can realize resultant cards `2` and `3`.
+
+Typed-API limitation (not a Def 3.97 defect): Lean cannot inject the
+`DiscreteSystem` type former, so the unconditional content stops at mode+card.
 -/
 theorem exercise5_142_unconditional :
     IsSystemMode twoStateMode cycleExhibitor ∧
@@ -432,8 +435,9 @@ theorem exercise5_142_unconditional :
 
 Conditional packaging under `DiscreteSystemStateReflection`: Lean cannot derive
 type-former injectivity from `HEq` on `DiscreteSystem`, so `¬ IsSubsystemOf`
-needs that named hypothesis.  The unconditional content is
-`exercise5_142_unconditional`.
+needs that named hypothesis.  This is a typed-API limitation of
+`DiscreteSystem`, not a textbook defect in Def 3.97.  The unconditional content
+is `exercise5_142_unconditional`.
 -/
 theorem systemMode_not_subsystem_counterexample (H : DiscreteSystemStateReflection) :
     IsSystemMode twoStateMode cycleExhibitor ∧
@@ -747,12 +751,12 @@ theorem mutual_constantMode_self_d_sq_indices
 open Homomorphism
 
 /--
-  [textbook/exercise5.152/source/exercise|partial]
-  [textbook/exercise5.152/plan/mutual_primary_modes_isomorphic|partial]
+  [textbook/exercise5.152/source/exercise]
+  [textbook/exercise5.152/plan/mutual_primary_modes_isomorphic]
 
 Charitable reading of “Z₁ = Z₂”: mutual primary modes whose embeddings are
 mutual inverses, on systems that stutter autonomously, yield an isomorphism.
-Literal identification of distinct Lean types is not claimed.
+Literal identification of distinct Lean types is not claimed (faithful typed reading).
 -/
 noncomputable def mutual_primary_modes_isomorphism
     (M₁₂ : SystemMode Z₁ Z₂) (M₂₁ : SystemMode Z₂ Z₁)
@@ -849,8 +853,8 @@ theorem not_manifest_zero_not_inMode
 /--
   [textbook/exercise5.157/source/exercise]
   [textbook/exercise5.157/plan/primary_has_CNS_SMBF]
-
-A primary mode admits the canonical constant-input duration-one SMBF.
+A primary mode admits the canonical constant-input duration-one SMBF
+(`primaryConstantInputMode`). Charitable rebuild reading of “the primary mode”.
 -/
 theorem primary_has_CNS_SMBF (M : SystemMode Z₁ Z₂) (h : IsPrimaryMode M) :
     IsPrimaryMode (primaryConstantInputMode M h) ∧
@@ -1141,7 +1145,8 @@ theorem inevitable_admits_alternate_SMBF_exercise (M : SystemMode Z₁ Z₂)
 /--
   [textbook/exercise5.173/source/exercise]
   [textbook/exercise5.173/plan/primary_constOutput_inevitable_exercise]
-  Exercise 5.173: primary modes have constant output and inevitable transitions.
+  Exercise 5.173: primary modes have constant output and inevitable transitions
+  (proved on the CNS rebuild `primaryConstantInputMode` / original mode).
 -/
 theorem primary_constOutput_inevitable_exercise (M : SystemMode Z₁ Z₂)
     (h : IsPrimaryMode M) :
@@ -1152,10 +1157,10 @@ theorem primary_constOutput_inevitable_exercise (M : SystemMode Z₁ Z₂)
 /-! ## Exercise 5.174 — time elaboration implements -/
 
 /--
-  [textbook/exercise5.174/source/exercise]
-  [textbook/exercise5.174/plan/timeElaborate_implements_exercise]
-  Exercise 5.174: time elaboration yields a constant-input/time/output mode
-  (CNS-inevitable) that implements the original system.
+  [textbook/exercise5.174/source/exercise|partial]
+  [textbook/exercise5.174/plan/timeElaborate_implements_exercise|partial]
+  Exercise 5.174 late-wrap reading (partial): constant I/O/time + Implements,
+  without `HasInevitableTransitions` (wrap uses late-step input).
 -/
 theorem timeElaborate_implements_exercise (Z : DiscreteSystem S I O)
     (n : Nat) (hn : 1 < n) :
@@ -1167,6 +1172,25 @@ theorem timeElaborate_implements_exercise (Z : DiscreteSystem S I O)
     timeElaborateMode_constantTime Z n hn,
     timeElaborateMode_constantOutput Z n hn,
     ⟨timeElaborateImplements Z n hn⟩⟩
+
+/--
+  [textbook/exercise5.174/source/exercise]
+  [textbook/exercise5.174/plan/timeElaborateCNS_implements_inevitable_exercise]
+  Exercise 5.174 full claim via latch CNS elaboration: constant I/O/time,
+  Implements, and inevitable transitions.
+-/
+theorem timeElaborateCNS_implements_inevitable_exercise (Z : DiscreteSystem S I O)
+    (n : Nat) (hn : 1 < n) :
+    HasConstantInput (timeElaborateCNSMode Z n hn) ∧
+      HasConstantTimeIndex (timeElaborateCNSMode Z n hn) n ∧
+      HasConstantOutput (timeElaborateCNSMode Z n hn) ∧
+      HasInevitableTransitions (timeElaborateCNSMode Z n hn) ∧
+      Nonempty (Implements Z (timeElaborateCNS Z n hn)) :=
+  ⟨timeElaborateCNSMode_constantInput Z n hn,
+    timeElaborateCNSMode_constantTime Z n hn,
+    timeElaborateCNSMode_constantOutput Z n hn,
+    timeElaborateCNSMode_inevitable Z n hn,
+    ⟨timeElaborateCNSImplements Z n hn⟩⟩
 
 /-! ## Exercise 5.175 — primary mode reflexive -/
 
@@ -1250,10 +1274,11 @@ theorem primary_hiisysmo_exercise
   primary_hiisysmo_properties D h
 
 /--
-  [textbook/exercise5.185/source/exercise|partial]
-  [textbook/exercise5.185/plan/constant_hiisysmo_exercise|partial]
-  Exercise 5.185: constant-time modes generate unique HIISYSMO constant-time
-  inverse-image modes (constant-input on the fibre not claimed; see library note).
+  [textbook/exercise5.185/source/exercise]
+  [textbook/exercise5.185/plan/constant_hiisysmo_exercise]
+  Exercise 5.185: constant-input + constant-time modes generate HIISYSMO fibre
+  modes with CNS fibre SMBF (constant input and time). Def 5.89 CHI lift is
+  retained separately; this is the exercise's CNS fibre reading.
 -/
 theorem constant_hiisysmo_exercise
     {SM IM OM S₁ I₁ O₁ S₂ I₂ O₂ : Type}
@@ -1261,17 +1286,22 @@ theorem constant_hiisysmo_exercise
     {Z₁ : DiscreteSystem S₁ I₁ O₁}
     {Z₂ : DiscreteSystem S₂ I₂ O₂}
     (D : InverseImageModeData ZM Z₁ Z₂) (d : Time)
+    (hinput : HasConstantInput D.mode)
     (htime : HasConstantTimeIndex D.mode d) :
-    IsSystemMode D.homomorphicInverseImageMode Z₂ ∧
-      HasConstantTimeIndex D.inverseImageSystemMode d ∧
-      IsHomomorphicImage ZM D.homomorphicInverseImageMode :=
-  constant_hiisysmo_properties D d htime
+    IsSystemMode (D.homomorphicInverseImageModeCNS hinput) Z₂ ∧
+      HasConstantInput (D.inverseImageSystemModeCNS hinput) ∧
+      HasConstantTimeIndex (D.inverseImageSystemModeCNS hinput) d ∧
+      IsHomomorphicImage ZM (D.homomorphicInverseImageModeCNS hinput) :=
+  constant_hiisysmo_CNS_properties D d hinput htime
 
 /--
   [textbook/exercise5.186/source/exercise]
   [textbook/exercise5.186/plan/implements_of_homImage_implements_exercise]
   Exercise 5.186: if Z₂ is a homomorphic image of Z₁ and Z₂ implements Z₃,
   then Z₁ implements Z₃.
+
+  Requires `ModePreservesAutonomous` on the implementation mode (intentional
+  enrichment policy; same as Def 5.89 / Thm 5.97).
 -/
 noncomputable def implements_of_homImage_implements_exercise
     {S₁ I₁ O₁ S₂ I₂ O₂ S₃ I₃ O₃ : Type}

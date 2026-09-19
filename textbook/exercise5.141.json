@@ -13,7 +13,7 @@
     {
       "id": "5.141/source/exercise",
       "type": "exercise",
-      "text": "Source Exercise 5.141, lines 416. The universal claim is refuted unconditionally: `IsSubsystemOf loneSystem pairSystem` and `¬ IsSystemMode loneSystem pairSystem`.",
+      "text": "Source Exercise 5.141, lines 416. The universal claim is refuted unconditionally: `IsSubsystemOf loneSystem pairSystem` and `\u00ac IsSystemMode loneSystem pairSystem`.",
       "lean_anchor": "subsystem_isSystemMode_or_counterexample",
       "status": "counterexample",
       "fidelity": "faithful"

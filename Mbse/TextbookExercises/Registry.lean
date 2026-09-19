@@ -71,7 +71,7 @@ def registry : List ExerciseEntry :=
   , ⟨"4.84", 4, .theoremProof, "solved", "Ch04.ex4_84_reflexive"⟩
   , ⟨"4.85", 4, .theoremProof, "solved", "Ch04.ex4_85_rearrangement_isomorphic"⟩
   , ⟨"4.86", 4, .theoremProof, "solved", "Ch04.ex4_86_nested_coupling_isomorphic"⟩
-  , ⟨"5.141", 5, .theoremProof, "solved", "Ch05.subsystem_isSystemMode_or_counterexample"⟩
+  , ⟨"5.141", 5, .theoremProof, "counterexample", "Ch05.subsystem_isSystemMode_or_counterexample"⟩
   , ⟨"5.142", 5, .theoremProof, "qualified", "Ch05.exercise5_142_unconditional"⟩
   , ⟨"5.146", 5, .theoremProof, "solved", "Ch05.selfMode_constantTime_iterate"⟩
   , ⟨"5.147", 5, .theoremProof, "solved", "Ch05.constantMode_state_at_mul"⟩
@@ -79,8 +79,8 @@ def registry : List ExerciseEntry :=
   , ⟨"5.149", 5, .theoremProof, "solved", "Ch05.constantMode_compose_indices"⟩
   , ⟨"5.150", 5, .theoremProof, "solved", "Ch05.variableTime_compose_isSystemMode"⟩
   , ⟨"5.151", 5, .theoremProof, "solved", "Ch05.mutual_constantMode_self_d_sq_indices"⟩
-  , ⟨"5.152", 5, .theoremProof, "qualified", "Ch05.mutual_primary_modes_isomorphic"⟩
-  , ⟨"5.153", 5, .theoremProof, "solved", "Ch05.mutual_modes_not_equal_counterexample"⟩
+  , ⟨"5.152", 5, .theoremProof, "solved", "Ch05.mutual_primary_modes_isomorphic"⟩
+  , ⟨"5.153", 5, .theoremProof, "counterexample", "Ch05.mutual_modes_not_equal_counterexample"⟩
   , ⟨"5.156", 5, .theoremProof, "solved", "Ch05.not_manifest_zero_not_inMode"⟩
   , ⟨"5.157", 5, .theoremProof, "solved", "Ch05.primary_has_CNS_SMBF"⟩
   , ⟨"5.158", 5, .theoremProof, "solved", "Ch05.primary_NZ_RZ_restriction"⟩
@@ -94,23 +94,23 @@ def registry : List ExerciseEntry :=
   , ⟨"5.166", 5, .theoremProof, "solved", "Ch05.absorbingState_generates_absorbing_rsysmo"⟩
   , ⟨"5.167", 5, .theoremProof, "solved", "Ch05.proper_reachableMode_absorbing_exercise"⟩
   , ⟨"5.168", 5, .theoremProof, "solved", "Ch05.isolated_isAbsorbing_exercise"⟩
-  , ⟨"5.169", 5, .theoremProof, "solved", "Ch05.constantInput_nonprimary_not_implies_constantTime"⟩
+  , ⟨"5.169", 5, .theoremProof, "counterexample", "Ch05.constantInput_nonprimary_not_implies_constantTime"⟩
   , ⟨"5.170", 5, .theoremProof, "solved", "Ch05.fixedTimeMode_constant_indices"⟩
   , ⟨"5.171", 5, .theoremProof, "solved", "Ch05.transientComplement_isAbsorbing_exercise"⟩
   , ⟨"5.172", 5, .theoremProof, "solved", "Ch05.inevitable_admits_alternate_SMBF_exercise"⟩
   , ⟨"5.173", 5, .theoremProof, "solved", "Ch05.primary_constOutput_inevitable_exercise"⟩
-  , ⟨"5.174", 5, .theoremProof, "solved", "Ch05.timeElaborate_implements_exercise"⟩
+  , ⟨"5.174", 5, .theoremProof, "solved", "Ch05.timeElaborateCNS_implements_inevitable_exercise"⟩
   , ⟨"5.175", 5, .theoremProof, "solved", "Ch05.primaryMode_reflexive_exercise"⟩
   , ⟨"5.176", 5, .theoremProof, "solved", "Ch05.primaryMode_transitive_exercise"⟩
   , ⟨"5.177", 5, .theoremProof, "solved", "Ch05.implements_of_mode_hom_iso_exercise"⟩
   , ⟨"5.178", 5, .theoremProof, "solved", "Ch05.iimpsys_isSystemParameterization"⟩
   , ⟨"5.179", 5, .theoremProof, "solved", "Ch05.eimpsys_isSystemParameterization"⟩
   , ⟨"5.184", 5, .theoremProof, "solved", "Ch05.primary_hiisysmo_exercise"⟩
-  , ⟨"5.185", 5, .theoremProof, "qualified", "Ch05.constant_hiisysmo_exercise"⟩
+  , ⟨"5.185", 5, .theoremProof, "solved", "Ch05.constant_hiisysmo_exercise"⟩
   , ⟨"5.186", 5, .theoremProof, "solved", "Ch05.implements_of_homImage_implements_exercise"⟩
   , ⟨"5.187", 5, .theoremProof, "solved", "Ch05.constantMode_implementedExperiment_exercise"⟩
-  , ⟨"5.188", 5, .theoremProof, "solved", "Ch05.inevitable_mode_not_transitive"⟩
-  , ⟨"5.190", 5, .theoremProof, "solved", "Ch05.smbf_not_unique_without_inevitable"⟩
+  , ⟨"5.188", 5, .theoremProof, "counterexample", "Ch05.inevitable_mode_not_transitive"⟩
+  , ⟨"5.190", 5, .theoremProof, "counterexample", "Ch05.smbf_not_unique_without_inevitable"⟩
   , ⟨"5.191", 5, .theoremProof, "solved", "Ch05.sysmo_functional_iff_exercise"⟩
   , ⟨"5.193", 5, .theoremProof, "qualified", "Ch05.hologenic_conjunctive_nonconstricting_qualified"⟩
   , ⟨"6.82", 6, .theoremProof, "solved", "Ch06.rsysmo_fsr_iff_exercise"⟩

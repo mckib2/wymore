@@ -3,7 +3,7 @@
   "kind": "exercise",
   "name": "Exercise 5.186",
   "chapter": 5,
-  "description": "Exercise 5.186. Implements transitivity through HIMSY.",
+  "description": "Exercise 5.186. Implements transitivity through HIMSY. Partial: requires ModePreservesAutonomous enrichment.",
   "source": {
     "file": "rest-of-chpt-5-exercises.txt",
     "lines": ""
