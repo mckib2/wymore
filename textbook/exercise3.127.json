@@ -8,12 +8,18 @@
     {
       "id": "3.127/theorem/resultant_conjunctive_readout",
       "type": "theorem",
-      "text": "rsyOutAt SCR hOut x op = csyOut SCR.VSCR hOut x op when SCR is conjunctive."
+      "text": "rsyOutAt SCR hOut x op = csyOut SCR.VSCR hOut x op when SCR is conjunctive.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "3.127/theorem/rsy_RZ_eq_csy_readout_fun",
       "type": "theorem",
-      "text": "Full resultant readout function on UnconnOutPort equals CSY readout at each unconnected output tag."
+      "text": "Full resultant readout function on UnconnOutPort equals CSY readout at each unconnected output tag.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

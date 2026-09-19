@@ -655,6 +655,7 @@ def csy_parameterization (n : Nat) :
   [textbook/theorem3.45/proof/state_induction]
   The state trajectory of a conjunctive (parallel) system evaluated at component `i`
   is equal to the state trajectory of the `i`-th component system running under projected inputs.
+  Proof packaging differs from the textbook induction (proof comparison §11); claim is faithful.
 -/
 theorem csy_state_trajectory {n : Nat} (VSCR : PortSystemVector n) (x : (i : Fin n) → VSCR.SZ i)
     (f : ITZ ((ip : Σ i, VSCR.Port i) → VSCR.PortVal ip.1 ip.2)) (t : Time) (i : Fin n) :

@@ -6,7 +6,12 @@
     {
       "id": "3.15/definition/conjunctive_scr",
       "type": "component",
-      "text": "The system coupling recipe SCR is conjunctive if and only if CSCR = ∅."
+      "text": "The system coupling recipe SCR is conjunctive if and only if CSCR = ∅.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 3
 }

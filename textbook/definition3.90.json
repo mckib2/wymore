@@ -6,17 +6,27 @@
     {
       "id": "3.90/definition/order_zero",
       "type": "definition",
-      "text": "Component i is of order 0 when it has an unconnected input or output port."
+      "text": "Component i is of order 0 when it has an unconnected input or output port.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.90/definition/order",
       "type": "definition",
-      "text": "Component i is of order m + 1 when coupled to some component of order m."
+      "text": "Component i is of order m + 1 when coupled to some component of order m.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.90/definition/null_order",
       "type": "definition",
-      "text": "Null order: not of positive order (no external interface)."
+      "text": "Null order: not of order m for any m (Lean `¬ ComponentHasOrder`), i.e. no chain of SCR couplings reaches a component with an external interface. Not merely “not of positive order.”",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 3,
+  "fidelity_note": "Locked: null order = ¬ComponentHasOrder (no order at all), not merely “not of positive order”; required by Ex 4.66."
 }

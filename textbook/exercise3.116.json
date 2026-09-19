@@ -8,7 +8,11 @@
     {
       "id": "3.116/theorem/cascade_min_two_components",
       "type": "theorem",
-      "text": "IsCascade SCR with nonempty CSCR implies n > 1."
+      "text": "IsCascade SCR with nonempty CSCR implies n > 1.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

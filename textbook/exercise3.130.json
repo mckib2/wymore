@@ -8,7 +8,11 @@
     {
       "id": "3.130/theorem/subsystem_reflexive",
       "type": "theorem",
-      "text": "IsSubsystemOf Z Z for any resultant Z = RSY(SCR)."
+      "text": "IsSubsystemOf Z Z for any resultant Z = RSY(SCR).",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

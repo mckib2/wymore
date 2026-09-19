@@ -8,17 +8,25 @@
     {
       "id": "3.122/definition/singular_scr",
       "type": "definition",
-      "text": "Singular coupling recipe (V, ∅) for a one-component connectable vector."
+      "text": "Singular coupling recipe (V, ∅) for a one-component connectable vector.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "3.122/definition/port_vector_of_system",
       "type": "definition",
-      "text": "Embed a port-encoded discrete system as a PortSystemVector 1."
+      "text": "Embed a port-encoded discrete system as a PortSystemVector 1.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "3.122/theorem/every_system_is_resultant",
       "type": "theorem",
-      "text": "Z = RSY(Z, ∅) for port-encoded systems: singular recipe, InRSY, NZ and readout alignment."
+      "text": "Z = RSY(Z, ∅) for port-encoded systems: singular recipe, InRSY, NZ and readout alignment.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

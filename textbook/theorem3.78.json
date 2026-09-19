@@ -6,7 +6,12 @@
     {
       "id": "3.78/theorem/second_open_loop_closed_loop",
       "type": "implication",
-      "text": "State and output trajectories match for `cfscr`."
+      "text": "State and output trajectories match for `cfscr`.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 3
 }

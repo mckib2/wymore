@@ -8,12 +8,18 @@
     {
       "id": "3.114/theorem/unconnected_ports_exist",
       "type": "theorem",
-      "text": "There exist unconnected input and output ports in every coupling recipe."
+      "text": "There exist unconnected input and output ports in every coupling recipe.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "3.114/theorem/cscr_domain_range_eq",
       "type": "theorem",
-      "text": "Domain and range of CSCR have equal cardinality."
+      "text": "Domain and range of CSCR have equal cardinality.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

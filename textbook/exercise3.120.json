@@ -8,32 +8,46 @@
     {
       "id": "3.120/theorem/conjunctive_input_port_map",
       "type": "theorem",
-      "text": "IP&(V,Z) ∈ FNS(IPZ, 1TO1, ONTO, ⋃{IPZi})."
+      "text": "IP&(V,Z) ∈ FNS(IPZ, 1TO1, ONTO, ⋃{IPZi}).",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "3.120/theorem/conjunctive_inverse_input_port_map",
       "type": "theorem",
-      "text": "INIP&(V,Z) ∈ FNS(⋃{IPZi}, 1TO1, ONTO, IPZ)."
+      "text": "INIP&(V,Z) ∈ FNS(⋃{IPZi}, 1TO1, ONTO, IPZ).",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "3.120/theorem/conjunctive_input_port_structure",
       "type": "theorem",
-      "text": "IS&(V,Z) = ISZ on conjunctive input ports."
+      "text": "IS&(V,Z) = ISZ on conjunctive input ports.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "3.120/theorem/conjunctive_output_port_map",
       "type": "theorem",
-      "text": "OP&(V,Z) ∈ FNS(OPZ, 1TO1, ONTO, ⋃{OPZi})."
+      "text": "OP&(V,Z) ∈ FNS(OPZ, 1TO1, ONTO, ⋃{OPZi}).",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "3.120/theorem/conjunctive_output_port_structure",
       "type": "theorem",
-      "text": "OS&(V,Z) = OSZ on conjunctive output ports."
+      "text": "OS&(V,Z) = OSZ on conjunctive output ports.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "3.120/theorem/conjunctive_port_functions",
       "type": "theorem",
-      "text": "Aggregate CSY port-map FNS and structure equalities."
+      "text": "Aggregate CSY port-map FNS and structure equalities.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

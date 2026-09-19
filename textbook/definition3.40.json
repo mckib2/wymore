@@ -6,62 +6,89 @@
     {
       "id": "3.40/definition/csy",
       "type": "component",
-      "text": "CSY = {(V, Z): V is a connectable vector of systems; if V = Z1, then Z = Z1; if V = (Z1, ..., Zn), then Z = (SZ, IZ, OZ, NZ, RZ)."
+      "text": "CSY = {(V, Z): V is a connectable vector of systems; if V = Z1, then Z = Z1; if V = (Z1, ..., Zn), then Z = (SZ, IZ, OZ, NZ, RZ).",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.40/definition/sz",
       "type": "component",
-      "text": "SZ = ⅹ (SZ1, ..., SZn)."
+      "text": "SZ = ⅹ (SZ1, ..., SZn).",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.40/definition/iz",
       "type": "component",
-      "text": "IZ = ⅹ (I1Z1, ..., Ik1Z1, ..., I1Zn, ..., IknZn)."
+      "text": "IZ = ⅹ (I1Z1, ..., Ik1Z1, ..., I1Zn, ..., IknZn).",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.40/definition/oz",
       "type": "component",
-      "text": "OZ = ⅹ (O1Z1, ..., Om1Z1, ..., O1Zn, ..., OmnZn)."
+      "text": "OZ = ⅹ (O1Z1, ..., Om1Z1, ..., O1Zn, ..., OmnZn).",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.40/definition/nz",
       "type": "component",
-      "text": "NZ = {((x, p), y) : x ∈ SZ; p ∈ IZ; y ∈ SZ; if i ∈ IJS[1, n], then PJNi(y) = NZi(PJNi(x), PJNPZi(p))}."
+      "text": "NZ = {((x, p), y) : x ∈ SZ; p ∈ IZ; y ∈ SZ; if i ∈ IJS[1, n], then PJNi(y) = NZi(PJNi(x), PJNPZi(p))}.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.40/definition/rz",
       "type": "component",
-      "text": "RZ = {(x, q): x ∈ SZ; q ∈ OZ; if i ∈ IJS[1, n], then PJNOPZi(q) = RZi(PJNi(x))}."
+      "text": "RZ = {(x, q): x ∈ SZ; q ∈ OZ; if i ∈ IJS[1, n], then PJNOPZi(q) = RZi(PJNi(x))}.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.40/definition/ip_map",
       "type": "component",
-      "text": "IP& is a function mapping the input ports of the conjunctive system to the input ports of the component systems."
+      "text": "IP& is a function mapping the input ports of the conjunctive system to the input ports of the component systems.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.40/definition/inip_map",
       "type": "component",
-      "text": "INIP& is the inverse function of IP&."
+      "text": "INIP& is the inverse function of IP&.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.40/definition/is_map",
       "type": "component",
-      "text": "IS& is the input port structure function of the conjunctive system."
+      "text": "IS& is the input port structure function of the conjunctive system.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.40/definition/op_map",
       "type": "component",
-      "text": "OP& is a function mapping the output ports of the conjunctive system to the output ports of the component systems."
+      "text": "OP& is a function mapping the output ports of the conjunctive system to the output ports of the component systems.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.40/definition/inop_map",
       "type": "component",
-      "text": "INOP& is the inverse function of OP&."
+      "text": "INOP& is the inverse function of OP&.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.40/definition/os_map",
       "type": "component",
-      "text": "OS& is the output port structure function of the conjunctive system."
+      "text": "OS& is the output port structure function of the conjunctive system.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 3
 }

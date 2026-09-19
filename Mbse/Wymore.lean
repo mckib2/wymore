@@ -897,6 +897,12 @@ noncomputable def csy_parameterization (n : Nat) (VSCR : PortSystemVector n)
       ((op : Σ i, VSCR.OutPort i) → VSCR.OutPortVal op.1 op.2) :=
   csy VSCR hOut
 
+/--
+  [textbook/theorem3.45/theorem/trajectories_relation]
+  [textbook/theorem3.45/proof/state_induction]
+  Theorem 3.45 (state projection). DTT packaging uses `wymore_trajectory_induction`
+  rather than the textbook's informal induction (proof comparison §11); claim is faithful.
+-/
 theorem csy_state_trajectory {n : Nat} (VSCR : PortSystemVector n)
     (hOut : ∀ i, AlwaysOutputs (VSCR.Z i)) (x : (i : Fin n) → VSCR.SZ i)
     (f : ITZW ((ip : Σ i, VSCR.Port i) → VSCR.PortVal ip.1 ip.2)) (t : Time) (i : Fin n) :
@@ -1451,6 +1457,8 @@ lemma mem_uoscr_of_not_mem_coscr {n : Nat} (SCR : SystemCouplingRecipe n)
 /-!
   Uniform `Nat → Nat` IO for heterogeneous port arities inside `PortSystemVector` (Exercises 3.124–3.126).
   SCR port metadata uses `Nat` indices; `uniformNatPortWrap` decodes to `Fin n → Nat` component ports.
+  Intentional encoding policy (faithful-with-notes): see [wymore_chapter3_audit.md](wymore_chapter3_audit.md)
+  and [proof_comparison_report.md](proof_comparison_report.md) §23–§24.
 -/
 
 /-- Decode uniform input `inp : Nat → Nat` into `Fin n → Nat` (indices `≥ n` read as `inp k` only for `k < n`). -/

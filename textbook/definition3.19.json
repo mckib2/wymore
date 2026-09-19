@@ -6,12 +6,19 @@
     {
       "id": "3.19/definition/cascade_scr",
       "type": "component",
-      "text": "The system coupling recipe SCR is cascade if and only if CSCR contains no feedback connections."
+      "text": "The system coupling recipe SCR is cascade if and only if CSCR contains no feedback connections.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.19/definition/essentially_cascade_scr",
       "type": "component",
-      "text": "The system coupling recipe SCR, where VSCR = (Z1, ..., Zn) for n ∈ IJS+, is 'essentially cascade' if there exists f ∈ FNS(IJS[1, n], 1TO1, ONTO, IJS[1, n]) such that if SCRf = ((Zf(1), ..., Zf(n)), CSCR), then SCRf is cascade."
+      "text": "The system coupling recipe SCR, where VSCR = (Z1, ..., Zn) for n ∈ IJS+, is 'essentially cascade' if there exists f ∈ FNS(IJS[1, n], 1TO1, ONTO, IJS[1, n]) such that if SCRf = ((Zf(1), ..., Zf(n)), CSCR), then SCRf is cascade.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 3
 }

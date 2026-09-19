@@ -6,12 +6,19 @@
     {
       "id": "3.68/definition/coupling_function",
       "type": "definition",
-      "text": "Constructive coupling function `cfscr` on closed-loop experiments."
+      "text": "Constructive coupling function `cfscr` on closed-loop experiments.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.68/definition/coupling_function_scr",
       "type": "definition",
-      "text": "Relational coupling-function specification `CouplingFunctionSCR`."
+      "text": "Relational coupling-function specification `CouplingFunctionSCR`.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 3
 }

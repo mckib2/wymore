@@ -6,7 +6,12 @@
     {
       "id": "3.33/definition/mixed_scr",
       "type": "component",
-      "text": "A system coupling recipe is mixed if it is not singular, conjunctive, cascade, essentially cascade, or pure feedback."
+      "text": "A system coupling recipe is mixed if it is not singular, conjunctive, cascade, essentially cascade, or pure feedback.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 3
 }

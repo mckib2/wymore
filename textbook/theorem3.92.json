@@ -6,7 +6,12 @@
     {
       "id": "3.92/theorem/order_zero_component",
       "type": "theorem",
-      "text": "There exists a component with an unconnected port and hence not of null order."
+      "text": "There exists a component with an unconnected port and hence not of null order.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 3
 }

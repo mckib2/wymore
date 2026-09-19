@@ -6,17 +6,27 @@
     {
       "id": "3.31/theorem/class_in_themselves",
       "type": "implication",
-      "text": "If SCR is a pure feedback system coupling recipe, then SCR is neither singular, conjunctive, or cascade."
+      "text": "If SCR is a pure feedback system coupling recipe, then SCR is neither singular, conjunctive, or cascade.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.31/proof/not_singular_conjunctive",
       "type": "component",
-      "text": "SCR is neither singular or conjunctive because CSCR ≠ ∅ by the definition at 3.29."
+      "text": "SCR is neither singular or conjunctive because CSCR ≠ ∅ by the definition at 3.29.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.31/proof/not_cascade",
       "type": "component",
-      "text": "SCR is not cascade, since CSCR must contain a pair of the form (B, A) where B is an output port of VSCR and A is an input port of VSCR, which is a feedback connection, by the definition at 3.7."
+      "text": "SCR is not cascade, since CSCR must contain a pair of the form (B, A) where B is an output port of VSCR and A is an input port of VSCR, which is a feedback connection, by the definition at 3.7.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 3,
+  "fidelity_note": "Proof-style differs (Subsingleton / class separation); claim faithful — proof_comparison §10."
 }

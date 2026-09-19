@@ -8,37 +8,53 @@
     {
       "id": "3.121/theorem/resultant_input_port_map",
       "type": "theorem",
-      "text": "IP@(SCR,Z) ∈ FNS(IPZ, 1TO1, ONTO, UISCR)."
+      "text": "IP@(SCR,Z) ∈ FNS(IPZ, 1TO1, ONTO, UISCR).",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "3.121/theorem/resultant_inverse_input_port_map",
       "type": "theorem",
-      "text": "INIP@(SCR,Z) ∈ FNS(UISCR, 1TO1, ONTO, IPZ)."
+      "text": "INIP@(SCR,Z) ∈ FNS(UISCR, 1TO1, ONTO, IPZ).",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "3.121/theorem/resultant_input_port_structure",
       "type": "theorem",
-      "text": "IS@(SCR,Z) = ISZ on resultant input ports."
+      "text": "IS@(SCR,Z) = ISZ on resultant input ports.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "3.121/theorem/resultant_output_port_map",
       "type": "theorem",
-      "text": "OP@(SCR,Z) ∈ FNS(OPZ, 1TO1, ONTO, UOSCR)."
+      "text": "OP@(SCR,Z) ∈ FNS(OPZ, 1TO1, ONTO, UOSCR).",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "3.121/theorem/resultant_inverse_output_port_map",
       "type": "theorem",
-      "text": "INOP@(SCR,Z) ∈ FNS(UOSCR, 1TO1, ONTO, OPZ)."
+      "text": "INOP@(SCR,Z) ∈ FNS(UOSCR, 1TO1, ONTO, OPZ).",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "3.121/theorem/resultant_output_port_structure",
       "type": "theorem",
-      "text": "OS@(SCR,Z) = OSZ on resultant output ports."
+      "text": "OS@(SCR,Z) = OSZ on resultant output ports.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "3.121/theorem/resultant_port_functions",
       "type": "theorem",
-      "text": "Aggregate RSY port-map FNS and structure equalities."
+      "text": "Aggregate RSY port-map FNS and structure equalities.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

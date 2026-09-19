@@ -8,7 +8,11 @@
     {
       "id": "3.117/theorem/pure_feedback_min_ports",
       "type": "theorem",
-      "text": "min(scr_input_port_count, scr_output_port_count) ≥ 2 for pure feedback SCR."
+      "text": "min(scr_input_port_count, scr_output_port_count) ≥ 2 for pure feedback SCR.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

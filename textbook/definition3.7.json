@@ -6,32 +6,47 @@
     {
       "id": "3.7/definition/connectivity_relation",
       "type": "component",
-      "text": "A set CSCR is a system connectivity for the connectable vector VSCR of systems if and only if: (i) either CSCR = ∅ or CSCR is a 1TO1 function."
+      "text": "A set CSCR is a system connectivity for the connectable vector VSCR of systems if and only if: (i) either CSCR = ∅ or CSCR is a 1TO1 function.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.7/requirement/domain_subset",
       "type": "constraint",
-      "text": "(ii) DMN(CSCR) is a proper subset of ∪ {OPZ' : Z' ∈ VSCR}."
+      "text": "(ii) DMN(CSCR) is a proper subset of ∪ {OPZ' : Z' ∈ VSCR}.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.7/requirement/range_subset",
       "type": "constraint",
-      "text": "(iii) RNG(CSCR) is a proper subset of ∪ {IPZ' : Z' ∈ VSCR}."
+      "text": "(iii) RNG(CSCR) is a proper subset of ∪ {IPZ' : Z' ∈ VSCR}.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.7/requirement/port_compatibility",
       "type": "constraint",
-      "text": "(iv) if (B, A) ∈ CSCR, where B ∈ OPZ', A ∈ IPZ'', Z' ∈ VSCR and Z'' ∈ VSCR, then OSZ'(B) = ISZ''(A) (the port compatibility condition)."
+      "text": "(iv) if (B, A) ∈ CSCR, where B ∈ OPZ', A ∈ IPZ'', Z' ∈ VSCR and Z'' ∈ VSCR, then OSZ'(B) = ISZ''(A) (the port compatibility condition).",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.7/definition/feedforward_connection",
       "type": "component",
-      "text": "A feedforward connection is a pair (B, A) ∈ CSCR, where, if VSCR = (Z1, ..., Zn), B ∈ OPZi and A ∈ IPZj, then i < j."
+      "text": "A feedforward connection is a pair (B, A) ∈ CSCR, where, if VSCR = (Z1, ..., Zn), B ∈ OPZi and A ∈ IPZj, then i < j.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.7/definition/feedback_connection",
       "type": "component",
-      "text": "A feedback connection is a pair (B, A) ∈ CSCR, where, if VSCR = (Z1, ..., Zn), B ∈ OPZi and A ∈ IPZj, then i ≥ j."
+      "text": "A feedback connection is a pair (B, A) ∈ CSCR, where, if VSCR = (Z1, ..., Zn), B ∈ OPZi and A ∈ IPZj, then i ≥ j.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 3
 }

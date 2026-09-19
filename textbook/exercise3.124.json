@@ -8,12 +8,19 @@
     {
       "id": "3.124/theorem/simple_cascade_rsy",
       "type": "theorem",
-      "text": "RSY(SCR) next-state and readout match Z1/Z2' on external inputs and connected ports."
+      "text": "RSY(SCR) next-state and readout match Z1/Z2' on external inputs and connected ports.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "3.124/theorem/is_cascade",
       "type": "theorem",
-      "text": "The simple cascade SCR satisfies IsCascade."
+      "text": "The simple cascade SCR satisfies IsCascade.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved",
+  "fidelity_note": "Homogeneous uniformNatPortWrap encoding; see proof_comparison §23–§24."
 }

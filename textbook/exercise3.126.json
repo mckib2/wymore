@@ -8,12 +8,19 @@
     {
       "id": "3.126/theorem/simple_mixed_rsy",
       "type": "theorem",
-      "text": "RSY(SCR) next-state at both time indices and readout on Z1 port 0 match component dynamics."
+      "text": "RSY(SCR) next-state at both time indices and readout on Z1 port 0 match component dynamics.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "3.126/theorem/mixed_readout_audit",
       "type": "theorem",
-      "text": "Lean proves R1Z1 at state x(0); textbook cites x(2) — documented as likely typo."
+      "text": "Lean proves R1Z1 at state x(0); textbook cites x(2) — documented as likely typo.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved",
+  "fidelity_note": "Homogeneous wrap + readout index typo lock (book x(2) → Lean x(0)); see proof_comparison §23–§25."
 }

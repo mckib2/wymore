@@ -6,12 +6,19 @@
     {
       "id": "3.85/definition/nonsingular_conjunctive",
       "type": "definition",
-      "text": "Conjunctive coupling recipe with more than one component (CSCR = ∅, n > 1)."
+      "text": "Conjunctive coupling recipe with more than one component (CSCR = ∅, n > 1).",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.85/theorem/nonsingular_conjunctive_scr_unique",
       "type": "theorem",
-      "text": "Equal VSCR on nonsingular conjunctive recipes determines the coupling recipe."
+      "text": "Equal VSCR on nonsingular conjunctive recipes determines the coupling recipe.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 3
 }

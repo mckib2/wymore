@@ -6,12 +6,19 @@
     {
       "id": "3.71/theorem/coupling_function_exists",
       "type": "implication",
-      "text": "A coupling function exists for each closed-loop experiment."
+      "text": "A coupling function exists for each closed-loop experiment.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.71/theorem/coupling_function_in_FNS",
       "type": "implication",
-      "text": "The coupling-function map is total and single-valued (FNS)."
+      "text": "The coupling-function map is total and single-valued (FNS).",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 3
 }

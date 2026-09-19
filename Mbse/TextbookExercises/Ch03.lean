@@ -5,9 +5,13 @@ import Mathlib.Data.Fin.Basic
 import Mathlib.Tactic.FinCases
 
 /-!
-# Chapter 3 — coupling recipe exercises (3.113–3.126)
+# Chapter 3 — coupling recipe exercises (3.113–3.133)
 
-Encoding choices for exercises 3.124–3.126 (homogeneous `uniformNatPortWrap`, `DependsOnInputPort`, distinctness) are documented in [proof_comparison_report.md](proof_comparison_report.md) §23–§25.
+Encoding policy (faithful-with-notes; see [wymore_chapter3_audit.md](wymore_chapter3_audit.md)):
+
+* Exercises 3.124–3.126 use homogeneous `uniformNatPortWrap` so SCR port metadata stays on `Nat`
+  indices while components keep `Fin n → Nat` IO ([proof_comparison_report.md](proof_comparison_report.md) §23–§24).
+* Exercise 3.126 readout is Lean `R1Z1(x(0))`; the textbook’s `R1Z1(x(2))` is treated as a typo (§25).
 -/
 
 namespace Mbse.TextbookExercises.Ch03

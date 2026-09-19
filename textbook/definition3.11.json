@@ -6,42 +6,61 @@
     {
       "id": "3.11/definition/system_coupling_recipe",
       "type": "component",
-      "text": "A system coupling recipe is a pair denoted SCR = (VSCR, CSCR) where (i) VSCR is a connectable vector of systems and (ii) CSCR is a system connectivity for VSCR."
+      "text": "A system coupling recipe is a pair denoted SCR = (VSCR, CSCR) where (i) VSCR is a connectable vector of systems and (ii) CSCR is a system connectivity for VSCR.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.11/interpretation/vscr",
       "type": "interpretation",
-      "text": "VSCR is called the connectable vector of system components of SCR."
+      "text": "VSCR is called the connectable vector of system components of SCR.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.11/interpretation/cscr",
       "type": "interpretation",
-      "text": "CSCR is called the system connectivity of SCR."
+      "text": "CSCR is called the system connectivity of SCR.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.11/definition/coscr",
       "type": "component",
-      "text": "COSCR = DMN(CSCR), if CSCR is a function or COSCR = ∅, if CSCR = ∅."
+      "text": "COSCR = DMN(CSCR), if CSCR is a function or COSCR = ∅, if CSCR = ∅.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.11/definition/ciscr",
       "type": "component",
-      "text": "CISCR = RNG(CSCR), if CSCR is a function or CISCR = ∅, if CSCR = ∅."
+      "text": "CISCR = RNG(CSCR), if CSCR is a function or CISCR = ∅, if CSCR = ∅.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.11/definition/uoscr",
       "type": "component",
-      "text": "UOSCR = ∪ {OPZ' : Z' ∈ VSCR} - COSCR."
+      "text": "UOSCR = ∪ {OPZ' : Z' ∈ VSCR} - COSCR.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.11/definition/uiscr",
       "type": "component",
-      "text": "UISCR = ∪ {IPZ' : Z' ∈ VSCR} - CISCR."
+      "text": "UISCR = ∪ {IPZ' : Z' ∈ VSCR} - CISCR.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.11/definition/interface",
       "type": "component",
-      "text": "The interface between Z' and Z'' specified by SCR, where Z' and Z'' are in VSCR, is the set of all pairs in CSCR involving only input ports and outputs of both Z' and Z''; that is, the interface between Z' and Z'' is (CSCR ∩ (OPZ' × IPZ'')) ∪ (CSCR ∩ (OPZ'' × IPZ'))."
+      "text": "The interface between Z' and Z'' specified by SCR, where Z' and Z'' are in VSCR, is the set of all pairs in CSCR involving only input ports and outputs of both Z' and Z''; that is, the interface between Z' and Z'' is (CSCR ∩ (OPZ' × IPZ'')) ∪ (CSCR ∩ (OPZ'' × IPZ')).",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 3
 }

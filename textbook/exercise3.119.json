@@ -8,7 +8,11 @@
     {
       "id": "3.119/theorem/conjunctive_port_identification",
       "type": "theorem",
-      "text": "rsy_IS_map, rsy_OS_map, rsy_IP_map, rsy_OP_map identify with csy maps on unconnected ports."
+      "text": "rsy_IS_map, rsy_OS_map, rsy_IP_map, rsy_OP_map identify with csy maps on unconnected ports.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

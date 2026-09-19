@@ -7,6 +7,11 @@ import Mathlib.Data.Fintype.Card
 # Chapter 3 — coupling recipe structure (order, components, subsystems)
 
 Structural definitions and theorems from Wymore Ch. 3 (Defs 3.90, 3.95, 3.97; Thms 3.85, 3.87, 3.92).
+
+**Def 3.90 null-order policy:** `ComponentNullOrder` is `¬ ComponentHasOrder` (“no order at all”),
+not merely “not of positive order.” This locked reading is required by Exercise 4.66
+(`ex4_66_null_order_elimination`). See [proof_comparison_report.md](proof_comparison_report.md) §28
+and [wymore_chapter3_audit.md](wymore_chapter3_audit.md).
 -/
 
 namespace Mbse.Wymore

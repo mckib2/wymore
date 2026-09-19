@@ -6,12 +6,19 @@
     {
       "id": "3.3/definition/connection_vector",
       "type": "component",
-      "text": "VSCR is a connection vector of systems iff: (i) either VSCR ∈ DSYSTEMS or VSCR is an n-tuple for some n ∈ IJS+ of the form VSCR = (Z1, ..., Zn) for n ∈ IJS+ and Zi ∈ DSYSTEMS for every i ∈ IJS[1, n]."
+      "text": "VSCR is a connection vector of systems iff: (i) either VSCR ∈ DSYSTEMS or VSCR is an n-tuple for some n ∈ IJS+ of the form VSCR = (Z1, ..., Zn) for n ∈ IJS+ and Zi ∈ DSYSTEMS for every i ∈ IJS[1, n].",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.3/requirement/pairwise_distinct",
       "type": "constraint",
-      "text": "(ii) if {i, j} ⊆ IJS[1, n] such that i ≠ j, then Zi ≠ Zj."
+      "text": "(ii) if {i, j} ⊆ IJS[1, n] such that i ≠ j, then Zi ≠ Zj.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 3
 }

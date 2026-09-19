@@ -6,12 +6,19 @@
     {
       "id": "3.73/theorem/characterization",
       "type": "implication",
-      "text": "`cfscr` satisfies the coupling-function equations."
+      "text": "`cfscr` satisfies the coupling-function equations.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.73/theorem/uniqueness",
       "type": "implication",
-      "text": "Any solution `g` equals `cfscr`."
+      "text": "Any solution `g` equals `cfscr`.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 3
 }

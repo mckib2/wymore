@@ -8,7 +8,11 @@
     {
       "id": "3.129/theorem/subsystem_iff_recipes",
       "type": "theorem",
-      "text": "IsSubsystemOf Z1 Z2 ↔ ∃ recipes and an injective component embedding φ with Z1 = RSY(SCR1), Z2 = RSY(SCR2), and CSCR1 the restriction of CSCR2 to embedded ports."
+      "text": "IsSubsystemOf Z1 Z2 ↔ ∃ recipes and an injective component embedding φ with Z1 = RSY(SCR1), Z2 = RSY(SCR2), and CSCR1 the restriction of CSCR2 to embedded ports.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

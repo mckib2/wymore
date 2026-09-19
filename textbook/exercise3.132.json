@@ -8,12 +8,18 @@
     {
       "id": "3.132/theorem/singular_cfscr_eq_closed_loop",
       "type": "theorem",
-      "text": "cfscr on singularSCR equals conjunctiveClosedLoopAsOpenLoop f."
+      "text": "cfscr on singularSCR equals conjunctiveClosedLoopAsOpenLoop f.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "3.132/theorem/singular_rsy_eq_component",
       "type": "theorem",
-      "text": "InRSY and NZ/RZ agreement between rsy singularSCR and V.Z 0."
+      "text": "InRSY and NZ/RZ agreement between rsy singularSCR and V.Z 0.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

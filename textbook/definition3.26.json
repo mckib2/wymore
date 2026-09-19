@@ -6,7 +6,12 @@
     {
       "id": "3.26/definition/singular_scr",
       "type": "component",
-      "text": "The system coupling recipe SCR is singular if and only if: (i) VSCR = Z for some system Z and (ii) CSCR = ∅."
+      "text": "The system coupling recipe SCR is singular if and only if: (i) VSCR = Z for some system Z and (ii) CSCR = ∅.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 3
 }

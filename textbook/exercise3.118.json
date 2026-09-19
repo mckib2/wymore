@@ -8,7 +8,11 @@
     {
       "id": "3.118/witness/simple_conjunction",
       "type": "witness",
-      "text": "ex3_118_scr is conjunctive and nonsingular conjunctive."
+      "text": "ex3_118_scr is conjunctive and nonsingular conjunctive.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

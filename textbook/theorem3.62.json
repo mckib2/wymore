@@ -6,22 +6,33 @@
     {
       "id": "3.62/theorem/rsy_parameterization",
       "type": "implication",
-      "text": "RSY is a system parameterization."
+      "text": "RSY is a system parameterization.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.62/proof/dsystems",
       "type": "component",
-      "text": "The resultant system Z belongs to DSYSTEMS, verifying state, input, output, and transition/readout function conditions."
+      "text": "The resultant system Z belongs to DSYSTEMS, verifying state, input, output, and transition/readout function conditions.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.62/proof/existence",
       "type": "component",
-      "text": "For every system coupling recipe SCR, there exists Z ∈ DSYSTEMS such that (SCR, Z) ∈ RSY."
+      "text": "For every system coupling recipe SCR, there exists Z ∈ DSYSTEMS such that (SCR, Z) ∈ RSY.",
+      "fidelity": "faithful",
+      "status": "proved"
     },
     {
       "id": "3.62/proof/uniqueness",
       "type": "component",
-      "text": "If (SCR, Z1) ∈ RSY and (SCR, Z2) ∈ RSY, then Z1 = Z2."
+      "text": "If (SCR, Z1) ∈ RSY and (SCR, Z2) ∈ RSY, then Z1 = Z2.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 3
 }

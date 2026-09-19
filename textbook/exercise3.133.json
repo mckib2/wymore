@@ -8,12 +8,18 @@
     {
       "id": "3.133/theorem/conjunctive_cfscr_eq_closed_loop",
       "type": "theorem",
-      "text": "cfscr SCR hOut f x = conjunctiveClosedLoopAsOpenLoop SCR h f."
+      "text": "cfscr SCR hOut f x = conjunctiveClosedLoopAsOpenLoop SCR h f.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "3.133/theorem/conjunctive_rsy_eq_csy",
       "type": "theorem",
-      "text": "Pointwise NZ and readout agreement between rsy SCR and csy SCR.VSCR."
+      "text": "Pointwise NZ and readout agreement between rsy SCR and csy SCR.VSCR.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

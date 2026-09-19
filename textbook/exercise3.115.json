@@ -8,7 +8,11 @@
     {
       "id": "3.115/theorem/port_counts_gt_connections",
       "type": "theorem",
-      "text": "scr_input_port_count and scr_output_port_count are strictly greater than scr_cscr_card."
+      "text": "scr_input_port_count and scr_output_port_count are strictly greater than scr_cscr_card.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

@@ -6,7 +6,12 @@
     {
       "id": "3.81/theorem/resultant_output_component_decomposition",
       "type": "implication",
-      "text": "Unconnected output ports follow component output trajectories."
+      "text": "Unconnected output ports follow component output trajectories.",
+      "fidelity": "faithful",
+      "status": "proved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "proved",
+  "chapter": 3
 }

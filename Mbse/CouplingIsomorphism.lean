@@ -14,6 +14,7 @@ homomorphism/copy algebra of [`Mbse.Isomorphism`](Isomorphism.lean):
 * Corollary 4.59 — the same statement with "copy" in place of "homomorphic image".
 * Exercise 4.66 — deleting the components of null order from a coupling recipe leaves `UISCR` and
   `UOSCR` unchanged and makes the new resultant a homomorphic image of the original one.
+  Uses Def 3.90’s locked null-order reading (`¬ ComponentHasOrder`; see Ch.3 audit / proof_comparison §28).
 
 Shared port-skeleton transport lives in [`Mbse.CouplingPortMaps`](CouplingPortMaps.lean).
 -/

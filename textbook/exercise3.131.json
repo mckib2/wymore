@@ -8,7 +8,11 @@
     {
       "id": "3.131/theorem/subsystem_transitive",
       "type": "theorem",
-      "text": "IsSubsystemOf is transitive on resultant systems."
+      "text": "IsSubsystemOf is transitive on resultant systems.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved"
 }

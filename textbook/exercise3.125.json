@@ -8,12 +8,19 @@
     {
       "id": "3.125/theorem/simple_feedback_rsy",
       "type": "theorem",
-      "text": "RSY(SCR) NZ and readout match Z1 with external input on port 0 and feedback from port 1."
+      "text": "RSY(SCR) NZ and readout match Z1 with external input on port 0 and feedback from port 1.",
+      "fidelity": "faithful",
+      "status": "solved"
     },
     {
       "id": "3.125/theorem/is_pure_feedback",
       "type": "theorem",
-      "text": "The simple feedback SCR satisfies IsPureFeedback."
+      "text": "The simple feedback SCR satisfies IsPureFeedback.",
+      "fidelity": "faithful",
+      "status": "solved"
     }
-  ]
+  ],
+  "fidelity": "faithful",
+  "status": "solved",
+  "fidelity_note": "Homogeneous uniformNatPortWrap encoding; see proof_comparison §23–§24."
 }
