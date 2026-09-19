@@ -800,4 +800,100 @@ theorem eimpsys_eq {S : Type} {Port OutPort : Type}
     eimpsys S Port OutPort PV OV p = p.implemented :=
   rfl
 
+/-! ## Exercises 5.184–5.187: HIISYSMO specializations and Implements -/
+
+/-- Inverse-image mode inherits primary time index 1 (Exercise 5.184). -/
+theorem inverseImage_isPrimary_of_primary
+    {SM IM OM S₁ I₁ O₁ S₂ I₂ O₂ : Type}
+    {ZM : DiscreteSystem SM IM OM}
+    {Z₁ : DiscreteSystem S₁ I₁ O₁}
+    {Z₂ : DiscreteSystem S₂ I₂ O₂}
+    (D : InverseImageModeData ZM Z₁ Z₂)
+    (h : IsPrimaryMode D.mode) :
+    IsPrimaryMode D.inverseImageSystemMode :=
+  ⟨Nat.zero_lt_one, fun x p => h.2 (D.stateProjection x) (D.inputProjection p)⟩
+
+/-- Inverse-image mode inherits constant time index (Exercise 5.185). -/
+theorem inverseImage_constantTime_of_constantTime
+    {SM IM OM S₁ I₁ O₁ S₂ I₂ O₂ : Type}
+    {ZM : DiscreteSystem SM IM OM}
+    {Z₁ : DiscreteSystem S₁ I₁ O₁}
+    {Z₂ : DiscreteSystem S₂ I₂ O₂}
+    (D : InverseImageModeData ZM Z₁ Z₂) (d : Time)
+    (h : HasConstantTimeIndex D.mode d) :
+    HasConstantTimeIndex D.inverseImageSystemMode d :=
+  ⟨h.1, fun x p => h.2 (D.stateProjection x) (D.inputProjection p)⟩
+
+/-- Primary HIISYSMO package (Exercise 5.184). -/
+theorem primary_hiisysmo_properties
+    {SM IM OM S₁ I₁ O₁ S₂ I₂ O₂ : Type}
+    {ZM : DiscreteSystem SM IM OM}
+    {Z₁ : DiscreteSystem S₁ I₁ O₁}
+    {Z₂ : DiscreteSystem S₂ I₂ O₂}
+    (D : InverseImageModeData ZM Z₁ Z₂)
+    (h : IsPrimaryMode D.mode) :
+    IsSystemMode D.homomorphicInverseImageMode Z₂ ∧
+      IsPrimaryMode D.inverseImageSystemMode ∧
+      IsHomomorphicImage ZM D.homomorphicInverseImageMode :=
+  ⟨homomorphicInverseImage_isSystemMode D,
+    inverseImage_isPrimary_of_primary D h,
+    mode_isHomomorphicImage_of_inverseImage D⟩
+
+/-- Constant-time HIISYSMO package (Exercise 5.185; constant-input on fibre not claimed). -/
+theorem constant_hiisysmo_properties
+    {SM IM OM S₁ I₁ O₁ S₂ I₂ O₂ : Type}
+    {ZM : DiscreteSystem SM IM OM}
+    {Z₁ : DiscreteSystem S₁ I₁ O₁}
+    {Z₂ : DiscreteSystem S₂ I₂ O₂}
+    (D : InverseImageModeData ZM Z₁ Z₂) (d : Time)
+    (htime : HasConstantTimeIndex D.mode d) :
+    IsSystemMode D.homomorphicInverseImageMode Z₂ ∧
+      HasConstantTimeIndex D.inverseImageSystemMode d ∧
+      IsHomomorphicImage ZM D.homomorphicInverseImageMode :=
+  ⟨homomorphicInverseImage_isSystemMode D,
+    inverseImage_constantTime_of_constantTime D d htime,
+    mode_isHomomorphicImage_of_inverseImage D⟩
+
+/--
+  If Z₂ is a homomorphic image of Z₁ and Z₂ implements Z₃, then Z₁ implements Z₃
+  (Exercise 5.186; autonomous enrichment as in Thm 5.97).
+-/
+noncomputable def implements_of_homImage_implements
+    {S₁ I₁ O₁ S₂ I₂ O₂ S₃ I₃ O₃ : Type}
+    {Z₁ : DiscreteSystem S₁ I₁ O₁}
+    {Z₂ : DiscreteSystem S₂ I₂ O₂}
+    {Z₃ : DiscreteSystem S₃ I₃ O₃}
+    (h : HomomorphicImageWitness Z₂ Z₁)
+    (w : Implements Z₃ Z₂)
+    (hauto : ModePreservesAutonomous w.mode) :
+    Implements Z₃ Z₁ :=
+  w.trans (Implements.ofHomomorphicImage h) hauto
+
+/--
+  Under constant input/time on the implementation mode, Thm 5.99 lifts experiments
+  and the exhibitor elapsed time is `d * t` (Exercise 5.187).
+-/
+theorem constantMode_implementedExperiment
+    {S₁ I₁ O₁ S₂ I₂ O₂ : Type}
+    {Z₁ : DiscreteSystem S₁ I₁ O₁} {Z₂ : DiscreteSystem S₂ I₂ O₂}
+    (w : Implements Z₁ Z₂) (d : Time)
+    (_hIn : HasConstantInput w.mode) (_hTime : HasConstantTimeIndex w.mode d)
+    (f : ITZ I₁) (x : S₁) (t : Time) :
+    generateStateTrajectory Z₂ (implementedExperiment_lift w f x t).2.1
+          (implementedExperiment_lift w f x t).1
+          (implementedExperiment_lift w f x t).2.2 =
+        w.mode.stateMap
+          (generateStateTrajectory w.modeSystem (implementedStateLift w x)
+            (liftInput (implementedInputLift w f)) t) ∧
+      w.hom.HS
+          (generateStateTrajectory w.modeSystem (implementedStateLift w x)
+            (liftInput (implementedInputLift w f)) t) =
+        generateStateTrajectory Z₁ x (liftInput f) t ∧
+      compiledElapsed w.mode (implementedStateLift w x)
+          (implementedInputLift w f) t = d * t := by
+  refine ⟨(implementedExperiment_state w f x t).1,
+    (implementedExperiment_state w f x t).2, ?_⟩
+  exact compiledElapsed_constantTime w.mode d _hTime
+    (implementedStateLift w x) (implementedInputLift w f) t
+
 end WymoreImplementation

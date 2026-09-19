@@ -105,6 +105,14 @@ def registry : List ExerciseEntry :=
   , ⟨"5.177", 5, .theoremProof, "solved", "Ch05.implements_of_mode_hom_iso_exercise"⟩
   , ⟨"5.178", 5, .theoremProof, "solved", "Ch05.iimpsys_isSystemParameterization"⟩
   , ⟨"5.179", 5, .theoremProof, "solved", "Ch05.eimpsys_isSystemParameterization"⟩
+  , ⟨"5.184", 5, .theoremProof, "solved", "Ch05.primary_hiisysmo_exercise"⟩
+  , ⟨"5.185", 5, .theoremProof, "qualified", "Ch05.constant_hiisysmo_exercise"⟩
+  , ⟨"5.186", 5, .theoremProof, "solved", "Ch05.implements_of_homImage_implements_exercise"⟩
+  , ⟨"5.187", 5, .theoremProof, "solved", "Ch05.constantMode_implementedExperiment_exercise"⟩
+  , ⟨"5.188", 5, .theoremProof, "solved", "Ch05.inevitable_mode_not_transitive"⟩
+  , ⟨"5.190", 5, .theoremProof, "solved", "Ch05.smbf_not_unique_without_inevitable"⟩
+  , ⟨"5.191", 5, .theoremProof, "solved", "Ch05.sysmo_functional_iff_exercise"⟩
+  , ⟨"5.193", 5, .theoremProof, "qualified", "Ch05.hologenic_conjunctive_nonconstricting_qualified"⟩
   ]
 
 def solvedCount : Nat :=

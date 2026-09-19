@@ -2,11 +2,13 @@ import Mbse.WymoreSystemModes
 import Mbse.WymoreCouplingStructure
 import Mbse.WymoreImplementation
 import Mbse.Isomorphism
+import Mbse.WymoreModeCoupling
 
 /-!
 # Chapter 5 — system-mode exercises
 
-Exercises 5.141, 5.142, 5.146–5.153, and 5.156–5.179.
+Exercises 5.141, 5.142, 5.146–5.153, 5.156–5.179, and 5.184–5.193
+(gaps 5.180–5.183, 5.189, 5.192 absent from the source list).
 
 Two different relations meet here.  `Mbse.Wymore.IsSubsystemOf` is *recipe based*:
 it asserts the existence of coupling recipes, an injective component embedding,
@@ -745,8 +747,8 @@ theorem mutual_constantMode_self_d_sq_indices
 open Homomorphism
 
 /--
-  [textbook/exercise5.152/source/exercise]
-  [textbook/exercise5.152/plan/mutual_primary_modes_isomorphic]
+  [textbook/exercise5.152/source/exercise|partial]
+  [textbook/exercise5.152/plan/mutual_primary_modes_isomorphic|partial]
 
 Charitable reading of “Z₁ = Z₂”: mutual primary modes whose embeddings are
 mutual inverses, on systems that stutter autonomously, yield an isomorphism.
@@ -1226,5 +1228,317 @@ theorem eimpsys_isSystemParameterization {S : Type} {Port OutPort : Type}
     (p : EimpsysParam S Port OutPort PV OV) :
     eimpsys S Port OutPort PV OV p = p.implemented :=
   eimpsys_eq p
+
+
+/-! ## Exercises 5.184–5.187 — HIISYSMO / Implements / experiment lift -/
+
+/--
+  [textbook/exercise5.184/source/exercise]
+  [textbook/exercise5.184/plan/primary_hiisysmo_exercise]
+  Exercise 5.184: primary modes generate unique HIISYSMO primary inverse-image modes.
+-/
+theorem primary_hiisysmo_exercise
+    {SM IM OM S₁ I₁ O₁ S₂ I₂ O₂ : Type}
+    {ZM : DiscreteSystem SM IM OM}
+    {Z₁ : DiscreteSystem S₁ I₁ O₁}
+    {Z₂ : DiscreteSystem S₂ I₂ O₂}
+    (D : InverseImageModeData ZM Z₁ Z₂)
+    (h : IsPrimaryMode D.mode) :
+    IsSystemMode D.homomorphicInverseImageMode Z₂ ∧
+      IsPrimaryMode D.inverseImageSystemMode ∧
+      IsHomomorphicImage ZM D.homomorphicInverseImageMode :=
+  primary_hiisysmo_properties D h
+
+/--
+  [textbook/exercise5.185/source/exercise|partial]
+  [textbook/exercise5.185/plan/constant_hiisysmo_exercise|partial]
+  Exercise 5.185: constant-time modes generate unique HIISYSMO constant-time
+  inverse-image modes (constant-input on the fibre not claimed; see library note).
+-/
+theorem constant_hiisysmo_exercise
+    {SM IM OM S₁ I₁ O₁ S₂ I₂ O₂ : Type}
+    {ZM : DiscreteSystem SM IM OM}
+    {Z₁ : DiscreteSystem S₁ I₁ O₁}
+    {Z₂ : DiscreteSystem S₂ I₂ O₂}
+    (D : InverseImageModeData ZM Z₁ Z₂) (d : Time)
+    (htime : HasConstantTimeIndex D.mode d) :
+    IsSystemMode D.homomorphicInverseImageMode Z₂ ∧
+      HasConstantTimeIndex D.inverseImageSystemMode d ∧
+      IsHomomorphicImage ZM D.homomorphicInverseImageMode :=
+  constant_hiisysmo_properties D d htime
+
+/--
+  [textbook/exercise5.186/source/exercise]
+  [textbook/exercise5.186/plan/implements_of_homImage_implements_exercise]
+  Exercise 5.186: if Z₂ is a homomorphic image of Z₁ and Z₂ implements Z₃,
+  then Z₁ implements Z₃.
+-/
+noncomputable def implements_of_homImage_implements_exercise
+    {S₁ I₁ O₁ S₂ I₂ O₂ S₃ I₃ O₃ : Type}
+    {Z₁ : DiscreteSystem S₁ I₁ O₁}
+    {Z₂ : DiscreteSystem S₂ I₂ O₂}
+    {Z₃ : DiscreteSystem S₃ I₃ O₃}
+    (h : HomomorphicImageWitness Z₂ Z₁)
+    (w : Implements Z₃ Z₂)
+    (hauto : ModePreservesAutonomous w.mode) :
+    Implements Z₃ Z₁ :=
+  implements_of_homImage_implements h w hauto
+
+/--
+  [textbook/exercise5.187/source/exercise]
+  [textbook/exercise5.187/plan/constantMode_implementedExperiment_exercise]
+  Exercise 5.187: constant-input/time implementation modes lift experiments with
+  HS agreement and elapsed time `d * t`.
+-/
+theorem constantMode_implementedExperiment_exercise
+    {S₁ I₁ O₁ S₂ I₂ O₂ : Type}
+    {Z₁ : DiscreteSystem S₁ I₁ O₁} {Z₂ : DiscreteSystem S₂ I₂ O₂}
+    (w : Implements Z₁ Z₂) (d : Time)
+    (hIn : HasConstantInput w.mode) (hTime : HasConstantTimeIndex w.mode d)
+    (f : ITZ I₁) (x : S₁) (t : Time) :
+    generateStateTrajectory Z₂ (implementedExperiment_lift w f x t).2.1
+          (implementedExperiment_lift w f x t).1
+          (implementedExperiment_lift w f x t).2.2 =
+        w.mode.stateMap
+          (generateStateTrajectory w.modeSystem (implementedStateLift w x)
+            (liftInput (implementedInputLift w f)) t) ∧
+      w.hom.HS
+          (generateStateTrajectory w.modeSystem (implementedStateLift w x)
+            (liftInput (implementedInputLift w f)) t) =
+        generateStateTrajectory Z₁ x (liftInput f) t ∧
+      compiledElapsed w.mode (implementedStateLift w x)
+          (implementedInputLift w f) t = d * t :=
+  constantMode_implementedExperiment w d hIn hTime f x t
+
+/-! ## Exercise 5.188 — inevitable-mode transitivity counterexample -/
+
+/-- Exhibitor with Bool inputs: `true` advances, `false` stays. -/
+def boolAdvanceExhibitor : DiscreteSystem (Fin 3) Bool (Fin 3) :=
+  DiscreteSystem.ofTotal (fun x b => if b then x + 1 else x) id ⟨0⟩
+
+/-- Unit-input +1 system (middle layer). -/
+def unitAdvance : DiscreteSystem (Fin 3) Unit (Fin 3) :=
+  DiscreteSystem.ofTotal (fun x _ => x + 1) id ⟨0⟩
+
+/-- Unit-input +2 system (mode layer). -/
+def unitDoubleAdvance : DiscreteSystem (Fin 3) Unit (Fin 3) :=
+  DiscreteSystem.ofTotal (fun x _ => x + 2) id ⟨0⟩
+
+/-- Duration-2 sampled mode `unitDoubleAdvance ↪ unitAdvance` (inevitable: Unit alphabet). -/
+def unitSampledMode : SystemMode unitDoubleAdvance unitAdvance where
+  stateMap := id
+  inputMap := id
+  outputMap := id
+  stateMap_injective := Function.injective_id
+  inputMap_injective := Function.injective_id
+  outputMap_injective := Function.injective_id
+  behavior :=
+    { input := fun _ _ _ => ()
+      duration := fun _ _ => 2
+      duration_pos := fun _ _ => by decide }
+  behavior_initial := fun _ _ => rfl
+  transition := by decide
+  readout := by decide
+
+lemma unitSampledMode_inevitable : HasInevitableTransitions unitSampledMode := by
+  intro x p g hg
+  have hg' : ∀ t, g t = () := fun t => Subsingleton.elim _ _
+  change generateStateTrajectory unitAdvance x (liftInput g) 2 = x + 2
+  rw [generateStateTrajectory_succ, generateStateTrajectory_succ, generateStateTrajectory_zero]
+  simp only [liftInput, hg', unitAdvance, DiscreteSystem.ofTotal]
+  exact Fin.ext (by simp [Fin.val_add])
+
+/-- Primary embedding of `unitAdvance` into `boolAdvanceExhibitor` via `true`. -/
+def unitIntoBoolPrimary : SystemMode unitAdvance boolAdvanceExhibitor :=
+  primaryModeOfMaps unitAdvance boolAdvanceExhibitor id (fun _ => true) id
+    Function.injective_id (fun _ _ _ => rfl) Function.injective_id
+    (fun x _ => by
+      change x + 1 = (if true then (x : Fin 3) + 1 else x)
+      simp)
+    (fun x => by
+      change (some (id x)).map id = some (id x)
+      rfl)
+
+lemma unitIntoBoolPrimary_isPrimary : IsPrimaryMode unitIntoBoolPrimary :=
+  primaryModeOfMaps_isPrimary Function.injective_id (fun _ _ _ => rfl)
+    Function.injective_id
+    (fun x _ => by
+      change x + 1 = (if true then (x : Fin 3) + 1 else x)
+      simp)
+    (fun x => by
+      change (some (id x)).map id = some (id x)
+      rfl)
+
+lemma unitIntoBoolPrimary_inevitable :
+    HasInevitableTransitions unitIntoBoolPrimary :=
+  primary_hasInevitableTransitions _ unitIntoBoolPrimary_isPrimary
+
+/-- Composite duration-2 mode into the Bool exhibitor. -/
+def inevitableComposite : SystemMode unitDoubleAdvance boolAdvanceExhibitor :=
+  unitSampledMode.trans unitIntoBoolPrimary
+
+lemma inevitableComposite_timeIndex (x : Fin 3) (p : Unit) :
+    inevitableComposite.timeIndex x p = 2 := by
+  change compiledElapsed unitIntoBoolPrimary x (fun _ => ()) 2 = 2
+  have hP : IsPrimaryMode unitIntoBoolPrimary := unitIntoBoolPrimary_isPrimary
+  simp only [compiledElapsed, generateStateTrajectory_zero, generateStateTrajectory_succ,
+    unitAdvance, DiscreteSystem.ofTotal]
+  rw [hP.2 x (), hP.2 (x + 1) ()]
+
+lemma inevitableComposite_inputMap : inevitableComposite.inputMap () = true :=
+  rfl
+
+lemma inevitableComposite_not_inevitable :
+    ¬ HasInevitableTransitions inevitableComposite := by
+  intro h
+  let g : ITZ Bool := fun t => decide (t = 0)
+  have htraj := h 0 () g (by rw [inevitableComposite_inputMap]; rfl)
+  rw [inevitableComposite_timeIndex] at htraj
+  change
+      generateStateTrajectory boolAdvanceExhibitor 0 (liftInput g) 2 =
+        inevitableComposite.stateMap (0 + 2) at htraj
+  have hL :
+      generateStateTrajectory boolAdvanceExhibitor 0 (liftInput g) 2 = 1 := by
+    rw [generateStateTrajectory_succ, generateStateTrajectory_succ,
+      generateStateTrajectory_zero]
+    simp only [liftInput, g, boolAdvanceExhibitor, DiscreteSystem.ofTotal]
+    decide
+  have hR : inevitableComposite.stateMap (0 + 2 : Fin 3) = 2 := rfl
+  rw [hL, hR] at htraj
+  exact absurd htraj (by decide)
+
+/--
+  [textbook/exercise5.188/source/exercise]
+  [textbook/exercise5.188/plan/inevitable_mode_not_transitive]
+  Exercise 5.188 counterexample: inevitable transitions are not transitive under
+  `SystemMode.trans` (Unit-sampled mode composed with a Bool primary embedding).
+-/
+theorem inevitable_mode_not_transitive :
+    HasInevitableTransitions unitSampledMode ∧
+      HasInevitableTransitions unitIntoBoolPrimary ∧
+      ¬ HasInevitableTransitions (unitSampledMode.trans unitIntoBoolPrimary) :=
+  ⟨unitSampledMode_inevitable, unitIntoBoolPrimary_inevitable,
+    inevitableComposite_not_inevitable⟩
+
+/-! ## Exercise 5.190 — SMBF uniqueness without inevitability (counterexample) -/
+
+/-- Exhibitor: `true` advances by 1, `false` stays. -/
+def stayOrAdvance : DiscreteSystem (Fin 5) Bool (Fin 5) :=
+  DiscreteSystem.ofTotal (fun x b => if b then x + 1 else x) id ⟨0⟩
+
+/-- Mode system advancing by 2. -/
+def plusTwoModeSys : DiscreteSystem (Fin 5) Unit (Fin 5) :=
+  DiscreteSystem.ofTotal (fun x _ => x + 2) id ⟨0⟩
+
+/-- SMBF of duration 2: `[true, true]`. -/
+def plusTwoFastSMBF : SystemMode plusTwoModeSys stayOrAdvance where
+  stateMap := id
+  inputMap := fun _ => true
+  outputMap := id
+  stateMap_injective := Function.injective_id
+  inputMap_injective := fun _ _ _ => Subsingleton.elim _ _
+  outputMap_injective := Function.injective_id
+  behavior :=
+    { input := fun _ _ _ => true
+      duration := fun _ _ => 2
+      duration_pos := fun _ _ => by decide }
+  behavior_initial := fun _ _ => rfl
+  transition := by decide
+  readout := by decide
+
+/-- Alternate SMBF of duration 3: `[true, true, false]`. -/
+def plusTwoSlowSMBF : SystemMode plusTwoModeSys stayOrAdvance where
+  stateMap := id
+  inputMap := fun _ => true
+  outputMap := id
+  stateMap_injective := Function.injective_id
+  inputMap_injective := fun _ _ _ => Subsingleton.elim _ _
+  outputMap_injective := Function.injective_id
+  behavior :=
+    { input := fun _ _ t => decide (t < 2)
+      duration := fun _ _ => 3
+      duration_pos := fun _ _ => by decide }
+  behavior_initial := fun _ _ => rfl
+  transition := by decide
+  readout := by decide
+
+lemma plusTwoFastSMBF_not_inevitable : ¬ HasInevitableTransitions plusTwoFastSMBF := by
+  intro h
+  let g : ITZ Bool := fun t => decide (t = 0)
+  have := h 0 () g rfl
+  -- [T,F] yields +1, not +2
+  simp only [plusTwoFastSMBF, generateStateTrajectory_succ, generateStateTrajectory_zero,
+    g, stayOrAdvance, DiscreteSystem.ofTotal, plusTwoModeSys] at this
+  exact absurd this (by decide)
+
+lemma plusTwoSlowSMBF_not_inevitable : ¬ HasInevitableTransitions plusTwoSlowSMBF := by
+  intro h
+  let g : ITZ Bool := fun _ => true
+  have hg0 : g 0 = plusTwoSlowSMBF.inputMap () := rfl
+  have := h 0 () g hg0
+  simp only [plusTwoSlowSMBF, generateStateTrajectory_succ, generateStateTrajectory_zero,
+    g, stayOrAdvance, DiscreteSystem.ofTotal, plusTwoModeSys] at this
+  exact absurd this (by decide)
+
+/--
+  [textbook/exercise5.190/source/exercise]
+  [textbook/exercise5.190/plan/smbf_not_unique_without_inevitable]
+  Exercise 5.190 counterexample: without inevitability, two distinct SMBFs can
+  present the same `Z₁` as a mode of `Z₂` (durations 2 vs 3).
+-/
+theorem smbf_not_unique_without_inevitable :
+    (∀ x, plusTwoFastSMBF.stateMap x = plusTwoSlowSMBF.stateMap x) ∧
+      (∀ p, plusTwoFastSMBF.inputMap p = plusTwoSlowSMBF.inputMap p) ∧
+      (∀ x, plusTwoFastSMBF.outputMap x = plusTwoSlowSMBF.outputMap x) ∧
+      (∃ x p, plusTwoFastSMBF.timeIndex x p ≠ plusTwoSlowSMBF.timeIndex x p) ∧
+      ¬ HasInevitableTransitions plusTwoFastSMBF ∧
+      ¬ HasInevitableTransitions plusTwoSlowSMBF :=
+  ⟨fun _ => rfl, fun _ => rfl, fun _ => rfl, ⟨0, (), by decide⟩,
+    plusTwoFastSMBF_not_inevitable, plusTwoSlowSMBF_not_inevitable⟩
+
+/-! ## Exercise 5.191 — SYSMO functionality -/
+
+/--
+  [textbook/exercise5.191/source/exercise]
+  [textbook/exercise5.191/plan/sysmo_functional_iff_exercise]
+  Exercise 5.191: `SYSMO` is functional; mode via SMBF/Q iff equality with `sysmoSystem`.
+-/
+theorem sysmo_functional_iff_exercise (D : SysmoData Z₂) :
+    IsSystemMode (sysmoSystem D) Z₂ ∧
+      (sysmoMode D).behavior = D.behavior ∧
+      (sysmoMode D).stateMap = D.sMap ∧
+      (sysmoMode D).inputMap = D.pMap ∧
+      (sysmoMode D).outputMap = D.qMap ∧
+      (∀ (M : SystemMode (sysmoSystem D) Z₂)
+        (hnone : ∀ x, (sysmoSystem D).NZ x none = x),
+        sysmoSystem (sysmoDataOfMode M hnone) = sysmoSystem D) :=
+  sysmo_functional_iff D
+
+/-! ## Exercise 5.193 — hologenic without constriction (qualified) -/
+
+open WymoreModeCoupling
+
+/--
+  [textbook/exercise5.193/source/exercise|partial]
+  [textbook/exercise5.193/plan/hologenic_conjunctive_nonconstricting_qualified|partial]
+  Exercise 5.193 (qualified): conjunctive (`CSCR = ∅`) non-constricting mode vectors
+  are hologenic under the mild extra hypotheses of constant input and common duration
+  (`hologenic_of_constant_input_empty_cscr`). The bare claim without those hypotheses
+  is the open weakening recorded at Open Question 5.139.
+-/
+theorem hologenic_conjunctive_nonconstricting_qualified
+    {n : Nat} {SCR : SystemCouplingRecipe n}
+    (D : InducedSystemModeRecipe SCR)
+    (hOut : ∀ i, AlwaysOutputs (SCR.VSCR.Z i))
+    (hModeOut : ∀ i, AlwaysOutputs ((sysmoscr D).VSCR.Z i))
+    {d : Time} (components : EmptyConnectivityConstantComponentModeData D d)
+    [∀ i p, Nonempty (D.ModePortVal i p)]
+    [∀ i q, Nonempty (D.ModeOutPortVal i q)] :
+    IsConjunctive SCR ∧
+      IsSystemModeHologenic D hOut hModeOut ∧
+      ∃ M : SystemMode (rsy (sysmoscr D) hModeOut) (rsy SCR hOut),
+        HasConstantInput M ∧ HasConstantTimeIndex M d := by
+  refine ⟨?_, hologenic_of_constant_input_empty_cscr D hOut hModeOut components⟩
+  simpa [IsConjunctive] using components.empty
 
 end Mbse.TextbookExercises.Ch05

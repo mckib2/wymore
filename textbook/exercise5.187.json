@@ -1,0 +1,31 @@
+{
+  "id": "5.187",
+  "kind": "exercise",
+  "name": "Exercise 5.187",
+  "chapter": 5,
+  "description": "Exercise 5.187. Constant-mode experiment lift with elapsed d*t.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.187/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.187. Constant-mode experiment lift with elapsed d*t.",
+      "lean_anchor": "constantMode_implementedExperiment_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.187/plan/constantMode_implementedExperiment_exercise",
+      "type": "exercise",
+      "text": "Lean anchor `constantMode_implementedExperiment_exercise` for Exercise 5.187.",
+      "lean_anchor": "constantMode_implementedExperiment_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

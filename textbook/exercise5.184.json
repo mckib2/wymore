@@ -1,0 +1,31 @@
+{
+  "id": "5.184",
+  "kind": "exercise",
+  "name": "Exercise 5.184",
+  "chapter": 5,
+  "description": "Exercise 5.184. Primary HIISYSMO inverse-image modes.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.184/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.184. Primary HIISYSMO inverse-image modes.",
+      "lean_anchor": "primary_hiisysmo_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.184/plan/primary_hiisysmo_exercise",
+      "type": "exercise",
+      "text": "Lean anchor `primary_hiisysmo_exercise` for Exercise 5.184.",
+      "lean_anchor": "primary_hiisysmo_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

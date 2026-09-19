@@ -1574,4 +1574,55 @@ theorem timeElaborateMode_CNS_realizes_transition (Z : DiscreteSystem S₁ I₁ 
   rfl
 
 
+
+/-! ## Exercise 5.191: SYSMO functionality / characterization -/
+
+/-- Recover `SysmoData` from a mode witness (autonomous stutter required by `SYSMO`). -/
+def sysmoDataOfMode (M : SystemMode Z₁ Z₂)
+    (_hnone : ∀ x, Z₁.NZ x none = x) : SysmoData Z₂ where
+  S := S₁
+  P := I₁
+  Q := O₁
+  sMap := M.stateMap
+  pMap := M.inputMap
+  qMap := M.outputMap
+  sMap_injective := M.stateMap_injective
+  pMap_injective := M.inputMap_injective
+  qMap_injective := M.outputMap_injective
+  state_nonempty := Z₁.sz_nonempty
+  behavior := M.behavior
+  behavior_initial := M.behavior_initial
+  next := fun x p => Z₁.NZ x (some p)
+  transition := M.transition
+  readout := Z₁.RZ
+  readout_compat := M.readout
+
+theorem sysmoSystem_of_mode (M : SystemMode Z₁ Z₂)
+    (hnone : ∀ x, Z₁.NZ x none = x) :
+    sysmoSystem (sysmoDataOfMode M hnone) = Z₁ := by
+  apply DiscreteSystem.ext
+  · funext x op
+    cases op with
+    | none =>
+      change x = Z₁.NZ x none
+      exact (hnone x).symm
+    | some p => rfl
+  · rfl
+
+/--
+  `SYSMO` is functional on its data: the constructed system is a mode of `Z₂`
+  with the named SMBF/embeddings, and every mode (with autonomous stutter)
+  arises uniquely as `SYSMO` of its extracted data (Exercise 5.191).
+-/
+theorem sysmo_functional_iff (D : SysmoData Z₂) :
+    IsSystemMode (sysmoSystem D) Z₂ ∧
+      (sysmoMode D).behavior = D.behavior ∧
+      (sysmoMode D).stateMap = D.sMap ∧
+      (sysmoMode D).inputMap = D.pMap ∧
+      (sysmoMode D).outputMap = D.qMap ∧
+      (∀ (M : SystemMode (sysmoSystem D) Z₂)
+        (hnone : ∀ x, (sysmoSystem D).NZ x none = x),
+        sysmoSystem (sysmoDataOfMode M hnone) = sysmoSystem D) :=
+  ⟨sysmo_isSystemMode D, rfl, rfl, rfl, rfl, fun M hnone => sysmoSystem_of_mode M hnone⟩
+
 end WymoreSystemModes

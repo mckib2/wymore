@@ -1,0 +1,31 @@
+{
+  "id": "5.185",
+  "kind": "exercise",
+  "name": "Exercise 5.185",
+  "chapter": 5,
+  "description": "Exercise 5.185. Constant-time HIISYSMO inverse-image modes (constant-input on fibre not claimed).",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "partial",
+  "elements": [
+    {
+      "id": "5.185/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.185. Constant-time HIISYSMO inverse-image modes (constant-input on fibre not claimed).",
+      "lean_anchor": "constant_hiisysmo_exercise",
+      "status": "qualified",
+      "fidelity": "partial"
+    },
+    {
+      "id": "5.185/plan/constant_hiisysmo_exercise",
+      "type": "exercise",
+      "text": "Lean anchor `constant_hiisysmo_exercise` for Exercise 5.185.",
+      "lean_anchor": "constant_hiisysmo_exercise",
+      "status": "qualified",
+      "fidelity": "partial"
+    }
+  ],
+  "status": "qualified"
+}

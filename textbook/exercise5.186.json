@@ -1,0 +1,31 @@
+{
+  "id": "5.186",
+  "kind": "exercise",
+  "name": "Exercise 5.186",
+  "chapter": 5,
+  "description": "Exercise 5.186. Implements transitivity through HIMSY.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.186/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.186. Implements transitivity through HIMSY.",
+      "lean_anchor": "implements_of_homImage_implements_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.186/plan/implements_of_homImage_implements_exercise",
+      "type": "exercise",
+      "text": "Lean anchor `implements_of_homImage_implements_exercise` for Exercise 5.186.",
+      "lean_anchor": "implements_of_homImage_implements_exercise",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

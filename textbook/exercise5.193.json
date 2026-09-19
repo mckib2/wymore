@@ -1,0 +1,31 @@
+{
+  "id": "5.193",
+  "kind": "exercise",
+  "name": "Exercise 5.193",
+  "chapter": 5,
+  "description": "Exercise 5.193. Qualified: conjunctive non-constricting hologenic under constant input/time.",
+  "source": {
+    "file": "rest-of-chpt-5-exercises.txt",
+    "lines": ""
+  },
+  "fidelity": "partial",
+  "elements": [
+    {
+      "id": "5.193/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.193. Qualified: conjunctive non-constricting hologenic under constant input/time.",
+      "lean_anchor": "hologenic_conjunctive_nonconstricting_qualified",
+      "status": "qualified",
+      "fidelity": "partial"
+    },
+    {
+      "id": "5.193/plan/hologenic_conjunctive_nonconstricting_qualified",
+      "type": "exercise",
+      "text": "Lean anchor `hologenic_conjunctive_nonconstricting_qualified` for Exercise 5.193.",
+      "lean_anchor": "hologenic_conjunctive_nonconstricting_qualified",
+      "status": "qualified",
+      "fidelity": "partial"
+    }
+  ],
+  "status": "qualified"
+}
