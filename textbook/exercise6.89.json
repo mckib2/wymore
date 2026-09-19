@@ -1,0 +1,31 @@
+{
+  "id": "6.89",
+  "kind": "exercise",
+  "name": "Exercise 6.89",
+  "chapter": 6,
+  "description": "Exercise 6.89. IOR isomorphism + HIMSY satisfaction iff (P/CE). Partial: stripped CE without IOR-iso/HIMSY hyps.",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.89/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 6.89. IOR isomorphism + HIMSY satisfaction iff (P/CE).",
+      "lean_anchor": "ior_iso_himsy_iff_claim",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.89/plan/ior_iso_himsy_iff_claim",
+      "type": "exercise",
+      "text": "Lean anchor `ior_iso_himsy_iff_claim` for Exercise 6.89.",
+      "lean_anchor": "ior_iso_himsy_iff_claim",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

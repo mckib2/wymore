@@ -1,0 +1,39 @@
+{
+  "id": "6.66",
+  "kind": "traceability",
+  "name": "Definition 6.66",
+  "chapter": 6,
+  "description": "Definition 6.66. Input trajectory tracking system TSY.",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.66/source/definition",
+      "type": "definition",
+      "text": "Source Definition 6.66. Input trajectory tracking system TSY.",
+      "lean_anchor": "tsy",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.66/lean/tsy",
+      "type": "definition",
+      "text": "Source Definition 6.66. Input trajectory tracking system TSY.",
+      "lean_anchor": "tsy",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.66/lean/TsyParam",
+      "type": "definition",
+      "text": "Source Definition 6.66. Input trajectory tracking system TSY.",
+      "lean_anchor": "TsyParam",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

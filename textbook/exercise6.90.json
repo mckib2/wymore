@@ -1,0 +1,31 @@
+{
+  "id": "6.90",
+  "kind": "exercise",
+  "name": "Exercise 6.90",
+  "chapter": 6,
+  "description": "Exercise 6.90. Subrequirement + ITR1=ITR2 lifts satisfaction (P/CE). Partial: CE shape missing IsIOSubrequirement packaging.",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.90/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 6.90. Subrequirement + ITR1=ITR2 lifts satisfaction (P/CE).",
+      "lean_anchor": "subreq_equal_itr_lifts_claim",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.90/plan/subreq_equal_itr_lifts_claim",
+      "type": "exercise",
+      "text": "Lean anchor `subreq_equal_itr_lifts_claim` for Exercise 6.90.",
+      "lean_anchor": "subreq_equal_itr_lifts_claim",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

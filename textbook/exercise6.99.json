@@ -1,0 +1,31 @@
+{
+  "id": "6.99",
+  "kind": "exercise",
+  "name": "Exercise 6.99",
+  "chapter": 6,
+  "description": "Exercise 6.99. NORMIO members satisfy completely.",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.99/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 6.99. NORMIO members satisfy completely.",
+      "lean_anchor": "normIO_satisfies_completely",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.99/plan/normIO_satisfies_completely",
+      "type": "exercise",
+      "text": "Lean anchor `normIO_satisfies_completely` for Exercise 6.99.",
+      "lean_anchor": "normIO_satisfies_completely",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

@@ -1,0 +1,31 @@
+{
+  "id": "6.31",
+  "kind": "traceability",
+  "name": "Definition 6.31",
+  "chapter": 6,
+  "description": "Definition 6.31. System satisfies IOR (RSN reading of 6.33).",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.31/source/definition",
+      "type": "definition",
+      "text": "Source Definition 6.31. System satisfies IOR (RSN reading of 6.33).",
+      "lean_anchor": "SatisfiesIOR",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.31/lean/SatisfiesIOR",
+      "type": "definition",
+      "text": "Source Definition 6.31. System satisfies IOR (RSN reading of 6.33).",
+      "lean_anchor": "SatisfiesIOR",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

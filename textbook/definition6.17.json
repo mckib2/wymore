@@ -1,0 +1,31 @@
+{
+  "id": "6.17",
+  "kind": "traceability",
+  "name": "Definition 6.17",
+  "chapter": 6,
+  "description": "Definition 6.17. Normal IOR parameterization NORMIO (ER typo corrected).",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.17/source/definition",
+      "type": "definition",
+      "text": "Source Definition 6.17. Normal IOR parameterization NORMIO (ER typo corrected).",
+      "lean_anchor": "normIO",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.17/lean/normIO",
+      "type": "definition",
+      "text": "Source Definition 6.17. Normal IOR parameterization NORMIO (ER typo corrected).",
+      "lean_anchor": "normIO",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

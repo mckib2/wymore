@@ -1,0 +1,31 @@
+{
+  "id": "6.101",
+  "kind": "exercise",
+  "name": "Exercise 6.101",
+  "chapter": 6,
+  "description": "Exercise 6.101. FSR closed under nonempty TSZ subsets.",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.101/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 6.101. FSR closed under nonempty TSZ subsets.",
+      "lean_anchor": "fsr_closed_under_ts_subset",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.101/plan/fsr_closed_under_ts_subset",
+      "type": "exercise",
+      "text": "Lean anchor `fsr_closed_under_ts_subset` for Exercise 6.101.",
+      "lean_anchor": "fsr_closed_under_ts_subset",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

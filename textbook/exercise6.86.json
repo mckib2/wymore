@@ -1,0 +1,31 @@
+{
+  "id": "6.86",
+  "kind": "exercise",
+  "name": "Exercise 6.86",
+  "chapter": 6,
+  "description": "Exercise 6.86. Eligible output restrictions uniqueness (P/CE).",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.86/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 6.86. Eligible output restrictions uniqueness (P/CE).",
+      "lean_anchor": "eligible_output_restriction_claim",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.86/plan/eligible_output_restriction_claim",
+      "type": "exercise",
+      "text": "Lean anchor `eligible_output_restriction_claim` for Exercise 6.86.",
+      "lean_anchor": "eligible_output_restriction_claim",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

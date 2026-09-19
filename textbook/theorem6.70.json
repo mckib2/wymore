@@ -1,0 +1,31 @@
+{
+  "id": "6.70",
+  "kind": "traceability",
+  "name": "Theorem 6.70",
+  "chapter": 6,
+  "description": "Theorem 6.70. TSY satisfies IOR under TSZ side condition. Partial: currently only TSZ={0} with time-0 agreement hyp.",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "partial",
+  "elements": [
+    {
+      "id": "6.70/source/theorem",
+      "type": "theorem",
+      "text": "Source Theorem 6.70. TSY satisfies IOR under TSZ side condition.",
+      "lean_anchor": "tsy_satisfies_ior",
+      "status": "proved",
+      "fidelity": "partial"
+    },
+    {
+      "id": "6.70/lean/tsy_satisfies_ior",
+      "type": "theorem",
+      "text": "Source Theorem 6.70. TSY satisfies IOR under TSZ side condition.",
+      "lean_anchor": "tsy_satisfies_ior",
+      "status": "proved",
+      "fidelity": "partial"
+    }
+  ],
+  "status": "proved"
+}

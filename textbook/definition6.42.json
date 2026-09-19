@@ -1,0 +1,39 @@
+{
+  "id": "6.42",
+  "kind": "traceability",
+  "name": "Definition 6.42",
+  "chapter": 6,
+  "description": "Definition 6.42. Functionality cotyledon CTL(IOR) / FSR.",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.42/source/definition",
+      "type": "definition",
+      "text": "Source Definition 6.42. Functionality cotyledon CTL(IOR) / FSR.",
+      "lean_anchor": "FSR",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.42/lean/FSR",
+      "type": "definition",
+      "text": "Source Definition 6.42. Functionality cotyledon CTL(IOR) / FSR.",
+      "lean_anchor": "FSR",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.42/lean/CTL",
+      "type": "definition",
+      "text": "Source Definition 6.42. Functionality cotyledon CTL(IOR) / FSR.",
+      "lean_anchor": "CTL",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

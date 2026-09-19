@@ -1,0 +1,31 @@
+{
+  "id": "6.51",
+  "kind": "traceability",
+  "name": "Theorem 6.51",
+  "chapter": 6,
+  "description": "Theorem 6.51. Subrequirement with equal TSR/IR/ITR/OR implies FSR1 \u2286 FSR2.",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.51/source/theorem",
+      "type": "theorem",
+      "text": "Source Theorem 6.51. Subrequirement with equal TSR/IR/ITR/OR implies FSR1 \u2286 FSR2.",
+      "lean_anchor": "subrequirement_fsr_subset",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.51/lean/subrequirement_fsr_subset",
+      "type": "theorem",
+      "text": "Source Theorem 6.51. Subrequirement with equal TSR/IR/ITR/OR implies FSR1 \u2286 FSR2.",
+      "lean_anchor": "subrequirement_fsr_subset",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

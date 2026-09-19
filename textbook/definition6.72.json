@@ -1,0 +1,39 @@
+{
+  "id": "6.72",
+  "kind": "traceability",
+  "name": "Definition 6.72",
+  "chapter": 6,
+  "description": "Definition 6.72. Homomorphic image of IOR (HIMIO).",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.72/source/definition",
+      "type": "definition",
+      "text": "Source Definition 6.72. Homomorphic image of IOR (HIMIO).",
+      "lean_anchor": "IsHomomorphicIOR",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.72/lean/IsHomomorphicIOR",
+      "type": "definition",
+      "text": "Source Definition 6.72. Homomorphic image of IOR (HIMIO).",
+      "lean_anchor": "IsHomomorphicIOR",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.72/lean/himio",
+      "type": "definition",
+      "text": "Source Definition 6.72. Homomorphic image of IOR (HIMIO).",
+      "lean_anchor": "himio",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

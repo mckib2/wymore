@@ -1,0 +1,31 @@
+{
+  "id": "6.10",
+  "kind": "traceability",
+  "name": "Definition 6.10",
+  "chapter": 6,
+  "description": "Definition 6.10. Input/output requirement parameterization.",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.10/source/definition",
+      "type": "definition",
+      "text": "Source Definition 6.10. Input/output requirement parameterization.",
+      "lean_anchor": "IOSpecParameterization",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.10/lean/IOSpecParameterization",
+      "type": "definition",
+      "text": "Source Definition 6.10. Input/output requirement parameterization.",
+      "lean_anchor": "IOSpecParameterization",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

@@ -1,0 +1,31 @@
+{
+  "id": "6.50",
+  "kind": "traceability",
+  "name": "Definition 6.50",
+  "chapter": 6,
+  "description": "Definition 6.50. IOR subrequirement (IT1\u2192IR1 correction).",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.50/source/definition",
+      "type": "definition",
+      "text": "Source Definition 6.50. IOR subrequirement (IT1\u2192IR1 correction).",
+      "lean_anchor": "IsIOSubrequirement",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.50/lean/IsIOSubrequirement",
+      "type": "definition",
+      "text": "Source Definition 6.50. IOR subrequirement (IT1\u2192IR1 correction).",
+      "lean_anchor": "IsIOSubrequirement",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

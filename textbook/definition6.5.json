@@ -1,0 +1,39 @@
+{
+  "id": "6.5",
+  "kind": "traceability",
+  "name": "Definition 6.5",
+  "chapter": 6,
+  "description": "Definition 6.5. Input/output requirement IOR = (OLR, IR, ITR, OR, OTR, ER).",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.5/source/definition",
+      "type": "definition",
+      "text": "Source Definition 6.5. Input/output requirement IOR = (OLR, IR, ITR, OR, OTR, ER).",
+      "lean_anchor": "InputOutputRequirement",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.5/lean/InputOutputRequirement",
+      "type": "definition",
+      "text": "Source Definition 6.5. Input/output requirement IOR = (OLR, IR, ITR, OR, OTR, ER).",
+      "lean_anchor": "InputOutputRequirement",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.5/lean/OperationalLength",
+      "type": "definition",
+      "text": "Source Definition 6.5. Input/output requirement IOR = (OLR, IR, ITR, OR, OTR, ER).",
+      "lean_anchor": "OperationalLength",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

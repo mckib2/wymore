@@ -1,0 +1,31 @@
+{
+  "id": "6.64",
+  "kind": "traceability",
+  "name": "Theorem 6.64",
+  "chapter": 6,
+  "description": "Theorem 6.64. #FSR \u2208 {0, \u221e}.",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "partial",
+  "elements": [
+    {
+      "id": "6.64/source/theorem",
+      "type": "theorem",
+      "text": "Source Theorem 6.64. #FSR \u2208 {0, \u221e}.",
+      "lean_anchor": "fsr_card_zero_or_infinite",
+      "status": "proved",
+      "fidelity": "partial"
+    },
+    {
+      "id": "6.64/lean/fsr_card_zero_or_infinite",
+      "type": "theorem",
+      "text": "Source Theorem 6.64. #FSR \u2208 {0, \u221e}.",
+      "lean_anchor": "fsr_card_zero_or_infinite",
+      "status": "proved",
+      "fidelity": "partial"
+    }
+  ],
+  "status": "proved"
+}

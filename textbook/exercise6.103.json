@@ -1,0 +1,31 @@
+{
+  "id": "6.103",
+  "kind": "exercise",
+  "name": "Exercise 6.103",
+  "chapter": 6,
+  "description": "Exercise 6.103. TSY state/output trajectory characterization. Partial: only t=0 and t=1 state characterization.",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "partial",
+  "elements": [
+    {
+      "id": "6.103/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 6.103. TSY state/output trajectory characterization.",
+      "lean_anchor": "tsy_trajectory_characterization",
+      "status": "solved",
+      "fidelity": "partial"
+    },
+    {
+      "id": "6.103/plan/tsy_trajectory_characterization",
+      "type": "exercise",
+      "text": "Lean anchor `tsy_trajectory_characterization` for Exercise 6.103.",
+      "lean_anchor": "tsy_trajectory_characterization",
+      "status": "solved",
+      "fidelity": "partial"
+    }
+  ],
+  "status": "solved"
+}

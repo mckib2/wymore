@@ -1,0 +1,31 @@
+{
+  "id": "6.40",
+  "kind": "traceability",
+  "name": "Definition 6.40",
+  "chapter": 6,
+  "description": "Definition 6.40. Functional system design (Z, DSZ, TSZ).",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.40/source/definition",
+      "type": "definition",
+      "text": "Source Definition 6.40. Functional system design (Z, DSZ, TSZ).",
+      "lean_anchor": "FunctionalSystemDesign",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.40/lean/FunctionalSystemDesign",
+      "type": "definition",
+      "text": "Source Definition 6.40. Functional system design (Z, DSZ, TSZ).",
+      "lean_anchor": "FunctionalSystemDesign",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

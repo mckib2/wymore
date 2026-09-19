@@ -1,0 +1,31 @@
+{
+  "id": "6.102",
+  "kind": "exercise",
+  "name": "Exercise 6.102",
+  "chapter": 6,
+  "description": "Exercise 6.102. TSY is a system parameterization.",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.102/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 6.102. TSY is a system parameterization.",
+      "lean_anchor": "tsy_isSystemParameterization",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.102/plan/tsy_isSystemParameterization",
+      "type": "exercise",
+      "text": "Lean anchor `tsy_isSystemParameterization` for Exercise 6.102.",
+      "lean_anchor": "tsy_isSystemParameterization",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

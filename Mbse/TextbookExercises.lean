@@ -3,6 +3,7 @@ import Mbse.TextbookExercises.Ch02
 import Mbse.TextbookExercises.Ch03
 import Mbse.TextbookExercises.Ch04
 import Mbse.TextbookExercises.Ch05
+import Mbse.TextbookExercises.Ch06
 import Mbse.TextbookExercises.Registry
 
 /-!

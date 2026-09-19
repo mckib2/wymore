@@ -1,0 +1,31 @@
+{
+  "id": "6.36",
+  "kind": "traceability",
+  "name": "Definition 6.36",
+  "chapter": 6,
+  "description": "Definition 6.36. Complete satisfaction: TSZ = TSR.",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.36/source/definition",
+      "type": "definition",
+      "text": "Source Definition 6.36. Complete satisfaction: TSZ = TSR.",
+      "lean_anchor": "SatisfiesIORCompletely",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.36/lean/SatisfiesIORCompletely",
+      "type": "definition",
+      "text": "Source Definition 6.36. Complete satisfaction: TSZ = TSR.",
+      "lean_anchor": "SatisfiesIORCompletely",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

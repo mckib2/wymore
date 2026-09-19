@@ -1,0 +1,31 @@
+{
+  "id": "6.58",
+  "kind": "traceability",
+  "name": "Theorem 6.58",
+  "chapter": 6,
+  "description": "Theorem 6.58. HIMSY with ID I/O preserves IOR satisfaction (Te\u2192T).",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.58/source/theorem",
+      "type": "theorem",
+      "text": "Source Theorem 6.58. HIMSY with ID I/O preserves IOR satisfaction (Te\u2192T).",
+      "lean_anchor": "himsy_idIO_satisfies_iff",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.58/lean/himsy_idIO_satisfies_iff",
+      "type": "theorem",
+      "text": "Source Theorem 6.58. HIMSY with ID I/O preserves IOR satisfaction (Te\u2192T).",
+      "lean_anchor": "himsy_idIO_satisfies_iff",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

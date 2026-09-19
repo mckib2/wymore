@@ -1,0 +1,31 @@
+{
+  "id": "6.93",
+  "kind": "exercise",
+  "name": "Exercise 6.93",
+  "chapter": 6,
+  "description": "Exercise 6.93. Full ITR on IJS++ \u21d2 FSR nonempty (P/CE).",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.93/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 6.93. Full ITR on IJS++ \u21d2 FSR nonempty (P/CE).",
+      "lean_anchor": "full_itr_fsr_nonempty_claim",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.93/plan/full_itr_fsr_nonempty_claim",
+      "type": "exercise",
+      "text": "Lean anchor `full_itr_fsr_nonempty_claim` for Exercise 6.93.",
+      "lean_anchor": "full_itr_fsr_nonempty_claim",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

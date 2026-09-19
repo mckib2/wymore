@@ -113,6 +113,21 @@ def registry : List ExerciseEntry :=
   , ⟨"5.190", 5, .theoremProof, "solved", "Ch05.smbf_not_unique_without_inevitable"⟩
   , ⟨"5.191", 5, .theoremProof, "solved", "Ch05.sysmo_functional_iff_exercise"⟩
   , ⟨"5.193", 5, .theoremProof, "qualified", "Ch05.hologenic_conjunctive_nonconstricting_qualified"⟩
+  , ⟨"6.82", 6, .theoremProof, "solved", "Ch06.rsysmo_fsr_iff_exercise"⟩
+  , ⟨"6.86", 6, .theoremProof, "solved", "Ch06.eligible_output_restriction_claim_exercise"⟩
+  , ⟨"6.87", 6, .theoremProof, "solved", "Ch06.himio_himsy_reverse_claim_exercise"⟩
+  , ⟨"6.88", 6, .theoremProof, "solved", "Ch06.himsy_satisfies_himio_exercise"⟩
+  , ⟨"6.89", 6, .theoremProof, "solved", "Ch06.ior_iso_himsy_iff_claim_exercise"⟩
+  , ⟨"6.90", 6, .theoremProof, "solved", "Ch06.subreq_equal_itr_lifts_claim_exercise"⟩
+  , ⟨"6.91", 6, .theoremProof, "solved", "Ch06.canonical_subreq_claim_exercise"⟩
+  , ⟨"6.93", 6, .theoremProof, "solved", "Ch06.full_itr_fsr_nonempty_claim_exercise"⟩
+  , ⟨"6.94", 6, .theoremProof, "solved", "Ch06.full_itr_complete_or_empty_claim_exercise"⟩
+  , ⟨"6.95", 6, .theoremProof, "solved", "Ch06.incomplete_only_fsr_exists_exercise"⟩
+  , ⟨"6.97", 6, .theoremProof, "qualified", "Ch06.tsy_family_eq_normio_exercise"⟩
+  , ⟨"6.99", 6, .theoremProof, "solved", "Ch06.normIO_satisfies_completely_exercise"⟩
+  , ⟨"6.101", 6, .theoremProof, "solved", "Ch06.fsr_closed_under_ts_subset_exercise"⟩
+  , ⟨"6.102", 6, .theoremProof, "solved", "Ch06.tsy_isSystemParameterization_exercise"⟩
+  , ⟨"6.103", 6, .theoremProof, "solved", "Ch06.tsy_trajectory_characterization_exercise"⟩
   ]
 
 def solvedCount : Nat :=

@@ -1,0 +1,31 @@
+{
+  "id": "6.88",
+  "kind": "exercise",
+  "name": "Exercise 6.88",
+  "chapter": 6,
+  "description": "Exercise 6.88. HIMSY of satisfier satisfies HIMIO.",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.88/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 6.88. HIMSY of satisfier satisfies HIMIO.",
+      "lean_anchor": "himsy_satisfies_himio",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.88/plan/himsy_satisfies_himio",
+      "type": "exercise",
+      "text": "Lean anchor `himsy_satisfies_himio` for Exercise 6.88.",
+      "lean_anchor": "himsy_satisfies_himio",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

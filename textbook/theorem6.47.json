@@ -1,0 +1,39 @@
+{
+  "id": "6.47",
+  "kind": "traceability",
+  "name": "Theorem 6.47",
+  "chapter": 6,
+  "description": "Theorem 6.47. FSR of DFLTIO(A,B) is all systems with IZ=A, OZ=B. Partial: dfltIO_fsr_satisfies_iff is the real characterization under AlwaysOutputs; dfltIO_fsr is Nonempty only.",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "partial",
+  "elements": [
+    {
+      "id": "6.47/source/theorem",
+      "type": "theorem",
+      "text": "Source Theorem 6.47. FSR of DFLTIO(A,B) is all systems with IZ=A, OZ=B.",
+      "lean_anchor": "dfltIO_fsr_satisfies_iff",
+      "status": "proved",
+      "fidelity": "partial"
+    },
+    {
+      "id": "6.47/lean/dfltIO_fsr",
+      "type": "theorem",
+      "text": "Packages one AlwaysOutputs design into Nonempty FSR.",
+      "lean_anchor": "dfltIO_fsr",
+      "status": "proved",
+      "fidelity": "partial"
+    },
+    {
+      "id": "6.47/lean/dfltIO_fsr_satisfies_iff",
+      "type": "theorem",
+      "text": "Characterization: SatisfiesIOR of DFLTIO iff nonempty timescale (under AlwaysOutputs).",
+      "lean_anchor": "dfltIO_fsr_satisfies_iff",
+      "status": "proved",
+      "fidelity": "partial"
+    }
+  ],
+  "status": "proved"
+}

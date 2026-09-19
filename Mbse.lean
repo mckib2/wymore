@@ -6,6 +6,7 @@ import Mbse.WymoreCouplingStructure
 import Mbse.WymoreSystemModes
 import Mbse.WymoreImplementation
 import Mbse.WymoreModeCoupling
+import Mbse.WymoreRequirements
 import Mbse.Notation
 import Mbse.CombinationalWymore
 import Mbse.DPDAWymore

@@ -1,0 +1,31 @@
+{
+  "id": "6.94",
+  "kind": "exercise",
+  "name": "Exercise 6.94",
+  "chapter": 6,
+  "description": "Exercise 6.94. Full ITR \u21d2 empty or complete FSD exists (P/CE). Partial until single-IOR incomplete-only CE or proof.",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.94/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 6.94. Full ITR \u21d2 empty or complete FSD exists (P/CE).",
+      "lean_anchor": "full_itr_complete_or_empty_claim",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.94/plan/full_itr_complete_or_empty_claim",
+      "type": "exercise",
+      "text": "Lean anchor `full_itr_complete_or_empty_claim` for Exercise 6.94.",
+      "lean_anchor": "full_itr_complete_or_empty_claim",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

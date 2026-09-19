@@ -1,0 +1,31 @@
+{
+  "id": "6.48",
+  "kind": "traceability",
+  "name": "Theorem 6.48",
+  "chapter": 6,
+  "description": "Theorem 6.48. Every Z in S is in FSR of NORMIO(S,ST,L,F).",
+  "source": {
+    "file": "wymore-defs-n-proofs-n-exercises-chp6.txt",
+    "lines": ""
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "6.48/source/theorem",
+      "type": "theorem",
+      "text": "Source Theorem 6.48. Every Z in S is in FSR of NORMIO(S,ST,L,F).",
+      "lean_anchor": "normIO_members_in_fsr",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "6.48/lean/normIO_members_in_fsr",
+      "type": "theorem",
+      "text": "Source Theorem 6.48. Every Z in S is in FSR of NORMIO(S,ST,L,F).",
+      "lean_anchor": "normIO_members_in_fsr",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}
