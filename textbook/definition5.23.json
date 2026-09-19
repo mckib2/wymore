@@ -1,0 +1,31 @@
+{
+  "id": "5.23",
+  "kind": "traceability",
+  "name": "Definition 5.23",
+  "chapter": 5,
+  "description": "Definition 5.23. Correct `Nz2` to `NZ2`; reachable states are those attained from `S`; expose state closure, inherited input/readout/transition.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "77\u201386"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.23/source/definition",
+      "type": "definition",
+      "text": "Source Definition 5.23, lines 77\u201386. Corrected traceability decision: Correct `Nz2` to `NZ2`; reachable states are those attained from `S`; expose state closure, inherited input/readout/transition.",
+      "lean_anchor": "reachableMode",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.23/lean/reachableSystemMode",
+      "type": "definition",
+      "text": "Lean anchor `reachableSystemMode` for this corrected reading. Status: corrected.",
+      "lean_anchor": "reachableMode",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

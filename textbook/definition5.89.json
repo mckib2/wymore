@@ -1,0 +1,39 @@
+{
+  "id": "5.89",
+  "kind": "traceability",
+  "name": "Definition 5.89",
+  "chapter": 5,
+  "description": "Definition 5.89. Treat `HI^-1` as nonempty fibers and `CHI` as a choice function; correct `HI^-2` to preimage; define lifted behavior and restricted readout explicitly.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "252\u2013267"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.89/source/definition",
+      "type": "definition",
+      "text": "Source Definition 5.89, lines 252\u2013267. Corrected traceability decision: Treat `HI^-1` as nonempty fibers and `CHI` as a choice function; correct `HI^-2` to preimage; define lifted behavior and restricted readout explicitly.",
+      "lean_anchor": "homomorphicInverseImageMode",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.89/lean/homomorphicInverseImageMode",
+      "type": "definition",
+      "text": "Lean anchor `homomorphicInverseImageMode` for this corrected reading. Status: qualified.",
+      "lean_anchor": "homomorphicInverseImageMode",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.89/lean/hiisysmo",
+      "type": "definition",
+      "text": "Lean anchor `hiisysmo` for this corrected reading. Status: qualified.",
+      "lean_anchor": "inverseImageSystemMode",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

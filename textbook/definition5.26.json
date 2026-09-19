@@ -1,0 +1,31 @@
+{
+  "id": "5.26",
+  "kind": "traceability",
+  "name": "Definition 5.26",
+  "chapter": 5,
+  "description": "Definition 5.26. Literal reading; “outside cannot enter” is a separate element.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "90–94"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.26/source/definition",
+      "type": "definition",
+      "text": "Source Definition 5.26, lines 90–94. Corrected traceability decision: Literal reading; “outside cannot enter” is a separate element.",
+      "lean_anchor": "IsIsolatedMode",
+      "status": "exact",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.26/lean/SystemMode_IsIsolated",
+      "type": "definition",
+      "text": "Lean anchor `SystemMode.IsIsolated` for this corrected reading. Status: exact; fidelity: faithful.",
+      "lean_anchor": "IsIsolatedMode",
+      "status": "exact",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "exact"
+}

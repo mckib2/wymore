@@ -1,6 +1,7 @@
 import Mbse.TextbookExercises.Ch02
 import Mbse.TextbookExercises.Ch03
 import Mbse.TextbookExercises.Ch04
+import Mbse.TextbookExercises.Ch05
 
 /-!
 # Textbook exercise registry
@@ -70,6 +71,11 @@ def registry : List ExerciseEntry :=
   , ⟨"4.84", 4, .theoremProof, "solved", "Ch04.ex4_84_reflexive"⟩
   , ⟨"4.85", 4, .theoremProof, "solved", "Ch04.ex4_85_rearrangement_isomorphic"⟩
   , ⟨"4.86", 4, .theoremProof, "solved", "Ch04.ex4_86_nested_coupling_isomorphic"⟩
+  , ⟨"5.141", 5, .theoremProof, "solved", "Ch05.subsystem_isSystemMode_or_counterexample"⟩
+  , ⟨"5.142", 5, .theoremProof, "qualified", "Ch05.exercise5_142_unconditional"⟩
+  , ⟨"5.146", 5, .theoremProof, "solved", "Ch05.selfMode_constantTime_iterate"⟩
+  , ⟨"5.147", 5, .theoremProof, "solved", "Ch05.constantMode_state_at_mul"⟩
+  , ⟨"5.148", 5, .theoremProof, "qualified", "Ch05.variableTime_constantInput_state_at_accumulatedTime"⟩
   ]
 
 def solvedCount : Nat :=

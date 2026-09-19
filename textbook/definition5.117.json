@@ -1,0 +1,31 @@
+{
+  "id": "5.117",
+  "kind": "traceability",
+  "name": "Definition 5.117",
+  "chapter": 5,
+  "description": "Definition 5.117. Correct grammar to \u201cis system-mode hologenic\u201d; resultant of induced recipe must be a mode of original resultant.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "335"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.117/source/definition",
+      "type": "definition",
+      "text": "Source Definition 5.117, lines 335. Corrected traceability decision: Correct grammar to \u201cis system-mode hologenic\u201d; resultant of induced recipe must be a mode of original resultant.",
+      "lean_anchor": "IsSystemModeHologenic",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.117/lean/CouplingRecipe.IsSystemModeHologenic",
+      "type": "definition",
+      "text": "Lean anchor `CouplingRecipe.IsSystemModeHologenic` for this corrected reading. Status: qualified.",
+      "lean_anchor": "IsSystemModeHologenic",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

@@ -1,0 +1,39 @@
+{
+  "id": "5.139",
+  "kind": "open_question",
+  "name": "Open question 5.139",
+  "chapter": 5,
+  "description": "Open Question 5.139. Are there other or less stringent conditions for system-mode hologenicity? Easy weakenings of 5.134 are recorded; the question remains open.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "414"
+  },
+  "fidelity": "partial",
+  "elements": [
+    {
+      "id": "5.139/source/open_question",
+      "type": "open_question",
+      "text": "Research question remains open. Probed: empty CSCR, duration one, source-only output; 5.138 already weakens under inevitability. Blocked: cascade-only, unequal durations, drop constant input without inevitability.",
+      "lean_anchor": "chapter5_openQuestion_5_139",
+      "status": "open",
+      "fidelity": "partial"
+    },
+    {
+      "id": "5.139/lean/chapter5_openQuestion_5_139",
+      "type": "open_question",
+      "text": "Documentation marker plus recorded probes.",
+      "lean_anchor": "chapter5_openQuestion_5_139",
+      "status": "open",
+      "fidelity": "partial"
+    },
+    {
+      "id": "5.139/policy/remains_open",
+      "type": "open_question",
+      "text": "Policy: remain open; do not invent axioms.",
+      "lean_anchor": "chapter5_openQuestion_5_139",
+      "status": "open",
+      "fidelity": "partial"
+    }
+  ],
+  "status": "open"
+}

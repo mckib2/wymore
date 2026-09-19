@@ -1,0 +1,31 @@
+{
+  "id": "5.71",
+  "kind": "traceability",
+  "name": "Definition 5.71",
+  "chapter": 5,
+  "description": "Definition 5.71. Literal two-stage reading: a mode of `Z2` followed by a homomorphic image.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "231–234"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.71/source/definition",
+      "type": "definition",
+      "text": "Source Definition 5.71, lines 231–234. Corrected traceability decision: Literal two-stage reading: a mode of `Z2` followed by a homomorphic image.",
+      "lean_anchor": "Implements",
+      "status": "exact",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.71/lean/System_Implements",
+      "type": "definition",
+      "text": "Lean anchor `System.Implements` for this corrected reading. Status: exact; fidelity: faithful.",
+      "lean_anchor": "Implements",
+      "status": "exact",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "exact"
+}

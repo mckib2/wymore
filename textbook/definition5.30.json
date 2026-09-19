@@ -1,0 +1,39 @@
+{
+  "id": "5.30",
+  "kind": "traceability",
+  "name": "Definition 5.30",
+  "chapter": 5,
+  "description": "Definition 5.30. Correct \u201cthere exist s p'\u201d to \u201cthere exists `p'`\u201d; separate transient mode and transient state. Clause (v) is eventual exit, not inevitable exit.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "97\u2013109"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.30/source/definition",
+      "type": "definition",
+      "text": "Source Definition 5.30, lines 97\u2013109. Corrected traceability decision: Correct \u201cthere exist s p'\u201d to \u201cthere exists `p'`\u201d; separate transient mode and transient state. Clause (v) is eventual exit, not inevitable exit.",
+      "lean_anchor": "IsTransientMode",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.30/lean/SystemMode_IsTransient",
+      "type": "definition",
+      "text": "Lean anchor `SystemMode.IsTransient` for this corrected reading. Status: corrected.",
+      "lean_anchor": "IsTransientMode",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.30/lean/System_IsTransientState",
+      "type": "definition",
+      "text": "Lean anchor `System.IsTransientState` for this corrected reading. Status: corrected.",
+      "lean_anchor": "IsTransientState",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

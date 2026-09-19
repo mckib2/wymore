@@ -1,0 +1,39 @@
+{
+  "id": "5.136",
+  "kind": "traceability",
+  "name": "Corollary 5.136",
+  "chapter": 5,
+  "description": "Corollary 5.136. Paragraph 5.135 replaces a primary behavior by the one-step constant input. The corollary is Theorem 5.134 at duration one.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "387–396"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.136/source/corollary",
+      "type": "theorem",
+      "text": "Corollary 5.136, the duration-one case of Theorem 5.134.",
+      "lean_anchor": "hologenic_of_primary_modes",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.136/lean/hologenic_of_primary_modes",
+      "type": "theorem",
+      "text": "Primary component modes induce a primary resultant mode.",
+      "lean_anchor": "hologenic_of_primary_modes",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.136/paragraph/primary_constant_behavior",
+      "type": "theorem",
+      "text": "Paragraph 5.135: replacing a primary behavior by the one-step constant input preserves the mode equations, and constant output on [0, 1) is the initial readout.",
+      "lean_anchor": "primaryConstantInputMode",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

@@ -1,0 +1,47 @@
+{
+  "id": "5.62",
+  "kind": "traceability",
+  "name": "Theorem 5.62",
+  "chapter": 5,
+  "description": "Theorem 5.62. Replace self-referential comprehension by finite concatenation of SMBF trajectory segments; duration is the sum of segment times (zero for `t1=0`).",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "194\u2013207"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.62/source/theorem",
+      "type": "theorem",
+      "text": "Source Theorem 5.62, lines 194\u2013207. Corrected traceability decision: Replace self-referential comprehension by finite concatenation of SMBF trajectory segments; duration is the sum of segment times (zero for `t1=0`).",
+      "lean_anchor": "compiledInput",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.62/lean/liftExperiment_systemMode",
+      "type": "theorem",
+      "text": "Lean anchor `liftExperiment_systemMode` for this corrected reading. Status: corrected.",
+      "lean_anchor": "compiledInput",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.62/lean/liftExperiment_systemMode_state",
+      "type": "theorem",
+      "text": "Lean anchor `liftExperiment_systemMode_state` for this corrected reading. Status: corrected.",
+      "lean_anchor": "compiled_state",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.62/lean/liftExperiment_systemMode_output",
+      "type": "theorem",
+      "text": "Lean anchor `liftExperiment_systemMode_output` for this corrected reading. Status: corrected.",
+      "lean_anchor": "compiled_output",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

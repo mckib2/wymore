@@ -1,0 +1,39 @@
+{
+  "id": "5.57",
+  "kind": "traceability",
+  "name": "Definition 5.57",
+  "chapter": 5,
+  "description": "Definition 5.57. Correct \u201cif the system\u201d to \u201cof the system\u201d; expose input/output constriction separately.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "180"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.57/source/definition",
+      "type": "definition",
+      "text": "Source Definition 5.57, lines 180. Corrected traceability decision: Correct \u201cif the system\u201d to \u201cof the system\u201d; expose input/output constriction separately.",
+      "lean_anchor": "HasInputPortConstriction",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.57/lean/SystemMode_ConstrictsInputs",
+      "type": "definition",
+      "text": "Lean anchor `SystemMode.ConstrictsInputs` for this corrected reading. Status: qualified.",
+      "lean_anchor": "HasInputPortConstriction",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.57/lean/SystemMode_ConstrictsOutputs",
+      "type": "definition",
+      "text": "Lean anchor `SystemMode.ConstrictsOutputs` for this corrected reading. Status: qualified.",
+      "lean_anchor": "HasOutputPortConstriction",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

@@ -1,0 +1,39 @@
+{
+  "id": "5.114",
+  "kind": "traceability",
+  "name": "Definition 5.114",
+  "chapter": 5,
+  "description": "Definition 5.114. Correct \u201creceipe\u201d; induced recipe replaces every component by a non-constricting mode and preserves corresponding connectivity; retain connectivity well-formedness.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "326\u2013332"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.114/source/definition",
+      "type": "definition",
+      "text": "Source Definition 5.114, lines 326\u2013332. Corrected traceability decision: Correct \u201creceipe\u201d; induced recipe replaces every component by a non-constricting mode and preserves corresponding connectivity; retain connectivity well-formedness.",
+      "lean_anchor": "InducedSystemModeRecipe",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.114/lean/inducedSystemModeRecipe",
+      "type": "definition",
+      "text": "Lean anchor `inducedSystemModeRecipe` for this corrected reading. Status: qualified.",
+      "lean_anchor": "InducedSystemModeRecipe",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.114/lean/sysmoscr",
+      "type": "definition",
+      "text": "Lean anchor `sysmoscr` for this corrected reading. Status: qualified.",
+      "lean_anchor": "sysmoscr",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

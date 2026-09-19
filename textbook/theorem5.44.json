@@ -1,0 +1,31 @@
+{
+  "id": "5.44",
+  "kind": "traceability",
+  "name": "Theorem 5.44",
+  "chapter": 5,
+  "description": "Theorem 5.44. Correct malformed timing hypothesis to `(k+1)*d \u2264 t`; use `k` as a nonnegative mode-step index; constant input on `[k*d,(k+1)*d)`.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "135\u2013143"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.44/source/theorem",
+      "type": "theorem",
+      "text": "Source Theorem 5.44, lines 135\u2013143. Corrected traceability decision: Correct malformed timing hypothesis to `(k+1)*d \u2264 t`; use `k` as a nonnegative mode-step index; constant input on `[k*d,(k+1)*d)`.",
+      "lean_anchor": "manifestation_next_of_constant",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.44/lean/manifest_next_of_constant_input_time",
+      "type": "theorem",
+      "text": "Lean anchor `manifest_next_of_constant_input_time` for this corrected reading. Status: corrected.",
+      "lean_anchor": "manifestation_next_of_constant",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

@@ -1,0 +1,39 @@
+{
+  "id": "5.40",
+  "kind": "traceability",
+  "name": "Definition 5.40",
+  "chapter": 5,
+  "description": "Definition 5.40. Literal reading; distinguish witness duration from constant/variable predicates.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "126–129"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.40/source/definition",
+      "type": "definition",
+      "text": "Source Definition 5.40, lines 126–129. Corrected traceability decision: Literal reading; distinguish witness duration from constant/variable predicates.",
+      "lean_anchor": "HasConstantTimeIndex",
+      "status": "exact",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.40/lean/SystemMode_HasConstantTimeIndex",
+      "type": "definition",
+      "text": "Lean anchor `SystemMode.HasConstantTimeIndex` for this corrected reading. Status: exact; fidelity: faithful.",
+      "lean_anchor": "HasConstantTimeIndex",
+      "status": "exact",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.40/lean/SystemMode_HasVariableTimeIndex",
+      "type": "definition",
+      "text": "Lean anchor `SystemMode.HasVariableTimeIndex` for this corrected reading. Status: exact; fidelity: faithful.",
+      "lean_anchor": "HasVariableTimeIndex",
+      "status": "exact",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "exact"
+}

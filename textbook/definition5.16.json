@@ -1,0 +1,31 @@
+{
+  "id": "5.16",
+  "kind": "traceability",
+  "name": "Definition 5.16",
+  "chapter": 5,
+  "description": "Definition 5.16. Literal reading.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "60"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.16/source/definition",
+      "type": "definition",
+      "text": "Source Definition 5.16, lines 60. Corrected traceability decision: Literal reading.",
+      "lean_anchor": "IsProperMode",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.16/lean/SystemMode_IsProper",
+      "type": "definition",
+      "text": "Lean anchor `SystemMode.IsProper` for this corrected reading. Status: corrected.",
+      "lean_anchor": "IsProperMode",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

@@ -1,0 +1,31 @@
+{
+  "id": "5.93",
+  "kind": "traceability",
+  "name": "Theorem 5.93",
+  "chapter": 5,
+  "description": "Theorem 5.93. Use the lifted SMBF from 5.89 and prove equality with the `SYSMO` construction.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "273\u2013277"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.93/source/theorem",
+      "type": "theorem",
+      "text": "Source Theorem 5.93, lines 273\u2013277. Corrected traceability decision: Use the lifted SMBF from 5.89 and prove equality with the `SYSMO` construction.",
+      "lean_anchor": "homomorphicInverseImage_isSystemMode",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.93/lean/homomorphicInverseImage_isSystemMode",
+      "type": "theorem",
+      "text": "Lean anchor `homomorphicInverseImage_isSystemMode` for this corrected reading. Status: qualified.",
+      "lean_anchor": "homomorphicInverseImage_isSystemMode",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

@@ -1,0 +1,31 @@
+{
+  "id": "5.146",
+  "kind": "exercise",
+  "name": "Exercise 5.146",
+  "chapter": 5,
+  "description": "Exercise 5.146. Strongest reading is provable: from `T^d=T` under constant input, derive `T^(k*(d-1)+1)=T`; retain `k≥1`.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "420"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.146/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.146, lines 420. Corrected traceability decision: Strongest reading is provable: from `T^d=T` under constant input, derive `T^(k*(d-1)+1)=T`; retain `k≥1`.",
+      "lean_anchor": "selfMode_constantTime_iterate",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.146/plan/selfMode_constantTime_iterate",
+      "type": "exercise",
+      "text": "Lean anchor `selfMode_constantTime_iterate` for this corrected reading. Status: solved; fidelity: faithful.",
+      "lean_anchor": "selfMode_constantTime_iterate",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

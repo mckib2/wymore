@@ -1,0 +1,31 @@
+{
+  "id": "5.77",
+  "kind": "traceability",
+  "name": "Definition 5.77",
+  "chapter": 5,
+  "description": "Definition 5.77. Literal parameterization; keep the implementation witness explicit.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "237–239"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.77/source/definition",
+      "type": "definition",
+      "text": "Source Definition 5.77, lines 237–239. Corrected traceability decision: Literal parameterization; keep the implementation witness explicit.",
+      "lean_anchor": "ImplementedSystemParameter",
+      "status": "exact",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.77/lean/implementedSystems",
+      "type": "definition",
+      "text": "Lean anchor `implementedSystems` for this corrected reading. Status: exact; fidelity: faithful.",
+      "lean_anchor": "implementedSystems",
+      "status": "exact",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "exact"
+}

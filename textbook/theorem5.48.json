@@ -1,0 +1,39 @@
+{
+  "id": "5.48",
+  "kind": "statement",
+  "name": "Statement 5.48",
+  "chapter": 5,
+  "description": "Statement 5.48. Preserve existential reading (\u201cmay be infinitely many\u201d), not a universal infinitude claim; formalize non-uniqueness and an infinite-family example.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "162"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.48/source/statement",
+      "type": "statement",
+      "text": "Source Statement 5.48, lines 162. Corrected traceability decision: Preserve existential reading (\u201cmay be infinitely many\u201d), not a universal infinitude claim; formalize non-uniqueness and an infinite-family example.",
+      "lean_anchor": "stutterModeAt",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.48/lean/behaviorFunction_not_unique_example",
+      "type": "theorem",
+      "text": "Lean anchor `behaviorFunction_not_unique_example` for this corrected reading. Status: corrected.",
+      "lean_anchor": "stutterModeAt",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.48/lean/behaviorFunction_infinite_family_example",
+      "type": "theorem",
+      "text": "Lean anchor `behaviorFunction_infinite_family_example` for this corrected reading. Status: corrected.",
+      "lean_anchor": "stutterModeAt_injective",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

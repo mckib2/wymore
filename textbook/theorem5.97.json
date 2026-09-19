@@ -1,0 +1,31 @@
+{
+  "id": "5.97",
+  "kind": "traceability",
+  "name": "Theorem 5.97",
+  "chapter": 5,
+  "description": "Theorem 5.97. Compose implementation through a chosen inverse-image mode; make dependence on `SMBF2s` and `CHI` explicit.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "289\u2013298"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.97/source/theorem",
+      "type": "theorem",
+      "text": "Source Theorem 5.97, lines 289\u2013298. Corrected traceability decision: Compose implementation through a chosen inverse-image mode; make dependence on `SMBF2s` and `CHI` explicit.",
+      "lean_anchor": "Implements.trans",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.97/lean/implements_trans",
+      "type": "theorem",
+      "text": "Lean anchor `implements_trans` for this corrected reading. Status: qualified.",
+      "lean_anchor": "implements_trans",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

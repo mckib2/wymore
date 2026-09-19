@@ -1,0 +1,39 @@
+{
+  "id": "5.45",
+  "kind": "traceability",
+  "name": "Definition 5.45",
+  "chapter": 5,
+  "description": "Definition 5.45. Correct `z2` capitalization; inevitable transition quantifies over every exhibitor trajectory starting at `p`; expose local and global predicates.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "147\u2013150"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.45/source/definition",
+      "type": "definition",
+      "text": "Source Definition 5.45, lines 147\u2013150. Corrected traceability decision: Correct `z2` capitalization; inevitable transition quantifies over every exhibitor trajectory starting at `p`; expose local and global predicates.",
+      "lean_anchor": "InevitableAt",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.45/lean/SystemMode_InevitableAt",
+      "type": "definition",
+      "text": "Lean anchor `SystemMode.InevitableAt` for this corrected reading. Status: corrected.",
+      "lean_anchor": "InevitableAt",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.45/lean/SystemMode_HasInevitableTransitions",
+      "type": "definition",
+      "text": "Lean anchor `SystemMode.HasInevitableTransitions` for this corrected reading. Status: corrected.",
+      "lean_anchor": "HasInevitableTransitions",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

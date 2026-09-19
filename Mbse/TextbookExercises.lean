@@ -2,6 +2,7 @@ import Mbse.TextbookExercises.Predicates
 import Mbse.TextbookExercises.Ch02
 import Mbse.TextbookExercises.Ch03
 import Mbse.TextbookExercises.Ch04
+import Mbse.TextbookExercises.Ch05
 import Mbse.TextbookExercises.Registry
 
 /-!
@@ -29,5 +30,13 @@ export Ch02 (ex2_117_system ex2_117_always_active ex2_117_is_trivial ex2_117_not
 export Ch03 (scr_port_count_sum_eq_union scr_unconnected_ports_exist scr_cscr_domain_range_eq
   scr_port_counts_gt_connections cascade_scr_min_two_components pure_feedback_min_ports
   ex3_118_scr ex3_118_simple_conjunction ex3_119_conjunctive_port_identification)
+
+export Ch05 (subsystem_isSystemMode_or_counterexample systemMode_not_subsystem_counterexample
+  DiscreteSystemStateReflection resultant_state_card_dvd subsystem_state_card_dvd
+  exercise5_142_unconditional
+  selfMode_constantTime_iterate selfModeAtIteratedTime
+  selfModeAtIteratedTime_hasIndices constantMode_state_at_mul
+  accumulatedModeTime
+  variableTime_constantInput_state_at_accumulatedTime)
 
 end Mbse.TextbookExercises

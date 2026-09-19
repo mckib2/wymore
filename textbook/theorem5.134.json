@@ -1,0 +1,39 @@
+{
+  "id": "5.134",
+  "kind": "traceability",
+  "name": "Theorem 5.134",
+  "chapter": 5,
+  "description": "Theorem 5.134. Constant input, constant output, a common duration, and no port constriction make the induced resultant a system mode of the exhibitor resultant, derived from cfscr and Lemma 3.77.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "373–384"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.134/source/theorem",
+      "type": "theorem",
+      "text": "Theorem 5.134, derived by simultaneous induction on resolved component inputs.",
+      "lean_anchor": "hologenic_of_constant_input_output_time",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.134/lean/hologenic_of_constant_input_output_time",
+      "type": "theorem",
+      "text": "The resultant of constant-input, constant-output, constant-time component modes is hologenic.",
+      "lean_anchor": "hologenic_of_constant_input_output_time",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.134/proof/resolved_input",
+      "type": "theorem",
+      "text": "Under the constant external input, the coupling function resolves each component input to that component's constant mode input on the half-open interval before d.",
+      "lean_anchor": "resolved_input_constant",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

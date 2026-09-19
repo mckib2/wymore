@@ -1,0 +1,31 @@
+{
+  "id": "5.20",
+  "kind": "traceability",
+  "name": "Theorem 5.20",
+  "chapter": 5,
+  "description": "Theorem 5.20. Read `NZ1 \u2286 NZ2` as agreement/restriction on the smaller domain. Implemented as a necessary direction plus a corrected existential converse.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "66\u201373"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.20/source/theorem",
+      "type": "theorem",
+      "text": "Source Theorem 5.20, lines 66\u201373. Corrected traceability decision: Read `NZ1 \u2286 NZ2` as agreement/restriction on the smaller domain. Implemented as a necessary direction plus a corrected existential converse.",
+      "lean_anchor": "primary_preserves_transition",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.20/lean/primary_iff_componentwise_subset",
+      "type": "theorem",
+      "text": "Lean anchor `primary_iff_componentwise_subset` for this corrected reading. Status: corrected.",
+      "lean_anchor": "primary_preserves_transition; primaryModeOfMaps",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

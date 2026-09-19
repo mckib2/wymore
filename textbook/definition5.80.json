@@ -1,0 +1,31 @@
+{
+  "id": "5.80",
+  "kind": "traceability",
+  "name": "Definition 5.80",
+  "chapter": 5,
+  "description": "Definition 5.80. Normalize inconsistent `Zs/Z2s` to one mode witness `Z2s`; isomorphic implementation adds `ISY`.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "242\u2013245"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.80/source/definition",
+      "type": "definition",
+      "text": "Source Definition 5.80, lines 242\u2013245. Corrected traceability decision: Normalize inconsistent `Zs/Z2s` to one mode witness `Z2s`; isomorphic implementation adds `ISY`.",
+      "lean_anchor": "IsomorphicallyImplements",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.80/lean/System_IsomorphicallyImplements",
+      "type": "definition",
+      "text": "Lean anchor `System.IsomorphicallyImplements` for this corrected reading. Status: corrected.",
+      "lean_anchor": "IsomorphicallyImplements",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

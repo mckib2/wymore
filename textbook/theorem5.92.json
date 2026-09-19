@@ -1,0 +1,31 @@
+{
+  "id": "5.92",
+  "kind": "traceability",
+  "name": "Theorem 5.92",
+  "chapter": 5,
+  "description": "Theorem 5.92. Formalize closure/typing of the parameterization; no stronger mode theorem is folded into this item.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "270"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.92/source/theorem",
+      "type": "theorem",
+      "text": "Source Theorem 5.92, lines 270. Corrected traceability decision: Formalize closure/typing of the parameterization; no stronger mode theorem is folded into this item.",
+      "lean_anchor": "hiisysmo_isSystemParameterization",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.92/lean/hiisysmo_isSystemParameterization",
+      "type": "theorem",
+      "text": "Lean anchor `hiisysmo_isSystemParameterization` for this corrected reading. Status: qualified.",
+      "lean_anchor": "hiisysmo_isSystemParameterization",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

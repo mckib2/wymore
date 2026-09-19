@@ -1,0 +1,47 @@
+{
+  "id": "5.6",
+  "kind": "traceability",
+  "name": "Definition 5.6",
+  "chapter": 5,
+  "description": "Definition 5.6. Correct clause (i) domain to `SZ1 \u00d7 IZ1` (the following quantifier's `IZ2` is a typo); require positive duration; expose behavior, input-index, time-index, closure, transition and readout clauses.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "1\u201323"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.6/source/definition",
+      "type": "definition",
+      "text": "Source Definition 5.6, lines 1\u201323. Corrected traceability decision: Correct clause (i) domain to `SZ1 \u00d7 IZ1` (the following quantifier's `IZ2` is a typo); require positive duration; expose behavior, input-index, time-index, closure, transition and readout clauses.",
+      "lean_anchor": "SystemMode",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.6/lean/SystemMode",
+      "type": "definition",
+      "text": "Lean anchor `SystemMode` for this corrected reading. Status: corrected.",
+      "lean_anchor": "SystemMode",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.6/lean/SystemMode_inputIndex",
+      "type": "definition",
+      "text": "Lean anchor `SystemMode.inputIndex` for this corrected reading. Status: corrected.",
+      "lean_anchor": "SystemMode.inputIndex",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.6/lean/SystemMode_timeIndex",
+      "type": "definition",
+      "text": "Lean anchor `SystemMode.timeIndex` for this corrected reading. Status: corrected.",
+      "lean_anchor": "SystemMode.timeIndex",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

@@ -1,0 +1,39 @@
+{
+  "id": "5.64",
+  "kind": "traceability",
+  "name": "Definition 5.64",
+  "chapter": 5,
+  "description": "Definition 5.64. Correct range to positive times as required by 5.6; require state closure after each behavior segment; expose `SYSMO` constructor fields.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "210\u2013225"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.64/source/definition",
+      "type": "definition",
+      "text": "Source Definition 5.64, lines 210\u2013225. Corrected traceability decision: Correct range to positive times as required by 5.6; require state closure after each behavior segment; expose `SYSMO` constructor fields.",
+      "lean_anchor": "SysmoData",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.64/lean/systemModeOfBehavior",
+      "type": "definition",
+      "text": "Lean anchor `systemModeOfBehavior` for this corrected reading. Status: corrected.",
+      "lean_anchor": "SysmoData",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.64/lean/sysmo",
+      "type": "definition",
+      "text": "Lean anchor `sysmo` for this corrected reading. Status: corrected.",
+      "lean_anchor": "sysmoSystem; sysmoMode",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

@@ -15,6 +15,17 @@
 | `4.59/proof/copy_witness` | `proof` | When every component homomorphism is 1TO1, the product state map and the portwise input and output maps are 1TO1 as well. | ✅ Faithful | `elabResultantCopyWitness` ([Mbse/CouplingIsomorphism.lean:474](Mbse/CouplingIsomorphism.lean#L474)) |
 | `4.59/theorem/resultant_copy` | `theorem` | RSY(SCR) is a copy of RSY(SCR$). | ✅ Faithful | `cor4_59_resultant_copy` ([Mbse/CouplingIsomorphism.lean:499](Mbse/CouplingIsomorphism.lean#L499))<br>`cor4_59_resultant_copy` ([Mbse/TextbookExercises/Ch04.lean:377](Mbse/TextbookExercises/Ch04.lean#L377)) |
 
+### `textbook/corollary5.136` — Corollary 5.136
+
+- Structured source file: [textbook/corollary5.136.json](textbook/corollary5.136.json)
+- Description: *Corollary 5.136. Paragraph 5.135 replaces a primary behavior by the one-step constant input. The corollary is Theorem 5.134 at duration one.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.136/source/corollary` | `theorem` | Corollary 5.136, the duration-one case of Theorem 5.134. | ✅ Faithful | `hologenic_of_primary_modes` ([Mbse/WymoreModeCoupling.lean:824](Mbse/WymoreModeCoupling.lean#L824)) |
+| `5.136/lean/hologenic_of_primary_modes` | `theorem` | Primary component modes induce a primary resultant mode. | ✅ Faithful | `hologenic_of_primary_modes` ([Mbse/WymoreModeCoupling.lean:824](Mbse/WymoreModeCoupling.lean#L824)) |
+| `5.136/paragraph/primary_constant_behavior` | `theorem` | Paragraph 5.135: replacing a primary behavior by the one-step constant input preserves the mode equations, and constant output on [0, 1) is the initial readout. | ✅ Faithful | `primaryConstantInputMode` ([Mbse/WymoreSystemModes.lean:191](Mbse/WymoreSystemModes.lean#L191)) |
+
 ### `textbook/definition2.11` — Finite System and Order Vector
 
 - Structured source file: [textbook/definition2.11.json](textbook/definition2.11.json)
@@ -461,6 +472,240 @@
 | Element ID | Type | Textbook Text | Status | Linked Lean Elements |
 |------------|------|---------------|--------|----------------------|
 | `4.53/definition/copy` | `definition` | COPY: Z1 is a copy of Z2 exactly when a copy witness exists. | ✅ Faithful | `IsCopyOf` ([Mbse/Isomorphism.lean:572](Mbse/Isomorphism.lean#L572)) |
+
+### `textbook/definition5.11` — Definition 5.11
+
+- Structured source file: [textbook/definition5.11.json](textbook/definition5.11.json)
+- Description: *Definition 5.11. Correct “said/tie” to `s`; bind `x1,p1`; interpret shifted restriction relative to `r`; define manifest, in-mode, on-the-way, enters and exits separately.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.11/source/definition` | `definition` | Source Definition 5.11, lines 27–53. Corrected traceability decision: Correct “said/tie” to `s`; bind `x1,p1`; interpret shifted restriction relative to `r`; define manifest, in-mode, on-the-way, enters and exits separately. | ✅ Faithful | `ManifestAt` ([Mbse/WymoreSystemModes.lean:78](Mbse/WymoreSystemModes.lean#L78)) |
+| `5.11/lean/SystemMode_Manifest` | `definition` | Lean anchor `SystemMode.Manifest` for this corrected reading. Status: corrected. | ✅ Faithful | `ManifestAt` ([Mbse/WymoreSystemModes.lean:78](Mbse/WymoreSystemModes.lean#L78)) |
+| `5.11/lean/SystemMode_InMode` | `definition` | Lean anchor `SystemMode.InMode` for this corrected reading. Status: corrected. | ✅ Faithful | `InModeAt` ([Mbse/WymoreSystemModes.lean:101](Mbse/WymoreSystemModes.lean#L101)) |
+| `5.11/lean/SystemMode_Enters` | `definition` | Lean anchor `SystemMode.Enters` for this corrected reading. Status: corrected. | ✅ Faithful | `EntersAt` ([Mbse/WymoreSystemModes.lean:123](Mbse/WymoreSystemModes.lean#L123)) |
+| `5.11/lean/SystemMode_Exits` | `definition` | Lean anchor `SystemMode.Exits` for this corrected reading. Status: corrected. | ✅ Faithful | `ExitsAt` ([Mbse/WymoreSystemModes.lean:128](Mbse/WymoreSystemModes.lean#L128)) |
+
+### `textbook/definition5.114` — Definition 5.114
+
+- Structured source file: [textbook/definition5.114.json](textbook/definition5.114.json)
+- Description: *Definition 5.114. Correct “receipe”; induced recipe replaces every component by a non-constricting mode and preserves corresponding connectivity; retain connectivity well-formedness.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.114/source/definition` | `definition` | Source Definition 5.114, lines 326–332. Corrected traceability decision: Correct “receipe”; induced recipe replaces every component by a non-constricting mode and preserves corresponding connectivity; retain connectivity well-formedness. | ✅ Faithful | `InducedSystemModeRecipe` ([Mbse/WymoreModeCoupling.lean:24](Mbse/WymoreModeCoupling.lean#L24)) |
+| `5.114/lean/inducedSystemModeRecipe` | `definition` | Lean anchor `inducedSystemModeRecipe` for this corrected reading. Status: qualified. | ✅ Faithful | `InducedSystemModeRecipe` ([Mbse/WymoreModeCoupling.lean:24](Mbse/WymoreModeCoupling.lean#L24)) |
+| `5.114/lean/sysmoscr` | `definition` | Lean anchor `sysmoscr` for this corrected reading. Status: qualified. | ✅ Faithful | `sysmoscr` ([Mbse/WymoreModeCoupling.lean:66](Mbse/WymoreModeCoupling.lean#L66)) |
+
+### `textbook/definition5.117` — Definition 5.117
+
+- Structured source file: [textbook/definition5.117.json](textbook/definition5.117.json)
+- Description: *Definition 5.117. Correct grammar to “is system-mode hologenic”; resultant of induced recipe must be a mode of original resultant.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.117/source/definition` | `definition` | Source Definition 5.117, lines 335. Corrected traceability decision: Correct grammar to “is system-mode hologenic”; resultant of induced recipe must be a mode of original resultant. | ✅ Faithful | `IsSystemModeHologenic` ([Mbse/WymoreModeCoupling.lean:161](Mbse/WymoreModeCoupling.lean#L161)) |
+| `5.117/lean/CouplingRecipe.IsSystemModeHologenic` | `definition` | Lean anchor `CouplingRecipe.IsSystemModeHologenic` for this corrected reading. Status: qualified. | ✅ Faithful | `IsSystemModeHologenic` ([Mbse/WymoreModeCoupling.lean:161](Mbse/WymoreModeCoupling.lean#L161)) |
+
+### `textbook/definition5.14` — Definition 5.14
+
+- Structured source file: [textbook/definition5.14.json](textbook/definition5.14.json)
+- Description: *Definition 5.14. Literal reading.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.14/source/definition` | `definition` | Source Definition 5.14, lines 57. Corrected traceability decision: Literal reading. | ✅ Faithful | `IsTrivialMode` ([Mbse/WymoreSystemModes.lean:133](Mbse/WymoreSystemModes.lean#L133)) |
+| `5.14/lean/SystemMode_IsTrivial` | `definition` | Lean anchor `SystemMode.IsTrivial` for this corrected reading. Status: exact; fidelity: faithful. | ✅ Faithful | `IsTrivialMode` ([Mbse/WymoreSystemModes.lean:133](Mbse/WymoreSystemModes.lean#L133)) |
+
+### `textbook/definition5.16` — Definition 5.16
+
+- Structured source file: [textbook/definition5.16.json](textbook/definition5.16.json)
+- Description: *Definition 5.16. Literal reading.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.16/source/definition` | `definition` | Source Definition 5.16, lines 60. Corrected traceability decision: Literal reading. | ✅ Faithful | `IsProperMode` ([Mbse/WymoreSystemModes.lean:138](Mbse/WymoreSystemModes.lean#L138)) |
+| `5.16/lean/SystemMode_IsProper` | `definition` | Lean anchor `SystemMode.IsProper` for this corrected reading. Status: corrected. | ✅ Faithful | `IsProperMode` ([Mbse/WymoreSystemModes.lean:138](Mbse/WymoreSystemModes.lean#L138)) |
+
+### `textbook/definition5.18` — Definition 5.18
+
+- Structured source file: [textbook/definition5.18.json](textbook/definition5.18.json)
+- Description: *Definition 5.18. Primary means time index `1`; correct displayed `NZ2 = NZ1` wording to equality of one-step transitions on `SZ1 × IZ1`.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.18/source/definition` | `definition` | Source Definition 5.18, lines 62–63. Corrected traceability decision: Primary means time index `1`; correct displayed `NZ2 = NZ1` wording to equality of one-step transitions on `SZ1 × IZ1`. | ✅ Faithful | `IsPrimaryMode` ([Mbse/WymoreSystemModes.lean:164](Mbse/WymoreSystemModes.lean#L164)) |
+| `5.18/lean/SystemMode_IsPrimary` | `definition` | Lean anchor `SystemMode.IsPrimary` for this corrected reading. Status: corrected. | ✅ Faithful | `IsPrimaryMode` ([Mbse/WymoreSystemModes.lean:164](Mbse/WymoreSystemModes.lean#L164)) |
+
+### `textbook/definition5.23` — Definition 5.23
+
+- Structured source file: [textbook/definition5.23.json](textbook/definition5.23.json)
+- Description: *Definition 5.23. Correct `Nz2` to `NZ2`; reachable states are those attained from `S`; expose state closure, inherited input/readout/transition.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.23/source/definition` | `definition` | Source Definition 5.23, lines 77–86. Corrected traceability decision: Correct `Nz2` to `NZ2`; reachable states are those attained from `S`; expose state closure, inherited input/readout/transition. | ✅ Faithful | `reachableModeSystem` ([Mbse/WymoreSystemModes.lean:283](Mbse/WymoreSystemModes.lean#L283)) |
+| `5.23/lean/reachableSystemMode` | `definition` | Lean anchor `reachableSystemMode` for this corrected reading. Status: corrected. | ✅ Faithful | `reachableModeSystem` ([Mbse/WymoreSystemModes.lean:283](Mbse/WymoreSystemModes.lean#L283)) |
+
+### `textbook/definition5.26` — Definition 5.26
+
+- Structured source file: [textbook/definition5.26.json](textbook/definition5.26.json)
+- Description: *Definition 5.26. Literal reading; “outside cannot enter” is a separate element.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.26/source/definition` | `definition` | Source Definition 5.26, lines 90–94. Corrected traceability decision: Literal reading; “outside cannot enter” is a separate element. | ✅ Faithful | `IsIsolatedMode` ([Mbse/WymoreSystemModes.lean:328](Mbse/WymoreSystemModes.lean#L328)) |
+| `5.26/lean/SystemMode_IsIsolated` | `definition` | Lean anchor `SystemMode.IsIsolated` for this corrected reading. Status: exact; fidelity: faithful. | ✅ Faithful | `IsIsolatedMode` ([Mbse/WymoreSystemModes.lean:328](Mbse/WymoreSystemModes.lean#L328)) |
+
+### `textbook/definition5.30` — Definition 5.30
+
+- Structured source file: [textbook/definition5.30.json](textbook/definition5.30.json)
+- Description: *Definition 5.30. Correct “there exist s p'” to “there exists `p'`”; separate transient mode and transient state. Clause (v) is eventual exit, not inevitable exit.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.30/source/definition` | `definition` | Source Definition 5.30, lines 97–109. Corrected traceability decision: Correct “there exist s p'” to “there exists `p'`”; separate transient mode and transient state. Clause (v) is eventual exit, not inevitable exit. | ✅ Faithful | `IsTransientMode` ([Mbse/WymoreSystemModes.lean:336](Mbse/WymoreSystemModes.lean#L336)) |
+| `5.30/lean/SystemMode_IsTransient` | `definition` | Lean anchor `SystemMode.IsTransient` for this corrected reading. Status: corrected. | ✅ Faithful | `IsTransientMode` ([Mbse/WymoreSystemModes.lean:336](Mbse/WymoreSystemModes.lean#L336)) |
+| `5.30/lean/System_IsTransientState` | `definition` | Lean anchor `System.IsTransientState` for this corrected reading. Status: corrected. | ✅ Faithful | `IsTransientState` ([Mbse/WymoreSystemModes.lean:347](Mbse/WymoreSystemModes.lean#L347)) |
+
+### `textbook/definition5.34` — Definition 5.34
+
+- Structured source file: [textbook/definition5.34.json](textbook/definition5.34.json)
+- Description: *Definition 5.34. Literal reading; note that the mode definition only gives primary, proper, and full input set, while closure follows from primary/restricted transition.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.34/source/definition` | `definition` | Source Definition 5.34, lines 113–117. Corrected traceability decision: Literal reading; note that the mode definition only gives primary, proper, and full input set, while closure follows from primary/restricted transition. | ✅ Faithful | `IsAbsorbingMode` ([Mbse/WymoreSystemModes.lean:309](Mbse/WymoreSystemModes.lean#L309)) |
+| `5.34/lean/SystemMode_IsAbsorbing` | `definition` | Lean anchor `SystemMode.IsAbsorbing` for this corrected reading. Status: corrected. | ✅ Faithful | `IsAbsorbingMode` ([Mbse/WymoreSystemModes.lean:309](Mbse/WymoreSystemModes.lean#L309)) |
+| `5.34/lean/System_IsAbsorbingState` | `definition` | Lean anchor `System.IsAbsorbingState` for this corrected reading. Status: corrected. | ✅ Faithful | `IsAbsorbingState` ([Mbse/WymoreSystemModes.lean:353](Mbse/WymoreSystemModes.lean#L353)) |
+
+### `textbook/definition5.40` — Definition 5.40
+
+- Structured source file: [textbook/definition5.40.json](textbook/definition5.40.json)
+- Description: *Definition 5.40. Literal reading; distinguish witness duration from constant/variable predicates.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.40/source/definition` | `definition` | Source Definition 5.40, lines 126–129. Corrected traceability decision: Literal reading; distinguish witness duration from constant/variable predicates. | ✅ Faithful | `HasConstantTimeIndex` ([Mbse/WymoreSystemModes.lean:147](Mbse/WymoreSystemModes.lean#L147)) |
+| `5.40/lean/SystemMode_HasConstantTimeIndex` | `definition` | Lean anchor `SystemMode.HasConstantTimeIndex` for this corrected reading. Status: exact; fidelity: faithful. | ✅ Faithful | `HasConstantTimeIndex` ([Mbse/WymoreSystemModes.lean:147](Mbse/WymoreSystemModes.lean#L147)) |
+| `5.40/lean/SystemMode_HasVariableTimeIndex` | `definition` | Lean anchor `SystemMode.HasVariableTimeIndex` for this corrected reading. Status: exact; fidelity: faithful. | ✅ Faithful | `HasVariableTimeIndex` ([Mbse/WymoreSystemModes.lean:153](Mbse/WymoreSystemModes.lean#L153)) |
+
+### `textbook/definition5.42` — Definition 5.42
+
+- Structured source file: [textbook/definition5.42.json](textbook/definition5.42.json)
+- Description: *Definition 5.42. Interpret `CNS(p)` as the constant input trajectory on `TZ2`.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.42/source/definition` | `definition` | Source Definition 5.42, lines 132. Corrected traceability decision: Interpret `CNS(p)` as the constant input trajectory on `TZ2`. | ✅ Faithful | `HasConstantInput` ([Mbse/WymoreSystemModes.lean:158](Mbse/WymoreSystemModes.lean#L158)) |
+| `5.42/lean/SystemMode_HasConstantInput` | `definition` | Lean anchor `SystemMode.HasConstantInput` for this corrected reading. Status: exact; fidelity: faithful. | ✅ Faithful | `HasConstantInput` ([Mbse/WymoreSystemModes.lean:158](Mbse/WymoreSystemModes.lean#L158)) |
+
+### `textbook/definition5.45` — Definition 5.45
+
+- Structured source file: [textbook/definition5.45.json](textbook/definition5.45.json)
+- Description: *Definition 5.45. Correct `z2` capitalization; inevitable transition quantifies over every exhibitor trajectory starting at `p`; expose local and global predicates.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.45/source/definition` | `definition` | Source Definition 5.45, lines 147–150. Corrected traceability decision: Correct `z2` capitalization; inevitable transition quantifies over every exhibitor trajectory starting at `p`; expose local and global predicates. | ✅ Faithful | `InevitableAt` ([Mbse/WymoreSystemModes.lean:84](Mbse/WymoreSystemModes.lean#L84)) |
+| `5.45/lean/SystemMode_InevitableAt` | `definition` | Lean anchor `SystemMode.InevitableAt` for this corrected reading. Status: corrected. | ✅ Faithful | `InevitableAt` ([Mbse/WymoreSystemModes.lean:84](Mbse/WymoreSystemModes.lean#L84)) |
+| `5.45/lean/SystemMode_HasInevitableTransitions` | `definition` | Lean anchor `SystemMode.HasInevitableTransitions` for this corrected reading. Status: corrected. | ✅ Faithful | `HasInevitableTransitions` ([Mbse/WymoreSystemModes.lean:96](Mbse/WymoreSystemModes.lean#L96)) |
+
+### `textbook/definition5.49` — Definition 5.49
+
+- Structured source file: [textbook/definition5.49.json](textbook/definition5.49.json)
+- Description: *Definition 5.49. Interpret port projection pointwise; retain half-open interval so transition endpoint may change output.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.49/source/definition` | `definition` | Source Definition 5.49, lines 164–167. Corrected traceability decision: Interpret port projection pointwise; retain half-open interval so transition endpoint may change output. | ✅ Faithful | `HasConstantOutputOn` ([Mbse/WymoreSystemModes.lean:487](Mbse/WymoreSystemModes.lean#L487)) |
+| `5.49/lean/SystemMode_HasConstantOutputOn` | `definition` | Lean anchor `SystemMode.HasConstantOutputOn` for this corrected reading. Status: corrected. | ✅ Faithful | `HasConstantOutputOn` ([Mbse/WymoreSystemModes.lean:487](Mbse/WymoreSystemModes.lean#L487)) |
+| `5.49/lean/SystemMode_HasConstantOutput` | `definition` | Lean anchor `SystemMode.HasConstantOutput` for this corrected reading. Status: corrected. | ✅ Faithful | `HasConstantOutput` ([Mbse/WymoreSystemModes.lean:499](Mbse/WymoreSystemModes.lean#L499)) |
+
+### `textbook/definition5.57` — Definition 5.57
+
+- Structured source file: [textbook/definition5.57.json](textbook/definition5.57.json)
+- Description: *Definition 5.57. Correct “if the system” to “of the system”; expose input/output constriction separately.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.57/source/definition` | `definition` | Source Definition 5.57, lines 180. Corrected traceability decision: Correct “if the system” to “of the system”; expose input/output constriction separately. | ✅ Faithful | `HasInputPortConstriction` ([Mbse/WymoreSystemModes.lean:516](Mbse/WymoreSystemModes.lean#L516)) |
+| `5.57/lean/SystemMode_ConstrictsInputs` | `definition` | Lean anchor `SystemMode.ConstrictsInputs` for this corrected reading. Status: qualified. | ✅ Faithful | `HasInputPortConstriction` ([Mbse/WymoreSystemModes.lean:516](Mbse/WymoreSystemModes.lean#L516)) |
+| `5.57/lean/SystemMode_ConstrictsOutputs` | `definition` | Lean anchor `SystemMode.ConstrictsOutputs` for this corrected reading. Status: qualified. | ✅ Faithful | `HasOutputPortConstriction` ([Mbse/WymoreSystemModes.lean:527](Mbse/WymoreSystemModes.lean#L527)) |
+
+### `textbook/definition5.6` — Definition 5.6
+
+- Structured source file: [textbook/definition5.6.json](textbook/definition5.6.json)
+- Description: *Definition 5.6. Correct clause (i) domain to `SZ1 × IZ1` (the following quantifier's `IZ2` is a typo); require positive duration; expose behavior, input-index, time-index, closure, transition and readout clauses.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.6/source/definition` | `definition` | Source Definition 5.6, lines 1–23. Corrected traceability decision: Correct clause (i) domain to `SZ1 × IZ1` (the following quantifier's `IZ2` is a typo); require positive duration; expose behavior, input-index, time-index, closure, transition and readout clauses. | ✅ Faithful | `BehaviorWitness` ([Mbse/WymoreSystemModes.lean:27](Mbse/WymoreSystemModes.lean#L27)) |
+| `5.6/lean/SystemMode` | `definition` | Lean anchor `SystemMode` for this corrected reading. Status: corrected. | ✅ Faithful | `BehaviorWitness` ([Mbse/WymoreSystemModes.lean:27](Mbse/WymoreSystemModes.lean#L27))<br>`SystemMode` ([Mbse/WymoreSystemModes.lean:39](Mbse/WymoreSystemModes.lean#L39)) |
+| `5.6/lean/SystemMode_inputIndex` | `definition` | Lean anchor `SystemMode.inputIndex` for this corrected reading. Status: corrected. | ✅ Faithful | `SystemMode` ([Mbse/WymoreSystemModes.lean:66](Mbse/WymoreSystemModes.lean#L66)) |
+| `5.6/lean/SystemMode_timeIndex` | `definition` | Lean anchor `SystemMode.timeIndex` for this corrected reading. Status: corrected. | ✅ Faithful | `SystemMode` ([Mbse/WymoreSystemModes.lean:72](Mbse/WymoreSystemModes.lean#L72)) |
+
+### `textbook/definition5.64` — Definition 5.64
+
+- Structured source file: [textbook/definition5.64.json](textbook/definition5.64.json)
+- Description: *Definition 5.64. Correct range to positive times as required by 5.6; require state closure after each behavior segment; expose `SYSMO` constructor fields.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.64/source/definition` | `definition` | Source Definition 5.64, lines 210–225. Corrected traceability decision: Correct range to positive times as required by 5.6; require state closure after each behavior segment; expose `SYSMO` constructor fields. | ✅ Faithful | `SysmoData` ([Mbse/WymoreSystemModes.lean:724](Mbse/WymoreSystemModes.lean#L724)) |
+| `5.64/lean/systemModeOfBehavior` | `definition` | Lean anchor `systemModeOfBehavior` for this corrected reading. Status: corrected. | ✅ Faithful | `SysmoData` ([Mbse/WymoreSystemModes.lean:724](Mbse/WymoreSystemModes.lean#L724)) |
+| `5.64/lean/sysmo` | `definition` | Lean anchor `sysmo` for this corrected reading. Status: corrected. | ✅ Faithful | `sysmoSystem` ([Mbse/WymoreSystemModes.lean:753](Mbse/WymoreSystemModes.lean#L753)) |
+
+### `textbook/definition5.71` — Definition 5.71
+
+- Structured source file: [textbook/definition5.71.json](textbook/definition5.71.json)
+- Description: *Definition 5.71. Literal two-stage reading: a mode of `Z2` followed by a homomorphic image.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.71/source/definition` | `definition` | Source Definition 5.71, lines 231–234. Corrected traceability decision: Literal two-stage reading: a mode of `Z2` followed by a homomorphic image. | ✅ Faithful | `Implements` ([Mbse/WymoreImplementation.lean:30](Mbse/WymoreImplementation.lean#L30)) |
+| `5.71/lean/System_Implements` | `definition` | Lean anchor `System.Implements` for this corrected reading. Status: exact; fidelity: faithful. | ✅ Faithful | `Implements` ([Mbse/WymoreImplementation.lean:30](Mbse/WymoreImplementation.lean#L30)) |
+
+### `textbook/definition5.77` — Definition 5.77
+
+- Structured source file: [textbook/definition5.77.json](textbook/definition5.77.json)
+- Description: *Definition 5.77. Literal parameterization; keep the implementation witness explicit.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.77/source/definition` | `definition` | Source Definition 5.77, lines 237–239. Corrected traceability decision: Literal parameterization; keep the implementation witness explicit. | ✅ Faithful | `ImplementedSystemParameter` ([Mbse/WymoreImplementation.lean:46](Mbse/WymoreImplementation.lean#L46)) |
+| `5.77/lean/implementedSystems` | `definition` | Lean anchor `implementedSystems` for this corrected reading. Status: exact; fidelity: faithful. | ✅ Faithful | `ImplementedSystemParameter` ([Mbse/WymoreImplementation.lean:46](Mbse/WymoreImplementation.lean#L46))<br>`implementedSystems` ([Mbse/WymoreImplementation.lean:59](Mbse/WymoreImplementation.lean#L59)) |
+
+### `textbook/definition5.80` — Definition 5.80
+
+- Structured source file: [textbook/definition5.80.json](textbook/definition5.80.json)
+- Description: *Definition 5.80. Normalize inconsistent `Zs/Z2s` to one mode witness `Z2s`; isomorphic implementation adds `ISY`.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.80/source/definition` | `definition` | Source Definition 5.80, lines 242–245. Corrected traceability decision: Normalize inconsistent `Zs/Z2s` to one mode witness `Z2s`; isomorphic implementation adds `ISY`. | ✅ Faithful | `IsomorphicallyImplements` ([Mbse/WymoreImplementation.lean:69](Mbse/WymoreImplementation.lean#L69)) |
+| `5.80/lean/System_IsomorphicallyImplements` | `definition` | Lean anchor `System.IsomorphicallyImplements` for this corrected reading. Status: corrected. | ✅ Faithful | `IsomorphicallyImplements` ([Mbse/WymoreImplementation.lean:69](Mbse/WymoreImplementation.lean#L69)) |
+
+### `textbook/definition5.82` — Definition 5.82
+
+- Structured source file: [textbook/definition5.82.json](textbook/definition5.82.json)
+- Description: *Definition 5.82. Correct `HS<` to `HS` and normalize `Zs/Z2s`; exact implementation adds `COPY` and port maps.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.82/source/definition` | `definition` | Source Definition 5.82, lines 247–249. Corrected traceability decision: Correct `HS<` to `HS` and normalize `Zs/Z2s`; exact implementation adds `COPY` and port maps. | ✅ Faithful | `ExactlyImplements` ([Mbse/WymoreImplementation.lean:92](Mbse/WymoreImplementation.lean#L92)) |
+| `5.82/lean/System_ExactlyImplements` | `definition` | Lean anchor `System.ExactlyImplements` for this corrected reading. Status: corrected. | ✅ Faithful | `ExactlyImplements` ([Mbse/WymoreImplementation.lean:92](Mbse/WymoreImplementation.lean#L92)) |
+
+### `textbook/definition5.89` — Definition 5.89
+
+- Structured source file: [textbook/definition5.89.json](textbook/definition5.89.json)
+- Description: *Definition 5.89. Treat `HI^-1` as nonempty fibers and `CHI` as a choice function; correct `HI^-2` to preimage; define lifted behavior and restricted readout explicitly.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.89/source/definition` | `definition` | Source Definition 5.89, lines 252–267. Corrected traceability decision: Treat `HI^-1` as nonempty fibers and `CHI` as a choice function; correct `HI^-2` to preimage; define lifted behavior and restricted readout explicitly. | ✅ Faithful | `ModePreservesAutonomous` ([Mbse/WymoreImplementation.lean:130](Mbse/WymoreImplementation.lean#L130)) |
+| `5.89/lean/homomorphicInverseImageMode` | `definition` | Lean anchor `homomorphicInverseImageMode` for this corrected reading. Status: qualified. | ✅ Faithful | `ModePreservesAutonomous` ([Mbse/WymoreImplementation.lean:130](Mbse/WymoreImplementation.lean#L130))<br>`homomorphicInverseImageMode` ([Mbse/WymoreImplementation.lean:308](Mbse/WymoreImplementation.lean#L308)) |
+| `5.89/lean/hiisysmo` | `definition` | Lean anchor `hiisysmo` for this corrected reading. Status: qualified. | ✅ Faithful | `inverseImageSystemMode` ([Mbse/WymoreImplementation.lean:324](Mbse/WymoreImplementation.lean#L324)) |
 
 ### `textbook/definition_a1.155` — Function Specification (FNS)
 
@@ -991,6 +1236,208 @@
 | `4.8/proof/output_homomorphism` | `component` | HO = PJN(OPZ$) ∈ FNS(OZ&, ONTO, OZ$) by theorem A1.176. | ✅ Faithful | `csy_output_proj` ([Mbse/Homomorphism.lean:301](Mbse/Homomorphism.lean#L301)) |
 | `4.8/proof/next_state_consistency` | `component` | Next-state consistency follows from the CSY definition at 3.40. | ✅ Faithful | `csy_component_homomorphic_image` ([Mbse/Homomorphism.lean:356](Mbse/Homomorphism.lean#L356)) |
 | `4.8/proof/readout_consistency` | `component` | Readout consistency follows from the CSY definition at 3.40. | ✅ Faithful | `csy_component_homomorphic_image` ([Mbse/Homomorphism.lean:356](Mbse/Homomorphism.lean#L356)) |
+
+### `textbook/theorem5.119` — Theorem 5.119
+
+- Structured source file: [textbook/theorem5.119.json](textbook/theorem5.119.json)
+- Description: *Theorem 5.119. Hologenicity supplies the mode of the implementing resultant. Component port-preserving witnesses are a ComponentwiseElaboration, so the book's Theorem 4.55 (repository Theorem 4.56) supplies the homomorphism.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.119/source/theorem` | `theorem` | Theorem 5.119, composed from hologenicity and the resultant homomorphism theorem. | ✅ Faithful | `resultant_implements_of_componentwise` ([Mbse/WymoreModeCoupling.lean:1008](Mbse/WymoreModeCoupling.lean#L1008)) |
+| `5.119/lean/resultant_implements_of_componentwise` | `theorem` | Component implementations and hologenicity lift to an implementation of the resultants. | ✅ Faithful | `resultant_implements_of_componentwise` ([Mbse/WymoreModeCoupling.lean:1008](Mbse/WymoreModeCoupling.lean#L1008)) |
+
+### `textbook/theorem5.134` — Theorem 5.134
+
+- Structured source file: [textbook/theorem5.134.json](textbook/theorem5.134.json)
+- Description: *Theorem 5.134. Constant input, constant output, a common duration, and no port constriction make the induced resultant a system mode of the exhibitor resultant, derived from cfscr and Lemma 3.77.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.134/source/theorem` | `theorem` | Theorem 5.134, derived by simultaneous induction on resolved component inputs. | ✅ Faithful | `hologenic_of_constant_input_output_time` ([Mbse/WymoreModeCoupling.lean:684](Mbse/WymoreModeCoupling.lean#L684)) |
+| `5.134/lean/hologenic_of_constant_input_output_time` | `theorem` | The resultant of constant-input, constant-output, constant-time component modes is hologenic. | ✅ Faithful | `hologenic_of_constant_input_output_time` ([Mbse/WymoreModeCoupling.lean:684](Mbse/WymoreModeCoupling.lean#L684)) |
+| `5.134/proof/resolved_input` | `theorem` | Under the constant external input, the coupling function resolves each component input to that component's constant mode input on the half-open interval before d. | ✅ Faithful | `resolved_input_constant` ([Mbse/WymoreModeCoupling.lean:428](Mbse/WymoreModeCoupling.lean#L428)) |
+
+### `textbook/theorem5.138` — Theorem 5.138
+
+- Structured source file: [textbook/theorem5.138.json](textbook/theorem5.138.json)
+- Description: *Theorem 5.138. Time-zero coupling agreement and component inevitability make the constant external input a mode behavior; every external trajectory with that initial value reaches the mode successor. The swapped English subject is not a second claim.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.138/source/theorem` | `theorem` | Theorem 5.138, derived from the time-zero port calculation and component inevitability. | ✅ Faithful | `hologenic_of_inevitable_constantTime` ([Mbse/WymoreModeCoupling.lean:964](Mbse/WymoreModeCoupling.lean#L964)) |
+| `5.138/lean/hologenic_of_inevitable_constantTime` | `theorem` | Inevitable constant-time component modes induce an inevitable resultant mode of the same duration. | ✅ Faithful | `hologenic_of_inevitable_constantTime` ([Mbse/WymoreModeCoupling.lean:964](Mbse/WymoreModeCoupling.lean#L964)) |
+
+### `textbook/theorem5.139` — Open question 5.139
+
+- Structured source file: [textbook/theorem5.139.json](textbook/theorem5.139.json)
+- Description: *Open Question 5.139. Are there other or less stringent conditions for system-mode hologenicity? Easy weakenings of 5.134 are recorded; the question remains open.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.139/source/open_question` | `open_question` | Research question remains open. Probed: empty CSCR, duration one, source-only output; 5.138 already weakens under inevitability. Blocked: cascade-only, unequal durations, drop constant input without inevitability. | ⚠️ Stub/Partial | `chapter5_openQuestion_5_139` ([Mbse/WymoreModeCoupling.lean:1046](Mbse/WymoreModeCoupling.lean#L1046)) _(partial)_ |
+| `5.139/lean/chapter5_openQuestion_5_139` | `open_question` | Documentation marker plus recorded probes. | ⚠️ Stub/Partial | `chapter5_openQuestion_5_139` ([Mbse/WymoreModeCoupling.lean:1046](Mbse/WymoreModeCoupling.lean#L1046)) _(partial)_ |
+| `5.139/policy/remains_open` | `open_question` | Policy: remain open; do not invent axioms. | ⚠️ Stub/Partial | `chapter5_openQuestion_5_139` ([Mbse/WymoreModeCoupling.lean:1046](Mbse/WymoreModeCoupling.lean#L1046)) _(partial)_ |
+
+### `textbook/theorem5.20` — Theorem 5.20
+
+- Structured source file: [textbook/theorem5.20.json](textbook/theorem5.20.json)
+- Description: *Theorem 5.20. Read `NZ1 ⊆ NZ2` as agreement/restriction on the smaller domain. Implemented as a necessary direction plus a corrected existential converse.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.20/source/theorem` | `theorem` | Source Theorem 5.20, lines 66–73. Corrected traceability decision: Read `NZ1 ⊆ NZ2` as agreement/restriction on the smaller domain. Implemented as a necessary direction plus a corrected existential converse. | ✅ Faithful | `primary_preserves_transition` ([Mbse/WymoreSystemModes.lean:170](Mbse/WymoreSystemModes.lean#L170)) |
+| `5.20/lean/primary_iff_componentwise_subset` | `theorem` | Lean anchor `primary_iff_componentwise_subset` for this corrected reading. Status: corrected. | ✅ Faithful | `primary_preserves_transition` ([Mbse/WymoreSystemModes.lean:170](Mbse/WymoreSystemModes.lean#L170))<br>`primaryModeOfMaps` ([Mbse/WymoreSystemModes.lean:224](Mbse/WymoreSystemModes.lean#L224)) |
+
+### `textbook/theorem5.36` — Statement 5.36
+
+- Structured source file: [textbook/theorem5.36.json](textbook/theorem5.36.json)
+- Description: *Statement 5.36 is informal prose: transient and absorbing modes are “always found in pairs.” It is not a theorem. The definitions still imply that one mode cannot be both.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.36/source/statement` | `statement` | Informal prose, not a theorem. The related fact that one mode is not both transient and absorbing is proved separately. | ⚠️ Stub/Partial | `transient_not_absorbing` ([Mbse/WymoreSystemModes.lean:358](Mbse/WymoreSystemModes.lean#L358)) _(partial)_ |
+| `5.36/lean/transient_not_absorbing` | `theorem` | One mode cannot be both transient and absorbing. This is not a counterexample to Statement 5.36. | ⚠️ Stub/Partial | `transient_not_absorbing` ([Mbse/WymoreSystemModes.lean:358](Mbse/WymoreSystemModes.lean#L358)) _(partial)_ |
+
+### `textbook/theorem5.37` — Statement 5.37
+
+- Structured source file: [textbook/theorem5.37.json](textbook/theorem5.37.json)
+- Description: *Statement 5.37. Formalize the defensible claim: a proper reachable mode generated by nonempty `S` is absorbing, using reachability closure and inherited full inputs.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.37/source/statement` | `statement` | Source Statement 5.37, lines 123. Corrected traceability decision: Formalize the defensible claim: a proper reachable mode generated by nonempty `S` is absorbing, using reachability closure and inherited full inputs. | ✅ Faithful | `proper_reachableMode_absorbing` ([Mbse/WymoreSystemModes.lean:315](Mbse/WymoreSystemModes.lean#L315)) |
+| `5.37/lean/reachableSystemMode_isAbsorbing` | `theorem` | Lean anchor `reachableSystemMode_isAbsorbing` for this corrected reading. Status: corrected. | ✅ Faithful | `proper_reachableMode_absorbing` ([Mbse/WymoreSystemModes.lean:315](Mbse/WymoreSystemModes.lean#L315)) |
+
+### `textbook/theorem5.44` — Theorem 5.44
+
+- Structured source file: [textbook/theorem5.44.json](textbook/theorem5.44.json)
+- Description: *Theorem 5.44. Correct malformed timing hypothesis to `(k+1)*d ≤ t`; use `k` as a nonnegative mode-step index; constant input on `[k*d,(k+1)*d)`.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.44/source/theorem` | `theorem` | Source Theorem 5.44, lines 135–143. Corrected traceability decision: Correct malformed timing hypothesis to `(k+1)*d ≤ t`; use `k` as a nonnegative mode-step index; constant input on `[k*d,(k+1)*d)`. | ✅ Faithful | `manifestation_next_of_constant` ([Mbse/WymoreSystemModes.lean:377](Mbse/WymoreSystemModes.lean#L377)) |
+| `5.44/lean/manifest_next_of_constant_input_time` | `theorem` | Lean anchor `manifest_next_of_constant_input_time` for this corrected reading. Status: corrected. | ✅ Faithful | `manifestation_next_of_constant` ([Mbse/WymoreSystemModes.lean:377](Mbse/WymoreSystemModes.lean#L377)) |
+
+### `textbook/theorem5.47` — Theorem 5.47
+
+- Structured source file: [textbook/theorem5.47.json](textbook/theorem5.47.json)
+- Description: *Theorem 5.47. Correct “and every Z2 is in Z1” to “and Z2 is in Z1 at every `r`”; use the duration attached to the manifested state/input and require the endpoint to be within the experiment.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.47/source/theorem` | `theorem` | Source Theorem 5.47, lines 154–159. Corrected traceability decision: Correct “and every Z2 is in Z1” to “and Z2 is in Z1 at every `r`”; use the duration attached to the manifested state/input and require the endpoint to be within the experiment. | ✅ Faithful | `inevitable_next_manifestation_total` ([Mbse/WymoreSystemModes.lean:411](Mbse/WymoreSystemModes.lean#L411)) |
+| `5.47/lean/manifest_at_behavior_deadline` | `theorem` | Lean anchor `manifest_at_behavior_deadline` for this corrected reading. Status: qualified. | ✅ Faithful | `inevitable_next_manifestation_total` ([Mbse/WymoreSystemModes.lean:411](Mbse/WymoreSystemModes.lean#L411)) |
+| `5.47/lean/inMode_until_behavior_deadline` | `theorem` | Lean anchor `inMode_until_behavior_deadline` for this corrected reading. Status: qualified. | ✅ Faithful | `inevitable_inMode_interval` ([Mbse/WymoreSystemModes.lean:429](Mbse/WymoreSystemModes.lean#L429)) |
+
+### `textbook/theorem5.48` — Statement 5.48
+
+- Structured source file: [textbook/theorem5.48.json](textbook/theorem5.48.json)
+- Description: *Statement 5.48. Preserve existential reading (“may be infinitely many”), not a universal infinitude claim; formalize non-uniqueness and an infinite-family example.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.48/source/statement` | `statement` | Source Statement 5.48, lines 162. Corrected traceability decision: Preserve existential reading (“may be infinitely many”), not a universal infinitude claim; formalize non-uniqueness and an infinite-family example. | ✅ Faithful | `stutterModeAt` ([Mbse/WymoreSystemModes.lean:458](Mbse/WymoreSystemModes.lean#L458)) |
+| `5.48/lean/behaviorFunction_not_unique_example` | `theorem` | Lean anchor `behaviorFunction_not_unique_example` for this corrected reading. Status: corrected. | ✅ Faithful | `stutterModeAt` ([Mbse/WymoreSystemModes.lean:458](Mbse/WymoreSystemModes.lean#L458)) |
+| `5.48/lean/behaviorFunction_infinite_family_example` | `theorem` | Lean anchor `behaviorFunction_infinite_family_example` for this corrected reading. Status: corrected. | ✅ Faithful | `stutterModeAt_injective` ([Mbse/WymoreSystemModes.lean:477](Mbse/WymoreSystemModes.lean#L477)) |
+
+### `textbook/theorem5.54` — Theorem 5.54
+
+- Structured source file: [textbook/theorem5.54.json](textbook/theorem5.54.json)
+- Description: *Theorem 5.54. A product-structured port inclusion is an equivalence of port indices. Fin 2 is not equivalent to Fin 3, so a two-port product is not a subset of a three-port product. Equal counts mean the portwise inclusions of paragraph 5.59.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.54/source/theorem` | `theorem` | Theorem 5.54 and paragraph 5.55: unequal finite port-index sets are not equivalent. | ✅ Faithful | `theorem5_54_fin2_not_equiv_fin3` ([Mbse/WymoreSystemModes.lean:561](Mbse/WymoreSystemModes.lean#L561)) |
+| `5.54/lean/systemMode_inputPort_card` | `theorem` | There is no equivalence Fin 2 ≃ Fin 3. | ✅ Faithful | `theorem5_54_fin2_not_equiv_fin3` ([Mbse/WymoreSystemModes.lean:561](Mbse/WymoreSystemModes.lean#L561)) |
+| `5.54/lean/systemMode_outputPort_card` | `theorem` | The same port-index obstruction applies to output ports. | ✅ Faithful | `theorem5_54_fin2_not_equiv_fin3` ([Mbse/WymoreSystemModes.lean:561](Mbse/WymoreSystemModes.lean#L561)) |
+| `5.54/lean/systemMode_port_subset` | `theorem` | Paragraph 5.59: equal port counts mean PreservesPorts along the identity equivalence. | ✅ Faithful | `paragraph5_59_portwise` ([Mbse/WymoreSystemModes.lean:575](Mbse/WymoreSystemModes.lean#L575)) |
+
+### `textbook/theorem5.61` — Theorem 5.61
+
+- Structured source file: [textbook/theorem5.61.json](textbook/theorem5.61.json)
+- Description: *Theorem 5.61. Repair `K/k` and the malformed set comprehension: `f2` is the block-stuttering lift of `f1`, constant on each length-`d` block. State/output equalities are at `t2=d*t1`.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.61/source/theorem` | `theorem` | Source Theorem 5.61, lines 184–191. Corrected traceability decision: Repair `K/k` and the malformed set comprehension: `f2` is the block-stuttering lift of `f1`, constant on each length-`d` block. State/output equalities are at `t2=d*t1`. | ✅ Faithful | `expandConstantInput` ([Mbse/WymoreSystemModes.lean:655](Mbse/WymoreSystemModes.lean#L655)) |
+| `5.61/lean/liftExperiment_constantInputTime` | `theorem` | Lean anchor `liftExperiment_constantInputTime` for this corrected reading. Status: corrected. | ✅ Faithful | `expandConstantInput` ([Mbse/WymoreSystemModes.lean:655](Mbse/WymoreSystemModes.lean#L655)) |
+| `5.61/lean/liftExperiment_constantInputTime_state` | `theorem` | Lean anchor `liftExperiment_constantInputTime_state` for this corrected reading. Status: corrected. | ✅ Faithful | `constant_compiled_state` ([Mbse/WymoreSystemModes.lean:664](Mbse/WymoreSystemModes.lean#L664)) |
+| `5.61/lean/liftExperiment_constantInputTime_output` | `theorem` | Lean anchor `liftExperiment_constantInputTime_output` for this corrected reading. Status: corrected. | ✅ Faithful | `constant_compiled_output` ([Mbse/WymoreSystemModes.lean:710](Mbse/WymoreSystemModes.lean#L710)) |
+
+### `textbook/theorem5.62` — Theorem 5.62
+
+- Structured source file: [textbook/theorem5.62.json](textbook/theorem5.62.json)
+- Description: *Theorem 5.62. Replace self-referential comprehension by finite concatenation of SMBF trajectory segments; duration is the sum of segment times (zero for `t1=0`).*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.62/source/theorem` | `theorem` | Source Theorem 5.62, lines 194–207. Corrected traceability decision: Replace self-referential comprehension by finite concatenation of SMBF trajectory segments; duration is the sum of segment times (zero for `t1=0`). | ✅ Faithful | `compiledInput` ([Mbse/WymoreSystemModes.lean:596](Mbse/WymoreSystemModes.lean#L596)) |
+| `5.62/lean/liftExperiment_systemMode` | `theorem` | Lean anchor `liftExperiment_systemMode` for this corrected reading. Status: corrected. | ✅ Faithful | `compiledInput` ([Mbse/WymoreSystemModes.lean:596](Mbse/WymoreSystemModes.lean#L596)) |
+| `5.62/lean/liftExperiment_systemMode_state` | `theorem` | Lean anchor `liftExperiment_systemMode_state` for this corrected reading. Status: corrected. | ✅ Faithful | `compiled_state` ([Mbse/WymoreSystemModes.lean:627](Mbse/WymoreSystemModes.lean#L627)) |
+| `5.62/lean/liftExperiment_systemMode_output` | `theorem` | Lean anchor `liftExperiment_systemMode_output` for this corrected reading. Status: corrected. | ✅ Faithful | `compiled_output` ([Mbse/WymoreSystemModes.lean:646](Mbse/WymoreSystemModes.lean#L646)) |
+
+### `textbook/theorem5.67` — Theorem 5.67
+
+- Structured source file: [textbook/theorem5.67.json](textbook/theorem5.67.json)
+- Description: *Theorem 5.67. Composition must concatenate/retime the outer behavior segments; use a constructed composite SMBF, not bare relational transitivity.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.67/source/theorem` | `theorem` | Source Theorem 5.67, lines 228. Corrected traceability decision: Composition must concatenate/retime the outer behavior segments; use a constructed composite SMBF, not bare relational transitivity. | ✅ Faithful | `SystemMode` ([Mbse/WymoreSystemModes.lean:788](Mbse/WymoreSystemModes.lean#L788)) |
+| `5.67/lean/SystemMode_trans` | `theorem` | Lean anchor `SystemMode.trans` for this corrected reading. Status: exact; fidelity: faithful. | ✅ Faithful | `SystemMode` ([Mbse/WymoreSystemModes.lean:788](Mbse/WymoreSystemModes.lean#L788)) |
+
+### `textbook/theorem5.92` — Theorem 5.92
+
+- Structured source file: [textbook/theorem5.92.json](textbook/theorem5.92.json)
+- Description: *Theorem 5.92. Formalize closure/typing of the parameterization; no stronger mode theorem is folded into this item.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.92/source/theorem` | `theorem` | Source Theorem 5.92, lines 270. Corrected traceability decision: Formalize closure/typing of the parameterization; no stronger mode theorem is folded into this item. | ✅ Faithful | `hiisysmo` ([Mbse/WymoreImplementation.lean:432](Mbse/WymoreImplementation.lean#L432)) |
+| `5.92/lean/hiisysmo_isSystemParameterization` | `theorem` | Lean anchor `hiisysmo_isSystemParameterization` for this corrected reading. Status: qualified. | ✅ Faithful | `hiisysmo` ([Mbse/WymoreImplementation.lean:432](Mbse/WymoreImplementation.lean#L432)) |
+
+### `textbook/theorem5.93` — Theorem 5.93
+
+- Structured source file: [textbook/theorem5.93.json](textbook/theorem5.93.json)
+- Description: *Theorem 5.93. Use the lifted SMBF from 5.89 and prove equality with the `SYSMO` construction.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.93/source/theorem` | `theorem` | Source Theorem 5.93, lines 273–277. Corrected traceability decision: Use the lifted SMBF from 5.89 and prove equality with the `SYSMO` construction. | ✅ Faithful | `homomorphicInverseImage_isSystemMode` ([Mbse/WymoreImplementation.lean:455](Mbse/WymoreImplementation.lean#L455)) |
+| `5.93/lean/homomorphicInverseImage_isSystemMode` | `theorem` | Lean anchor `homomorphicInverseImage_isSystemMode` for this corrected reading. Status: qualified. | ✅ Faithful | `homomorphicInverseImage_isSystemMode` ([Mbse/WymoreImplementation.lean:455](Mbse/WymoreImplementation.lean#L455)) |
+
+### `textbook/theorem5.95` — Theorem 5.95
+
+- Structured source file: [textbook/theorem5.95.json](textbook/theorem5.95.json)
+- Description: *Theorem 5.95. Restrict all three homomorphisms to inverse-image mode carriers; prove the original mode is their homomorphic image.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.95/source/theorem` | `theorem` | Source Theorem 5.95, lines 281–285. Corrected traceability decision: Restrict all three homomorphisms to inverse-image mode carriers; prove the original mode is their homomorphic image. | ✅ Faithful | `mode_isHomomorphicImage_of_inverseImage` ([Mbse/WymoreImplementation.lean:469](Mbse/WymoreImplementation.lean#L469)) |
+| `5.95/lean/mode_isHomomorphicImage_of_inverseImage` | `theorem` | Lean anchor `mode_isHomomorphicImage_of_inverseImage` for this corrected reading. Status: qualified. | ✅ Faithful | `inverseImageHom` ([Mbse/WymoreImplementation.lean:366](Mbse/WymoreImplementation.lean#L366))<br>`mode_isHomomorphicImage_of_inverseImage` ([Mbse/WymoreImplementation.lean:469](Mbse/WymoreImplementation.lean#L469)) |
+
+### `textbook/theorem5.97` — Theorem 5.97
+
+- Structured source file: [textbook/theorem5.97.json](textbook/theorem5.97.json)
+- Description: *Theorem 5.97. Compose implementation through a chosen inverse-image mode; make dependence on `SMBF2s` and `CHI` explicit.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.97/source/theorem` | `theorem` | Source Theorem 5.97, lines 289–298. Corrected traceability decision: Compose implementation through a chosen inverse-image mode; make dependence on `SMBF2s` and `CHI` explicit. | ✅ Faithful | `Implements` ([Mbse/WymoreImplementation.lean:484](Mbse/WymoreImplementation.lean#L484)) |
+| `5.97/lean/implements_trans` | `theorem` | Lean anchor `implements_trans` for this corrected reading. Status: qualified. | ✅ Faithful | `Implements` ([Mbse/WymoreImplementation.lean:484](Mbse/WymoreImplementation.lean#L484)) |
+
+### `textbook/theorem5.99` — Theorem 5.99
+
+- Structured source file: [textbook/theorem5.99.json](textbook/theorem5.99.json)
+- Description: *Theorem 5.99. Correct `\cric` to pointwise chosen lift, use `x2s` (not `x1`) in mode trajectories, repair `t1 0 1` to `t1-1`, and define exhibitor input by segment concatenation as in 5.62.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.99/source/theorem` | `theorem` | Source Theorem 5.99, lines 302–323. Corrected traceability decision: Correct `\cric` to pointwise chosen lift, use `x2s` (not `x1`) in mode trajectories, repair `t1 0 1` to `t1-1`, and define exhibitor input by segment concatenation as in 5.62. | ✅ Faithful | `implementedExperiment_lift` ([Mbse/WymoreImplementation.lean:549](Mbse/WymoreImplementation.lean#L549)) |
+| `5.99/lean/implementedExperiment_lift` | `theorem` | Lean anchor `implementedExperiment_lift` for this corrected reading. Status: corrected. | ✅ Faithful | `implementedExperiment_lift` ([Mbse/WymoreImplementation.lean:549](Mbse/WymoreImplementation.lean#L549)) |
+| `5.99/lean/implementedExperiment_state` | `theorem` | Lean anchor `implementedExperiment_state` for this corrected reading. Status: corrected. | ✅ Faithful | `implementedExperiment_state` ([Mbse/WymoreImplementation.lean:565](Mbse/WymoreImplementation.lean#L565)) |
+| `5.99/lean/implementedExperiment_output` | `theorem` | Lean anchor `implementedExperiment_output` for this corrected reading. Status: corrected. | ✅ Faithful | `implementedExperiment_output` ([Mbse/WymoreImplementation.lean:601](Mbse/WymoreImplementation.lean#L601)) |
 
 ### `textbook/theorem_a1.163` — Equality of Functions (Extensionality)
 
@@ -1572,19 +2019,72 @@ Curated exercise solutions live in [`Mbse/TextbookExercises/`](Mbse/TextbookExer
 | `4.86/proof/isomorphism_witness` | `proof` | Z@$ = ISY(Z@, HS, HI, HO): HS, HI and HO are bijections that preserve next state and readout. | ✅ Faithful | `flatIsomorphismWitness` ([Mbse/NestedCoupling.lean:672](Mbse/NestedCoupling.lean#L672)) |
 | `4.86/theorem/nested_coupling_isomorphic` | `theorem` | Z@ = ISY(Z@$, HS, HI, HO) where Z@$ = RSY(SCR$). | ✅ Faithful | `ex4_86_nested_coupling_isomorphic` ([Mbse/NestedCoupling.lean:714](Mbse/NestedCoupling.lean#L714))<br>`ex4_86_nested_coupling_isomorphic` ([Mbse/TextbookExercises/Ch04.lean:406](Mbse/TextbookExercises/Ch04.lean#L406)) |
 
-- Exercise kinds: **4** witness, **40** theorem-proof
+### `textbook/exercise5.141` — Exercise 5.141
+
+- Structured source file: [textbook/exercise5.141.json](textbook/exercise5.141.json)
+- Description: *Exercise 5.141. The literal claim that every subsystem is a system mode is false. A fully checked finite counterexample: the resultant of a lone revealing component is a subsystem of the cascade that hides that component's output, but it is not a system mode because the exhibitor readout is constant.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.141/source/exercise` | `exercise` | Source Exercise 5.141, lines 416. The universal claim is refuted unconditionally: `IsSubsystemOf loneSystem pairSystem` and `¬ IsSystemMode loneSystem pairSystem`. | ✅ Faithful | `subsystem_isSystemMode_or_counterexample` ([Mbse/TextbookExercises/Ch05.lean:265](Mbse/TextbookExercises/Ch05.lean#L265)) |
+| `5.141/plan/subsystem_isSystemMode_or_counterexample` | `exercise` | Lean theorem `subsystem_isSystemMode_or_counterexample`. Status: counterexample; fidelity: faithful. No extra hypotheses. | ✅ Faithful | `subsystem_isSystemMode_or_counterexample` ([Mbse/TextbookExercises/Ch05.lean:265](Mbse/TextbookExercises/Ch05.lean#L265)) |
+| `5.141/counterexample/literal_claim` | `counterexample` | Unconditional finite counterexample: a subsystem whose readout separates two states cannot be a mode of a cascade whose external readout is constant. | ✅ Faithful | `subsystem_isSystemMode_or_counterexample` ([Mbse/TextbookExercises/Ch05.lean:265](Mbse/TextbookExercises/Ch05.lean#L265)) |
+
+### `textbook/exercise5.142` — Exercise 5.142
+
+- Structured source file: [textbook/exercise5.142.json](textbook/exercise5.142.json)
+- Description: *Exercise 5.142. The claim is false. Unconditional answer: a two-state sampled mode of a three-cycle is a system mode, and no injective subrecipe with matching component cards can realize resultant cards 2 and 3. Conditional packaging: ¬ IsSubsystemOf under DiscreteSystemStateReflection.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.142/source/exercise` | `exercise` | Unconditional counterexample shape: IsSystemMode plus recipe cardinality obstruction 2 ∤ 3. | ⚠️ Stub/Partial | `exercise5_142_unconditional` ([Mbse/TextbookExercises/Ch05.lean:402](Mbse/TextbookExercises/Ch05.lean#L402)) _(partial)_ |
+| `5.142/plan/exercise5_142_unconditional` | `exercise` | Primary unconditional answer to Exercise 5.142. | ⚠️ Stub/Partial | `exercise5_142_unconditional` ([Mbse/TextbookExercises/Ch05.lean:402](Mbse/TextbookExercises/Ch05.lean#L402)) _(partial)_ |
+| `5.142/plan/systemMode_not_subsystem_counterexample` | `exercise` | Conditional ¬ IsSubsystemOf under DiscreteSystemStateReflection. | ⚠️ Stub/Partial | `systemMode_not_subsystem_counterexample` ([Mbse/TextbookExercises/Ch05.lean:423](Mbse/TextbookExercises/Ch05.lean#L423)) _(partial)_ |
+| `5.142/counterexample/literal_claim` | `counterexample` | Full ¬ IsSubsystemOf needs DiscreteSystemStateReflection; unconditional content is exercise5_142_unconditional. | ⚠️ Stub/Partial | `systemMode_not_subsystem_counterexample` ([Mbse/TextbookExercises/Ch05.lean:423](Mbse/TextbookExercises/Ch05.lean#L423)) _(partial)_ |
+
+### `textbook/exercise5.146` — Exercise 5.146
+
+- Structured source file: [textbook/exercise5.146.json](textbook/exercise5.146.json)
+- Description: *Exercise 5.146. Strongest reading is provable: from `T^d=T` under constant input, derive `T^(k*(d-1)+1)=T`; retain `k≥1`.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.146/source/exercise` | `exercise` | Source Exercise 5.146, lines 420. Corrected traceability decision: Strongest reading is provable: from `T^d=T` under constant input, derive `T^(k*(d-1)+1)=T`; retain `k≥1`. | ✅ Faithful | `selfMode_constantTime_iterate` ([Mbse/TextbookExercises/Ch05.lean:458](Mbse/TextbookExercises/Ch05.lean#L458)) |
+| `5.146/plan/selfMode_constantTime_iterate` | `exercise` | Lean anchor `selfMode_constantTime_iterate` for this corrected reading. Status: solved; fidelity: faithful. | ✅ Faithful | `selfMode_constantTime_iterate` ([Mbse/TextbookExercises/Ch05.lean:458](Mbse/TextbookExercises/Ch05.lean#L458)) |
+
+### `textbook/exercise5.147` — Exercise 5.147
+
+- Structured source file: [textbook/exercise5.147.json](textbook/exercise5.147.json)
+- Description: *Exercise 5.147. m mode steps of a constant-time mode take d * m exhibitor steps.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.147/source/exercise` | `exercise` | Exercise 5.147: the state after m constant mode steps is the exhibitor state after d * m steps. | ✅ Faithful | `constantMode_state_at_mul` ([Mbse/TextbookExercises/Ch05.lean:560](Mbse/TextbookExercises/Ch05.lean#L560)) |
+| `5.147/plan/constantMode_state_at_mul` | `exercise` | Proved multiplication law constantMode_state_at_mul. | ✅ Faithful | `constantMode_state_at_mul` ([Mbse/TextbookExercises/Ch05.lean:560](Mbse/TextbookExercises/Ch05.lean#L560)) |
+
+### `textbook/exercise5.148` — Exercise 5.148
+
+- Structured source file: [textbook/exercise5.148.json](textbook/exercise5.148.json)
+- Description: *Exercise 5.148. Correct `timex` to `×`, bind `t`, and interpret `CNSp` as the appropriately typed constant trajectory; prove by induction using accumulated duration `H`.*
+
+| Element ID | Type | Textbook Text | Status | Linked Lean Elements |
+|------------|------|---------------|--------|----------------------|
+| `5.148/source/exercise` | `exercise` | Source Exercise 5.148, lines 424–428. Corrected traceability decision: Correct `timex` to `×`, bind `t`, and interpret `CNSp` as the appropriately typed constant trajectory; prove by induction using accumulated duration `H`. | ✅ Faithful | `variableTime_constantInput_state_at_accumulatedTime` ([Mbse/TextbookExercises/Ch05.lean:610](Mbse/TextbookExercises/Ch05.lean#L610)) |
+| `5.148/plan/variableTime_constantInput_state_at_accumulatedTime` | `exercise` | Lean anchor `variableTime_constantInput_state_at_accumulatedTime` for this corrected reading. Status: corrected. | ✅ Faithful | `variableTime_constantInput_state_at_accumulatedTime` ([Mbse/TextbookExercises/Ch05.lean:610](Mbse/TextbookExercises/Ch05.lean#L610)) |
+
+- Exercise kinds: **9** witness, **40** theorem-proof
 
 ## 3. Completeness & Quality Summary
 
-- **Total Structured JSON Entries**: 142 (98 definitions/theorems, 44 exercises)
-- **Definition/Theorem Elements**: 287 (285 faithful)
-- **Exercise Task Elements**: 140 (140 faithful)
-- **Total Individual Requirements/Elements**: 427
-- **Linked Elements (any annotation)**: 425 (425/427)
-- **Faithful Elements (excludes stub/partial)**: 425 (425/427)
-- **Stub/Partial Elements**: 0
-- **Annotation Coverage Rate**: **99.5%**
-- **Faithful Coverage Rate**: **99.5%**
+- **Total Structured JSON Entries**: 189 (140 definitions/theorems, 49 exercises)
+- **Definition/Theorem Elements**: 398 (391 faithful)
+- **Exercise Task Elements**: 153 (149 faithful)
+- **Total Individual Requirements/Elements**: 551
+- **Linked Elements (any annotation)**: 549 (549/551)
+- **Faithful Elements (excludes stub/partial)**: 540 (540/551)
+- **Stub/Partial Elements**: 9
+- **Annotation Coverage Rate**: **99.6%**
+- **Faithful Coverage Rate**: **98.0%**
 
 > Note: *Annotation coverage* counts any tagged link, including placeholders. *Faithful coverage* is the trustworthy figure: it excludes links explicitly marked `|stub` or `|partial`, which indicate the Lean artifact only partially captures (or stands in for) the textbook requirement.
 

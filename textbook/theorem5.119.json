@@ -1,0 +1,31 @@
+{
+  "id": "5.119",
+  "kind": "traceability",
+  "name": "Theorem 5.119",
+  "chapter": 5,
+  "description": "Theorem 5.119. Hologenicity supplies the mode of the implementing resultant. Component port-preserving witnesses are a ComponentwiseElaboration, so the book's Theorem 4.55 (repository Theorem 4.56) supplies the homomorphism.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "339–369"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.119/source/theorem",
+      "type": "theorem",
+      "text": "Theorem 5.119, composed from hologenicity and the resultant homomorphism theorem.",
+      "lean_anchor": "resultant_implements_of_componentwise",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.119/lean/resultant_implements_of_componentwise",
+      "type": "theorem",
+      "text": "Component implementations and hologenicity lift to an implementation of the resultants.",
+      "lean_anchor": "resultant_implements_of_componentwise",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

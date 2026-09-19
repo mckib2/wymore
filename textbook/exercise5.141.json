@@ -1,0 +1,39 @@
+{
+  "id": "5.141",
+  "kind": "exercise",
+  "name": "Exercise 5.141",
+  "chapter": 5,
+  "description": "Exercise 5.141. The literal claim that every subsystem is a system mode is false. A fully checked finite counterexample: the resultant of a lone revealing component is a subsystem of the cascade that hides that component's output, but it is not a system mode because the exhibitor readout is constant.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "416"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.141/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.141, lines 416. The universal claim is refuted unconditionally: `IsSubsystemOf loneSystem pairSystem` and `¬ IsSystemMode loneSystem pairSystem`.",
+      "lean_anchor": "subsystem_isSystemMode_or_counterexample",
+      "status": "counterexample",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.141/plan/subsystem_isSystemMode_or_counterexample",
+      "type": "exercise",
+      "text": "Lean theorem `subsystem_isSystemMode_or_counterexample`. Status: counterexample; fidelity: faithful. No extra hypotheses.",
+      "lean_anchor": "subsystem_isSystemMode_or_counterexample",
+      "status": "counterexample",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.141/counterexample/literal_claim",
+      "type": "counterexample",
+      "text": "Unconditional finite counterexample: a subsystem whose readout separates two states cannot be a mode of a cascade whose external readout is constant.",
+      "status": "counterexample",
+      "lean_anchor": "subsystem_isSystemMode_or_counterexample",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "counterexample"
+}

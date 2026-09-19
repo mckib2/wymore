@@ -1,0 +1,39 @@
+{
+  "id": "5.49",
+  "kind": "traceability",
+  "name": "Definition 5.49",
+  "chapter": 5,
+  "description": "Definition 5.49. Interpret port projection pointwise; retain half-open interval so transition endpoint may change output.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "164\u2013167"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.49/source/definition",
+      "type": "definition",
+      "text": "Source Definition 5.49, lines 164\u2013167. Corrected traceability decision: Interpret port projection pointwise; retain half-open interval so transition endpoint may change output.",
+      "lean_anchor": "HasConstantOutputOn",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.49/lean/SystemMode_HasConstantOutputOn",
+      "type": "definition",
+      "text": "Lean anchor `SystemMode.HasConstantOutputOn` for this corrected reading. Status: corrected.",
+      "lean_anchor": "HasConstantOutputOn",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.49/lean/SystemMode_HasConstantOutput",
+      "type": "definition",
+      "text": "Lean anchor `SystemMode.HasConstantOutput` for this corrected reading. Status: corrected.",
+      "lean_anchor": "HasConstantOutput",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

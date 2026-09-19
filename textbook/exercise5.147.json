@@ -1,0 +1,31 @@
+{
+  "id": "5.147",
+  "kind": "exercise",
+  "name": "Exercise 5.147",
+  "chapter": 5,
+  "description": "Exercise 5.147. m mode steps of a constant-time mode take d * m exhibitor steps.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "422"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.147/source/exercise",
+      "type": "exercise",
+      "text": "Exercise 5.147: the state after m constant mode steps is the exhibitor state after d * m steps.",
+      "lean_anchor": "constantMode_state_at_mul",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.147/plan/constantMode_state_at_mul",
+      "type": "exercise",
+      "text": "Proved multiplication law constantMode_state_at_mul.",
+      "lean_anchor": "constantMode_state_at_mul",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

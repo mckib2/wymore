@@ -1,0 +1,31 @@
+{
+  "id": "5.95",
+  "kind": "traceability",
+  "name": "Theorem 5.95",
+  "chapter": 5,
+  "description": "Theorem 5.95. Restrict all three homomorphisms to inverse-image mode carriers; prove the original mode is their homomorphic image.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "281\u2013285"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.95/source/theorem",
+      "type": "theorem",
+      "text": "Source Theorem 5.95, lines 281\u2013285. Corrected traceability decision: Restrict all three homomorphisms to inverse-image mode carriers; prove the original mode is their homomorphic image.",
+      "lean_anchor": "mode_isHomomorphicImage_of_inverseImage",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.95/lean/mode_isHomomorphicImage_of_inverseImage",
+      "type": "theorem",
+      "text": "Lean anchor `mode_isHomomorphicImage_of_inverseImage` for this corrected reading. Status: qualified.",
+      "lean_anchor": "mode_isHomomorphicImage_of_inverseImage",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

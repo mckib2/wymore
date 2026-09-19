@@ -1,0 +1,31 @@
+{
+  "id": "5.82",
+  "kind": "traceability",
+  "name": "Definition 5.82",
+  "chapter": 5,
+  "description": "Definition 5.82. Correct `HS<` to `HS` and normalize `Zs/Z2s`; exact implementation adds `COPY` and port maps.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "247\u2013249"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.82/source/definition",
+      "type": "definition",
+      "text": "Source Definition 5.82, lines 247\u2013249. Corrected traceability decision: Correct `HS<` to `HS` and normalize `Zs/Z2s`; exact implementation adds `COPY` and port maps.",
+      "lean_anchor": "ExactlyImplements",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.82/lean/System_ExactlyImplements",
+      "type": "definition",
+      "text": "Lean anchor `System.ExactlyImplements` for this corrected reading. Status: corrected.",
+      "lean_anchor": "ExactlyImplements",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

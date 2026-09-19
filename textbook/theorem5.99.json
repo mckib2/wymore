@@ -1,0 +1,47 @@
+{
+  "id": "5.99",
+  "kind": "traceability",
+  "name": "Theorem 5.99",
+  "chapter": 5,
+  "description": "Theorem 5.99. Correct `\\cric` to pointwise chosen lift, use `x2s` (not `x1`) in mode trajectories, repair `t1 0 1` to `t1-1`, and define exhibitor input by segment concatenation as in 5.62.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "302\u2013323"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.99/source/theorem",
+      "type": "theorem",
+      "text": "Source Theorem 5.99, lines 302\u2013323. Corrected traceability decision: Correct `\\cric` to pointwise chosen lift, use `x2s` (not `x1`) in mode trajectories, repair `t1 0 1` to `t1-1`, and define exhibitor input by segment concatenation as in 5.62.",
+      "lean_anchor": "implementedExperiment_lift",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.99/lean/implementedExperiment_lift",
+      "type": "theorem",
+      "text": "Lean anchor `implementedExperiment_lift` for this corrected reading. Status: corrected.",
+      "lean_anchor": "implementedExperiment_lift",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.99/lean/implementedExperiment_state",
+      "type": "theorem",
+      "text": "Lean anchor `implementedExperiment_state` for this corrected reading. Status: corrected.",
+      "lean_anchor": "implementedExperiment_state",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.99/lean/implementedExperiment_output",
+      "type": "theorem",
+      "text": "Lean anchor `implementedExperiment_output` for this corrected reading. Status: corrected.",
+      "lean_anchor": "implementedExperiment_output",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

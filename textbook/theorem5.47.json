@@ -1,0 +1,39 @@
+{
+  "id": "5.47",
+  "kind": "traceability",
+  "name": "Theorem 5.47",
+  "chapter": 5,
+  "description": "Theorem 5.47. Correct \u201cand every Z2 is in Z1\u201d to \u201cand Z2 is in Z1 at every `r`\u201d; use the duration attached to the manifested state/input and require the endpoint to be within the experiment.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "154\u2013159"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.47/source/theorem",
+      "type": "theorem",
+      "text": "Source Theorem 5.47, lines 154\u2013159. Corrected traceability decision: Correct \u201cand every Z2 is in Z1\u201d to \u201cand Z2 is in Z1 at every `r`\u201d; use the duration attached to the manifested state/input and require the endpoint to be within the experiment.",
+      "lean_anchor": "inevitable_next_manifestation_total",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.47/lean/manifest_at_behavior_deadline",
+      "type": "theorem",
+      "text": "Lean anchor `manifest_at_behavior_deadline` for this corrected reading. Status: qualified.",
+      "lean_anchor": "inevitable_next_manifestation_total",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.47/lean/inMode_until_behavior_deadline",
+      "type": "theorem",
+      "text": "Lean anchor `inMode_until_behavior_deadline` for this corrected reading. Status: qualified.",
+      "lean_anchor": "inevitable_inMode_interval",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

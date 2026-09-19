@@ -1,0 +1,31 @@
+{
+  "id": "5.148",
+  "kind": "exercise",
+  "name": "Exercise 5.148",
+  "chapter": 5,
+  "description": "Exercise 5.148. Correct `timex` to `\u00d7`, bind `t`, and interpret `CNSp` as the appropriately typed constant trajectory; prove by induction using accumulated duration `H`.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "424\u2013428"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.148/source/exercise",
+      "type": "exercise",
+      "text": "Source Exercise 5.148, lines 424\u2013428. Corrected traceability decision: Correct `timex` to `\u00d7`, bind `t`, and interpret `CNSp` as the appropriately typed constant trajectory; prove by induction using accumulated duration `H`.",
+      "lean_anchor": "variableTime_constantInput_state_at_accumulatedTime",
+      "status": "solved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.148/plan/variableTime_constantInput_state_at_accumulatedTime",
+      "type": "exercise",
+      "text": "Lean anchor `variableTime_constantInput_state_at_accumulatedTime` for this corrected reading. Status: corrected.",
+      "lean_anchor": "variableTime_constantInput_state_at_accumulatedTime",
+      "status": "solved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "solved"
+}

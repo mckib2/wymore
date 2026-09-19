@@ -1,0 +1,55 @@
+{
+  "id": "5.11",
+  "kind": "traceability",
+  "name": "Definition 5.11",
+  "chapter": 5,
+  "description": "Definition 5.11. Correct \u201csaid/tie\u201d to `s`; bind `x1,p1`; interpret shifted restriction relative to `r`; define manifest, in-mode, on-the-way, enters and exits separately.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "27\u201353"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.11/source/definition",
+      "type": "definition",
+      "text": "Source Definition 5.11, lines 27\u201353. Corrected traceability decision: Correct \u201csaid/tie\u201d to `s`; bind `x1,p1`; interpret shifted restriction relative to `r`; define manifest, in-mode, on-the-way, enters and exits separately.",
+      "lean_anchor": "ManifestAt",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.11/lean/SystemMode_Manifest",
+      "type": "definition",
+      "text": "Lean anchor `SystemMode.Manifest` for this corrected reading. Status: corrected.",
+      "lean_anchor": "ManifestAt",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.11/lean/SystemMode_InMode",
+      "type": "definition",
+      "text": "Lean anchor `SystemMode.InMode` for this corrected reading. Status: corrected.",
+      "lean_anchor": "InModeAt",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.11/lean/SystemMode_Enters",
+      "type": "definition",
+      "text": "Lean anchor `SystemMode.Enters` for this corrected reading. Status: corrected.",
+      "lean_anchor": "EntersAt",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.11/lean/SystemMode_Exits",
+      "type": "definition",
+      "text": "Lean anchor `SystemMode.Exits` for this corrected reading. Status: corrected.",
+      "lean_anchor": "ExitsAt",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

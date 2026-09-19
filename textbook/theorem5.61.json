@@ -1,0 +1,47 @@
+{
+  "id": "5.61",
+  "kind": "traceability",
+  "name": "Theorem 5.61",
+  "chapter": 5,
+  "description": "Theorem 5.61. Repair `K/k` and the malformed set comprehension: `f2` is the block-stuttering lift of `f1`, constant on each length-`d` block. State/output equalities are at `t2=d*t1`.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "184\u2013191"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.61/source/theorem",
+      "type": "theorem",
+      "text": "Source Theorem 5.61, lines 184\u2013191. Corrected traceability decision: Repair `K/k` and the malformed set comprehension: `f2` is the block-stuttering lift of `f1`, constant on each length-`d` block. State/output equalities are at `t2=d*t1`.",
+      "lean_anchor": "expandConstantInput",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.61/lean/liftExperiment_constantInputTime",
+      "type": "theorem",
+      "text": "Lean anchor `liftExperiment_constantInputTime` for this corrected reading. Status: corrected.",
+      "lean_anchor": "expandConstantInput",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.61/lean/liftExperiment_constantInputTime_state",
+      "type": "theorem",
+      "text": "Lean anchor `liftExperiment_constantInputTime_state` for this corrected reading. Status: corrected.",
+      "lean_anchor": "constant_compiled_state",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.61/lean/liftExperiment_constantInputTime_output",
+      "type": "theorem",
+      "text": "Lean anchor `liftExperiment_constantInputTime_output` for this corrected reading. Status: corrected.",
+      "lean_anchor": "constant_compiled_output",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

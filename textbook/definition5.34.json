@@ -1,0 +1,39 @@
+{
+  "id": "5.34",
+  "kind": "traceability",
+  "name": "Definition 5.34",
+  "chapter": 5,
+  "description": "Definition 5.34. Literal reading; note that the mode definition only gives primary, proper, and full input set, while closure follows from primary/restricted transition.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "113\u2013117"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.34/source/definition",
+      "type": "definition",
+      "text": "Source Definition 5.34, lines 113\u2013117. Corrected traceability decision: Literal reading; note that the mode definition only gives primary, proper, and full input set, while closure follows from primary/restricted transition.",
+      "lean_anchor": "IsAbsorbingMode",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.34/lean/SystemMode_IsAbsorbing",
+      "type": "definition",
+      "text": "Lean anchor `SystemMode.IsAbsorbing` for this corrected reading. Status: corrected.",
+      "lean_anchor": "IsAbsorbingMode",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.34/lean/System_IsAbsorbingState",
+      "type": "definition",
+      "text": "Lean anchor `System.IsAbsorbingState` for this corrected reading. Status: corrected.",
+      "lean_anchor": "IsAbsorbingState",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

@@ -1,0 +1,31 @@
+{
+  "id": "5.18",
+  "kind": "traceability",
+  "name": "Definition 5.18",
+  "chapter": 5,
+  "description": "Definition 5.18. Primary means time index `1`; correct displayed `NZ2 = NZ1` wording to equality of one-step transitions on `SZ1 \u00d7 IZ1`.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "62\u201363"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.18/source/definition",
+      "type": "definition",
+      "text": "Source Definition 5.18, lines 62\u201363. Corrected traceability decision: Primary means time index `1`; correct displayed `NZ2 = NZ1` wording to equality of one-step transitions on `SZ1 \u00d7 IZ1`.",
+      "lean_anchor": "IsPrimaryMode",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.18/lean/SystemMode_IsPrimary",
+      "type": "definition",
+      "text": "Lean anchor `SystemMode.IsPrimary` for this corrected reading. Status: corrected.",
+      "lean_anchor": "IsPrimaryMode",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

@@ -1,0 +1,31 @@
+{
+  "id": "5.67",
+  "kind": "traceability",
+  "name": "Theorem 5.67",
+  "chapter": 5,
+  "description": "Theorem 5.67. Composition must concatenate/retime the outer behavior segments; use a constructed composite SMBF, not bare relational transitivity.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "228"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.67/source/theorem",
+      "type": "theorem",
+      "text": "Source Theorem 5.67, lines 228. Corrected traceability decision: Composition must concatenate/retime the outer behavior segments; use a constructed composite SMBF, not bare relational transitivity.",
+      "lean_anchor": "SystemMode.trans",
+      "status": "exact",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.67/lean/SystemMode_trans",
+      "type": "theorem",
+      "text": "Lean anchor `SystemMode.trans` for this corrected reading. Status: exact; fidelity: faithful.",
+      "lean_anchor": "SystemMode.trans",
+      "status": "exact",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "exact"
+}

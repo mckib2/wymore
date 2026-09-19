@@ -1,0 +1,47 @@
+{
+  "id": "5.54",
+  "kind": "traceability",
+  "name": "Theorem 5.54",
+  "chapter": 5,
+  "description": "Theorem 5.54. A product-structured port inclusion is an equivalence of port indices. Fin 2 is not equivalent to Fin 3, so a two-port product is not a subset of a three-port product. Equal counts mean the portwise inclusions of paragraph 5.59.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "170–176"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.54/source/theorem",
+      "type": "theorem",
+      "text": "Theorem 5.54 and paragraph 5.55: unequal finite port-index sets are not equivalent.",
+      "lean_anchor": "theorem5_54_fin2_not_equiv_fin3",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.54/lean/systemMode_inputPort_card",
+      "type": "theorem",
+      "text": "There is no equivalence Fin 2 ≃ Fin 3.",
+      "lean_anchor": "theorem5_54_fin2_not_equiv_fin3",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.54/lean/systemMode_outputPort_card",
+      "type": "theorem",
+      "text": "The same port-index obstruction applies to output ports.",
+      "lean_anchor": "theorem5_54_fin2_not_equiv_fin3",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.54/lean/systemMode_port_subset",
+      "type": "theorem",
+      "text": "Paragraph 5.59: equal port counts mean PreservesPorts along the identity equivalence.",
+      "lean_anchor": "paragraph5_59_portwise",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}

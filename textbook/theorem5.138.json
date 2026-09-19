@@ -1,0 +1,31 @@
+{
+  "id": "5.138",
+  "kind": "traceability",
+  "name": "Theorem 5.138",
+  "chapter": 5,
+  "description": "Theorem 5.138. Time-zero coupling agreement and component inevitability make the constant external input a mode behavior; every external trajectory with that initial value reaches the mode successor. The swapped English subject is not a second claim.",
+  "source": {
+    "file": "wymore-defs-n-proofs.txt",
+    "lines": "399–411"
+  },
+  "fidelity": "faithful",
+  "elements": [
+    {
+      "id": "5.138/source/theorem",
+      "type": "theorem",
+      "text": "Theorem 5.138, derived from the time-zero port calculation and component inevitability.",
+      "lean_anchor": "hologenic_of_inevitable_constantTime",
+      "status": "proved",
+      "fidelity": "faithful"
+    },
+    {
+      "id": "5.138/lean/hologenic_of_inevitable_constantTime",
+      "type": "theorem",
+      "text": "Inevitable constant-time component modes induce an inevitable resultant mode of the same duration.",
+      "lean_anchor": "hologenic_of_inevitable_constantTime",
+      "status": "proved",
+      "fidelity": "faithful"
+    }
+  ],
+  "status": "proved"
+}
