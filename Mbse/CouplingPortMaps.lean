@@ -197,22 +197,18 @@ noncomputable def moveResultantHom {n : Nat} {Sf If Of : Type}
   exact hom
 
 /-!
-## `DiscreteSystemStateReflection`
+## Def 3.97 resultant packaging (historical note)
 
-Named packaging for the Def 3.97 / subsystem principle that Lean does not
-derive from `HEq` alone: injectivity of `DiscreteSystem` in its state
-argument.  From `HEq Z (rsy SCR hOut)` one obtains equality of the applied
-`DiscreteSystem` types, but not `SZ = rsy_SZ SCR`, because type formers are
-not injective in Lean's kernel.  Subsystem arguments that need state-type
-identification (e.g. Exercise 5.142) take this Prop as an explicit hypothesis
-rather than a silent axiom.  It holds in the standard set-theoretic semantics.
-
-The definition and its consumers live in
-[`Mbse.TextbookExercises.Ch05`](TextbookExercises/Ch05.lean); this module only
-records the package name for coupling-level documentation.
+Exercise 5.142 previously exposed a Prop `DiscreteSystemStateReflection` for
+injectivity of `DiscreteSystem` in its state argument, needed when Def 3.97 used
+only `HEq Z (rsy SCR _)`.  The definition now uses `IsResultantOf` (type-parameter
+equalities + dynamics) and `IsSubrecipeOf.sz`, so that card transport is
+definitional and no reflection hypothesis remains.  See
+[`Mbse.Wymore.IsResultantOf`](WymoreCouplingStructure.lean) and
+[`Mbse.TextbookExercises.Ch05`](TextbookExercises/Ch05.lean).
 -/
 abbrev DiscreteSystemStateReflectionDoc : String :=
-  "DiscreteSystemStateReflection: Prop packaging Def 3.97 HEq state-type " ++
-    "identification; see TextbookExercises/Ch05.lean"
+  "Historical: DiscreteSystemStateReflection was the HEq-era Ex 5.142 hyp; " ++
+    "superseded by IsResultantOf / IsSubrecipeOf.sz (see WymoreCouplingStructure.lean)"
 
 end Homomorphism

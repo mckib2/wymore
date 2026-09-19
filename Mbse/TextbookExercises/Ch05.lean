@@ -10,32 +10,25 @@ import Mbse.WymoreModeCoupling
 Exercises 5.141, 5.142, 5.146–5.153, 5.156–5.179, and 5.184–5.193
 (gaps 5.180–5.183, 5.189, 5.192 absent from the source list).
 
-Two different relations meet here.  `Mbse.Wymore.IsSubsystemOf` is *recipe based*:
-it asserts the existence of coupling recipes, an injective component embedding,
-and the `CSCR` restriction clause, tying the systems to the recipes only through
-`HEq Z (rsy SCR hOut)`.  `WymoreSystemModes.IsSystemMode` is *behavioral*: it
-asserts the existence of an SMBF witness together with typed embeddings of
-states, inputs and outputs, and a readout-graph inclusion.
+Two different relations meet here.  `Mbse.Wymore.IsSubsystemOf` is *recipe based*
+(Def 3.97): coupling recipes with nested VSCR/`CSCR` restriction, and
+`IsResultantOf` packaging book “\(Z = RSY(SCR)\)” as type-parameter equalities
+plus dynamics.  `WymoreSystemModes.IsSystemMode` is *behavioral*: SMBF witness
+plus typed embeddings and readout-graph inclusion.
 
-Both directions of the textbook's claims fail, and the two failures have quite
-different formal status:
+Both directions of the textbook's claims fail:
 
 * 5.141 is refuted outright.  Two concrete resultants are built (a lone
   component, and that component cascaded into a state-hiding component).  The
   lone component *is* a subsystem of the pair by an explicit recipe witness,
   and it is *not* a mode of the pair, because coupling internalises its output
   port: the exhibitor's readout is constant, so no injective output embedding
-  can satisfy Definition 5.6 (vi).  Nothing is assumed.
+  can satisfy Definition 5.6 (vi).
 
-* 5.142 is refuted relative to one clearly isolated principle.  A sampled mode
-  is exhibited, and the recipe-level obstruction is proved unconditionally:
-  a subrecipe embedding forces the resultant state cardinality to *divide* that
-  of the larger resultant.  Turning that into `¬ IsSubsystemOf` needs to move
-  cardinality information across `HEq Z (rsy SCR hOut)`, which requires
-  injectivity of the `DiscreteSystem` type former — not derivable in Lean's type
-  theory.  It is therefore exposed as the explicit proposition
-  `DiscreteSystemStateReflection` and discharged as a hypothesis, so the
-  dependency is visible in the statement rather than hidden in prose.
+* 5.142 is refuted outright.  A Fin-2 sampled mode of a Fin-3 cycle is a system
+  mode, but cannot be a subsystem: any Def 3.97 witness forces resultant state
+  cards to divide, and `2 ∤ 3`.  Type equalities in `IsResultantOf` /
+  `IsSubrecipeOf.sz` make the card transport unconditional (no reflection hyp).
 -/
 
 namespace Mbse.TextbookExercises.Ch05
@@ -225,6 +218,7 @@ theorem lone_isSubrecipe : IsSubrecipeOf (fun _ => (0 : Fin 2)) loneSCR pairSCR 
   inj := fun a b _ => Trajectory.fin_one_eq a b
   outPort := fun _ => HEq.rfl
   inPort := fun _ => HEq.rfl
+  sz := fun _ => rfl
   component := fun _ => HEq.rfl
   cscr := by
     intro p
@@ -242,7 +236,7 @@ theorem lone_isSubrecipe : IsSubrecipeOf (fun _ => (0 : Fin 2)) loneSCR pairSCR 
 theorem lone_isSubsystemVia :
     IsSubsystemVia loneSystem pairSystem loneSCR pairSCR loneSCR_hOut pairSCR_hOut
       (fun _ => (0 : Fin 2)) :=
-  ⟨lone_isSubrecipe, HEq.rfl, HEq.rfl⟩
+  ⟨lone_isSubrecipe, IsResultantOf.of_rsy loneSCR loneSCR_hOut, IsResultantOf.of_rsy pairSCR pairSCR_hOut⟩
 
 theorem lone_isSubsystem : IsSubsystemOf loneSystem pairSystem :=
   IsSubsystemVia.isSubsystemOf lone_isSubsystemVia
@@ -348,27 +342,6 @@ theorem twoStateMode_transition_not_restriction :
   decide
 
 /--
-Injectivity of the `DiscreteSystem` type former in its state argument.
-
-This is the named Prop package for Def 3.97 `HEq` packaging (see also
-[`Homomorphism.DiscreteSystemStateReflectionDoc`] in `CouplingPortMaps.lean`):
-not a new axiom, but a reusable hypothesis for subsystem arguments such as
-Exercise 5.142.  `HEq Z (rsy SCR hOut)` yields only equality of the two
-`DiscreteSystem` *applications*, and Lean proves no injectivity for type
-formers, so the state type of `Z` cannot otherwise be identified with
-`rsy_SZ SCR`.  Nor can cardinality substitute for it: a recipe whose components
-all have one state has resultant state cardinality `1` and resultant readout
-cardinality unconstrained, so `Nat.card (DiscreteSystem A B C)` — the only
-invariant a type equality transports — is matched by such recipes for every
-`A`, `B`, `C`, and `1` divides everything.  Every cardinality argument
-therefore collapses, which is why the principle is named and taken as a
-hypothesis here instead of being assumed silently.  It holds in the standard
-set-theoretic semantics of Lean's type theory.
--/
-def DiscreteSystemStateReflection : Prop :=
-  ∀ {A B C A' B' C' : Type}, DiscreteSystem A B C = DiscreteSystem A' B' C' → A = A'
-
-/--
 Unconditional recipe-level obstruction: a component embedding makes the smaller
 resultant's state cardinality divide the larger one's, because resultant states
 are products over components and `φ` is injective.
@@ -393,29 +366,41 @@ theorem resultant_state_card_dvd {n1 n2 : Nat} {φ : Fin n1 → Fin n2}
   rw [h1, h2, himage]
   exact Finset.prod_dvd_prod_of_subset _ _ _ (Finset.subset_univ _)
 
-/-- Transported to the systems themselves, the obstruction constrains `IsSubsystemOf`. -/
-theorem subsystem_state_card_dvd (H : DiscreteSystemStateReflection)
+/--
+  Def 3.97 packaging transports the recipe-level card obstruction to the systems:
+  `IsResultantOf` identifies state types with `rsy_SZ`, and `IsSubrecipeOf.sz`
+  matches component state cards.
+-/
+theorem subsystem_state_card_dvd
     {A B C A' B' C' : Type} {W₁ : DiscreteSystem A B C} {W₂ : DiscreteSystem A' B' C'}
     (h : IsSubsystemOf W₁ W₂) : Nat.card A ∣ Nat.card A' := by
-  obtain ⟨n1, n2, SCR1, SCR2, hOut1, hOut2, φ, hOutPort, hInPort, hinj, hcomp, hZ1, hZ2, -⟩ := h
-  have e1 : A = rsy_SZ SCR1 := H (type_eq_of_heq hZ1)
-  have e2 : A' = rsy_SZ SCR2 := H (type_eq_of_heq hZ2)
+  obtain ⟨n1, n2, SCR1, SCR2, _hOut1, _hOut2, φ, hsub, hr1, hr2⟩ := h
+  have e1 : A = rsy_SZ SCR1 := hr1.hSZ
+  have e2 : A' = rsy_SZ SCR2 := hr2.hSZ
   have ec : ∀ i, Nat.card (SCR1.VSCR.SZ i) = Nat.card (SCR2.VSCR.SZ (φ i)) := fun i =>
-    congrArg Nat.card (H (type_eq_of_heq (hcomp i)))
+    congrArg Nat.card (hsub.sz i)
   rw [e1, e2]
-  exact resultant_state_card_dvd hinj ec
+  exact resultant_state_card_dvd hsub.inj ec
 
 /--
-  [textbook/exercise5.142/source/exercise|partial]
-  [textbook/exercise5.142/plan/exercise5_142_unconditional|partial]
+  [textbook/exercise5.142/source/exercise]
+  [textbook/exercise5.142/plan/exercise5_142_unconditional]
+  [textbook/exercise5.142/counterexample/literal_claim]
+  [textbook/exercise5.142/plan/systemMode_not_subsystem_counterexample]
 
-Unconditional charitable answer to Exercise 5.142: the two-state sampled mode
-of the three-cycle is a system mode, and no injective component embedding with
-matching component state cards can realize resultant cards `2` and `3`.
-
-Typed-API limitation (not a Def 3.97 defect): Lean cannot inject the
-`DiscreteSystem` type former, so the unconditional content stops at mode+card.
+Exercise 5.142 counterexample: the two-state sampled mode of the three-cycle is a
+system mode but not a subsystem.  Def 3.97’s `IsResultantOf` / `IsSubrecipeOf.sz`
+packaging makes the `2 ∤ 3` card obstruction apply directly to `IsSubsystemOf`.
 -/
+theorem systemMode_not_subsystem_counterexample :
+    IsSystemMode twoStateMode cycleExhibitor ∧
+      ¬ IsSubsystemOf twoStateMode cycleExhibitor := by
+  refine ⟨⟨twoStateModeWitness⟩, fun h => ?_⟩
+  have hdvd := subsystem_state_card_dvd h
+  simp only [Nat.card_eq_fintype_card, Fintype.card_fin] at hdvd
+  exact absurd hdvd (by decide)
+
+/-- Recipe-level packaging of the same obstruction (mode + impossible resultant cards). -/
 theorem exercise5_142_unconditional :
     IsSystemMode twoStateMode cycleExhibitor ∧
       ∀ {n1 n2 : Nat} {φ : Fin n1 → Fin n2}
@@ -423,28 +408,10 @@ theorem exercise5_142_unconditional :
         Function.Injective φ →
         (∀ i, Nat.card (SCR1.VSCR.SZ i) = Nat.card (SCR2.VSCR.SZ (φ i))) →
         Nat.card (rsy_SZ SCR1) = 2 → Nat.card (rsy_SZ SCR2) = 3 → False := by
-  refine ⟨⟨twoStateModeWitness⟩, ?_⟩
+  refine ⟨systemMode_not_subsystem_counterexample.1, ?_⟩
   intro n1 n2 φ SCR1 SCR2 hinj hcard h2 h3
   have hdvd := resultant_state_card_dvd hinj hcard
   rw [h2, h3] at hdvd
-  exact absurd hdvd (by decide)
-
-/--
-  [textbook/exercise5.142/plan/systemMode_not_subsystem_counterexample|partial]
-  [textbook/exercise5.142/counterexample/literal_claim|partial]
-
-Conditional packaging under `DiscreteSystemStateReflection`: Lean cannot derive
-type-former injectivity from `HEq` on `DiscreteSystem`, so `¬ IsSubsystemOf`
-needs that named hypothesis.  This is a typed-API limitation of
-`DiscreteSystem`, not a textbook defect in Def 3.97.  The unconditional content
-is `exercise5_142_unconditional`.
--/
-theorem systemMode_not_subsystem_counterexample (H : DiscreteSystemStateReflection) :
-    IsSystemMode twoStateMode cycleExhibitor ∧
-      ¬ IsSubsystemOf twoStateMode cycleExhibitor := by
-  refine ⟨⟨twoStateModeWitness⟩, fun h => ?_⟩
-  have hdvd := subsystem_state_card_dvd H h
-  simp only [Nat.card_eq_fintype_card, Fintype.card_fin] at hdvd
   exact absurd hdvd (by decide)
 
 /-! ## Constant trajectories -/

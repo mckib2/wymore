@@ -303,6 +303,10 @@ def SCRSubsystemCSCRRestriction {n1 n2 : Nat} (φ : Fin n1 → Fin n2)
   Recipe-level form of the subsystem relation: `φ` embeds `VSCR₁` into `VSCR₂` preserving
   components and port structure (textbook (iii)), and `CSCR₁` is `CSCR₂` restricted to the
   embedded ports (textbook (iv)).
+
+  Component state types are identified by `Eq` (not only `HEq` of systems), matching the
+  set-theoretic reading of VSCR nesting and enabling card transport without type-former
+  reflection (see Ex 5.142 / Def 3.97 packaging).
 -/
 structure IsSubrecipeOf {n1 n2 : Nat} (φ : Fin n1 → Fin n2)
     (SCR1 : SystemCouplingRecipe n1) (SCR2 : SystemCouplingRecipe n2) : Prop where
@@ -312,15 +316,46 @@ structure IsSubrecipeOf {n1 n2 : Nat} (φ : Fin n1 → Fin n2)
   outPort : ∀ i, HEq (SCR1.VSCR.OutPort i) (SCR2.VSCR.OutPort (φ i))
   /-- Input port tags are preserved by the embedding. -/
   inPort : ∀ i, HEq (SCR1.VSCR.Port i) (SCR2.VSCR.Port (φ i))
+  /-- Embedded component state types agree (book “same component” on state sets). -/
+  sz : ∀ i, SCR1.VSCR.SZ i = SCR2.VSCR.SZ (φ i)
   /-- Embedded components are the same systems. -/
   component : ∀ i, HEq (SCR1.VSCR.Z i) (SCR2.VSCR.Z (φ i))
   /-- Textbook (iv): `CSCR₁` is the restriction of `CSCR₂` to embedded ports. -/
   cscr : SCRSubsystemCSCRRestriction φ SCR1 SCR2 outPort inPort
 
 /--
+  Book “\(Z = RSY(SCR)\)”: the system's type parameters *are* the resultant's, and the
+  dynamics equal after transport. Stronger than bare `HEq Z (rsy SCR _)`, which does not
+  identify `SZ` with `rsy_SZ SCR` in Lean's type theory.
+-/
+structure IsResultantOf {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ)
+    {n : Nat} (SCR : SystemCouplingRecipe n)
+    (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k)) : Prop where
+  hSZ : SZ = rsy_SZ SCR
+  hIZ : IZ = rsy_IZ SCR
+  hOZ : OZ = rsy_OZ SCR
+  /-- `Z` equals the resultant after transporting along `hSZ`/`hIZ`/`hOZ`. -/
+  eq : Z = hOZ ▸ hIZ ▸ hSZ ▸ rsy SCR hOut
+
+/-- Definitional resultant: `Z` is literally `rsy SCR hOut`. -/
+theorem IsResultantOf.of_eq {n : Nat} (SCR : SystemCouplingRecipe n)
+    (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k))
+    {Z : DiscreteSystem (rsy_SZ SCR) (rsy_IZ SCR) (rsy_OZ SCR)}
+    (h : Z = rsy SCR hOut) : IsResultantOf Z SCR hOut :=
+  ⟨rfl, rfl, rfl, h⟩
+
+/-- The resultant of a recipe is a resultant of that recipe. -/
+theorem IsResultantOf.of_rsy {n : Nat} (SCR : SystemCouplingRecipe n)
+    (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k)) :
+    IsResultantOf (rsy SCR hOut) SCR hOut :=
+  IsResultantOf.of_eq SCR hOut rfl
+
+/--
   [textbook/definition3.97/definition/is_subsystem_of]
   `Z1` is a subsystem of `Z2` when both are resultants of recipes with nested component vectors
   and `CSCR1` is the restriction of `CSCR2` to subsystem ports (textbook (iv)).
+
+  Clauses (i)–(ii) use `IsResultantOf` (type parameters + dynamics), not bare `HEq`.
 -/
 def IsSubsystemOf {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     (Z1 : DiscreteSystem SZ1 IZ1 OZ1)
@@ -328,14 +363,10 @@ def IsSubsystemOf {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
   ∃ (n1 n2 : Nat) (SCR1 : SystemCouplingRecipe n1) (SCR2 : SystemCouplingRecipe n2)
       (hOut1 : ∀ k, AlwaysOutputs (SCR1.VSCR.Z k))
       (hOut2 : ∀ k, AlwaysOutputs (SCR2.VSCR.Z k))
-      (φ : Fin n1 → Fin n2)
-      (hOutPort : ∀ i, HEq (SCR1.VSCR.OutPort i) (SCR2.VSCR.OutPort (φ i)))
-      (hInPort : ∀ i, HEq (SCR1.VSCR.Port i) (SCR2.VSCR.Port (φ i))),
-    Function.Injective φ ∧
-    (∀ i, HEq (SCR1.VSCR.Z i) (SCR2.VSCR.Z (φ i))) ∧
-    HEq Z1 (rsy SCR1 hOut1) ∧
-    HEq Z2 (rsy SCR2 hOut2) ∧
-    SCRSubsystemCSCRRestriction φ SCR1 SCR2 hOutPort hInPort
+      (φ : Fin n1 → Fin n2),
+    IsSubrecipeOf φ SCR1 SCR2 ∧
+      IsResultantOf Z1 SCR1 hOut1 ∧
+      IsResultantOf Z2 SCR2 hOut2
 
 /--
   `Z1` is a subsystem of `Z2` *via* the named recipe witnesses. Recording the witnesses is what
@@ -347,7 +378,7 @@ def IsSubsystemVia {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     {n1 n2 : Nat} (SCR1 : SystemCouplingRecipe n1) (SCR2 : SystemCouplingRecipe n2)
     (hOut1 : ∀ k, AlwaysOutputs (SCR1.VSCR.Z k)) (hOut2 : ∀ k, AlwaysOutputs (SCR2.VSCR.Z k))
     (φ : Fin n1 → Fin n2) : Prop :=
-  IsSubrecipeOf φ SCR1 SCR2 ∧ HEq Z1 (rsy SCR1 hOut1) ∧ HEq Z2 (rsy SCR2 hOut2)
+  IsSubrecipeOf φ SCR1 SCR2 ∧ IsResultantOf Z1 SCR1 hOut1 ∧ IsResultantOf Z2 SCR2 hOut2
 
 /-- Forgetting the recipe witnesses recovers the witness-free subsystem relation. -/
 theorem IsSubsystemVia.isSubsystemOf {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
@@ -357,8 +388,7 @@ theorem IsSubsystemVia.isSubsystemOf {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     {φ : Fin n1 → Fin n2}
     (h : IsSubsystemVia Z1 Z2 SCR1 SCR2 hOut1 hOut2 φ) :
     IsSubsystemOf Z1 Z2 :=
-  ⟨n1, n2, SCR1, SCR2, hOut1, hOut2, φ, h.1.outPort, h.1.inPort,
-    h.1.inj, h.1.component, h.2.1, h.2.2, h.1.cscr⟩
+  ⟨n1, n2, SCR1, SCR2, hOut1, hOut2, φ, h.1, h.2.1, h.2.2⟩
 
 /-! ## Exercise 3.129: recipe characterisation of the subsystem relation -/
 
@@ -367,7 +397,7 @@ theorem IsSubsystemVia.isSubsystemOf {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
   Ex. 3.129 — the assertion holds. `Z1` is a subsystem of `Z2` exactly when there are coupling
   recipes with `Z1 = RSY(SCR1)` (i), `Z2 = RSY(SCR2)` (ii), `VSCR1 ⊆ VSCR2` via an injective
   component embedding (iii), and `CSCR1` the restriction of `CSCR2` to the embedded output/input
-  ports (iv). Clauses (iii)–(iv) are exactly `IsSubrecipeOf`.
+  ports (iv). Clauses (iii)–(iv) are exactly `IsSubrecipeOf`; (i)–(ii) are `IsResultantOf`.
 -/
 theorem subsystem_iff_recipes {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     (Z1 : DiscreteSystem SZ1 IZ1 OZ1) (Z2 : DiscreteSystem SZ2 IZ2 OZ2) :
@@ -378,8 +408,8 @@ theorem subsystem_iff_recipes {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
         (φ : Fin n1 → Fin n2),
         IsSubsystemVia Z1 Z2 SCR1 SCR2 hOut1 hOut2 φ := by
   constructor
-  · rintro ⟨n1, n2, SCR1, SCR2, hOut1, hOut2, φ, hOutPort, hInPort, hinj, hcomp, hZ1, hZ2, hcscr⟩
-    exact ⟨n1, n2, SCR1, SCR2, hOut1, hOut2, φ, ⟨hinj, hOutPort, hInPort, hcomp, hcscr⟩, hZ1, hZ2⟩
+  · rintro ⟨n1, n2, SCR1, SCR2, hOut1, hOut2, φ, h⟩
+    exact ⟨n1, n2, SCR1, SCR2, hOut1, hOut2, φ, h⟩
   · rintro ⟨n1, n2, SCR1, SCR2, hOut1, hOut2, φ, h⟩
     exact IsSubsystemVia.isSubsystemOf h
 
@@ -390,6 +420,7 @@ theorem subrecipe_refl {n : Nat} (SCR : SystemCouplingRecipe n) : IsSubrecipeOf 
   inj := Function.injective_id
   outPort := fun _ => HEq.rfl
   inPort := fun _ => HEq.rfl
+  sz := fun _ => rfl
   component := fun _ => HEq.rfl
   cscr := by
     intro p
@@ -412,6 +443,7 @@ theorem subrecipe_trans {n1 n2 n3 : Nat}
   inj := h23.inj.comp h12.inj
   outPort := fun i => HEq.trans (h12.outPort i) (h23.outPort (φ1 i))
   inPort := fun i => HEq.trans (h12.inPort i) (h23.inPort (φ1 i))
+  sz := fun i => h12.sz i ▸ h23.sz (φ1 i)
   component := fun i => HEq.trans (h12.component i) (h23.component (φ1 i))
   cscr := by
     intro p
@@ -440,7 +472,7 @@ theorem subrecipe_trans {n1 n2 n3 : Nat}
 theorem subsystem_reflexive {SZ IZ OZ : Type}
     (Z : DiscreteSystem SZ IZ OZ) (n : Nat) (SCR : SystemCouplingRecipe n)
     (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k))
-    (hZ : HEq Z (rsy SCR hOut)) :
+    (hZ : IsResultantOf Z SCR hOut) :
     IsSubsystemOf Z Z :=
   IsSubsystemVia.isSubsystemOf ⟨subrecipe_refl SCR, hZ, hZ⟩
 
@@ -459,9 +491,9 @@ lemma Fin.not_heq_of_ne {n m : Nat} (h : n ≠ m) : ¬ HEq (Fin n) (Fin m) := by
   restrictions chain through the shared middle recipe.
 
   Transitivity is stated on `IsSubsystemVia` rather than `IsSubsystemOf` because a resultant does
-  not determine its own coupling recipe: from `HEq Z2 (rsy SCR2 _)` and `HEq Z2 (rsy SCR2' _)` the
-  equality `SCR2 = SCR2'` is not derivable (it would need injectivity of `Pi` types in the index,
-  which Lean's type theory does not provide). Naming the middle recipe supplies exactly the
+  not determine its own coupling recipe: from `IsResultantOf Z2 SCR2 _` and
+  `IsResultantOf Z2 SCR2' _` the equality `SCR2 = SCR2'` is not derivable (it would need
+  injectivity of `Pi` types in the index). Naming the middle recipe supplies exactly the
   identification the textbook argument uses implicitly.
 -/
 theorem subsystem_transitive {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 SZ3 IZ3 OZ3 : Type}

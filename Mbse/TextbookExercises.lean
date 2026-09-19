@@ -33,7 +33,7 @@ export Ch03 (scr_port_count_sum_eq_union scr_unconnected_ports_exist scr_cscr_do
   ex3_118_scr ex3_118_simple_conjunction ex3_119_conjunctive_port_identification)
 
 export Ch05 (subsystem_isSystemMode_or_counterexample systemMode_not_subsystem_counterexample
-  DiscreteSystemStateReflection resultant_state_card_dvd subsystem_state_card_dvd
+  resultant_state_card_dvd subsystem_state_card_dvd
   exercise5_142_unconditional
   selfMode_constantTime_iterate selfModeAtIteratedTime
   selfModeAtIteratedTime_hasIndices constantMode_state_at_mul

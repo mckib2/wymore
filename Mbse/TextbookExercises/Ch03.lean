@@ -1270,7 +1270,7 @@ abbrev ex3_129_subsystem_iff_recipes {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
 abbrev ex3_130_subsystem_reflexive {SZ IZ OZ : Type}
     (Z : DiscreteSystem SZ IZ OZ) (n : Nat) (SCR : SystemCouplingRecipe n)
     (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k))
-    (hZ : HEq Z (rsy SCR hOut)) :=
+    (hZ : IsResultantOf Z SCR hOut) :=
   subsystem_reflexive Z n SCR hOut hZ
 
 /--
