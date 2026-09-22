@@ -1,78 +1,128 @@
 \section{Methodology} \label{sec:methodology}
 
-\subsection{Verification Paradigm Comparison}
-Figure~\ref{fig:comparison} contrasts classical constructive verification with assertional property checking. In panel~A, requirements are formalized as a reference system $Z_{\text{spec}}$ and a buildable system $Z_{\text{impl}}$ is related to it by a Wymore system homomorphism. In panel~B, requirements are encoded as a property set $\Phi$ (directly, or optionally via $Z_{\text{spec}}$) and $Z_{\text{impl}}$ is checked by assertional satisfaction. Table~\ref{tab:comparison} summarizes the comparison. When a buildable system changes structure, constructive proofs that depend on a particular homomorphism may need substantial rework; assertional checking re-evaluates whether the revised $Z_{\text{impl}}$ still satisfies the same $\Phi$.
+\subsection{From Constructive Evidence to Temporal Assertions}
+Figure~\ref{fig:comparison} separates the source of functional intent from the
+reference used for implementation checking. The IOR $R$ generates
+$\mathrm{FSR}(R)$ and its characteristic fragment $\Phi_R$. A chosen
+$D_{\mathrm{ref}}\in\mathrm{FSR}(R)$ supplies the system $Z_{\mathrm{ref}}$
+from which $\Phi_{\mathrm{dyn}}$ is compiled.
 
 \begin{figure}[t]
   \centering
-  \resizebox{\textwidth}{!}{%
+  \resizebox{\linewidth}{!}{%
   \begin{tikzpicture}[auto, >=stealth, thick,
-    block/.style={draw=blue!60, fill=blue!5, rectangle, rounded corners, minimum width=2.8cm, minimum height=1.1cm, align=center, thick},
-    model/.style={draw=orange!60, fill=orange!5, rectangle, rounded corners, minimum width=2.8cm, minimum height=1.1cm, align=center, thick},
+    block/.style={draw=blue!60, fill=blue!5, rectangle, rounded corners, minimum width=3.1cm, minimum height=0.95cm, align=center, thick},
+    model/.style={draw=orange!60, fill=orange!5, rectangle, rounded corners, minimum width=3.1cm, minimum height=0.95cm, align=center, thick},
     arrow/.style={->, >=stealth, thick, draw=black!70},
     dashedarrow/.style={->, >=stealth, dashed, thick, draw=blue!80}
   ]
     \begin{scope}
-      \node (reqA) [block] {System\\Requirements};
-      \node (specA) [model, right=2.4cm of reqA] {Reference\\System $Z_{\text{spec}}$};
-      \node (implA) [model, below=1.0cm of specA] {Buildable\\System $Z_{\text{impl}}$};
-      \path[arrow] (reqA) -- node[above, font=\footnotesize] {formalized as} (specA);
-      \path[arrow] (implA) -- node[right=3pt, font=\footnotesize] {Homomorphism $h$} (specA);
-      \node[inner sep=6pt, fit=(reqA)(specA)(implA)] (panelAbox) {};
+      \node (iorA) [block] at (0,2.4) {Input/output\\requirement $R$};
+      \node (fsrA) [block] at (0,0.8) {Functionality cotyledon\\$\mathrm{FSR}(R)$};
+      \node (drefA) [model] at (0,-0.8) {Chosen design\\$D_{\mathrm{ref}}$};
+      \node (implA) [model] at (4.0,-0.8) {Buildable resultant\\$Z_{\mathrm{impl}}$};
+      \path[arrow] (iorA) -- node[right, font=\footnotesize] {generates} (fsrA);
+      \path[arrow] (fsrA) -- node[right, font=\footnotesize] {choose} (drefA);
+      \path[arrow] (implA) -- node[above, font=\footnotesize]
+        {$h:Z_{\mathrm{impl}}\to Z_{\mathrm{ref}}$} (drefA);
+      \node[inner sep=7pt, fit=(iorA)(fsrA)(drefA)(implA)] (panelAbox) {};
       \node[below=0.2cm of panelAbox, font=\headingfont\bfseries] {A. Classical Constructive T3SD};
     \end{scope}
-    \begin{scope}[xshift=9.8cm]
-      \node (reqB) [block] {System\\Requirements};
-      \node (phiB) [block, right=2.4cm of reqB] {Temporal Properties\\$\Phi$};
-      \node (specB) [model, right=1.6cm of phiB] {Reference\\System $Z_{\text{spec}}$};
-      \node (implB) [model, below=1.0cm of phiB] {Buildable\\System $Z_{\text{impl}}$};
-      \draw[arrow] (reqB.north) .. controls ($(reqB.north)+(0,1.35)$) and ($(specB.north)+(0,1.35)$) ..
-        node[midway, above, font=\footnotesize] {formalized as} (specB.north);
-      \path[dashedarrow] (reqB.east) -- (phiB.west);
-      \path[arrow] (specB.west) -- node[above, font=\footnotesize] {compile} (phiB.east);
-      \path[dashedarrow] (implB.north) -- node[left=3pt, font=\footnotesize, align=center] {Property checking\\$Z_{\text{impl}} \models_{\mathcal{L}} \Phi$} (phiB.south);
-      \node[inner sep=8pt, fit=(reqB)(phiB)(specB)(implB)] (panelBbox) {};
-      \node[below=0.2cm of panelBbox, font=\headingfont\bfseries] {B. Assertional FC};
+    \begin{scope}[xshift=10.0cm]
+      \node (iorB) [block] at (0,2.4) {Input/output\\requirement $R$};
+      \node (phiR) [block] at (0,0.8) {Boundary fragment\\$\Phi_R$};
+      \node (afsr) [block] at (0,-0.8) {Assertional space\\$\mathrm{AFSR}(\Phi_R)\simeq\mathrm{FSR}(R)$};
+      \node (drefB) [model] at (4.0,2.4) {$D_{\mathrm{ref}}$ with system\\$Z_{\mathrm{ref}}$};
+      \node (phiDyn) [block] at (4.0,0.8) {Dynamics fragment\\$\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$};
+      \node (implB) [model] at (4.0,-0.8) {Buildable resultant\\$Z_{\mathrm{impl}}$};
+      \path[dashedarrow] (iorB) -- node[right, font=\footnotesize] {compile} (phiR);
+      \path[dashedarrow] (phiR) -- node[right, font=\footnotesize] {generates} (afsr);
+      \path[arrow] (drefB) -- node[right, font=\footnotesize] {compile} (phiDyn);
+      \path[dashedarrow] (implB) -- node[right, font=\footnotesize] {check} (phiDyn);
+      \node[inner sep=8pt, fit=(iorB)(phiR)(afsr)(drefB)(phiDyn)(implB)] (panelBbox) {};
+      \node[below=0.2cm of panelBbox, font=\headingfont\bfseries] {B. Assertional presentation};
     \end{scope}
   \end{tikzpicture}%
   }
-  \caption{Classical constructive verification (A) versus assertional property checking (B). Panel~B may encode requirements as authored $\Phi$ (dashed) or compile $\Phi$ from $Z_{\text{spec}}$.}
+  \caption{The IOR generates functionality in both presentations. A chosen functional
+  design supplies $Z_{\mathrm{ref}}$ for the separate implementation check.}
   \label{fig:comparison}
 \end{figure}
 
-\subsection{Traces, Observability, and Assertional Modes}
+\subsection{The Characteristic Boundary Fragment}
 \label{sec:trace-observability}
-For $Z = (S, I, O, \delta, \rho)$ and trajectories $(f, g, y)$, Wymore's construction is
-\begin{align}
-    g(0) &= s_0 \label{eq:trace-init}\\
-    g(t+1) &= \delta(g(t), f(t)) \label{eq:trace-step}\\
-    y(t) &= \rho(g(t)) \label{eq:trace-readout}
-\end{align}
-with execution trace $\sigma = (f, g, y)$. Properties may refer to external ports ($f$, $y$) or internal state ($g$).
+Let $R=(OLR,IR,ITR,OR,OTR,ER)$ be any Wymore IOR, and let $T_R$ be the time scale selected by $OLR$. Its characteristic boundary fragment is
+\[
+  \Phi_R=(T_R,ITR,A_R),
+  \qquad
+  A_R(f,g)\;\Longleftrightarrow\;g\in ER(f).
+\]
+It mentions complete input and output trajectories. It retains finite or
+infinite operational length, any admissible-input set, and the full
+eligible-output relation, including nondeterministic relations.
 
-We write $Z \models_{\mathcal{L}} \Phi$ when every admissible input trajectory and initial state in a stated class induces a trace satisfying $\Phi$ \citep{Pnueli1977,BaierKatoen2008}. The assertional Functionality Cotyledon is $\mathcal{FC}_{\mathcal{L}}(\Phi) = \{ Z \mid Z \models_{\mathcal{L}} \Phi \}$. Verification of a buildable system is the membership test $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$. Admissible inputs are those consistent with boundary assumptions, not necessarily all of $I^T$ \citep{salado2019mbse}.
+For $Z=(S,I,O,\delta,\rho)$, initial state $s_0$, and nonempty $T\subseteq T_R$, define $Z,s_0,T\models_{IO}\Phi_R$ when, for every $f\in ITR$ and every complete input $h$ agreeing with $f$ on $T_R$, there exists $g$ with $A_R(f,g)$ such that the output generated by $Z$ on $h$ agrees with $g$ on $T$. Let $\mathrm{AFSR}(\Phi_R)$ package $Z$, $s_0$, $T$, and a proof of this assertional satisfaction relation.
 
-\paragraph{Admissible initial states.}
-The bi-implication of Section~\ref{sec:dynamics-encoding-fragment} quantifies over runs from \emph{every} state of $Z_{\text{impl}}$, and this assumption does real work: the map laws it recovers are laws at each state, so a state that no admissible run ever reaches cannot be constrained by any run-based reading. Where a designated initial state is intended, the correct object is the subsystem generated by it---the reachable part---and the results below are then read of that subsystem. We state this once here rather than repeating it, and take the admissible initial-state class to be all states unless a reachable subsystem is named.
+Temporal assertions are useful only if they preserve the functional designs
+admitted by the original IOR.
 
-\label{sec:assertional-modes}
-Assertional checking admits two modeling strategies: systems modelers may write $\Phi$ directly, or compile $\Phi_{\mathrm{dyn}}$ from an explicit reference $Z_{\text{spec}}$. The property set/homomorphism bi-implication depends on \emph{fragment shape}, not on the modeling strategy. A complete dynamics-encoding property set (whether compiled from $Z_{\text{spec}}$ or authored in the same clause schemas) is equivalent to implementability relative to the (possibly implied) reference system. Temporal formulas outside that fragment, such as bare liveness $F$, are however not.
+\begin{theorem}[Characteristic boundary fragment]
+\label{thm:boundary-characteristic}
+For every Wymorian IOR $R$,
+\[
+ Z,s_0,T\models_{IO}\Phi_R
+ \quad\Longleftrightarrow\quad
+ SatisfiesIOR(Z,R,s_0,T).
+\]
+Consequently there is a canonical bijection
+\[
+  \mathrm{AFSR}(\Phi_R)\simeq\mathrm{FSR}(R)
+\]
+that fixes the system, designated state, and time scale.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Substitute $T_R$, $ITR$, and $A_R(f,g)\Leftrightarrow g\in ER(f)$ into the
+assertional satisfaction definition. Its clauses are those of
+$SatisfiesIOR$. The bijection preserves the design data and converts the
+satisfaction certificate in either direction.
+\end{proof}
+
+The fragment omits a separate $OTR$ field because Wymore's IOR axioms define
+that set through the ranges of $ER$. The theorem covers finite and infinite
+horizons, restricted input sets, and deterministic or relational eligible
+outputs. Finite ordinary-LTL formulas are available when the trajectory
+relation has a suitable presentation; Section~\ref{sec:case-basics} gives
+three examples.
+
+Implementation checking uses a second construction. Choose
+$D_{\mathrm{ref}}\in\mathrm{FSR}(R)$ and write
+$Z_{\mathrm{ref}}:=D_{\mathrm{ref}}.Z$. The transition and readout tables of
+$Z_{\mathrm{ref}}$ generate $\Phi_{\mathrm{dyn}}$. Thus $\Phi_R$
+characterizes functional designs for $R$, while $\Phi_{\mathrm{dyn}}$
+characterizes systems that realise the selected functional design.
+
+Recovering the map laws at every state requires runs starting from every state
+of $Z_{\mathrm{impl}}$. Restricting the initial-state class leaves unreachable
+states unconstrained. For a designated initial state, the result applies to the
+subsystem it generates. The statements below use all states unless a reachable
+subsystem is named.
 
 \begingroup
 \renewcommand{\arraystretch}{1.5}
-\begin{tabularx}{\textwidth}{@{}P{0.28\textwidth}YY@{}}
+\begin{tabularx}{\linewidth}{@{}P{0.28\linewidth}YY@{}}
     \rowcolor{tableheader}
     \headingfont\bfseries Feature & \headingfont\bfseries Constructive & \headingfont\bfseries Assertional \\
     \addlinespace[4pt]
-    Spec form & Reference system $Z_{\text{spec}}$ & Property set $\Phi$ (dialect $\mathcal{L}$) \\
+    Functionality & $R$ generates $\mathrm{FSR}(R)$ & $R$ compiles to $\Phi_R$ and $\mathrm{AFSR}(\Phi_R)\simeq\mathrm{FSR}(R)$ \\
     \addlinespace[4pt]
-    Evidence & Homomorphism $h$ & Property checking \\
+    Implementation evidence & Explicit homomorphism $h$ & Satisfaction of compiled $\Phi_{\mathrm{dyn}}$ \\
     \addlinespace[4pt]
-    Guarantee & Trajectory simulation under $h$ & Temporal satisfaction of $\Phi$ \\
+    Guarantee & Trajectory simulation under $h$ & The same simulation, by the bi-implication \\
     \addlinespace[4pt]
-    Typical effort & Construct and maintain $h$ & Encode $\Phi$ and re-check \\
+    Maintained artifact & Pair-specific maps $h_S,h_I,h_O$ & Reference-indexed fragment $\Phi_{\mathrm{dyn}}$ \\
 \end{tabularx}
-\captionof{table}{Verification workflow comparison. Fragment-qualified hom$\leftrightarrow\Phi$ equivalence is proved in Section~\ref{sec:dynamics-encoding-fragment}; global cotyledon set equality remains open (Section~\ref{sec:limitations}).}
+\captionof{table}{The proposed workflow changes the maintained evidence, not Wymore's functionality or implementation semantics.}
 \label{tab:comparison}
 \endgroup
 \vspace{6pt}
@@ -81,30 +131,40 @@ Assertional checking admits two modeling strategies: systems modelers may write 
 \subsection{The Dynamics-Encoding Fragment}
 \label{sec:dynamics-encoding-fragment}
 
-When assertional checking is used to answer the classical implementability question---whether a buildable system is a Wymore homomorphic image of a reference system---$\Phi$ cannot be an arbitrary temporal formula. We use a \emph{dynamics-encoding} fragment $\Phi_{\mathrm{dyn}}$: a direct logical reading of the state-transition and readout table of $Z_{\text{spec}}$. Throughout, ``homomorphism'' means the surjective, transition- and readout-preserving triple $h=(h_S,h_I,h_O)$ of \citet{Wymore1993}; the appendix states it as an indexed definition and cites its number there.
+For the classical implementation question, the relevant reference is
+$Z_{\mathrm{ref}}$, the system component of $D_{\mathrm{ref}}$. We compile its
+state-transition and readout tables into a \emph{dynamics-encoding} fragment
+$\Phi_{\mathrm{dyn}}$. Throughout, ``homomorphism'' means the surjective,
+transition- and readout-preserving triple $h=(h_S,h_I,h_O)$ of
+\citet{Wymore1993}; the appendix states the indexed definition.
 
-Table~\ref{tab:phi-dyn-fragment} states the fragment that makes the bi-implication hold. Clauses are compiled from $Z_{\text{spec}}$ and checked on $Z_{\text{impl}}$ under surjective maps $h_S,h_I,h_O$, or under identity when labels are shared. Computationally: at each tick of a buildable system's run, $\mathit{state}(s)$ means the buildable system's own state component equals $s$; $\mathit{specState}(s)$ means the projected specification state equals $s$, i.e., $h_S$ of the current buildable system's state is $s$. Inputs and outputs are read the same way on the buildable system's trace (with $h_I$/$h_O$ when checking under a homomorphism).
+Table~\ref{tab:phi-dyn-fragment} states the fragment that makes the
+bi-implication hold. Clauses are compiled from $Z_{\mathrm{ref}}$ and checked
+on $Z_{\mathrm{impl}}$ under surjective maps $h_S,h_I,h_O$, or under identity
+when labels are shared. At each tick, $\mathit{refState}(s)$ means that
+$h_S$ maps the implementation state to reference state $s$. Inputs and outputs
+are interpreted similarly through $h_I$ and $h_O$.
 
 \begingroup
 \renewcommand{\arraystretch}{1.35}
 \footnotesize
-\begin{tabularx}{\textwidth}{@{}A{0.22\textwidth} A{0.78\textwidth}@{}}
+\begin{tabularx}{\linewidth}{@{}A{0.22\linewidth} A{0.78\linewidth}@{}}
     \rowcolor{tableheader}
     \headingfont\bfseries Element & \headingfont\bfseries Dynamics-encoding fragment $\Phi_{\mathrm{dyn}}$ \\
     \addlinespace[2pt]
     Operators & $G$ (always), $X$ (next), $\rightarrow$, $\wedge$; \textbf{not} $F$ (eventually) \\
     \addlinespace[2pt]
-    Atoms & $\mathit{state}(s)$ / $\mathit{specState}(s)$; $\mathit{input}(i)$, $\mathit{input}(\mathrm{none})$; $\mathit{output}(o)$, $\mathit{output}(\mathrm{none})$ \\
+    Atoms & $\mathit{state}(s)$ / $\mathit{refState}(s)$; $\mathit{input}(i)$, $\mathit{input}(\mathrm{none})$; $\mathit{output}(o)$, $\mathit{output}(\mathrm{none})$ \\
     \addlinespace[2pt]
-    Open readout & $G\bigl(\mathit{specState}(s) \rightarrow \mathit{output}(o)\bigr)$ whenever $\rho_{\text{spec}}(s)=o$ \\
+    Open readout & $G\bigl(\mathit{refState}(s) \rightarrow \mathit{output}(o)\bigr)$ whenever $\rho_{\text{ref}}(s)=o$ \\
     \addlinespace[2pt]
-    Closed readout & $G\bigl(\mathit{specState}(s) \rightarrow \mathit{output}(\mathrm{none})\bigr)$ whenever $\rho_{\text{spec}}(s)=\mathrm{none}$ \\
+    Closed readout & $G\bigl(\mathit{refState}(s) \rightarrow \mathit{output}(\mathrm{none})\bigr)$ whenever $\rho_{\text{ref}}(s)=\mathrm{none}$ \\
     \addlinespace[2pt]
-    Autonomous step & $G\bigl((\mathit{specState}(s)\wedge\mathit{input}(\mathrm{none})) \rightarrow X(\mathit{specState}(\delta_{\text{spec}}(s,\mathrm{none})))\bigr)$ \\
+    Autonomous step & $G\bigl((\mathit{refState}(s)\wedge\mathit{input}(\mathrm{none})) \rightarrow X(\mathit{refState}(\delta_{\text{ref}}(s,\mathrm{none})))\bigr)$ \\
     \addlinespace[2pt]
-    Guided step & $G\bigl((\mathit{specState}(s)\wedge\mathit{input}(i)) \rightarrow X(\mathit{specState}(\delta_{\text{spec}}(s,i)))\bigr)$ for each $i\in I_{\text{spec}}$ \\
+    Guided step & $G\bigl((\mathit{refState}(s)\wedge\mathit{input}(i)) \rightarrow X(\mathit{refState}(\delta_{\text{ref}}(s,i)))\bigr)$ for each $i\in I_{\text{ref}}$ \\
     \addlinespace[2pt]
-    Compiled from & Reference system $Z_{\text{spec}}$ (transition and readout table) \\
+    Compiled from & System component $Z_{\mathrm{ref}}$ of $D_{\mathrm{ref}}$ \\
     \addlinespace[2pt]
     Checked on & Buildable system $Z_{\text{impl}}$ under surjective $h_S,h_I,h_O$ (or identity on shared labels) \\
     % \addlinespace[2pt]
@@ -115,55 +175,91 @@ Table~\ref{tab:phi-dyn-fragment} states the fragment that makes the bi-implicati
 \endgroup
 \vspace{4pt}
 
-Table~\ref{tab:fragment-compare} contrasts $\Phi_{\mathrm{dyn}}$ with propositional LTL and FO-LTL as commonly used for requirements and model checking. The point is not that $\Phi_{\mathrm{dyn}}$ is ``more expressive,'' but that it is a \emph{restricted, table-shaped} fragment engineered so that satisfaction coincides with Wymore implementability.
+LTL supplies the notation for this table-shaped fragment. Predicate-indexed
+clauses permit infinite or real-valued $S$, $I$, and $O$. Closed readouts and
+autonomous steps remain first-class; finite-state instances can be flattened
+for automated checking.
 
-\begingroup
-\renewcommand{\arraystretch}{1.25}
-\footnotesize
-\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.16\linewidth}YYY@{}}
-    \rowcolor{tableheader}
-    \headingfont\bfseries Dimension & \headingfont\bfseries Prop.\ LTL & \headingfont\bfseries FO-LTL & \headingfont\bfseries $\Phi_{\mathrm{dyn}}$ \\
-    \addlinespace[2pt]
-    Typical use & Finite-state MC of liveness/safety specs & Infinite/real state; quantified tick laws & Compile $Z_{\text{spec}}$ table; check implementability \\
-    \addlinespace[2pt]
-    Logic / operators & Full LTL ($G,F,X,U,\ldots$) & Same, plus FO & $G,X,\rightarrow,\wedge$ only; no $F$/$U$ \\
-    \addlinespace[2pt]
-    Atoms & Propositional labels & FO atoms over values & $\mathit{state}$/$\mathit{specState}$, $\mathit{input}$, $\mathit{output}$ \\
-    \addlinespace[2pt]
-    Formula shape & Arbitrary (within LTL) & Arbitrary (within FO-LTL) & Four fixed clause schemas (Table~\ref{tab:phi-dyn-fragment}) \\
-    \addlinespace[2pt]
-    Spec source & Engineer-authored $\Phi$ & Engineer-authored $\Phi$ & Compiled from $Z_{\text{spec}}$ (or authored as $\Phi_{\mathrm{dyn}}$) \\
-    \addlinespace[2pt]
-    Hom equivalence & Not in general & Not in general & Yes (bi-implication) \\
-    \addlinespace[2pt]
-    Decidable checking & Yes if finite-state & Not in general & Finite projection yes; FO/infinite/real constrained \\
-\end{tabularx}
-\captionof{table}{Comparison of propositional LTL, FO-LTL, and the dynamics-encoding fragment $\Phi_{\mathrm{dyn}}$.}
-\label{tab:fragment-compare}
-\endgroup
-\vspace{4pt}
+An assertional check must provide the same implementation evidence as the
+Wymore homomorphism it replaces.
 
-Because clauses are predicate-indexed rather than flattened into a finite propositional list, $S$, $I$, and $O$ may be infinite or real-valued. Closed readouts and autonomous steps are first-class, so silent outputs and unguided ticks cannot be ignored by a buildable system that claims to implement $Z_{\text{spec}}$.
-
-\paragraph{Bi-implication with classical implementability.}
-For fixed $Z_{\text{spec}}$, the following is proved in Appendix~\ref{app:hom-biimp} and illustrated in Section~\ref{sec:case-study}:
+\begin{theorem}[Dynamics-fragment characterization]
+\label{thm:dynamics-characterization}
+Fix $D_{\mathrm{ref}}\in\mathrm{FSR}(R)$ and its system
+$Z_{\mathrm{ref}}$. Then
 \[
-  Z_{\text{impl}} \models_{\mathrm{dyn}} \Phi_{Z_{\text{spec}}}
+  Z_{\text{impl}} \models_{\mathrm{dyn}} \Phi_{Z_{\text{ref}}}
   \;\;\Longleftrightarrow\;\;
-  \exists\, h : Z_{\text{impl}} \to Z_{\text{spec}}\ \text{Wymore system homomorphism}.
+  \exists\, h : Z_{\text{impl}} \to Z_{\text{ref}}\ \text{Wymore system homomorphism}.
 \]
-Here $\models_{\mathrm{dyn}}$ means every admissible run of $Z_{\text{impl}}$ obeys the clause families of Table~\ref{tab:phi-dyn-fragment} under some surjective projection. No finiteness or total-readout precondition is required. On this fragment, engineers may treat assertional satisfaction of $\Phi_{Z_{\text{spec}}}$ as the primary verification artifact.
+\end{theorem}
 
-\paragraph{Shared fixed-table specialization.}
-When $Z_{\text{spec}}$ and $Z_{\text{impl}}$ share $(S,I,O)$ and labels are treated as canonical, literal satisfaction is equivalent to pointwise agreement of $\delta$ and $\rho$. Cross-type elaborations require the full hom-relative reading above. Finite propositional projections support automated model checking when spaces are small; they specialize the same semantic content and do not weaken the bi-implication.
+\begin{proof}[Proof sketch]
+A Wymore homomorphism satisfies the readout and transition equations at each
+implementation state. Applying those equations along a run yields the four
+clause families of Table~\ref{tab:phi-dyn-fragment}. Conversely, start a run
+from an arbitrary implementation state and inspect the clauses at tick zero.
+They recover the readout equation and each autonomous or guided transition
+equation. Appendix~\ref{app:hom-biimp} gives the indexed argument.
+\end{proof}
 
-\paragraph{Where the fragment sits.}
-$\Phi_{\mathrm{dyn}}$ is not a new logic. Each clause is $G$ of a Horn implication whose consequent lies under at most one $X$, so the fragment is a step-local safety fragment and satisfaction reduces to a per-state condition rather than an $\omega$-automaton emptiness check; compiling a table into a formula that characterizes its models is the characteristic-formula construction of process theory; and the maps a Wymore homomorphism requires are the bounded morphisms of modal logic. Section~\ref{sec:related-work} develops each of these relatives with references. The claim of this paper is an identification rather than an invention---that the shape T3SD implementability demands is exactly this known one---which is what allows existing tooling to apply (Section~\ref{sec:case-solver}).
+A conforming candidate must also be buildable before it supports a T3SD
+implementation decision.
+
+\begin{corollary}[Cotyledon implementability]
+\label{cor:cotyledon-implementability}
+If $Z_{\mathrm{impl}}\models_{\mathrm{dyn}}\Phi_{Z_{\mathrm{ref}}}$ and
+$Z_{\mathrm{impl}}$ is the resultant of a buildable design in $TYR$, then
+$D_{\mathrm{ref}}$ and that buildable design form an element of
+$\mathrm{ISR}(R,TYR)$.
+\end{corollary}
+
+\begin{proof}[Proof sketch]
+Theorem~\ref{thm:dynamics-characterization} supplies the homomorphism, hence
+Wymore's implementation witness. Pair it with the given functional and
+buildable designs. Requirement inheritance uses Theorem~6.58 for identity
+boundary maps and transport for general maps.
+\end{proof}
+
+Shared design vocabularies should turn failed assertions into direct table
+discrepancies.
+
+\begin{proposition}[Shared-table specialization]
+\label{prop:shared-table}
+If $Z_{\mathrm{ref}}$ and $Z_{\mathrm{impl}}$ share $(S,I,O)$ and use
+the identity state, input, and output maps, satisfaction of
+$\Phi_{Z_{\mathrm{ref}}}$ is
+equivalent to pointwise agreement of their transition and readout functions.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+With canonical labels the three projection maps are identities. The readout
+clauses give equality of $\rho$ at each state, and the transition clauses give
+equality of $\delta$ for every optional input. The converse follows by
+substitution in the clauses.
+\end{proof}
+
+Cross-type elaborations use the hom-relative reading of
+Theorem~\ref{thm:dynamics-characterization}. Finite propositional projections
+support automated checking when the relevant spaces are finite.
+
+$\Phi_{\mathrm{dyn}}$ occupies a known part of temporal logic. Each clause is
+$G$ of a Horn implication whose consequent lies under at most one $X$, making
+satisfaction a per-state safety condition. Compiling a transition table into a
+formula is a characteristic-formula construction, and the maps required by a
+Wymore homomorphism are bounded morphisms. This identification connects T3SD
+implementation checking to established theory and tools
+(Section~\ref{sec:case-solver}).
 
 \input{sections/025-invariance}
 
 \subsection{Property Checking}
 \label{sec:automated-checking}
 
-Property checking of $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$ may proceed by finite-horizon unrolling, finite-state abstraction, or theory-specific solvers on bounded queries \citep{BaierKatoen2008,deMouraZ32008}. Satisfaction of $\Phi$ guarantees only what $\Phi$ states. Unbounded FO-LTL over infinite or real-valued coordinates is not decidable in general; practitioners rely on finite projections, bounded horizons, or restricted input classes. Propositional LTL on finite abstractions remains a mature automated path when those abstractions are adequate for the claim at hand.
+Property checking of $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$ may use
+finite-horizon unrolling, finite-state abstraction, or theory-specific solvers
+on bounded queries \citep{BaierKatoen2008,deMouraZ32008}. Unbounded FO-LTL
+over infinite or real-valued coordinates is undecidable in general. Finite
+projections, bounded horizons, restricted input classes, and symbolic proofs
+cover different parts of the resulting verification problem.
 

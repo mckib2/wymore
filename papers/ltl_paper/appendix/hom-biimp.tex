@@ -1,59 +1,199 @@
-\section{Dynamics-Encoding Bi-Implication}
+\section{Correspondence Proofs}
 \label{app:hom-biimp}
 
-This appendix proves the bi-implication stated in Section~\ref{sec:dynamics-encoding-fragment}.
+The main text uses two correspondence results. The first follows by unfolding
+the definition of IOR satisfaction. The second rests on a simple observation:
+a system's one-step table equations and the corresponding clauses along every
+run contain the same information, provided that a run may begin in every
+implementation state. We give both arguments here.
 
-\paragraph{Statement.}
-$Z_{\text{impl}}$ satisfies the hom-relative dynamics-encoding property set compiled from $Z_{\text{spec}}$
-if and only if
-there exists a Wymore system homomorphism $h : Z_{\text{impl}} \to Z_{\text{spec}}$ (Def.~4.3).
+\subsection{The boundary correspondence}
 
-\subsection{Setup}
-\label{app:hom-setup}
-Write $Z_{\text{spec}}=(S_{\text{spec}},I_{\text{spec}},O_{\text{spec}},\delta_{\text{spec}},\rho_{\text{spec}})$ and $Z_{\text{impl}}=(S_{\text{impl}},I_{\text{impl}},O_{\text{impl}},\delta_{\text{impl}},\rho_{\text{impl}})$. Types may differ. A run of $Z_{\text{impl}}$ is determined by $s_0$ and $f:T\to I_{\text{impl}}\cup\{\mathrm{none}\}$ via \eqref{eq:trace-init}--\eqref{eq:trace-readout}. Maps $h_S,h_I,h_O$ are surjective; $h_I$ lifts to options by sending $\mathrm{none}$ to $\mathrm{none}$.
-
-The admissible class quantifies over all states of $Z_{\text{impl}}$ as initial states and all input trajectories. This is used in one direction only---recovering the static laws from the runs---and it is necessary there: a state reached by no admissible run is unconstrained by any run-based reading, whereas Definition~4.3 constrains every state. When a designated initial state is intended, replace $Z_{\text{impl}}$ throughout by the subsystem it generates; the argument is unchanged and the conclusion is about that subsystem.
-
-\subsection{Hom-relative fragment}
-\label{app:hom-fragment}
-Clauses are indexed by specification states. The atom $\mathit{specState}(s)$ holds at tick $t$ when $h_S(g(t))=s$. For each spec state $s$:
-\begin{enumerate}[label=(\roman*), leftmargin=2em]
-    \item Open readout: if $\rho_{\text{spec}}(s)=o$ and $\mathit{specState}(s)$, then $h_O(y(t))=o$.
-    \item Closed readout: if $\rho_{\text{spec}}(s)=\mathrm{none}$ and $\mathit{specState}(s)$, then $h_O(y(t))=\mathrm{none}$.
-    \item Autonomous: if $\mathit{specState}(s)$ and $f(t)=\mathrm{none}$, then $h_S(g(t{+}1))=\delta_{\text{spec}}(s,\mathrm{none})$.
-    \item Guided: if $\mathit{specState}(s)$, $f(t)=i_{\text{impl}}$, and $h_I(i_{\text{impl}})=i_{\text{spec}}$, then $h_S(g(t{+}1))=\delta_{\text{spec}}(s,i_{\text{spec}})$.
-\end{enumerate}
-Write $Z_{\text{impl}}\models_{\mathrm{dyn}}\Phi^{\mathrm{hom}}_{Z_{\text{spec}}}$ when there exist surjective $h_S,h_I,h_O$ such that every admissible run satisfies every clause.
-
-\subsection{Def.~4.3 homomorphism}
-\label{app:hom-def}
-A homomorphism requires, for every impl state $x$,
-\begin{align}
-  h_O(\rho_{\text{impl}}(x)) &= \rho_{\text{spec}}(h_S(x)) \label{eq:hom-readout-static}\\
-  h_S(\delta_{\text{impl}}(x, oi)) &= \delta_{\text{spec}}(h_S(x), oi.\mathit{map}(h_I)). \label{eq:hom-step-static}
-\end{align}
-
-\subsection{Bridge lemma}
-\label{app:hom-bridge}
-Fix surjective $h_S,h_I,h_O$. The static laws~\eqref{eq:hom-readout-static}--\eqref{eq:hom-step-static} hold at every impl state if and only if every impl run satisfies the four clause families.
-
-\paragraph{Static $\Rightarrow$ runs.} Trajectory equations give $g(t{+}1)=\delta_{\text{impl}}(g(t),f(t))$ and $y(t)=\rho_{\text{impl}}(g(t))$. Instantiating the static laws at $g(t)$ yields each clause.
-
-\paragraph{Runs $\Rightarrow$ static.} From impl state $x$, run with constant input $oi$ (or $\mathrm{none}$). The clause at $t=0$ recovers the static law at $x$.
-
-\subsection{Directions}
-\label{app:hom-forward}
-\label{app:hom-backward}
-If $h$ is a homomorphism, the static laws hold, hence by the bridge lemma every run satisfies the clauses. Conversely, if $Z_{\text{impl}}\models_{\mathrm{dyn}}\Phi^{\mathrm{hom}}_{Z_{\text{spec}}}$, the witnessing maps satisfy the static laws at every state and are therefore a Def.~4.3 homomorphism. Surjectivity ensures every specification row is inhabited by some impl state.
-
-\subsection{Theorem and fixed-table corollary}
-\label{app:hom-fixed}
+Fix an IOR
 \[
-  Z_{\text{impl}} \models_{\mathrm{dyn}} \Phi^{\mathrm{hom}}_{Z_{\text{spec}}}
-  \;\;\Longleftrightarrow\;\;
-  \exists\, h : Z_{\text{impl}} \to Z_{\text{spec}}\ \text{Wymore homomorphism}.
+  R=(OLR,IR,ITR,OR,OTR,ER)
 \]
-When types coincide and identity maps are used, this specializes to pointwise $\delta$/$\rho$ agreement (partial identity homomorphic image). Formulas outside the fragment---including $F$ properties and output-table-only encodings---are outside the bi-implication. Global FC equality for arbitrary such $\Phi$ remains open.
+and let $T_R$ be its time scale. Its characteristic fragment retains exactly
+the data used to test a system at the boundary:
+\[
+  \Phi_R=(T_R,ITR,A_R),
+  \qquad A_R(f,g)\ \Longleftrightarrow\ g\in ER(f).
+\]
+For a system $Z$, designated state $s_0$, and nonempty $T\subseteq T_R$, the
+assertion $Z,s_0,T\models_{IO}\Phi_R$ says the following. Choose an admissible
+input $f\in ITR$, and then choose any complete input $h$ that agrees with $f$
+on $T_R$. The output generated by $Z$ from $s_0$ on $h$ must agree on $T$
+with some trajectory $g$ allowed by $A_R(f,\cdot)$.
 
-\paragraph{Machine-checked formalization.}
-This bi-implication, the invariance and composition results of Section~\ref{sec:invariance}, and every conformance and rejection claim of the case study are formalized in a proof assistant, including the coupling recipe of Section~\ref{sec:case-machine} and its resultant, the accepted and rejected zone variants, the lift of zone conformance to the coupled system, and the tick-granularity negative result. The rejections are proofs that no maps exist rather than reports of failed search. The finite instances decided by the checker of Section~\ref{sec:case-solver} are compared against those theorems wherever a theorem covers the instance, and one map found by the checker is re-verified inside the formalization.
+Substituting the definition of $A_R$ changes ``allowed by
+$A_R(f,\cdot)$'' into ``belongs to $ER(f)$.'' Every other clause is already
+the corresponding clause of Wymore's $SatisfiesIOR$: $T$ is nonempty,
+$T\subseteq T_R$, $f$ belongs to $ITR$, and $h$ is an agreeing extension.
+Thus, for every IOR and every choice of $Z,s_0,T$,
+\[
+  Z,s_0,T\models_{IO}\Phi_R
+  \quad\Longleftrightarrow\quad
+  SatisfiesIOR(Z,R,s_0,T).
+\]
+The two criteria are identical. A member of $\mathrm{AFSR}(\Phi_R)$ and the corresponding member of
+$\mathrm{FSR}(R)$ therefore carry the same system, designated state, and time
+scale. Only the name of the satisfaction certificate changes. Replacing that
+certificate in either direction gives the canonical bijection
+\[
+  \mathrm{AFSR}(\Phi_R)\simeq\mathrm{FSR}(R).
+\]
+
+\subsection{The dynamics correspondence}
+\label{app:hom-setup}
+
+We now prove Theorem~\ref{thm:dynamics-characterization}. Write the reference
+and implementation systems as
+\begin{align*}
+Z_{\mathrm{ref}}
+  &= (S_{\mathrm{ref}},I_{\mathrm{ref}},O_{\mathrm{ref}},
+      \delta_{\mathrm{ref}},\rho_{\mathrm{ref}}),\\
+Z_{\mathrm{impl}}
+  &= (S_{\mathrm{impl}},I_{\mathrm{impl}},O_{\mathrm{impl}},
+      \delta_{\mathrm{impl}},\rho_{\mathrm{impl}}).
+\end{align*}
+Their state and interface types need not be the same. Candidate maps therefore
+have the directions
+\[
+ h_S:S_{\mathrm{impl}}\to S_{\mathrm{ref}},\qquad
+ h_I:I_{\mathrm{impl}}\to I_{\mathrm{ref}},\qquad
+ h_O:O_{\mathrm{impl}}\to O_{\mathrm{ref}}.
+\]
+All three maps are required to be surjective. Write $\bar h_I$ and $\bar h_O$
+for their extensions to optional inputs and outputs, with
+$\mathrm{none}$ mapped to $\mathrm{none}$.
+
+A Wymore homomorphism is precisely such a triple satisfying, for every
+implementation state $x$ and optional implementation input $q$,
+\begin{align}
+  \bar h_O\!\left(\rho_{\mathrm{impl}}(x)\right)
+    &= \rho_{\mathrm{ref}}\!\left(h_S(x)\right),
+    \label{eq:hom-readout-static}\\
+  h_S\!\left(\delta_{\mathrm{impl}}(x,q)\right)
+    &= \delta_{\mathrm{ref}}\!\left(h_S(x),\bar h_I(q)\right).
+    \label{eq:hom-step-static}
+\end{align}
+Equation~\eqref{eq:hom-readout-static} says that observing and then abstracting
+gives the same answer as abstracting the state and then observing.
+Equation~\eqref{eq:hom-step-static} says the same for one step of behavior.
+These are the two commuting diagrams in Definition~4.3 of
+\citet{Wymore1993}.
+
+Now consider a run of $Z_{\mathrm{impl}}$. An initial state $s_0$ and an
+optional-input trajectory $f$ determine state and output trajectories by
+\begin{align}
+  g(0)&=s_0, \label{eq:trace-init}\\
+  g(t+1)&=\delta_{\mathrm{impl}}(g(t),f(t)),
+    \label{eq:trace-step}\\
+  y(t)&=\rho_{\mathrm{impl}}(g(t)).
+    \label{eq:trace-readout}
+\end{align}
+At tick $t$, the atom $\mathit{refState}(s)$ means $h_S(g(t))=s$.
+The four clause families in Table~\ref{tab:phi-dyn-fragment} can consequently
+be read in two compact lines:
+\begin{align}
+  \bar h_O(y(t))
+    &=\rho_{\mathrm{ref}}(h_S(g(t))), \label{eq:trace-readout-law}\\
+  h_S(g(t+1))
+    &=\delta_{\mathrm{ref}}(h_S(g(t)),\bar h_I(f(t))).
+    \label{eq:trace-step-law}
+\end{align}
+The open- and closed-readout clauses are the two cases of
+\eqref{eq:trace-readout-law}. The autonomous and guided clauses are the
+$\mathrm{none}$ and $\mathrm{some}$ cases of
+\eqref{eq:trace-step-law}. This compression is only notational; no clause has
+been dropped.
+
+The proof now reduces to the following bridge.
+
+\begin{lemma}[Static laws and run clauses]
+\label{lem:static-run-bridge}
+Fix surjective maps $h_S,h_I,h_O$. The static
+laws~\eqref{eq:hom-readout-static}--\eqref{eq:hom-step-static} hold at every
+implementation state if and only if
+\eqref{eq:trace-readout-law}--\eqref{eq:trace-step-law} hold at every tick of
+every implementation run.
+\end{lemma}
+
+\begin{proof}
+Suppose first that the static laws hold. At an arbitrary tick $t$, use
+\eqref{eq:trace-readout} and then apply the readout law at the current state
+$g(t)$:
+\[
+  \bar h_O(y(t))
+  =\bar h_O(\rho_{\mathrm{impl}}(g(t)))
+  =\rho_{\mathrm{ref}}(h_S(g(t))).
+\]
+This is \eqref{eq:trace-readout-law}. Likewise,
+\eqref{eq:trace-step} followed by the transition law at $g(t)$ with input
+$f(t)$ gives
+\[
+  h_S(g(t+1))
+  =h_S(\delta_{\mathrm{impl}}(g(t),f(t)))
+  =\delta_{\mathrm{ref}}(h_S(g(t)),\bar h_I(f(t))),
+\]
+which is \eqref{eq:trace-step-law}. Since the run and tick were arbitrary, all
+four clause families hold.
+
+For the converse, let $x$ be any implementation state. Begin a run at
+$s_0=x$. At tick zero, $g(0)=x$, so
+\eqref{eq:trace-readout-law} immediately gives
+\[
+  \bar h_O(\rho_{\mathrm{impl}}(x))
+  =\rho_{\mathrm{ref}}(h_S(x)).
+\]
+This recovers the static readout law at $x$.
+
+It remains to recover the transition law. Let $q$ be any optional
+implementation input, and choose a run whose input at tick zero is $q$.
+Equation~\eqref{eq:trace-step-law} at tick zero, together with
+$g(0)=x$ and
+$g(1)=\delta_{\mathrm{impl}}(x,q)$, gives
+\[
+  h_S(\delta_{\mathrm{impl}}(x,q))
+  =\delta_{\mathrm{ref}}(h_S(x),\bar h_I(q)).
+\]
+This covers both an autonomous step $q=\mathrm{none}$ and a guided step
+$q=\mathrm{some}(i)$. Because $x$ and $q$ were arbitrary, both static laws
+hold everywhere.
+\end{proof}
+
+The quantification over initial states is important in the reverse direction:
+it lets us place an arbitrary state $x$ at tick zero. If only one designated
+initial state is admitted, the same argument recovers the static laws on the
+reachable subsystem, but says nothing about unreachable states.
+
+We can now finish the correspondence. If
+$h=(h_S,h_I,h_O)$ is a Wymore homomorphism, its static laws hold by
+definition, and Lemma~\ref{lem:static-run-bridge} shows that every run satisfies
+the compiled fragment. Conversely, suppose
+$Z_{\mathrm{impl}}\models_{\mathrm{dyn}}\Phi_{Z_{\mathrm{ref}}}$.
+Satisfaction supplies surjective maps $h_S,h_I,h_O$ for which every run obeys
+the clauses. The reverse half of the lemma recovers the two static laws, so
+these maps form a Wymore homomorphism. Therefore
+\[
+  Z_{\mathrm{impl}}\models_{\mathrm{dyn}}\Phi_{Z_{\mathrm{ref}}}
+  \quad\Longleftrightarrow\quad
+  \exists\,h:Z_{\mathrm{impl}}\to Z_{\mathrm{ref}}
+  \ \text{Wymore system homomorphism}.
+\]
+
+Surjectivity deserves one final comment. The equations alone describe a
+behavior-preserving projection onto some part of the reference. Surjectivity
+ensures that every reference state, input, and output is represented by the
+implementation, as Definition~4.3 requires. In the clause presentation, it
+also prevents a reference row from being satisfied only because no
+implementation state ever projects to it.
+
+Finally, let $Z_{\mathrm{ref}}$ be the system component of
+$D_{\mathrm{ref}}\in\mathrm{FSR}(R)$, and let $Z_{\mathrm{impl}}$ be the
+resultant of a buildable design. Satisfaction of the dynamics fragment now
+supplies exactly the implementation witness needed to pair those two designs
+in $\mathrm{ISR}(R,TYR)$. The proof concerns the compiled readout and
+one-step clauses. Temporal properties outside that fragment, including
+eventuality, require their own arguments.
+

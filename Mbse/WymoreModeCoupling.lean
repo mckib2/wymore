@@ -598,8 +598,8 @@ def mkConstantResultantCompat {n : Nat} {SCR : SystemCouplingRecipe n}
     (hModeOut : ∀ i, AlwaysOutputs ((sysmoscr D).VSCR.Z i))
     {d : Time} (hd : 0 < d)
     (htrans : ∀ y e,
-      resultantStateMap D ((rsy (sysmoscr D) hModeOut).NZ y (some e)) =
-        generateStateTrajectory (rsy SCR hOut) (resultantStateMap D y)
+    resultantStateMap D ((rsy (sysmoscr D) hModeOut).NZ y (some e)) =
+      generateStateTrajectory (rsy SCR hOut) (resultantStateMap D y)
           (liftInput (constantExternalInput D e)) d)
     [∀ i p, Nonempty (D.ModePortVal i p)]
     [∀ i q, Nonempty (D.ModeOutPortVal i q)] :

@@ -40,8 +40,13 @@ variable {SZ IZ OZ SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
 
 /-! ## Membership predicates (documentation) -/
 
-/-- Classical FC membership: implementation is a Wymore Def.~4.3 homomorphic image of
-reference `Z_spec` (cross-type allowed). -/
+/-- Classical FC constructive proxy membership: implementation is a Wymore Def.~4.3 homomorphic
+image of reference `Z_spec` (cross-type allowed).
+
+In authentic Wymore T3SD (Ch. 6), the Functionality Cotyledon `CTL(IOR) = FSR(IOR)` is defined
+purely by trajectory satisfaction `SatisfiesIOR`. Classical constructive engineering practice
+retreated to instantiating a reference system `Z_spec ∈ FSR(IOR)` and seeking a homomorphism `h`.
+By Wymore Theorem 6.58 and `AssertionalCotyledonBridge`, homomorphic satisfaction preserves `SatisfiesIOR`. -/
 def ClassicalFCMembership
     (Z_spec : DiscreteSystem SZ1 IZ1 OZ1) (Z_impl : DiscreteSystem SZ2 IZ2 OZ2) : Prop :=
   IsHomomorphicImage Z_spec Z_impl

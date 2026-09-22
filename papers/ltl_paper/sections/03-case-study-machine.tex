@@ -1,178 +1,96 @@
-\subsection{A Coupled Machine with Arbitrary Functional Intent}
+\subsection{Four Components, One Algorithm}
 \label{sec:case-machine}
 
-The kit zones of Section~\ref{sec:case-basics} are single systems whose intent is stated in one line. Engineering intent is rarely like that, and a reader is entitled to ask whether the compiled fragment says anything once intent becomes demanding. This section answers that in the strongest available form: it builds a system whose functional intent is \emph{any} computable behavior, presents it as a coupling of two zones through declared ports, and shows that conformance of the coupling to a monolithic reference is exactly satisfaction of the compiled fragment.
+The components are ordinary discrete systems. They share one state type (a bit,
+a count in $\mathbb{N}$, a sense/act phase, and an auxiliary pending bit) and
+one port alphabet, a pair. Their next-state clauses make them pairwise distinct:
 
-The system is a Turing machine. Nothing about the presentation is computational in flavor---no program, no software, no domain story. There are two zones with ports, a wiring table, and a resultant, in the ordinary Wymorean sense. What the choice buys is that universality comes for free: a tape zone coupled to a finite control zone realizes any computable functional intent, so no reader can object that the demonstration was chosen to be easy.
-
-\subsubsection{Two zones, stated as discrete systems with ports}
-\label{sec:case-machine-zones}
-
-Fix a finite symbol set $\Gamma$ with a blank, and a finite label set $\Lambda$. A \emph{table} $M$ assigns to each label and scanned symbol either a halt or a triple (next label, symbol to write, head move).
-
-\paragraph{Tape zone $Z_{\mathrm{tape}}$.}
-State is a tape: a finite left part, a scanned symbol, a finite right part, extended with blanks as the head runs off either end. The zone has one input port carrying a command---either \emph{hold} or \emph{act}$(w,m)$, meaning write $w$ then move $m$---and two output ports, both carrying the scanned symbol. Two output ports are not redundancy: coupling connectivity is one-to-one, so exposing the scanned symbol to the control \emph{and} at the system boundary requires distinct ports.
-
-\begingroup
-\renewcommand{\arraystretch}{1.25}
-\footnotesize
 \begin{center}
-\begin{tabularx}{0.95\linewidth}{@{}>{\raggedright\arraybackslash}p{3.0cm}Y@{}}
-    \rowcolor{tableheader}
-    \headingfont\bfseries Component & \headingfont\bfseries $Z_{\mathrm{tape}}$ \\
-    \addlinespace[2pt]
-    $S$ & tapes $(\ell, a, r)$ over $\Gamma$ \\
-    \addlinespace[2pt]
-    Input ports & $\mathit{cmd}$ \\
-    \addlinespace[2pt]
-    Port value sets & $I_{\mathit{cmd}} = \{\mathit{hold}\} \cup \{\mathit{act}(w,m) \mid w\in\Gamma,\ m\in\{L,R,S\}\}$ \\
-    \addlinespace[2pt]
-    Output ports & $\mathit{scan}$, $\mathit{window}$ \\
-    \addlinespace[2pt]
-    Port value sets & $O_{\mathit{scan}} = O_{\mathit{window}} = \Gamma$ \\
-    \addlinespace[2pt]
-    $\delta(t, \mathit{cmd})$ & apply the command: write, then move, extending with blanks \\
-    \addlinespace[2pt]
-    $\delta(t, \mathrm{none})$ & $t$ \\
-    \addlinespace[2pt]
-    $\rho(t)$ & scanned symbol on both output ports \\
-\end{tabularx}
-\end{center}
-\captionof{table}{Tape zone $Z_{\mathrm{tape}}$: one command port in, the scanned symbol on two ports out.}
-\label{tab:z-tape}
-\endgroup
-\vspace{4pt}
-
-\paragraph{Control zone $Z_{\mathrm{ctl}}$.}
-Readout in a discrete system is a function of state alone. In a feedback coupling this has a consequence that is easy to miss and impossible to work around: the control cannot both observe the scanned symbol and emit a command derived from it within one tick, because the command it offers this tick was fixed by the state it was already in. The control is therefore a two-phase system. In a \emph{sense} phase it latches the action the table selects for the symbol it is being shown; in an \emph{act} phase it emits that action on its command port and returns to sensing. A halted state emits \emph{hold} forever. One machine step consequently occupies two ticks of the coupling, a point we return to in Section~\ref{sec:case-ticks}.
-
-\begingroup
-\renewcommand{\arraystretch}{1.25}
 \footnotesize
-\begin{center}
-\begin{tabularx}{0.95\linewidth}{@{}>{\raggedright\arraybackslash}p{3.0cm}Y@{}}
-    \rowcolor{tableheader}
-    \headingfont\bfseries Component & \headingfont\bfseries $Z_{\mathrm{ctl}}$ \\
-    \addlinespace[2pt]
-    $S$ & $\{\mathit{sense}(q)\} \cup \{\mathit{act}(q,c)\} \cup \{\mathit{halted}\}$, $q\in\Lambda$ \\
-    \addlinespace[2pt]
-    Input ports & $\mathit{sym}$, $\mathit{load}$ \\
-    \addlinespace[2pt]
-    Port value sets & $I_{\mathit{sym}} = \Gamma$, \quad $I_{\mathit{load}} = \Lambda \cup \{\mathrm{none}\}$ \\
-    \addlinespace[2pt]
-    Output ports & $\mathit{cmd}$, $\mathit{halted}$ \\
-    \addlinespace[2pt]
-    Port value sets & $O_{\mathit{cmd}} = I_{\mathit{cmd}}$ of Table~\ref{tab:z-tape}, \quad $O_{\mathit{halted}} = \{0,1\}$ \\
-    \addlinespace[2pt]
-    $\delta(\mathit{sense}(q), (a, \mathrm{none}))$ & $\mathit{act}(q', \mathit{act}(w,m))$ if $M(q,a)=(q',w,m)$; else $\mathit{halted}$ \\
-    \addlinespace[2pt]
-    $\delta(\mathit{act}(q,c), (a, \mathrm{none}))$ & $\mathit{sense}(q)$ \\
-    \addlinespace[2pt]
-    $\delta(s, (a, q_0))$ & $\mathit{sense}(q_0)$ \quad (an external load overrides the table) \\
-    \addlinespace[2pt]
-    $\rho(s)$ & the command $s$ offers, and whether $s$ is halted \\
-\end{tabularx}
+\begin{tabular}{@{}llll@{}}
+\toprule
+ & role & driven step & readout \\
+\midrule
+$0$ & tape & latch the scanned bit & echo the bit \\
+$1$ & head & flip the phase & echo the phase \\
+$2$ & register & store the incoming pair & echo the pair \\
+$3$ & table & same bit increments; a new bit resets the count to $1$ & emit the pair \\
+\bottomrule
+\end{tabular}
 \end{center}
-\captionof{table}{Control zone $Z_{\mathrm{ctl}}$: sense latches the table's decision, act emits it.}
-\label{tab:z-ctl}
-\endgroup
-\vspace{4pt}
 
-\subsubsection{The coupling recipe and its resultant}
-\label{sec:case-machine-coupling}
+The coupling recipe has three internal wires: tape output to table input, table output to register input, and a self-loop that closes the head's otherwise unused port. The only free input is the tape load; the only free output is the register pair. The head flips on every driven tick, giving the sense/act clock. The count is a natural number, so there is no maximum run length.
 
-The two zones form a connectable vector $(Z_{\mathrm{tape}}, Z_{\mathrm{ctl}})$. A coupling recipe adds a connectivity: a one-to-one correspondence between output ports and input ports that is proper in both directions, so that some ports on each side remain free and constitute the boundary of the resultant. Here the connectivity is the two-wire table below.
+The technology is the set of these four components. Wymore resultants update
+synchronously from pre-step readouts, so each wire is a Moore pipeline stage:
+the table sees the tape's previous readout, and the register sees the table's
+previous readout. The IOR records this latency.
 
-\begingroup
-\renewcommand{\arraystretch}{1.25}
-\footnotesize
-\begin{center}
-\begin{tabularx}{0.95\linewidth}{@{}>{\raggedright\arraybackslash}p{4.4cm}>{\raggedright\arraybackslash}p{4.4cm}Y@{}}
-    \rowcolor{tableheader}
-    \headingfont\bfseries From output port & \headingfont\bfseries To input port & \headingfont\bfseries Carries \\
-    \addlinespace[2pt]
-    $Z_{\mathrm{ctl}}.\mathit{cmd}$ & $Z_{\mathrm{tape}}.\mathit{cmd}$ & tape command \\
-    \addlinespace[2pt]
-    $Z_{\mathrm{tape}}.\mathit{scan}$ & $Z_{\mathrm{ctl}}.\mathit{sym}$ & scanned symbol \\
-\end{tabularx}
-\end{center}
-\captionof{table}{Connectivity of the recipe: a pure feedback coupling of the two zones.}
-\label{tab:machine-wires}
-\endgroup
-\vspace{4pt}
-
-Three ports are left unconnected and are therefore the interface of the coupled system: the control's $\mathit{load}$ input, the control's $\mathit{halted}$ output, and the tape's $\mathit{window}$ output. The resultant $Z_{\mathrm{mach}} = \mathrm{RSY}$ of the recipe is again a discrete system in the ordinary sense: its state is a pair (tape, control phase); its input is whatever arrives on $\mathit{load}$; its output is the pair (scanned symbol, halted flag) offered on the two free output ports. Its next-state function is the componentwise next state of the two zones, each fed by the values resolved on its input ports---which for a connected port is the value the driving output port currently offers, and for a free port is the value supplied by the environment.
-
-\begin{figure}[!ht]
-  \centering
-  \begin{tikzpicture}[
-    >=Stealth,
-    font=\footnotesize,
-    zone/.style={draw=blue!65!black, fill=blue!6, rounded corners=2pt,
-      align=center, minimum height=1.35cm, minimum width=3.1cm, thick},
-    wire/.style={->, thick, draw=black!70},
-    bnd/.style={->, thick, draw=black!45, dashed},
-    port/.style={font=\scriptsize, align=center}
-  ]
-    \node[zone] (tape) {$Z_{\mathrm{tape}}$\\[1pt]{\scriptsize state: tape}};
-    \node[zone, right=3.4cm of tape] (ctl) {$Z_{\mathrm{ctl}}$\\[1pt]{\scriptsize state: sense / act / halted}};
-
-    \draw[wire] ([yshift=9pt]ctl.west) -- node[above, port] {$\mathit{cmd}$} ([yshift=9pt]tape.east);
-    \draw[wire] ([yshift=-9pt]tape.east) -- node[below, port] {$\mathit{scan}$} ([yshift=-9pt]ctl.west);
-
-    \node[port, left=1.0cm of tape] (win) {$\mathit{window}$};
-    \draw[bnd] (tape.west) -- (win);
-    \node[port, right=1.0cm of ctl] (hal) {$\mathit{halted}$};
-    \draw[bnd] (ctl.east) -- (hal);
-    \node[port, above=0.75cm of ctl] (load) {$\mathit{load}$};
-    \draw[bnd] (load) -- (ctl.north);
-
-    \begin{scope}[on background layer]
-      \node[draw=black!35, dashed, rounded corners=3pt, inner sep=13pt,
-        fit=(tape)(ctl)] (box) {};
-    \end{scope}
-    \node[below=2pt of box, font=\scriptsize] {resultant $Z_{\mathrm{mach}}$; dashed ports are the system boundary};
-  \end{tikzpicture}
-  \caption{The coupling recipe of Table~\ref{tab:machine-wires}. Solid arrows are the connectivity; dashed ports are unconnected and form the interface of the resultant.}
-  \label{fig:machine-coupling}
-\end{figure}
-
-\subsubsection{The reference, and what conformance means here}
+\subsubsection{Boundary law and pipeline delay}
 \label{sec:case-machine-reference}
 
-The functional intent is stated separately, as a single reference system $Z_{\mathrm{ref}}$ over configurations, with no ports and no internal structure: state is a pair (tape, control phase), input is the load command, output is the pair (scanned symbol, halted flag), and one tick advances the tape by the command the control currently offers while stepping the control on the symbol currently under the head. This is intent as a systems engineer would write it---a table of required behavior---and it is deliberately not the coupling.
+The input is every infinite sequence $f:\mathbb{N}\to\{0,1\}$. One symbol is taken per sense/act pair, so symbol $k$ is $f(2k)$. Consecutive symbols are compared, not consecutive ticks:
+\[
+  \mathrm{runLen}(f,0)=1,
+  \qquad
+  \mathrm{runLen}(f,k{+}1)=
+  \begin{cases}
+    \mathrm{runLen}(f,k)+1 & \text{if }f\bigl(2(k{+}1)\bigr)=f(2k),\\
+    1 & \text{otherwise.}
+  \end{cases}
+\]
+The trajectory $\phi_{\mathrm{out}}$ of Equation~\eqref{eq:rle-phi} therefore
+emits $\bigl(f(2k),\mathrm{runLen}(f,k)\bigr)$ on tick $2k+1$ and holds that
+pair on tick $2k+2$. Let $R_{\mathrm{pipe}}$ be the coupled IOR with boundary law
+\[
+  \Phi_{R_{\mathrm{pipe}}}(f,y)
+  \quad\Longleftrightarrow\quad
+  y(t)=
+  \begin{cases}
+    (0,0), & t<2,\\
+    \phi_{\mathrm{out}}(f,t-2), & t\ge 2.
+  \end{cases}
+\]
+This is the characteristic fragment of the pipeline IOR: all bit trajectories
+are admissible, and the displayed trajectory is the eligible output. The
+functional design $D_{\mathrm{ref}}$ packages a pipeline reference
+$Z_{\mathrm{ref}}$ whose state stores the tape value, phase, table state, and
+register pair needed to realise the law.
 
-Compiling the fragment of Section~\ref{sec:dynamics-encoding-fragment} from $Z_{\mathrm{ref}}$ yields one open-readout clause per configuration, one guided-step clause per configuration and load value, and one autonomous clause per configuration. The bi-implication then says that the coupled machine satisfies that property set exactly when it realizes the reference. In the machine-checked development the coupling does satisfy it, and in fact the relation is tighter than required: the state map that reads off the two component states, together with the port readings on the boundary, is a bijection, so the coupling and the reference are isomorphic. Nothing was lost or added by decomposing intent into two zones and a wiring table.
+For the symbols $0,0,1$ at input ticks $0,2,4$, the register emits $(0,1)$,
+$(0,2)$, $(1,1)$ at ticks $3,5,7$. The coupling recipe determines the two-tick
+shift.
 
-Two remarks matter for how much this example proves.
+\subsubsection{Homomorphism and fragment}
+\label{sec:case-machine-zones}
 
-\emph{Universality is definitional, not asserted.} The construction is parametric in the table $M$. A tape coupled to a finite control realizes any computable functional intent by the standard argument; the case study therefore covers arbitrary computable behavior rather than a sample of it. This is the property the earlier kit examples cannot claim, and it is why the machine is the spine of the case study.
+The homomorphism from the four-component resultant to $Z_{\mathrm{ref}}$ keeps
+four observations: the tape bit, head phase, register pair, and table state.
+The input map projects the bit from the free tape port, and the output map
+projects the pair from the free register port. These maps are surjective and
+preserve each coupled transition and readout. Hence
+\[
+  Z_{\mathrm{RLE}}\models_{\mathrm{dyn}}\Phi_{Z_{\mathrm{ref}}}
+  \quad\Longleftrightarrow\quad
+  \exists h:Z_{\mathrm{RLE}}\to Z_{\mathrm{ref}},
+\]
+and the exhibited $h$ proves the left side. Here $Z_{\mathrm{RLE}}$ denotes the
+resultant of the four-component coupling recipe. It is buildable in the stated
+technology, so $D_{\mathrm{ref}}$ and the buildable design form an element of
+$\mathrm{ISR}(R_{\mathrm{pipe}},TYR)$.
 
-\emph{The coupling is not a re-skin of the reference.} The reference is a flat table over configurations; the coupling is two independently defined zones whose only interaction is through the two declared wires, with the tape unable to observe the control's label and the control unable to observe anything but the scanned symbol. That the resultant of the recipe agrees tick-for-tick with the flat table is a theorem about the wiring, and it is the theorem the compiled fragment certifies.
+Classical T3SD retains the three maps just described as conformance evidence.
+The assertional workflow
+retains $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ as the reference-indexed target.
+A revised component is checked against this fragment and supplies a witness for
+its current encoding.
 
-\subsubsection{The same intent, built differently}
-\label{sec:case-machine-variants}
-
-A single verified design demonstrates little about a verification method. The engineering question is which of several candidate builds conform, so we vary the zones and keep the reference fixed. Each variant below is a legitimate design decision or a plausible defect, and each verdict is a theorem.
-
-\paragraph{Instrumented tape (accepted).}
-A tape that additionally maintains an actuation count, exposed on no port. The zone-level state map forgets the count. It is a homomorphism and not an isomorphism: two implementation states differing only in the count are identified, which is the ordinary situation when a build carries internal structure its reference does not mention.
-
-\paragraph{Re-encoded control (accepted).}
-The same control under a different state encoding---a tagged sum rather than a record---with the dynamics transported along the encoding. The zone-level relation is an isomorphism. This variant exists to make a specific point: the compiled fragment cannot see state encodings at all, for reasons developed in Section~\ref{sec:invariance}.
-
-\paragraph{Frozen tape (rejected).}
-A tape that accepts commands on its port and never actuates them---a design that forgot the actuator. No state, input and output map whatever makes it a realization of the tape zone. The proof is short and worth stating, because it shows what a rejection looks like: pick an implementation state that the state map sends to a tape whose scanned symbol is $a$, and an implementation input the input map sends to the command \emph{write $b$, stay}. The frozen tape does not move, so the implementation state is unchanged; the reference must now read $b$ where it reads $a$. No choice of maps can absorb that.
-
-\paragraph{Blind tape (rejected).}
-A tape that actuates correctly but always reports a blank on its window. Its readout is constant, so it cannot cover two reference states that read out differently, and the state map is required to cover all of them.
-
-\paragraph{Over-reporting build against a silent reference (rejected).}
-The clause family that is easiest to overlook is the closed readout, so it is worth one variant of its own. Consider a reference tape whose window is undefined until the head has moved off the left end---a sensor that is not yet valid, stated at the reference level as no output. A build that reports on every tick fails, because a reference state with no output can only be covered by an implementation state that also produces none. Conformance constrains silence as well as speech.
-
-\subsubsection{Verify the zones, obtain the machine}
+\subsubsection{Re-encoding and rejection}
 \label{sec:case-machine-lift}
 
-The last movement is the one that matters for scale. Swap \emph{both} accepted variants into the recipe of Table~\ref{tab:machine-wires} at once, leaving the connectivity untouched. Because each zone of the rebuilt recipe is a port-preserving homomorphic image of the corresponding zone of the original, the resultant of the rebuilt recipe is a port-preserving homomorphic image of the original resultant, and the boundary is unchanged: the same free ports, carrying the same values. Composing that with the realization of Section~\ref{sec:case-machine-reference} gives conformance of the rebuilt machine to the reference---and the machine-level argument is never re-opened. The reasoning is entirely at the zones and at the wiring.
-
-This is the property that makes zone-level checking worth automating. A solver that can only settle small systems is still useful if zone verdicts assemble into system verdicts, and Section~\ref{sec:case-solver} takes that seriously by handing the zone-level questions to a solver.
+Flipping the table's phase convention gives an isomorphic component. Both
+tables satisfy the dynamics fragment compiled from the same table reference,
+with different witnessing state maps. Component conformance then lifts through
+elaboration. A head that holds its phase fails the corresponding fragment
+because it cannot realise the phase-flipping head. The two cases distinguish
+state encoding from behavior.

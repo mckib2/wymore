@@ -19,6 +19,7 @@ import Mbse.TuringZoneVariants
 import Mbse.TickGranularity
 import Mbse.FragmentInvariance
 import Mbse.SolverWitness
+import Mbse.AssertionalCotyledonBridge
 
 /-!
 # Paper claim linkage
@@ -32,7 +33,24 @@ namespace BlockerAudit
 open BiImplicationFailures PathologyExamples WymorePathologyExamples
   PropertyFragment.FSM FSMProperties PhiDecode ExtensionalDynamicsFragment
   ClassicalAssertionalBridge WymoreExercises ComposedCaseStudy MinskyKit FibCaseStudy
-  PartialDynamicsHomFragment Homomorphism TuringCoupling
+  PartialDynamicsHomFragment Homomorphism TuringCoupling Mbse.Wymore
+
+/--
+Every Wymore IOR—finite or infinite, deterministic or relational—has an exact
+characteristic boundary fragment.
+-/
+theorem audit_iorBoundaryFragment :
+    ∀ {S IR OR : Type} (Z : DiscreteSystem S IR OR)
+      (R : WymoreRequirements.InputOutputRequirement IR OR) (s0 : S) (T : Set Time),
+      IORTemporalFragment.Satisfies Z (IORTemporalFragment.ofIOR R) s0 T ↔
+        WymoreRequirements.SatisfiesIOR Z R s0 T :=
+  fun Z R s0 T => IORTemporalFragment.satisfies_ofIOR_iff Z R s0 T
+
+def audit_iorBoundaryCotyledon
+    (R : WymoreRequirements.InputOutputRequirement IR OR) :
+    IORTemporalFragment.AFSR (IORTemporalFragment.ofIOR R) ≃
+      WymoreRequirements.FSR R :=
+  IORTemporalFragment.afsrEquivFSR R
 
 theorem paperClaim_outputTableOnly_blocked
     (_h : SatisfactionWithoutHom (FSMSatisfiesOutputTable fsmStay fsmJump)
@@ -139,9 +157,9 @@ theorem audit_turingCoupling :
     TuringCoupling.tmResultant_isomorphic_reference Bool Bool bitFlipTable⟩
 
 /--
-Alternative buildables: two zones accepted (extra internal state, re-encoded state), three rejected
-with impossibility proofs, and the rebuilt machine still realises the reference through Theorem
-4.56 without re-verifying the machine.
+Not the case study.  The case study is the four-component run-length machine
+(`audit_runLength`); these two-zone rebuilds describe a recipe the paper no longer uses.
+The theorems stay because they are still true of that older recipe.
 -/
 theorem audit_turingZoneVariants :
     IsHomomorphicImage (TuringCoupling.tapeZone Bool) (TuringCoupling.instrTapeZone Bool) ∧
@@ -194,5 +212,58 @@ re-checked by the kernel.  The solver proposes, Lean verifies.
 theorem audit_solverWitness :
     SystemSatisfiesPartialDynamicsHom SolverWitness.specSys SolverWitness.implSys :=
   SolverWitness.solver_verdict_confirmed
+
+/--
+Cotyledon bridge.  `Φ` yields `Implements`.  Identity-boundary `IOR` transfer extracts the
+homomorphism from `Φ` and then applies Theorem 6.58; the identity equations are extra.
+Non-identity port maps use `satisfies_ior_transported`, not Theorem 6.58.
+-/
+theorem audit_cotyledonBridge :
+    (∀ {S1 S2 IR OR : Type} {Z_spec : DiscreteSystem S1 IR OR} {Z_impl : DiscreteSystem S2 IR OR}
+      (hPhi : SystemSatisfiesPartialDynamicsHom Z_spec Z_impl)
+      (_hHI : (AssertionalCotyledonBridge.witnessOfPhi hPhi).HI = id)
+      (_hHO : (AssertionalCotyledonBridge.witnessOfPhi hPhi).HO = id)
+      (IOR : WymoreRequirements.InputOutputRequirement IR OR) (DSZ_impl : S2) (T : Set Time),
+      WymoreRequirements.SatisfiesIOR Z_spec IOR
+          ((AssertionalCotyledonBridge.witnessOfPhi hPhi).HS DSZ_impl) T →
+        WymoreRequirements.SatisfiesIOR Z_impl IOR DSZ_impl T) ∧
+    (∀ {S1 I1 O1 S2 I2 O2 : Type} {Z_spec : DiscreteSystem S1 I1 O1} {Z_impl : DiscreteSystem S2 I2 O2},
+      SystemSatisfiesPartialDynamicsHom Z_spec Z_impl →
+        Nonempty (WymoreImplementation.Implements Z_spec Z_impl)) :=
+  ⟨fun hPhi hHI hHO IOR DSZ_impl T hSpec =>
+    AssertionalCotyledonBridge.satisfies_ior_of_phi_idIO hPhi hHI hHO IOR DSZ_impl T hSpec,
+   fun hPhi => AssertionalCotyledonBridge.implements_of_partialDynamicsHom hPhi⟩
+
+/--
+Case study.  The two-zone variant catalog is not this audit: the machine is tape, head, state
+register, and instruction table, and that catalog describes a different recipe.  What is checked
+here is streaming run-length encoding of an infinite bit trajectory.  The wired resultant
+realises its pipeline reference exactly when it satisfies the fragment; the table-level phase
+re-encoding does not change the verdict; a stuck head is rejected; and the same four-component
+resultant is both buildable and paired with the pipeline IOR as an implementable design.
+The trace `0,0,1` and the count cap are finite readings of the same step, not second algorithms.
+-/
+theorem audit_runLength :
+    (SystemSatisfiesPartialDynamicsHom RunLengthMachine.pipelineRef
+      RunLengthMachine.rleResultant ↔
+      IsHomomorphicImage RunLengthMachine.pipelineRef RunLengthMachine.rleResultant) ∧
+    (SystemSatisfiesPartialDynamicsHom RunLengthMachine.rleRef RunLengthMachine.instrTable ↔
+      SystemSatisfiesPartialDynamicsHom RunLengthMachine.rleRef RunLengthMachine.tableFlip) ∧
+    ¬ IsHomomorphicImage RunLengthMachine.head RunLengthMachine.stuckHead ∧
+    Nonempty (WymoreTechnology.BuildableSystemDesign RunLengthMachine.rleTechnology) ∧
+    Nonempty (WymoreTechnology.ImplementableSystemDesign RunLengthMachine.pipelineIOR
+      RunLengthMachine.rleTechnology) ∧
+    (RunLengthMachine.pipelineOut RunLengthMachine.trace001 3 = (false, 1) ∧
+      RunLengthMachine.pipelineOut RunLengthMachine.trace001 5 = (false, 2) ∧
+      RunLengthMachine.pipelineOut RunLengthMachine.trace001 7 = (true, 1)) ∧
+    RunLengthMachine.rleStepCap 4 RunLengthMachine.rleInit false =
+      RunLengthMachine.rleStep RunLengthMachine.rleInit false :=
+  ⟨RunLengthMachine.rleResultant_pipeline_fragment_iff_hom,
+    RunLengthMachine.table_fragment_invariant,
+    RunLengthMachine.no_hom_stuckHead,
+    ⟨RunLengthMachine.rle_resultant_in_bsr⟩,
+    ⟨AssertionalCotyledonBridge.rle_in_isr⟩,
+    RunLengthMachine.pipeline_trace_001,
+    RunLengthMachine.rleStep_cap_eq (by decide : RunLengthMachine.rleInit.count < 4)⟩
 
 end BlockerAudit

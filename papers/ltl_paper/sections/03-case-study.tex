@@ -1,23 +1,14 @@
 \section{Case Study}
 \label{sec:case-study}
 
-The purpose of this section is to establish one claim: on the dynamics-encoding fragment, checking a temporal property set is a usable substitute for constructing a homomorphism, at a scale where constructing one by hand is unattractive. The section builds up to a system whose functional intent is arbitrary---a Turing machine, presented as a coupling of two zones through declared ports---then varies how its zones are built, and then hands the resulting conformance questions to a solver.
-
-The order is deliberate:
-\begin{enumerate}
-    \item \textbf{Kit zones} (Section~\ref{sec:case-basics}). Four small reference systems---an incrementing counter, a saturating subtracter, a clear/add accumulator, and a zero-test---each presented as a five-tuple with a compiled fragment $\Phi_{\mathrm{dyn}}$ and a direct buildable. These fix notation and show what a compiled fragment looks like when it is short enough to read.
-    \item \textbf{Alternate buildables} (Section~\ref{sec:case-alternates}). The same references held fixed while buildable encodings change, contrasting re-checking a fixed fragment against reconstructing a homomorphism $h=(h_S,h_I,h_O)$ by hand.
-    \item \textbf{A coupled machine with arbitrary intent} (Section~\ref{sec:case-machine}). Two zones with ports---a tape and a finite control---a connectivity, and a resultant, related to a monolithic reference. Universality is definitional for this construction, so the demonstration covers any computable functional intent rather than a convenient sample. Zone variants, accepted and rejected, follow; zone conformance then lifts to the machine without re-examining the machine.
-    \item \textbf{Solver-decided conformance} (Section~\ref{sec:case-solver}). The conformance question for each of those builds, encoded and decided mechanically: a conformance map returned when one exists, a proof of non-existence when it does not.
-    \item \textbf{Matched ticks} (Section~\ref{sec:case-ticks}). What the fragment certifies and what it cannot, using Fibonacci as a sketch and a two-line negative result about temporal granularity.
-\end{enumerate}
-
-For readers less familiar with T3SD: a \emph{reference system} $Z_{\text{spec}}$ is a complete discrete-system table---states, inputs, outputs, next-state, readout---expressing required behavior. A \emph{buildable system} $Z_{\text{impl}}$ is another such table, often with richer internal state, intended to realize it. Classical checking asks for a homomorphism from $Z_{\text{impl}}$ onto $Z_{\text{spec}}$; here we compile $\Phi_{\mathrm{dyn}}$ from $Z_{\text{spec}}$ and check that property set instead. A \emph{coupling recipe} adds to a vector of such systems a connectivity---a one-to-one pairing of output ports with input ports---whose \emph{resultant} is again a single discrete system, with the unconnected ports as its interface.
-
-Two scope notes. Every conformance and rejection claim in Sections~\ref{sec:case-machine} and~\ref{sec:case-ticks} is machine-checked in a proof assistant, including the negative ones; a rejection is a proof that no maps exist, not a failed search. The solver results of Section~\ref{sec:case-solver} are separate evidence: they concern a finite, tape-bounded instance, they are cross-checked against those theorems wherever one exists, and they are feasibility evidence rather than a scalability claim.
+Three boundary laws show how characteristic IOR fragments become temporal
+clauses. The run-length law is then implemented by a tape, head, state register,
+and instruction table. Its boundary IOR records the latency of the coupled
+pipeline. The complete resultant is related to $Z_{\mathrm{ref}}$ by an explicit
+homomorphism and by the compiled dynamics fragment. Re-encoding and clock
+counterexamples test the scope of that fragment.
 
 \input{sections/03-case-study-basics}
-\input{sections/03-case-study-alternates}
 \input{sections/03-case-study-machine}
 \input{sections/03-case-study-solver}
 \input{sections/03-case-study-ticks}

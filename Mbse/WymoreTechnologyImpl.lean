@@ -322,7 +322,10 @@ theorem sgtyr_implementable {S SZ IZ OZ : Type} [Nonempty S]
   refine ⟨_, _, _, Z2, ⟨1, SCR, hOut, sgtyrGenerator_buildable S⟩, ?_⟩
   exact ⟨Implements.ofIsomorphism w⟩
 
-/-- Conjunctive resultant is implementable in SGTYR (multi-cell SCR from Phase 0). -/
+/--
+  [textbook/theorem7.54/theorem/sgtyr_conjunctive_implementable]
+  Conjunctive resultant is implementable in SGTYR (multi-cell SCR from Phase 0).
+-/
 theorem sgtyr_conjunctive_implementable (S : Type) [Nonempty S] [Nontrivial S]
     (n : Nat) (hn : 0 < n) :
     IsImplementableIn (SGTYR S)
@@ -515,6 +518,7 @@ noncomputable def tyrx2RsyInputEmbed (n : Nat) (hn : 0 < n) (k : Fin n) :
   decide (ip.val.1 = k)
 
 /--
+  [textbook/theorem7.60/theorem/finSystem_implementable_tyrx2]
   `finSystem` is implementable in TYRx2: buildable conjunctive multi-cell SCR as `Z2`,
   with `Implements` via the Fin-product one-hot mode into `boolProductSystem` (matching
   state shape `Fin n → Bool = rsy_SZ`) composed with the identity-on-state port remap

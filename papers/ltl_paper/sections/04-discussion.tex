@@ -1,64 +1,109 @@
 \section{Discussion} \label{sec:discussion}
 
-Encoding functional intent as temporal properties moves requirements from informal statements into a checkable language aligned with open-system boundary practice \citep{salado2019mbse,BaierKatoen2008}. The assertional reading developed here is a reinterpretation of the Functionality Cotyledon for verification workflow, not a replacement of T3SD when a reference system and homomorphism already exist and remain convenient.
+The two correspondences answer different questions and carry different checking
+obligations.
 
-\subsection{Relationship to Classical Functionality Cotyledon}
-\label{sec:classical-fc}
-
-On the dynamics-encoding bridge fragment, for fixed $Z_{\text{spec}}$,
-\[
-  Z_{\text{impl}} \in \mathrm{FC}_{\text{constructive}}(Z_{\text{spec}})
-  \;\;\Longleftrightarrow\;\;
-  Z_{\text{impl}} \models_{\mathrm{dyn}} \Phi_{Z_{\text{spec}}},
-\]
-where $\mathrm{FC}_{\text{constructive}}(Z_{\text{spec}})$ is the set of buildable systems that admit a Wymore system homomorphism into $Z_{\text{spec}}$ (Appendix~\ref{app:hom-biimp}; Section~\ref{sec:case-study}). The property sets exhibited for the kit zones are instances of Table~\ref{tab:phi-dyn-fragment}, as is the fragment compiled from the coupled machine's reference in Section~\ref{sec:case-machine-reference}.
-
-Formulas outside the dynamics-encoding fragment do not, in general, imply existence of such an $h$. As a concrete contrast: $F(\mathit{output}(1))$ may hold of a buildable system that eventually pulses a bit without agreeing with a given reference transition table, and a bare input/output safety property may be shared by systems with different next-state functions. Those cases lie outside the bi-implication; the bridge requires a complete $\Phi_{\mathrm{dyn}}$ (compiled from $Z_{\text{spec}}$, or authored in the same schemas).
-
-Global set equality between constructive FC and assertional FC for arbitrary $\Phi$ outside the fragment remains open. Output-table-only encodings and $F$ formulas conflated with dynamics tables are outside the bi-implication.
-
-\subsection{Why the Fragment Rather Than the Map}
-\label{sec:why-fragment}
-
-An equivalence, read naively, says the two sides are interchangeable and therefore that nothing is gained. The asymmetry is not in what the two sides assert but in what each depends on. The compiled fragment depends on the reference system alone; a homomorphism depends on the reference, the build, and the encoding of both. Section~\ref{sec:invariance} makes the consequence precise: conformance verdicts survive state re-encoding, port renaming and permutation, component reindexing, hierarchy flattening, removal of boundary-irrelevant components, and zone-by-zone rebuilding, and the fragment determines its reference up to isomorphism among finite systems. A homomorphism survives none of those changes as the same object, though of course a new one can be built.
-
-The case study is the intended reading of that asymmetry rather than an illustration of it. Section~\ref{sec:case-machine-lift} swaps both zones of the machine at once and obtains machine-level conformance without reopening the machine-level argument; Section~\ref{sec:case-solver} decides the resulting zone-level questions mechanically. The workflow those two sections describe together is the contribution we would defend: intent is compiled once, builds are checked against it, and the check is delegated where it is finite. The classical alternative asks a human for a fresh witness at every design change, which is the maintenance cost the fragment removes.
-
-\subsection{Expressivity, Checking, and Decidability}
-\label{sec:expressivity}
+\subsection{Expressivity and lock-step}
 \label{sec:limitations}
 
-Restricting to $\Phi_{\mathrm{dyn}}$ buys the homomorphism bi-implication; it also limits what engineers can \emph{say}. The fragment admits only table-shaped $G$/$X$ clauses compiled from a reference $\delta$ and $\rho$ (Table~\ref{tab:phi-dyn-fragment}): no $F$, no $U$, and no free-form quantification over values beyond indexing those clauses. Richer dialects---propositional LTL with the full operator set, or FO-LTL over infinite coordinates---let engineers author desired behavior beyond that fragment, at the cost of leaving the strict T3SD implementability bridge.
+The characteristic boundary construction covers every Wymorian IOR by retaining
+its time set, admissible trajectories, and eligible-output relation as semantic
+objects. A finite ordinary-LTL presentation requires additional structure.
+Echo, delay, and run length have compact presentations; arbitrary trajectory
+relations may require symbolic predicates or direct semantic reasoning.
 
-Two contrasts from the case study make the gap vivid. For the zero-test, $\Phi_{Z_{\mathrm{jz}}}$ requires every guided sample of the reference latch. In FO-LTL one can instead write
-\[
-  F\bigl(\mathit{output}(1)\bigr)
-\]
-(``eventually report zero''). That formula is easy to author as a boundary requirement, but it does not constrain \emph{which} samples produced the flag: a buildable that reports zero for the wrong reason still satisfies it, and satisfaction is not equivalent to a Wymore homomorphism into $Z_{\mathrm{jz}}$. The machine sharpens the same point at the other end of the scale. Conformance to the reference of Section~\ref{sec:case-machine-reference} certifies that a build takes the same steps as the table, for an arbitrary table; it does not certify
-\[
-  F\bigl(\mathit{halted}\bigr)
-\]
-(``eventually halt''), because ``eventually'' is not a row of any transition table. This is not a defect of our encoding but a property of the classical relation it is equivalent to: a homomorphism relates steps, and termination is not a step. Bounded versions---after $k$ ticks the window reads a stated value---are recoverable by unrolling; unbounded liveness is not (Section~\ref{sec:case-fib}).
+$\Phi_{\mathrm{dyn}}$ uses $G$/$X$ clauses for readout and one-step dynamics.
+The RLE requirement states the run so far. Eventual production of an encoding
+for an entire infinite input is a separate liveness property, outside the
+homomorphism bi-implication.
 
-A second limitation is temporal rather than logical, and Section~\ref{sec:case-ticks} treats it at length because it constrained the construction itself. Conformance is lock-step: one implementation tick answers to one reference tick. A build that needs two ticks for what intent states in one is rejected, and we prove that rejection on a two-state example. The remedy available within the theory is to state intent at the build's granularity, which is why the machine's reference carries a phase component that intent would not otherwise mention. A relation tolerating differing rates would be weaker than Wymore's and would need separate development; our negative result identifies precisely what such a development would have to relax.
+Conformance is lock-step. Section~\ref{sec:case-ticks} shows that a two-phase
+build fails a one-tick reference and satisfies the behavior restated at two
+ticks. Rate-tolerant conformance would require a different implementation
+relation.
 
-The bi-implication itself is a \emph{semantic} equivalence. It does not imply that checking $Z_{\text{impl}} \models_{\mathrm{dyn}} \Phi_{Z_{\text{spec}}}$ is decidable for arbitrary systems. On finite state, input, and output spaces the fragment reduces to a propositional query, and Section~\ref{sec:case-solver} discharges instances of it with an off-the-shelf solver; but existence of a surjective conformance map is NP-hard in general \citep{HellNesetril1990,BodirskyKaraMartin2012}, so those timings are feasibility evidence and not a scalability claim. For infinite discrete state, FO satisfaction is not decidable in general \citep{BaierKatoen2008}; practical constraints include finite abstraction, bounded-horizon unrolling, restricted input classes, and theory-specific queries. On the unbounded machine, conformance is established symbolically and machine-checked rather than searched for.
+The scope is therefore precise: the homomorphism result applies to the
+step-local schemas of $\Phi_{\mathrm{dyn}}$ and to matching clock rates. Other
+temporal properties may be checked alongside the fragment, with guarantees
+supplied by their own semantics.
+
+\subsection{Implications for systems engineering}
+\label{sec:implications}
+
+The fragments change which artifacts are maintained, not which designs are
+admissible. $\Phi_R$ is a presentation of the IOR: it can be inspected,
+specialized to compact temporal laws when the boundary relation permits, and
+used as the criterion that generates $\mathrm{FSR}(R)$. $\Phi_{\mathrm{dyn}}$
+is a presentation of a chosen functional design's dynamics. Implementation
+work then consists in checking a buildable resultant against that fragment,
+rather than reconstructing pair-specific maps at each revision.
+
+That split matches how engineers already separate requirement satisfaction from
+realization of a selected functional design. When a candidate fails
+$\Phi_R$, it is not a functional design for $R$. When it satisfies $\Phi_R$
+but fails $\Phi_{\mathrm{dyn}}$, it may still be functional for $R$ while
+failing to realise the chosen $D_{\mathrm{ref}}$. Shared-table specializations
+make the second failure a table disagreement. Hom-relative checking covers the
+case in which state or interface encodings differ.
+
+Coupling latency belongs in the IOR when the architecture is staged. The
+run-length case is the concrete instance: a one-tick encoder is a legitimate
+functional design, but it is the wrong implementation reference for a
+four-component synchronous resultant. Recording pipeline delay at the boundary
+keeps the implementability pairing honest and prevents a failed check from
+being misread as a coding error.
+
+The reuse theorems give a path to larger architectures without changing
+Wymore's implementation relation. A component can be checked against a
+fragment compiled from its own reference; a coupling witness then lifts those
+results to the resultant; later re-encodings keep the same fragment as the
+target. Finite components become generated decision problems. Infinite
+components remain symbolic, but they need not be re-proved from scratch when
+only a neighboring component changes. The search for maps is still hard in
+general. Decomposition changes the size of each obligation, not the underlying
+decision problem.
+
+Buildability remains a separate argument. Fragment satisfaction does not
+populate a technology or invent a coupling recipe. The implementability
+cotyledon still pairs a functional design with a buildable design; the
+assertional check supplies the implementation witness that Wymore requires of
+that pair.
 
 \subsection{Tooling}
 \label{sec:tooling}
 
-The workflow that the bi-implication and the invariance results together support is a pipeline, and the case study instruments each stage of it. Intent is a reference table; compiling the fragment is mechanical; checking a candidate build is a satisfiability query whose model is a conformance map; and a verdict about a coupled system is assembled from verdicts about its zones. Three properties of that pipeline are worth stating because they are what make it usable rather than merely correct.
+Finite systems admit a propositional check, and bounded counts or horizons
+provide finite projections of infinite systems. Symbolic arguments cover the
+unbounded RLE result. T3SD coupling supports lifting component results when the
+coupling witness is supplied. The present case proves the four-component
+resultant directly and demonstrates component-level reuse on the instruction
+table.
 
-\emph{Zone-level checking suffices.} The composition result means a solver never has to see a whole system. That matters more than solver capacity, because zones are the granularity at which designs actually change: a supplier substitution or an encoding change touches one zone, and re-checking that zone re-establishes the system.
+\subsection{Future work}
+\label{sec:future}
 
-\emph{Rejections are proofs.} An unsatisfiable query is non-existence of any conformance map, not a failed search. For design review that is the useful direction: the interesting output of a checker is the build it refuses, together with the guarantee that no amount of ingenuity would have made it fit.
+Several extensions sit outside the present correspondences and are worth
+stating as such.
 
-\emph{Solver output need not be trusted.} A solver-discovered map is checkable independently and in linear time, and one such map from our suite is re-verified inside the machine-checked development. The division of labor is that search is delegated and trust is not.
+A $k$-tick or stuttering implementation relation would address staged
+architectures without restating the reference clock. That relation is not
+Wymore's homomorphism, so the dynamics fragment and its bi-implication would
+need to be rebuilt around it.
 
-Because compiled fragments are stable artifacts indexed by $Z_{\text{spec}}$, they fit regression practice directly: when a zone changes, re-run its query. What we report is a working checker over a finite instance suite, cross-checked against machine-checked theorems, with generated proof artifacts. What we do not report is an integration with an industrial toolchain, a measurement of engineering effort saved, or evidence about scale beyond the instances in Table~\ref{tab:solver-results}.
+Liveness and progress can be attached as companion properties. The RLE
+encoder's eventual emission of a complete encoding, fairness of a scheduler,
+or eventual emptying of a buffer are natural examples. Their guarantees would
+come from their own semantics, not from Theorem~\ref{thm:dynamics-characterization}.
 
-\begin{itemize}
-    \item \textbf{Open:} global FC equality for arbitrary $\Phi$ outside the fragment; a conformance relation tolerating differing tick rates.
-    \item \textbf{Not claimed:} scalable homomorphism search---existence is NP-hard, and the reported instances are feasibility evidence only; conformance for the unbounded machine by solver rather than by proof; liveness or termination guarantees; continuous-time hybrid verification; measured verification-effort savings or industrial toolchain integration.
-    \item \textbf{Future work:} SysML tooling integration; incremental re-checking driven by which zone changed; heuristics exploiting the structure of the conformance query, which is far from an arbitrary CNF; a treatment of rate-tolerant conformance; deeper related-work engagement with runtime verification and supervisory control.
-\end{itemize}
+Compilation and checking can be made more mechanical: generate $\Phi_R$ from
+an IOR presentation, generate $\Phi_{\mathrm{dyn}}$ from a discrete-system
+table, and discharge finite instances with existing SAT, SMT, or model-checking
+tools. The RLE projections show the encoding; they are not a library or a
+measured workflow.
+
+Hierarchical case studies would exercise Theorem~\ref{thm:elaboration-coupling}
+at more than one coupling depth, including mixed finite and infinite
+components. Industrial examples and effort measurements against constructive
+homomorphism proofs would test whether the change in maintained artifact
+reduces engineering labor. Performance and other Wymore requirement types
+remain outside $\Phi_R$ and $\Phi_{\mathrm{dyn}}$ as formulated here.

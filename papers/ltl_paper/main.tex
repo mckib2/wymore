@@ -4,41 +4,29 @@
 %
 % TERMINOLOGY (vocabulary contract — use these terms consistently)
 % ----------------------------------------------------------------
-% Story: Functional intent in the Functionality Cotyledon may be expressed as a
-%   dynamics-encoding temporal fragment compiled from a Wymore DSYSTEM; on that
-%   fragment, assertional satisfaction is equivalent to classical implementability
-%   via Wymore system homomorphism, so engineers need not maintain an explicit
-%   homomorphism as the primary verification artifact.
+% Story: Every IOR generates a characteristic boundary fragment whose models are FSR(IOR).
+%   On Φ_dyn, satisfaction is a Wymore homomorphism, and with buildability
+%   that pairing is an implementable system design. Informally the implementability cotyledon
+%   is the overlap of functionality and buildability; formally it is the pairing, not a
+%   set intersection. Theorem 6.58 is identity-boundary only. The artifact worth keeping is
+%   the fragment. The case study is pipelined streaming RLE on four components.
 %
 % Preferred terms:
 %   DSYSTEM / discrete system — Wymore 5-tuple (S,I,O,δ,ρ); discrete clock;
 %     state/IO may be infinite or real-valued.
-%   Reference system Z_spec — specification-system for constructive / bridge verification.
-%   Buildable system / implementation system Z_impl — candidate under verification
-%     (prefer "buildable system" for BC→IC; "implementation system" once defined).
+%   Functionality Cotyledon CTL(IOR) / FSR(IOR) — set of systems satisfying IOR.
+%   Input/Output Requirement IOR — 6-tuple (OLR, IR, ITR, OR, OTR, ER) specifying boundary intent.
+%   Buildability Cotyledon CTL(TYR) / BSR(TYR) — systems buildable as resultants RSY(SCR) in TYR.
+%   Implementability Cotyledon CTL(IOR, TYR) / ISR(IOR, TYR) — implementable designs in technology.
+%   Functional design D_ref ∈ FSR(IOR); Z_ref is its system component.
+%   Buildable system Z_impl — candidate system in BSR(TYR) under verification.
 %   Wymore system homomorphism / homomorphic image — surjective
-%     h_S,h_I,h_O preserving transitions and readout (textbook Def. 4.3 only in appendix).
+%     h_S,h_I,h_O preserving transitions and readout.
 %   Property set Φ — temporal formulas in dialect L.
+%   Assertional Cotyledon FC_L(Φ) — { Z | Z ⊨_L Φ }.
 %   Dynamics-encoding fragment Φ_dyn — G/X/implication table-as-clauses fragment
-%     used for the hom↔Φ bi-implication (complete Φ_dyn, whether compiled or authored).
-%   Direct authorship — engineer writes Φ without first exhibiting Z_spec (workflow);
-%     bi-implication holds iff that Φ is a complete Φ_dyn (implied Z_spec).
-%   Outside bi-implication — Φ not in the fragment (F, U, arbitrary LTL) or incomplete.
-%   Dynamics-encoding bridge — Φ_dyn compiled from an explicit Z_spec (carries bi-imp).
+%     used for the hom↔Φ bi-implication (complete Φ_dyn, compiled from Z_ref).
 %   Assertional satisfaction — Z ⊨_L Φ / Z ⊨_dyn Φ_dyn.
-%   Implementability (classical) — existence of a Wymore system homomorphism into Z_spec.
-%   Exhibit / verify maps — finite-tier recovery or checking of h_S,h_I,h_O
-%     (not "synthesize/discover" on infinite or real state).
-%
-% Avoid / restrict:
-%   Do not use Def./Exercise numbers in main text; appendix may retain them.
-%   Do not alternate morphism/mapping/refinement for Wymore hom — use homomorphism.
-%   Reserve "model checking" for automated finite-state LTL procedures; otherwise
-%     "property checking".
-%   Do not call the fragment "decidable" when meaning the bi-implication holds —
-%     separate semantic equivalence from algorithmic checking.
-%   Do not name Lean in main text; appendices may say "machine-checked formalization".
-%   Avoid "headline / ungated / companion library" in reader-facing prose.
 % =================================================================
 
 \documentclass[num-refs]{wiley-article}
@@ -48,7 +36,7 @@
 \iflatexml
 \else
 \paperfield{Systems Engineering}
-\abbrevs{T3SD, Tricotyledon Theory of System Design; MBSE, Model-Based Systems Engineering; LTL, Linear Temporal Logic; FO-LTL, First-Order Linear Temporal Logic; FC, Functionality Cotyledon; DSYSTEM, Discrete System.}
+\abbrevs{T3SD, Tricotyledon Theory of System Design; MBSE, Model-Based Systems Engineering; LTL, Linear Temporal Logic; FO-LTL, First-Order Linear Temporal Logic; FC, Functionality Cotyledon; BC, Buildability Cotyledon; IC, Implementability Cotyledon; IOR, Input/Output Requirement; DSYSTEM, Discrete System.}
 \corraddress{Nicholas McKibben, Department of Systems and Industrial Engineering, University of Arizona, Tucson, AZ 85721, USA}
 \corremail{mckib2@arizona.edu}
 \fundinginfo{None}
@@ -59,7 +47,6 @@
 \title{Reinterpreting the Functionality Cotyledon: Temporal Logic for T3SD}
 
 \author[1]{Nicholas McKibben}
-\author[1]{Paul Wach}
 \author[1]{Larry Head}
 \author[1]{Alejandro Salado}
 
@@ -73,7 +60,7 @@
 \selectlanguage{english}
 \begin{abstract}
 \sloppy
-Adequately verifying that a buildable system realizes stated functional intent is a core concern of systems engineering. In the Tricotyledon Theory of System Design (T3SD), classical implementability is established constructively as a system homomorphism from a buildable system to a reference system in the Functionality Cotyledon. We show that the same functional intent can be expressed as an assertional dynamics-encoding temporal fragment compiled from a Wymore discrete system, and that satisfaction over the fragment is equivalent to T3SD implementability. Because the fragment depends only on the reference system, it is invariant under state re-encoding, port renaming and permutation, architectural regrouping, and component-by-component rebuilding, and it determines the reference up to isomorphism among finite systems; an explicit homomorphism has none of these properties. System modelers may therefore treat property checking of the compiled fragment as the primary verification artifact rather than constructing and maintaining explicit homomorphisms. We prove the equivalence, present a case study in which a Turing machine is built as a coupling of two connectable systems---so that the functional intent covered is arbitrary---rebuild its components in several ways, and show that component-level conformance lifts to the coupled system. Satisfaction of the fragment reduces to a per-state condition, so conformance is mechanically decidable over finite systems: we report a checker that returns a conformance map when one exists and a proof of non-existence when none does, cross-checked throughout against a machine-checked formalization. State, input, and output sets may be infinite; the clock is discrete.
+In Wymore's Tricotyledon Theory of System Design, an input/output requirement $R$ determines the functionality cotyledon $\mathrm{FSR}(R)$. Each functional design packages a system, a designated state, a time scale, and evidence that the system satisfies $R$. We derive from $R$ a characteristic boundary fragment $\Phi_R$ whose assertional functionality space is canonically equivalent to $\mathrm{FSR}(R)$. The construction covers every Wymorian IOR; structured relations yield compact temporal formulas suitable for established checking methods. A chosen functional design may also serve as an implementation reference. Compiling the transition and readout tables of its system component $Z_{\mathrm{ref}}$ gives a dynamics fragment $\Phi_{\mathrm{dyn}}$ whose satisfaction is equivalent to existence of a Wymore homomorphism. Invariance and composition results allow this fragment to be reused across state re-encoding, port relabeling, and componentwise elaboration. A four-component streaming run-length encoder demonstrates the method, including the pipeline latency induced by Wymore's synchronous coupling. The case also records the limits: the dynamics fragment is lock-step, excludes eventual-completion claims, and supports automated checking through finite or symbolic presentations.
 
 \keywords{Tricotyledon Theory of System Design (T3SD), temporal logic, formal verification, Model-Based Systems Engineering (MBSE), system homomorphism.}
 \end{abstract}

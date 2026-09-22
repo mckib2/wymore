@@ -1,31 +1,28 @@
-\subsection{Matched Ticks: What the Fragment Can and Cannot Say}
+\subsection{Matched Ticks}
 \label{sec:case-ticks}
 
-The machine of Section~\ref{sec:case-machine} invites a natural question, and answering it exposes the sharpest limitation of the fragment. The question: since the construction is parametric in the table, there is a table for which the machine computes Fibonacci numbers---so can the compiled fragment certify \emph{that}?
+A homomorphism equates one tick of the build with one tick of the reference. The head in Section~\ref{sec:case-machine} makes the modeling obligation obvious: sense, then act, is two ticks. A minimal counterexample isolates the resulting obstruction.
 
-\subsubsection{Fibonacci, as a sketch}
-\label{sec:case-fib}
+Staged implementations require a way to distinguish behavioral errors from
+mismatched timing abstractions.
 
-The instinct to reach for Fibonacci is worth following only as far as it goes, so we state the sketch and stop. Take the table $M_{\mathrm{fib}}$ of a standard machine that, started with $n$ in unary on the tape, halts with the $n$th Fibonacci number written in unary. Instantiating Section~\ref{sec:case-machine} at $M_{\mathrm{fib}}$ gives a coupled system, a monolithic reference, and---by the theorems already established---a compiled fragment that the coupling satisfies exactly when it realizes that reference. In that sense there is nothing left to do: a Fibonacci machine is a machine, and the case study covered arbitrary tables on purpose.
+\begin{proposition}[Matched-tick requirement]
+\label{prop:matched-ticks}
+Let the reference be a bit that flips on every driven tick, and let the
+implementation carry sense and act phases while flipping only on act ticks.
+The implementation fails the one-tick dynamics fragment. If the reference is
+restated with two ticks per flip, the implementation and reference are
+isomorphic.
+\end{proposition}
 
-But it is worth being precise about what such a certificate would and would not say, because the gap is instructive rather than embarrassing. Conformance to the reference says: \emph{this build takes the same steps as that table}. It does not say \emph{this build eventually halts with $F_n$ on the tape}. The latter is a liveness statement about a run, and the fragment has no $F$ operator; it has readout clauses and next-state clauses and nothing else. One can recover a bounded version---after a stated number of ticks the window reads $F_n$---by unrolling the reference, and that is a genuine and checkable property. What one cannot do is state ``eventually done'' inside the fragment at all. The honest summary is that $\Phi_{\mathrm{dyn}}$ certifies \emph{step-for-step correctness against intent}, and that termination and other liveness intent must be argued in a richer dialect, outside the bi-implication. Section~\ref{sec:expressivity} takes up the trade-off.
+\begin{proof}[Proof sketch]
+Readout preservation forces the state map to ignore the phase. On a sense tick,
+the implementation holds while the one-tick reference flips, so transition
+preservation would equate a reference bit with its negation. With the two-tick
+reference, the phase and bit coordinates correspond directly and the identity
+boundary maps complete an isomorphism.
+\end{proof}
 
-\subsubsection{Steps are not ticks, and the fragment counts ticks}
-\label{sec:case-ticks-witness}
-
-There is a second, less obvious lesson available from the same place. Recall from Section~\ref{sec:case-machine-zones} that one machine step occupies two ticks of the coupling, because the control must sense before it can act. That was forced by readout depending on state alone. The reference of Section~\ref{sec:case-machine-reference} was therefore written at the coupling's granularity---two ticks per machine step---and not at the granularity a systems engineer would naturally choose when writing down intent, which is one row per machine step.
-
-That choice was not cosmetic. A Wymore homomorphism relates ticks to ticks: the step law equates one implementation transition with one reference transition. It has no room for a build that takes two ticks to accomplish what the reference does in one, however obviously correct that build is. This is worth exhibiting on the smallest possible pair, so that the obstruction is visible rather than asserted.
-
-Let the reference be a one-bit register that inverts on every driven tick and reports its bit. Let the build be the same register with a sense/act phase, inverting every \emph{second} driven tick and reporting its bit throughout---exactly the two-phase pattern the control zone uses. There is no conformance map, and the argument is three lines. The readout law forces the state map to factor through the bit: any two build states with the same bit are sent to the same reference state, so the map cannot distinguish the sense phase from the act phase. But the step law applied to the sense state requires its successor---the act state, with the same bit---to be sent to the inverted reference state. So one reference state must equal its own inversion.
-
-The two-phase build is not wrong; the reference was written at the wrong granularity. Restate the same intent at two ticks per logical inversion and the identity maps are a conformance map, indeed an isomorphism. Both verdicts are machine-checked, and both appear in Table~\ref{tab:solver-results} as the pair \texttt{flip-one-tick} and \texttt{flip-matched-ticks}: the same build, rejected against one reference and accepted against the other.
-
-\subsubsection{What to do about it}
-\label{sec:case-ticks-practice}
-
-The practical reading is a modeling obligation, and it should be stated as such rather than buried. \emph{Reference and build must agree on what a tick is.} Two consequences for practice follow.
-
-First, when intent is written at a coarser granularity than the build can achieve---the usual case, since intent is written before the technology that will realize it is chosen---the reference must be expanded to the build's granularity before conformance is even the right question. The expansion is mechanical and it is where the design's internal phasing becomes visible in the specification. For the machine, this is why the reference has a phase component at all: not because intent cares about phases, but because the technology needs two ticks and lock-step conformance forces intent to say so.
-
-Second, this is a real limitation of the classical relation rather than of the temporal encoding, and the bi-implication is what makes that clear. Because satisfaction of the fragment and existence of a homomorphism are the same condition, the fragment inherits exactly the lock-step character of the classical homomorphism---no more and no less. A verification method that tolerated temporal abstraction would relate a build's $k$ ticks to a reference's one, which is a weaker relation than Wymore's and would need its own theory. We do not develop one here; we note that the fragment's rejection of the two-phase build is faithful reporting of the classical relation, and that a reader who wants tolerance for differing rates should read our negative result as identifying precisely what would have to be relaxed.
+The corresponding finite queries are respectively unsatisfiable and
+satisfiable. A relation allowing $k$ build ticks per reference tick would
+define a different conformance relation.

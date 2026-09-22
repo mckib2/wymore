@@ -1,9 +1,21 @@
 \section{Conclusions}
 
-Functional intent in T3SD is classically discharged by exhibiting a homomorphism from a build onto a reference system. We identify a temporal fragment---readout and next-state clauses compiled from the reference table, with no eventually and no until---for which satisfaction is equivalent to existence of such a homomorphism, and we argue that engineers should treat the fragment as the artifact they maintain. The reason is asymmetry rather than novelty: the fragment depends on the reference alone, so it is invariant under state re-encoding, port renaming and permutation, architectural regrouping, and zone-by-zone rebuilding, and it pins the reference down to isomorphism among finite systems. A homomorphism is data about a particular pair of encodings and must be rebuilt whenever either changes.
+The proposed representation retains the T3SD definitions. The IOR determines
+functionality, the technology and coupling recipe determine buildability, and
+Wymore's homomorphism supplies the implementation relation. The characteristic
+boundary fragment gives an equivalent assertional presentation of the
+functionality cotyledon.
 
-The case study is a Turing machine presented as a Wymore coupling: a tape zone and a two-phase control zone with declared ports, a two-wire connectivity, and a resultant shown to realize a monolithic reference. Universality is definitional for that construction, so the demonstration covers arbitrary computable functional intent rather than a convenient example. Its zones are then rebuilt in several ways---accepted variants and defective ones---and conformance of the rebuilt machine follows from conformance of its zones without the machine being re-examined. All of these results, including the rejections, are machine-checked.
+For implementation work, a chosen functional design supplies $Z_{\mathrm{ref}}$
+and its dynamics fragment. Component checks, compositional lifting, and
+invariance under re-encoding allow established results to be carried into larger
+and more detailed designs. The run-length case shows the complete path and keeps
+pipeline latency and clock granularity explicit at the boundary.
 
-Because satisfaction of the fragment is a per-state condition, the conformance question is mechanically decidable over finite systems, and we report a checker that decides it: on a finite instance suite it returns a conformance map where one exists and a proof of non-existence where none does, every verdict agrees with its machine-checked counterpart, and one solver-found map is re-verified by the proof assistant. Two honest limits bound that: existence of a surjective conformance map is NP-hard, so the timings are feasibility evidence rather than a scalability claim, and what makes larger systems tractable in this setting is the composition result rather than solver capacity.
-
-Two limitations point at the work we think is most worth doing next. Conformance is lock-step, so a build that takes two ticks to accomplish what intent states in one is rejected---we prove this---and intent must be restated at the build's granularity; a rate-tolerant conformance relation would be a weaker relation than Wymore's and needs its own theory. And the fragment cannot express liveness, so termination and response intent must be argued in a richer dialect, outside the bridge. Global equivalence for properties beyond the fragment remains open, as do toolchain integration and measurement of engineering effort.
+The practical consequence is that Wymore's cotyledons remain the design
+spaces, while temporal fragments are the artifacts that are inspected, reused,
+and, when finite, discharged by existing checkers. The method scales with
+architecture to the extent that obligations can be localized and lifted. What
+remains is to treat non-lock-step conformance, liveness, and measured industrial
+use as separate developments, each with its own relation or evidence, rather
+than as omitted clauses of $\Phi_{\mathrm{dyn}}$.
