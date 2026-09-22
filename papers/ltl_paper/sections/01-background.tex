@@ -8,18 +8,18 @@ Wymore's Tricotyledon Theory of System Design (T3SD) partitions design into thre
     \item \textbf{Implementability.} $\mathrm{CTL}(IOR,TYR)=\mathrm{ISR}(IOR,TYR)$ pairs functional and buildable designs for which the build implements the functional design.
 \end{enumerate}
 
+We often informally say that the implementability cotyledon is the ``overlap'' between the functionality and buildability cotyledons (not strictly correct, as the elements of the cotyledons are not comparable; but nonetheless useful for intuition).
+
 \paragraph{Classical constructive practice.}
 To avoid quantifying directly over boundary trajectories, classical practice selects
 $D_{\mathrm{ref}}\in\mathrm{FSR}(IOR)$ and exhibits a surjective, transition- and
 readout-preserving homomorphism from the buildable resultant to the system component
-$Z_{\mathrm{ref}}:=D_{\mathrm{ref}}.Z$. Wymore's Theorem~6.58 transfers requirement
-satisfaction when the input and output maps are identities; differing alphabets require
-transport along those maps.
+$Z_{\mathrm{ref}}:=D_{\mathrm{ref}}.Z$. T3SD shows that this homomorphism transfers requirement satisfaction when the input and output maps are identities.
 
 We restrict attention to Wymore discrete systems (DSYSTEMS): deterministic 5-tuples $Z=(S,I,O,\delta,\rho)$ \citep{Wymore1993}. ``Discrete'' refers to the clock; $S$, $I$, and $O$ may be infinite or real-valued at each tick. Given $f:T\to I$ and $s_0\in S$, Wymore's trajectory theorems yield unique state and output trajectories. Systems of interest are open: verification concerns observable boundary behavior \citep{salado2019mbse}.
 
 \miniheading{Notation}
-Table~\ref{tab:notation} maps Wymore textbook notation \citep{Wymore1993} to the functional notation used here.
+Table~\ref{tab:notation} maps Wymore textbook notation \citep{Wymore1993} to the more ergonomic functional notation used here.
 
 \begingroup
 \renewcommand{\arraystretch}{1.4}
@@ -47,7 +47,7 @@ Table~\ref{tab:notation} maps Wymore textbook notation \citep{Wymore1993} to the
 
 Conventions: $D_{\mathrm{ref}}$ is a chosen functional design in $\mathrm{FSR}(IOR)$,
 $Z_{\mathrm{ref}}$ is its system component, and $Z_{\mathrm{impl}}$ is the resultant
-of the buildable design under verification. The symbol $h$ denotes a Wymore system
+of the buildable design under verification. The symbol $h$ denotes a Wymorian system
 homomorphism, $\Phi_R$ denotes the characteristic boundary fragment of $R$, and
 $\Phi_{\mathrm{dyn}}$ denotes the dynamics fragment compiled from $Z_{\mathrm{ref}}$.
 
@@ -55,9 +55,8 @@ $\Phi_{\mathrm{dyn}}$ denotes the dynamics fragment compiled from $Z_{\mathrm{re
 Temporal logics provide notation and checking methods for time-indexed traces
 \citep{BaierKatoen2008,Pnueli1977}. This paper identifies two fragments aligned
 with Wymore's definitions. The characteristic boundary fragment retains the
-predicates and trajectory relation of an IOR. The dynamics fragment uses the
-table-shaped operators in Table~\ref{tab:ltl-operators}. Some IOR relations
-require symbolic predicates because they lack a finite ordinary-LTL formula.
+predicates and trajectory relation of an IOR. The dynamics fragment uses the operators in Table~\ref{tab:ltl-operators}. Some IOR relations
+require symbolic predicates as they lack a finite ordinary LTL formula.
 
 \begingroup
 \renewcommand{\arraystretch}{1.35}
@@ -83,15 +82,14 @@ require symbolic predicates because they lack a finite ordinary-LTL formula.
 \subsection{Related Work}
 \label{sec:related-work}
 
-Three bodies of work locate the contribution. Safety fragments use invariant,
+Three bodies of work are relavant to the current work. Safety fragments use invariant,
 step-local formulas and support mature checking methods
 \citep{Sistla1994,MannaPnueli1995,BiereCimattiClarkeZhu1999}. Characteristic
 formulas compile operational models into logical descriptions, commonly up to
 simulation or bisimulation \citep{GrafSifakis1986,SteffenIngolfsdottir1994};
 here the induced relation is Wymore's homomorphic image, whose maps resemble
 bounded morphisms \citep{BlackburnDeRijkeVenema2001}. T3SD modernization, DEVS,
-contract-based requirements, and supervisory control provide related
-assertional settings \citep{salado2019wymore,wach2021devs,salado2019mbse,RamadgeWonham1989}.
-This paper establishes the correspondence with Wymore functionality and
+contract-based requirements, and supervisory control provide related settings where assertional validation is desirable \citep{salado2019wymore,wach2021devs,salado2019mbse,RamadgeWonham1989}.
+This paper establishes the correspondence between Wymore functionality and
 implementation. Searching for finite maps is NP-hard in general
 \citep{HellNesetril1990}.

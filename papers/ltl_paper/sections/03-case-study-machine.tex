@@ -1,9 +1,7 @@
-\subsection{Four Components, One Algorithm}
+\subsection{Recipe for a Turing Machine}
 \label{sec:case-machine}
 
-The components are ordinary discrete systems. They share one state type (a bit,
-a count in $\mathbb{N}$, a sense/act phase, and an auxiliary pending bit) and
-one port alphabet, a pair. Their next-state clauses make them pairwise distinct:
+An interesting system example is a Turing machine. The components are ordinary discrete systems. They share one state type (a bit, a count in $\mathbb{N}$, a sense/act phase, and an auxiliary pending bit) and one port alphabet, also a pair. Their next-state clauses make them pairwise distinct:
 
 \begin{center}
 \footnotesize
@@ -19,17 +17,17 @@ $3$ & table & same bit increments; a new bit resets the count to $1$ & emit the 
 \end{tabular}
 \end{center}
 
-The coupling recipe has three internal wires: tape output to table input, table output to register input, and a self-loop that closes the head's otherwise unused port. The only free input is the tape load; the only free output is the register pair. The head flips on every driven tick, giving the sense/act clock. The count is a natural number, so there is no maximum run length.
+The coupling recipe has three internal connections: tape output to table input, table output to register input, and a self-loop (that closes the head's otherwise unused port). The only free input is the tape load and the output is the register pair. The head flips on every driven tick, giving the sense/act clock. The count is a natural number, so there is no maximum run length (i.e., this is an infinite state machine!).
 
-The technology is the set of these four components. Wymore resultants update
-synchronously from pre-step readouts, so each wire is a Moore pipeline stage:
+The technology TYR is the set of these four components. Wymore resultants update
+synchronously from pre-step readouts, so each connection is a Moore pipeline stage:
 the table sees the tape's previous readout, and the register sees the table's
-previous readout. The IOR records this latency.
+previous readout. The latency induced by this construction must be accounted for in the IOR specification.
 
-\subsubsection{Boundary law and pipeline delay}
+\subsubsection{Boundary requirement and pipeline delay}
 \label{sec:case-machine-reference}
 
-The input is every infinite sequence $f:\mathbb{N}\to\{0,1\}$. One symbol is taken per sense/act pair, so symbol $k$ is $f(2k)$. Consecutive symbols are compared, not consecutive ticks:
+The set of possible inputs is every infinite binary sequence $f:\mathbb{N}\to\{0,1\}$. One symbol is taken per sense/act pair, so symbol $k$ is $f(2k)$. Consecutive symbols are compared:
 \[
   \mathrm{runLen}(f,0)=1,
   \qquad
@@ -41,7 +39,7 @@ The input is every infinite sequence $f:\mathbb{N}\to\{0,1\}$. One symbol is tak
 \]
 The trajectory $\phi_{\mathrm{out}}$ of Equation~\eqref{eq:rle-phi} therefore
 emits $\bigl(f(2k),\mathrm{runLen}(f,k)\bigr)$ on tick $2k+1$ and holds that
-pair on tick $2k+2$. Let $R_{\mathrm{pipe}}$ be the coupled IOR with boundary law
+pair on tick $2k+2$. Let $R_{\mathrm{pipe}}$ be the coupled IOR with boundary requirement
 \[
   \Phi_{R_{\mathrm{pipe}}}(f,y)
   \quad\Longleftrightarrow\quad
@@ -55,9 +53,9 @@ This is the characteristic fragment of the pipeline IOR: all bit trajectories
 are admissible, and the displayed trajectory is the eligible output. The
 functional design $D_{\mathrm{ref}}$ packages a pipeline reference
 $Z_{\mathrm{ref}}$ whose state stores the tape value, phase, table state, and
-register pair needed to realise the law.
+register pair needed to realize the requirement.
 
-For the symbols $0,0,1$ at input ticks $0,2,4$, the register emits $(0,1)$,
+For example, for the symbols $0,0,1$ at input ticks $0,2,4$, the register emits $(0,1)$,
 $(0,2)$, $(1,1)$ at ticks $3,5,7$. The coupling recipe determines the two-tick
 shift.
 
@@ -80,10 +78,7 @@ technology, so $D_{\mathrm{ref}}$ and the buildable design form an element of
 $\mathrm{ISR}(R_{\mathrm{pipe}},TYR)$.
 
 Classical T3SD retains the three maps just described as conformance evidence.
-The assertional workflow
-retains $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ as the reference-indexed target.
-A revised component is checked against this fragment and supplies a witness for
-its current encoding.
+The assertional workflow retains $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ as the reference-indexed target. A revised component is checked against this fragment and supplies the required witness for its encoding.
 
 \subsubsection{Re-encoding and rejection}
 \label{sec:case-machine-lift}
@@ -92,5 +87,5 @@ Flipping the table's phase convention gives an isomorphic component. Both
 tables satisfy the dynamics fragment compiled from the same table reference,
 with different witnessing state maps. Component conformance then lifts through
 elaboration. A head that holds its phase fails the corresponding fragment
-because it cannot realise the phase-flipping head. The two cases distinguish
+because it cannot realize the phase-flipping head. The two cases distinguish
 state encoding from behavior.

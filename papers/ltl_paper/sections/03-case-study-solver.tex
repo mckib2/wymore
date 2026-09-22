@@ -1,10 +1,8 @@
 \subsection{Finite Checking}
 \label{sec:case-solver}
 
-The unbounded machine is established symbolically. Finite projections provide
-automated checks of bounded behavior. Capping the count at $n$ preserves the
-same transition whenever the current count is below $n$; the trace $0,0,1$
-remains below a cap of four.
+We describe the coupled system symbolically.  We can construct finite projections to enable automated checks of bounded behavior. Capping the count at $n$ preserves the
+same transition whenever the current count is below $n$.
 
 For any finite projection, satisfaction of $\Phi_{\mathrm{dyn}}$ becomes a
 propositional search for the three surjective maps subject to the readout,

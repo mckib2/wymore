@@ -1,7 +1,7 @@
-\subsection{From an IOR to Readable Temporal Laws}
+\subsection{Encoding IOR as Temporal Clauses}
 \label{sec:case-basics}
 
-The characteristic construction of Section~\ref{sec:trace-observability} applies to every IOR. For structured relations it reduces to compact laws that look familiar to an LTL reader:
+The characteristic construction of Section~\ref{sec:trace-observability} applies to every IOR. For structured relations, it reduces to compact laws that look familiar to classical LTL:
 \begin{align}
  \text{echo:}\quad
    &G\bigl(y(t)=f(t)\bigr), \label{eq:echo-phi}\\
@@ -12,15 +12,10 @@ The characteristic construction of Section~\ref{sec:trace-observability} applies
    &y(t)=\phi_{\mathrm{out}}(f,t). \label{eq:rle-phi}
 \end{align}
 Each equation abbreviates an eligible-output relation $ER(f)$.
-Equation~\eqref{eq:echo-phi} is memoryless. A Moore system with a fixed initial
-state cannot make $y(0)$ depend on an input first observed at tick zero, so its
-functionality cotyledon may be empty. Equation~\eqref{eq:delay-phi} adds the
-minimum state-compatible delay and is realizable by a one-bit register. The
-fragment therefore exposes the timing constraint already present in Wymore's
-trajectory semantics.
+Note that equation~\eqref{eq:echo-phi} is memoryless. A Moore system with a fixed initial state cannot make $y(0)$ depend on an input first observed at tick zero, so its functionality cotyledon may be empty. Equation~\eqref{eq:delay-phi} adds the minimum delay required by state transitions and is always realizable by a one-bit register. The fragment therefore exposes the timing constraint already present in Wymore's trajectory semantics.
 
 For Equation~\eqref{eq:rle-phi}, $\phi_{\mathrm{out}}(f,0)=(0,0)$;
 tick $2k+1$ emits the bit and run length for symbol $f(2k)$; tick $2k+2$
-holds that pair. The next subsection gives the run-length recurrence and the
-two-tick pipeline shift. Finite horizons and nondeterministic requirements use
+holds the pair. The next subsection gives the run-length recurrence and the
+two-tick pipeline shift. Finite as well as nondeterministic requirements use
 the same construction with a restricted time set or a multi-valued $ER(f)$.

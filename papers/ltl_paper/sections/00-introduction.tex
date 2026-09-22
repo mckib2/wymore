@@ -1,17 +1,20 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Wymore's Tricotyledon Theory of System Design (T3SD) defines functionality from an input/output requirement (IOR). For an IOR $R$, the cotyledon $\mathrm{FSR}(R)$ contains functional designs whose systems satisfy the boundary relation specified by $R$. Buildable designs arise from components in a technology and a coupling recipe. An implementable design pairs a functional design with a buildable design whose resultant implements it \citep{Wymore1993,salado2019wymore}.
+Wymore's Tricotyledon Theory of System Design (T3SD) defines functionality specification for a system design problem from an input/output requirement (IOR). For an IOR $R$, the cotyledon $\mathrm{FSR}(R)$ is defined as all the functional designs whose systems satisfy the boundary relation specified by $R$. Buildable designs arise from components in a technology and a coupling recipe. An implementable design pairs a functional design with a buildable design whose resultant implements it \citep{Wymore1993,salado2019wymore}.
 
-The definitions quantify over trajectories. Constructive verification commonly chooses a functional design $D_{\mathrm{ref}}\in\mathrm{FSR}(R)$ and exhibits a Wymore homomorphism from a buildable resultant to its system component $Z_{\mathrm{ref}}$. Constructing and maintaining those maps becomes laborious as state spaces, interfaces, and coupled architectures grow. Temporal assertional methods offer mature theory and tools for stating trace properties, checking finite or symbolic instances, and reusing properties through refinement.
+A constructive verification method may choose a functional design $D_{\mathrm{ref}}\in\mathrm{FSR}(R)$ and ask if there exists a Wymore homomorphism from a buildable resultant to its system component $Z_{\mathrm{ref}}$. Constructing and maintaining those maps becomes laborious as state spaces, interfaces, and coupled architectures grow. Temporal assertional methods offer mature theory and tools for instead stating trace properties, checking finite or symbolic instances, and reusing properties through refinement.
 
-\miniheading{Contributions}
+In this way we say that we reinterpret the functionality cotyledon as a temporal fragment.  Instead of a mapping from a functional design to a buildable design, we assert properties about the desired functionality of the system and check buildable designs for conformance to those properties.
+
+Specifically, the paper makes the following contributions:
 \begin{itemize}
     \item A characteristic boundary fragment for every Wymorian IOR, with a canonical equivalence between its assertional functionality space and $\mathrm{FSR}(R)$.
     \item A dynamics fragment compiled from $Z_{\mathrm{ref}}$, with the bi-implication
     $Z_{\mathrm{impl}}\models\Phi_{\mathrm{dyn}}$ iff $Z_{\mathrm{ref}}$ is a Wymore homomorphic image of $Z_{\mathrm{impl}}$.
     \item Invariance and composition results that preserve conformance through re-encoding, interface permutation, component elaboration, and coupling.
-    \item An end-to-end run-length encoder that establishes feasibility and locates the method's scope: lock-step conformance, separate treatment of liveness, and finite or symbolic checking according to the system representation.
 \end{itemize}
 
-Section~\ref{sec:background} fixes the T3SD and temporal notation. Section~\ref{sec:methodology} defines the two fragments and proves their correspondence with Wymore's functionality and implementation relations. Section~\ref{sec:case-study} develops the boundary examples and the run-length machine. Section~\ref{sec:discussion} states the limits, implications, and remaining work.
+We further demonstrate the method on an end-to-end run-length encoder that establishes feasibility and locates the method's scope: lock-step conformance, separate treatment of liveness, and finite or symbolic checking according to the system representation.
+
+The paper is organized as follows: Section~\ref{sec:background} presents background on T3SD and temporal notation. Section~\ref{sec:methodology} defines the relevant fragments and proves their correspondence with Wymore's functionality and implementation relations. Section~\ref{sec:case-study} develops the boundary examples and the run-length machine. Section~\ref{sec:discussion} states the limits, implications, and remaining work.

@@ -1,48 +1,40 @@
 \section{Discussion} \label{sec:discussion}
 
-The two correspondences answer different questions and carry different checking
-obligations.
-
-\subsection{Expressivity and lock-step}
+\subsection{Expressivity and timing}
 \label{sec:limitations}
 
 The characteristic boundary construction covers every Wymorian IOR by retaining
-its time set, admissible trajectories, and eligible-output relation as semantic
-objects. A finite ordinary-LTL presentation requires additional structure.
+its time scale, admissible trajectories, and eligible-output relation. A finite ordinary-LTL presentation requires additional structure.
 Echo, delay, and run length have compact presentations; arbitrary trajectory
 relations may require symbolic predicates or direct semantic reasoning.
 
 $\Phi_{\mathrm{dyn}}$ uses $G$/$X$ clauses for readout and one-step dynamics.
-The RLE requirement states the run so far. Eventual production of an encoding
+The RLE requirement states the run so far, or up to the current time. Eventual production of an encoding
 for an entire infinite input is a separate liveness property, outside the
 homomorphism bi-implication.
 
-Conformance is lock-step. Section~\ref{sec:case-ticks} shows that a two-phase
+Section~\ref{sec:case-ticks} shows that a two-phase
 build fails a one-tick reference and satisfies the behavior restated at two
 ticks. Rate-tolerant conformance would require a different implementation
 relation.
 
-The scope is therefore precise: the homomorphism result applies to the
-step-local schemas of $\Phi_{\mathrm{dyn}}$ and to matching clock rates. Other
-temporal properties may be checked alongside the fragment, with guarantees
-supplied by their own semantics.
+The homomorphism result applies only to the step-local schemas of $\Phi_{\mathrm{dyn}}$ and to matching clock rates. Other temporal properties may be checked alongside the fragment, with guarantees supplied by their own semantics.
 
 \subsection{Implications for systems engineering}
 \label{sec:implications}
 
-The fragments change which artifacts are maintained, not which designs are
-admissible. $\Phi_R$ is a presentation of the IOR: it can be inspected,
+For a constructive verification approach, the proposed fragment specifications allow assertions of properties without the need to reconstruct the pair-specific maps at each revision. $\Phi_R$ is a presentation of the IOR: it can be inspected,
 specialized to compact temporal laws when the boundary relation permits, and
 used as the criterion that generates $\mathrm{FSR}(R)$. $\Phi_{\mathrm{dyn}}$
 is a presentation of a chosen functional design's dynamics. Implementation
 work then consists in checking a buildable resultant against that fragment,
 rather than reconstructing pair-specific maps at each revision.
 
-That split matches how engineers already separate requirement satisfaction from
+This separation matches how requirement satisfaction is separated from
 realization of a selected functional design. When a candidate fails
-$\Phi_R$, it is not a functional design for $R$. When it satisfies $\Phi_R$
+$\Phi_R$, it is not a functional design for IOR $R$. When it satisfies $\Phi_R$
 but fails $\Phi_{\mathrm{dyn}}$, it may still be functional for $R$ while
-failing to realise the chosen $D_{\mathrm{ref}}$. Shared-table specializations
+failing to realize the chosen $D_{\mathrm{ref}}$. Shared-table specializations
 make the second failure a table disagreement. Hom-relative checking covers the
 case in which state or interface encodings differ.
 
@@ -53,21 +45,14 @@ four-component synchronous resultant. Recording pipeline delay at the boundary
 keeps the implementability pairing honest and prevents a failed check from
 being misread as a coding error.
 
-The reuse theorems give a path to larger architectures without changing
+The reuse theorems hints at a strategy for verifying systems without changing
 Wymore's implementation relation. A component can be checked against a
 fragment compiled from its own reference; a coupling witness then lifts those
 results to the resultant; later re-encodings keep the same fragment as the
-target. Finite components become generated decision problems. Infinite
-components remain symbolic, but they need not be re-proved from scratch when
+target. Finite components become generated decision problems. While
+components remain symbolic, they need not be re-proved from scratch when
 only a neighboring component changes. The search for maps is still hard in
-general. Decomposition changes the size of each obligation, not the underlying
-decision problem.
-
-Buildability remains a separate argument. Fragment satisfaction does not
-populate a technology or invent a coupling recipe. The implementability
-cotyledon still pairs a functional design with a buildable design; the
-assertional check supplies the implementation witness that Wymore requires of
-that pair.
+general (NP-hard!). Decomposition changes the size of each obligation, but it does not the underlying decision problem.
 
 \subsection{Tooling}
 \label{sec:tooling}
@@ -82,18 +67,15 @@ table.
 \subsection{Future work}
 \label{sec:future}
 
-Several extensions sit outside the present correspondences and are worth
-stating as such.
-
 A $k$-tick or stuttering implementation relation would address staged
 architectures without restating the reference clock. That relation is not
 Wymore's homomorphism, so the dynamics fragment and its bi-implication would
-need to be rebuilt around it.
+need to be adjusted accordingly.
 
-Liveness and progress can be attached as companion properties. The RLE
+Liveness and progress can be attached as companion properties. For example, the RLE
 encoder's eventual emission of a complete encoding, fairness of a scheduler,
 or eventual emptying of a buffer are natural examples. Their guarantees would
-come from their own semantics, not from Theorem~\ref{thm:dynamics-characterization}.
+come from their own semantics, not for free from Theorem~\ref{thm:dynamics-characterization}.
 
 Compilation and checking can be made more mechanical: generate $\Phi_R$ from
 an IOR presentation, generate $\Phi_{\mathrm{dyn}}$ from a discrete-system
