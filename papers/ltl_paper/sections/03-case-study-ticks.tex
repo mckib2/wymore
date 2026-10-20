@@ -3,9 +3,9 @@
 
 A recurring source of confusion in model-based systems engineering is distinguishing a genuine behavioral bug from a timing-abstraction mismatch between an idealized specification and a staged hardware implementation. Because a Wymore homomorphism equates one tick of the buildable mode $Z_m$ with one tick of the functional design $Z_f$, both the two-phase sense/act clock of the RLE head and the two-stage Moore pipeline delay of the coupling recipe $SCR$ must be respected at the system boundary.
 
-\begin{figure}[t]
+\begin{figure*}[t]
   \centering
-  \resizebox{0.98\linewidth}{!}{%
+  \resizebox{0.92\textwidth}{!}{%
   \begin{tikzpicture}[>=Latex, thick, font=\footnotesize]
     % Grid and Tick Header (3.0 = 2 * 1.5, 13.5 = 9 * 1.5; exact grid multiples)
     \draw[gray!35] (3.0, -3.5) grid[xstep=1.5, ystep=0.7] (13.5, 0.7);
@@ -65,7 +65,7 @@ A recurring source of confusion in model-based systems engineering is distinguis
   }
   \caption{Synchronous Moore pipeline timing across the four-component RLE resultant for input symbols $b_0=0$, $b_1=0$, $b_2=1$. Dashed arrows trace each sampled symbol from external input $f(2k)$ through the tape readout at $2k+1$, the instruction table update at $2k+2$, and finally the external register output $y(2k+3)$.}
   \label{fig:rle-timing}
-\end{figure}
+\end{figure*}
 
 Figure~\ref{fig:rle-timing} traces the exact tick-by-tick propagation across the coupled RLE machine:
 \begin{enumerate}

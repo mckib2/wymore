@@ -3,35 +3,37 @@
 
 Once the finite-capacity technology catalog $TYR_N$ is fixed, the boundary specification $\Phi_{IOR_N}$ of Equation~\eqref{eq:rle-fin-recurrence} compiles into six families of propositional LTL safety clauses over the boundary input bit $i_{\mathrm{in}}\in\{0,1\}$, the boundary register output $y=(\mathit{outBit},\mathit{outCnt})\in\{0,1\}\times\{0,\dots,N\}$, and the sense/act phase indicator $\mathit{phase}\in\{0,1\}$:
 \begin{align}
-  \varphi_{\mathrm{init}} &: \quad (\mathit{outCnt}=0)\ \wedge\ X(\mathit{outCnt}=0)\ \wedge\ XX(\mathit{outCnt}=0), \label{eq:ltl-init}\\
-  \varphi_{\mathrm{mode}} &: \quad G\bigl((\mathit{phase}=0 \leftrightarrow X(\mathit{phase}=1)) \wedge (\mathit{phase}=1 \leftrightarrow X(\mathit{phase}=0))\bigr), \label{eq:ltl-mode}\\
-  \varphi_{\mathrm{hold}} &: \quad \bigwedge_{b=0}^{1}\bigwedge_{c=1}^{N} G\bigl((\mathit{phase}=1 \wedge \mathit{outBit}=b \wedge \mathit{outCnt}=c) \rightarrow X(\mathit{outBit}=b \wedge \mathit{outCnt}=c)\bigr), \label{eq:ltl-hold}\\
-  \varphi_{\mathrm{start}} &: \quad \bigwedge_{b=0}^{1} G\bigl((\mathit{phase}=0 \wedge i_{\mathrm{in}}=b \wedge X(\mathit{outCnt}=0)) \rightarrow XXX(\mathit{outBit}=b \wedge \mathit{outCnt}=1)\bigr), \label{eq:ltl-start}\\
-  \varphi_{\mathrm{inc}} &: \quad \bigwedge_{b=0}^{1}\bigwedge_{c=1}^{N} G\Bigl(\bigl(\mathit{phase}=0 \wedge i_{\mathrm{in}}=b \wedge X(\mathit{outBit}=b \wedge \mathit{outCnt}=c)\bigr) \nonumber\\[-4pt]
-  &\hspace{7.8em} \rightarrow XXX\bigl(\mathit{outBit}=b \wedge \mathit{outCnt}=\min(c{+}1,N)\bigr)\Bigr), \label{eq:ltl-inc}\\
-  \varphi_{\mathrm{reset}} &: \quad \bigwedge_{b=0}^{1}\bigwedge_{c=1}^{N} G\Bigl(\bigl(\mathit{phase}=0 \wedge i_{\mathrm{in}}=b \wedge X(\mathit{outBit}=\neg b \wedge \mathit{outCnt}=c)\bigr) \nonumber\\[-4pt]
-  &\hspace{7.8em} \rightarrow XXX(\mathit{outBit}=b \wedge \mathit{outCnt}=1)\Bigr). \label{eq:ltl-reset}
+  \varphi_{\mathrm{init}} &: (\mathit{outCnt}=0) \wedge X(\mathit{outCnt}=0) \wedge XX(\mathit{outCnt}=0), \label{eq:ltl-init}\\
+  \varphi_{\mathrm{mode}} &: G\bigl((\mathit{phase}=0 \leftrightarrow X(\mathit{phase}=1)) \nonumber\\[-2pt]
+  &\hspace{1.8em} \wedge (\mathit{phase}=1 \leftrightarrow X(\mathit{phase}=0))\bigr), \label{eq:ltl-mode}\\
+  \varphi_{\mathrm{hold}} &: \bigwedge_{b=0}^{1}\bigwedge_{c=1}^{N} G\bigl((\mathit{phase}=1 \wedge \mathit{outBit}=b \wedge \mathit{outCnt}=c) \nonumber\\[-4pt]
+  &\hspace{3.6em} \rightarrow X(\mathit{outBit}=b \wedge \mathit{outCnt}=c)\bigr), \label{eq:ltl-hold}\\
+  \varphi_{\mathrm{start}} &: \bigwedge_{b=0}^{1} G\bigl((\mathit{phase}=0 \wedge i_{\mathrm{in}}=b \wedge X(\mathit{outCnt}=0)) \nonumber\\[-4pt]
+  &\hspace{3.6em} \rightarrow XXX(\mathit{outBit}=b \wedge \mathit{outCnt}=1)\bigr), \label{eq:ltl-start}\\
+  \varphi_{\mathrm{inc}} &: \bigwedge_{b=0}^{1}\bigwedge_{c=1}^{N} G\Bigl(\bigl(\mathit{phase}=0 \wedge i_{\mathrm{in}}=b \nonumber\\[-4pt]
+  &\hspace{2.6em} \wedge X(\mathit{outBit}=b \wedge \mathit{outCnt}=c)\bigr) \nonumber\\[-2pt]
+  &\hspace{2.6em} \rightarrow XXX\bigl(\mathit{outBit}=b \wedge \mathit{outCnt}=\min(c{+}1,N)\bigr)\Bigr), \label{eq:ltl-inc}\\
+  \varphi_{\mathrm{reset}} &: \bigwedge_{b=0}^{1}\bigwedge_{c=1}^{N} G\Bigl(\bigl(\mathit{phase}=0 \wedge i_{\mathrm{in}}=b \nonumber\\[-4pt]
+  &\hspace{2.6em} \wedge X(\mathit{outBit}=\neg b \wedge \mathit{outCnt}=c)\bigr) \nonumber\\[-2pt]
+  &\hspace{2.6em} \rightarrow XXX(\mathit{outBit}=b \wedge \mathit{outCnt}=1)\Bigr). \label{eq:ltl-reset}
 \end{align}
 Each clause has a direct systems engineering interpretation: $\varphi_{\mathrm{init}}$ specifies the three-tick pipeline startup window ($t=0,1,2$); $\varphi_{\mathrm{mode}}$ enforces the alternating sense/act phase clock; $\varphi_{\mathrm{hold}}$ enforces that the register holds its output pair across the second half of each cycle; and $\varphi_{\mathrm{start}}$, $\varphi_{\mathrm{inc}}$, and $\varphi_{\mathrm{reset}}$ govern the three-tick input-to-output pipeline response ($XXX$) on the first symbol, a matching symbol (saturating at $N$), and a run-breaking symbol, respectively.
 
 We implemented an automated verification script (\texttt{scripts/ltl\_ior\_checker.py}) that constructs the coupled resultant $Z_{b,N}=\mathrm{RSY}(SCR_N)$ from any candidate component catalog $TYR_N$, isolates the reachable operational system mode $Z_{m,N}\in\mathrm{SYSMO}(Z_{b,N})$, and model-checks both the boundary LTL specification $\Phi_{IOR_N}$ (Equations~\eqref{eq:ltl-init}--\eqref{eq:ltl-reset}) and the compiled dynamics fragment $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref},N})$. Table~\ref{tab:solver-results} reports the verification results across nine benchmark designs.
 
-\begingroup
-\vspace{4pt}
-\noindent
-\centering
-\footnotesize
-\renewcommand{\arraystretch}{1.25}
-\begin{tabularx}{\linewidth}{@{}X r r r r c c r@{}}
-\rowcolor{tableheader}
-\headingfont\bfseries Candidate Design & \headingfont\bfseries Cap $N$ & \headingfont\bfseries $|S_{\mathrm{resultant}}|$ & \headingfont\bfseries $|S_{\mathrm{mode}}|$ & \headingfont\bfseries Clauses & \headingfont\bfseries Verdict & \headingfont\bfseries Violated & \headingfont\bfseries Time (ms) \\
-\addlinespace[2pt]
-\input{generated/solver-results.tex}
-\end{tabularx}
-\captionof{table}{Automated LTL verification results for finite-tape buildable RLE resultants $Z_{b,N}=\mathrm{RSY}(SCR_N)$ and their operational system modes $Z_{m,N}\in\mathrm{SYSMO}(Z_{b,N})$ against $\Phi_{IOR_N}$ and $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref},N})$.}
+\begin{table*}[t]
+\caption{Automated LTL verification results for finite-tape buildable RLE resultants $Z_{b,N}=\mathrm{RSY}(SCR_N)$ and their operational system modes $Z_{m,N}\in\mathrm{SYSMO}(Z_{b,N})$ against $\Phi_{IOR_N}$ and $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref},N})$.}
 \label{tab:solver-results}
-\vspace{4pt}
-\endgroup
+\renewcommand{\arraystretch}{1.2}
+\footnotesize
+\begin{tabularx}{\textwidth}{@{}X r r r r c c r@{}}
+\toprule
+\textbf{Candidate Design} & \textbf{Cap $N$} & \textbf{$|S_{\mathrm{resultant}}|$} & \textbf{$|S_{\mathrm{mode}}|$} & \textbf{Clauses} & \textbf{Verdict} & \textbf{Violated} & \textbf{Time (ms)} \\
+\midrule
+\csname @@input\endcsname generated/solver-results.tex
+\bottomrule
+\end{tabularx}
+\end{table*}
 
 The nine rows of Table~\ref{tab:solver-results} highlight three practical capabilities of the temporal logic bridge:
 \begin{enumerate}

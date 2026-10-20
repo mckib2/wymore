@@ -1,6 +1,6 @@
 % =================================================================
 % Systems Engineering (Wiley) article driver.
-% Template: wiley-article.cls / ama.bst (from Wiley / Authorea pilot).
+% Template: syseng.cls / ama.bst (modern 2026 Wiley Systems Engineering layout).
 %
 % TERMINOLOGY (vocabulary contract — use these terms consistently)
 % ----------------------------------------------------------------
@@ -29,41 +29,40 @@
 %   Assertional satisfaction — Z ⊨_L Φ / Z ⊨_dyn Φ_dyn.
 % =================================================================
 
-\documentclass[num-refs]{wiley-article}
+\documentclass[regular]{syseng}
 
 \input{preamble}
 
-\iflatexml
-\else
-\paperfield{Systems Engineering}
-\abbrevs{T3SD, Tricotyledon Theory of System Design; MBSE, Model-Based Systems Engineering; LTL, Linear Temporal Logic; FO-LTL, First-Order Linear Temporal Logic; FSR, Functionality Space Requirement; BSR, Buildability Space Requirement; ISR, Implementability Space Requirement; IOR, Input/Output Requirement; TYR, Technology Requirement; SCR, System Coupling Recipe; SYSMO, System Mode; RLE, Run-Length Encoder.}
-\corraddress{Nicholas McKibben, Department of Systems and Industrial Engineering, University of Arizona, Tucson, AZ 85721, USA}
-\corremail{mckib2@arizona.edu}
-\fundinginfo{None}
-\fi
+\pubyear{2026}
+\volume{0}
+\doi{10.1002/sys.00000}
+\received{15 October 2026}
+\revised{18 October 2026}
+\accepted{20 October 2026}
+\correspondence{Nicholas McKibben, Department of Systems and Industrial Engineering, University of Arizona, Tucson, AZ 85721, USA (\href{mailto:mckib2@arizona.edu}{mckib2@arizona.edu})}
+\funding{None}
 
-\papertype{Original Article}
+\keywords{Tricotyledon Theory of System Design (T3SD) \kwsep Linear Temporal Logic (LTL) \kwsep formal verification \kwsep Model-Based Systems Engineering (MBSE) \kwsep system homomorphism \kwsep system modes}
 
 \title{Reinterpreting the Functionality Cotyledon: Temporal Logic for T3SD}
 
-\author[1]{Nicholas McKibben}
-\author[1]{Larry Head}
-\author[1]{Alejandro Salado}
+\author{%
+  Nicholas McKibben\affilmark{1} \authorsep
+  Larry Head\affilmark{1} \authorsep
+  Alejandro Salado\affilmark{1}%
+}
 
-\affil[1]{Department of Systems and Industrial Engineering, University of Arizona, Tucson, AZ}
+\affiliations{%
+  \affilnum{1}Department of Systems and Industrial Engineering, University of Arizona, Tucson, AZ, USA%
+}
 
-\runningauthor{McKibben et al.}
+\abstract{%
+In Wymore's Tricotyledon Theory of System Design (T3SD), an input/output requirement defines the functionality cotyledon of systems satisfying desired boundary trajectories, while a technology catalog and coupling recipe define the buildability cotyledon of component architectures. Certifying implementability requires isolating an operational mode of a buildable design and exhibiting a surjective homomorphism onto a functional design---a manual process that is arduous for coupled systems and lacks automated tooling. This paper bridges T3SD and temporal logic to bring automated model checking into Wymore's framework. First, we prove every Wymorian input/output requirement is isomorphic to a boundary specification in temporal logic. Second, we show certifying a buildable system mode reduces to checking temporal specifications directly, avoiding manual homomorphism search while preserving conformance across state re-encodings and component elaborations. Because buildable components are finite-state, Linear Temporal Logic (LTL) model checking over their modes is decidable and automated, demonstrated by refining an infinite-tape run-length encoder into a verified finite-tape machine.%
+}
 
 \begin{document}
 
 \maketitle
-\selectlanguage{english}
-\begin{abstract}
-\sloppy
-In Wymore's Tricotyledon Theory of System Design (T3SD), an input/output requirement defines the functionality cotyledon of systems satisfying desired boundary trajectories, while a technology catalog and coupling recipe define the buildability cotyledon of component architectures. Certifying implementability requires isolating an operational mode of a buildable design and exhibiting a surjective homomorphism onto a functional design---a manual process that is arduous for coupled systems and lacks automated tooling. This paper bridges T3SD and temporal logic to bring automated model checking into Wymore's framework. First, we prove every Wymorian input/output requirement is isomorphic to a boundary specification in temporal logic. Second, we show certifying a buildable system mode reduces to checking temporal specifications directly, avoiding manual homomorphism search while preserving conformance across state re-encodings and component elaborations. Because buildable components are finite-state, Linear Temporal Logic (LTL) model checking over their modes is decidable and automated, demonstrated by refining an infinite-tape run-length encoder into a verified finite-tape machine.
-
-\keywords{Tricotyledon Theory of System Design (T3SD), Linear Temporal Logic (LTL), formal verification, Model-Based Systems Engineering (MBSE), system homomorphism, system modes.}
-\end{abstract}
 
 % ----- Main body (in order) -----
 \input{sections/00-introduction}
@@ -73,11 +72,8 @@ In Wymore's Tricotyledon Theory of System Design (T3SD), an input/output require
 \input{sections/04-discussion}
 \input{sections/05-conclusions}
 
-\selectlanguage{english}
 \bibliographystyle{ama}
 \bibliography{refs}
-
-% \input{sections/biography}
 
 % ----- Appendices -----
 \appendix

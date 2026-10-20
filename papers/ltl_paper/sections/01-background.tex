@@ -25,20 +25,22 @@ Wymore bridges this gap in Chapter~5 of \citet{Wymore1993} through two concepts:
 \end{itemize}
 By Wymore's Definition~5.71, a buildable resultant $Z_b$ \emph{implements} a functional system $Z_f$ if and only if $Z_f$ is a homomorphic image of at least one system mode $Z_m\in\mathrm{SYSMO}(Z_b)$. Crucially, Wymore's Theorem~6.58 proves that when $Z_m$ and $Z_f$ share the boundary alphabets $(IR,OR)$ with identity port maps ($h_I=\mathrm{id}_{IR}$, $h_O=\mathrm{id}_{OR}$), any homomorphism $h_S:S_m\twoheadrightarrow S_f$ preserves $IOR$ satisfaction exactly:
 \begin{equation}
-    \mathrm{SatisfiesIOR}(Z_m,IOR,s_0,T) \;\Longleftrightarrow\; \mathrm{SatisfiesIOR}(Z_f,IOR,h_S(s_0),T).
+    \mathrm{SatisfiesIOR}(Z_m,IOR,s_0,T) \Longleftrightarrow \mathrm{SatisfiesIOR}(Z_f,IOR,h_S(s_0),T).
     \label{eq:thm-658-preview}
 \end{equation}
 
 \miniheading{Notation}
 Table~\ref{tab:notation} summarizes Wymore's textbook nomenclature \citep{Wymore1993} alongside the standard mathematical notation used throughout this paper.
 
-\begingroup
-\renewcommand{\arraystretch}{1.35}
+\begin{table*}[t]
+\caption{Correspondence between Wymore's T3SD terminology \citep{Wymore1993} and the mathematical notation used in this paper.}
+\label{tab:notation}
+\renewcommand{\arraystretch}{1.25}
 \footnotesize
-\begin{tabularx}{\linewidth}{@{}A{0.25\linewidth} A{0.33\linewidth} >{\raggedright\arraybackslash}X@{}}
-    \rowcolor{tableheader}
-    \headingfont\bfseries Concept & \headingfont\bfseries Wymore (T3SD) & \headingfont\bfseries Notation in This Paper \\
-    \addlinespace[3pt]
+\begin{tabularx}{\textwidth}{@{}A{0.25\textwidth} A{0.33\textwidth} >{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Concept} & \textbf{Wymore (T3SD)} & \textbf{Notation in This Paper} \\
+    \midrule
     Discrete system 5-tuple & $(SZ, IZ, OZ, \text{NZ}, \text{RZ})$ & $Z = (S, I, O, \delta, \rho)$ \\
     Input/Output Requirement & $\text{IOR} = (\text{OLR},\text{IR},\text{ITR},\text{OR},\text{OTR},\text{ER})$ & $IOR = (OLR, IR, ITR, OR, OTR, ER)$ \\
     Functionality Cotyledon & $\text{CTL}(\text{IOR}) = \text{FSR}(\text{IOR})$ & $\mathrm{CTL}(IOR) = \mathrm{FSR}(IOR)$ \\
@@ -49,37 +51,32 @@ Table~\ref{tab:notation} summarizes Wymore's textbook nomenclature \citep{Wymore
     Homomorphic image / maps & $Z_f \in \text{HIMSY}(Z_m)$ via $(\text{HS},\text{HI},\text{HO})$ & $h = (h_S, h_I, h_O) : Z_m \twoheadrightarrow Z_f$ \\
     Implementation relation & $Z_f \in \text{IMPSY}(Z_b)$ & $\exists Z_m \in \mathrm{SYSMO}(Z_b),\ h : Z_m \twoheadrightarrow Z_f$ \\
     Boundary / dynamics fragments & --- & $\Phi_{IOR}$ (boundary),\ $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ (dynamics) \\
+    \bottomrule
 \end{tabularx}
-\captionof{table}{Correspondence between Wymore's T3SD terminology \citep{Wymore1993} and the mathematical notation used in this paper.}
-\label{tab:notation}
-\endgroup
-\vspace{4pt}
+\end{table*}
 
 \subsection{Temporal Logics and Model Checking}
 \label{sec:background-ltl}
 Linear Temporal Logic (LTL) and its first-order extensions provide a mathematically precise language for asserting properties of time-indexed trajectories \citep{Pnueli1977,MannaPnueli1995,BaierKatoen2008,VardiWolper1986,Thomas1990}. Rather than specifying a system by writing down an explicit state set and transition table, a temporal formula specifies the admissible infinite or finite traces directly using Boolean connectives ($\wedge,\vee,\neg,\rightarrow$) and temporal modalities such as $G\,\varphi$ (``always $\varphi$'') and $X\,\varphi$ (``at the next tick, $\varphi$''), summarized in Table~\ref{tab:ltl-operators}.
 
-\begingroup
-\renewcommand{\arraystretch}{1.35}
-\footnotesize
-\begin{tabularx}{\linewidth}{@{}P{0.12\linewidth} P{0.16\linewidth} A{0.28\linewidth} A{0.38\linewidth}@{}}
-    \rowcolor{tableheader}
-    \headingfont\bfseries Op. & \headingfont\bfseries Name & \headingfont\bfseries Role in T3SD Bridge & \headingfont\bfseries Semantics at Tick $t$ \\
-    \addlinespace[2pt]
-    $G\,\varphi$ & always & Global safety / invariants & $\varphi$ holds at all ticks $\tau \ge t$ \\
-    \addlinespace[2pt]
-    $X\,\varphi$ & next & One-step transition / delay & $\varphi$ holds at tick $t+1$ \\
-    \addlinespace[2pt]
-    $\varphi \rightarrow \psi$ & implication & Guarded transitions / readouts & If $\varphi$ holds at $t$, then $\psi$ holds at $t$ \\
-    \addlinespace[2pt]
-    $\varphi \wedge \psi$ & conjunction & Joint state/input guards & Both $\varphi$ and $\psi$ hold at $t$ \\
-    \addlinespace[2pt]
-    $F\,\varphi$ & eventually & Liveness (outside $\Phi_{\mathrm{dyn}}$) & $\varphi$ holds at some future tick $\tau \ge t$ \\
-\end{tabularx}
-\captionof{table}{Core temporal logic operators used to express boundary requirements $\Phi_{IOR}$ and compiled dynamics $\Phi_{\mathrm{dyn}}$.}
+\begin{table}[t]
+\caption{Core temporal logic operators used to express boundary requirements $\Phi_{IOR}$ and compiled dynamics $\Phi_{\mathrm{dyn}}$.}
 \label{tab:ltl-operators}
-\endgroup
-\vspace{4pt}
+\renewcommand{\arraystretch}{1.2}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\columnwidth}{@{}l l >{\raggedright\arraybackslash}p{0.28\columnwidth} >{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Op.} & \textbf{Name} & \textbf{Role in T3SD} & \textbf{Semantics at Tick $t$} \\
+    \midrule
+    $G\,\varphi$ & always & Global safety & $\varphi$ holds at all $\tau \ge t$ \\
+    $X\,\varphi$ & next & 1-step delay & $\varphi$ holds at $t+1$ \\
+    $\varphi \rightarrow \psi$ & implies & Guarded step & If $\varphi$ at $t$, then $\psi$ at $t$ \\
+    $\varphi \wedge \psi$ & and & Joint guard & Both $\varphi$ and $\psi$ hold at $t$ \\
+    $F\,\varphi$ & eventually & Liveness & $\varphi$ holds at some $\tau \ge t$ \\
+    \bottomrule
+\end{tabularx}
+\end{table}
 
 When a discrete system $Z_m$ has finite state, input, and output sets, its closed-loop execution defines a finite Kripke structure whose paths are infinite sequences of $(s(t),i(t),y(t))$ triples. Deciding whether every run of a finite-state system satisfies an LTL formula ($Z_m\models\varphi$) is PSPACE-complete \citep{SistlaClarke1985} and supported by decades of industrial-strength explicit-state, symbolic BDD, and SAT/SMT-based model checkers \citep{BurchClarkeMcMillanDill1992,BiereCimattiClarkeZhu1999,BaierKatoen2008,deMouraZ32008}.
 

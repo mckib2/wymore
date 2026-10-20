@@ -1,53 +1,66 @@
 % =================================================================
-% Packages and macros for the Wiley Systems Engineering article.
+% Packages and macros for the Wiley Systems Engineering article (syseng.cls).
 % Document class, authors, and abstract live in main.tex.
 % =================================================================
 
-\usepackage{graphicx}
 \graphicspath{{./}{figures/}}
 \usepackage[space]{grffile}
-\usepackage{latexsym}
 \usepackage{textcomp}
 \usepackage{longtable}
-\usepackage{booktabs}
-\usepackage{array}
+\usepackage{colortbl}
+\usepackage{tabularx}
 \usepackage{multirow}
-\usepackage{amsfonts,amsmath,amssymb}
-\usepackage{url}
-\usepackage{hyperref}
-\hypersetup{colorlinks=false,pdfborder={0 0 0}}
+\usepackage{mathtools}
+\usepackage{bm}
 \usepackage{etoolbox}
-
-\usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
-
 \usepackage{siunitx}
 \usepackage{placeins}
-\usepackage{enumitem}
-\setlist{nosep}
 
 \usepackage{tikz}
 \usetikzlibrary{arrows,arrows.meta,positioning,shapes,shapes.geometric,fit,backgrounds,calc,automata}
 
-\usepackage{caption}
-\captionsetup{hypcap=false}
-% Override wiley-article ragged-right captions: center table/figure captions.
-\AtBeginDocument{%
-  \captionsetup[table]{justification=centering,singlelinecheck=true}%
-  \captionsetup[figure]{justification=centering,singlelinecheck=true}%
-}
+% Compatibility aliases for natbib-style citation commands used in the text.
+\providecommand{\citep}[1]{\cite{#1}}
+\providecommand{\citet}[1]{\cite{#1}}
+\providecommand{\citealt}[1]{\cite{#1}}
 
-% Table styling retained from the conference draft (compatible with Wiley).
-\definecolor{tableheader}{HTML}{D9D9D9}
+% Theorem and proof environments matching Wiley Systems Engineering style.
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\makeatletter
+\def\@opargbegintheorem#1#2#3{\trivlist
+   \item[\hskip \labelsep{\bfseries #1\ #2}]\textbf{(#3).}\ \itshape}
+\makeatother
+
+\newenvironment{proof}[1][Proof]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1.}]}{\end{trivlist}}
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1.}]}{\end{trivlist}}
+\newenvironment{example}[1][Example]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1.}]}{\end{trivlist}}
+\newenvironment{remark}[1][Remark]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1.}]}{\end{trivlist}}
+
+\newcommand{\qed}{\nobreak \ifvmode \relax \else
+      \ifdim\lastskip<1.5em \hskip-\lastskip
+      \hskip1.5em plus0em minus0.5em \fi \nobreak
+      \vrule height0.75em width0.5em depth0.25em\fi}
+
+% Table styling helpers.
+\definecolor{tableheader}{HTML}{E6E6E6}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
 \newcolumntype{A}[1]{>{\raggedright\arraybackslash}p{#1}}
 \newcolumntype{M}[1]{>{\raggedright\arraybackslash}m{#1}}
 \newcommand{\headingfont}{}
 
-% Lightweight stand-in for the old INCOSE mini-heading macro.
+% Lightweight stand-in for mini-heading macro.
 \newcommand{\miniheading}[1]{%
-  \paragraph{#1.}%
+  \par\vspace{4bp}\noindent\textbf{#1.}\space
 }
 
 % Safe figure include (optional assets).

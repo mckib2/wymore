@@ -3,9 +3,9 @@
 \subsection{Bridging the Functionality and Buildability Cotyledons via Temporal Logic}
 Figure~\ref{fig:cotyledons-bridge} illustrates the structural relationship between Wymore's three cotyledons and the temporal logic bridge developed in this section. On the left, an Input/Output Requirement $IOR$ defines the functionality cotyledon $\mathrm{CTL}(IOR)=\mathrm{FSR}(IOR)$, which is either empty or infinite. On the right, a technology $TYR$ and coupling recipe $SCR$ define a buildable resultant $Z_b=\mathrm{RSY}(SCR)\in\mathrm{CTL}(TYR)$, from which an operational system mode $Z_m\in\mathrm{SYSMO}(Z_b)$ is isolated.
 
-\begin{figure}[t]
+\begin{figure*}[t]
   \centering
-  \resizebox{\linewidth}{!}{%
+  \resizebox{0.94\textwidth}{!}{%
   \begin{tikzpicture}[auto, >=Latex, thick,
     cotyledon/.style={draw=black!55, dashed, rounded corners=8pt, inner sep=8pt},
     funcbox/.style={draw=blue!65!black, fill=blue!6, rectangle, rounded corners=4pt, minimum width=3.3cm, minimum height=0.9cm, align=center, font=\footnotesize},
@@ -22,15 +22,15 @@ Figure~\ref{fig:cotyledons-bridge} illustrates the structural relationship betwe
     \node (dref) [funcbox] at (0, -0.6) {Functional System Design\\$D_f=(Z_f,s_0,T)\in\mathrm{CTL}(IOR)$};
 
     % Center: Temporal Logic & Implementability
-    \node (phiIOR) [logicbox] at (5.0, 2.7) {Boundary Temporal Spec\\$\Phi_{IOR}=(T_{IOR},ITR,A_{IOR})$};
-    \node (afsr) [logicbox] at (5.0, 1.1) {Assertional Space\\$\mathrm{AFSR}(\Phi_{IOR})\simeq\mathrm{FSR}(IOR)$};
-    \node (phiDyn) [logicbox] at (5.0, -0.6) {Compiled Dynamics Fragment\\$\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ {\scriptsize ($G,X,\rightarrow,\wedge$)}};
-    \node (isr) [isrbox] at (5.0, -2.55) {Implementability Cotyledon\\$\mathrm{CTL}(IOR,TYR)=\mathrm{ISR}(IOR,TYR)$};
+    \node (phiIOR) [logicbox] at (6.0, 2.7) {Boundary Temporal Spec\\$\Phi_{IOR}=(T_{IOR},ITR,A_{IOR})$};
+    \node (afsr) [logicbox] at (6.0, 1.1) {Assertional Space\\$\mathrm{AFSR}(\Phi_{IOR})\simeq\mathrm{FSR}(IOR)$};
+    \node (phiDyn) [logicbox] at (6.0, -0.6) {Compiled Dynamics Fragment\\$\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ {\scriptsize ($G,X,\rightarrow,\wedge$)}};
+    \node (isr) [isrbox] at (6.0, -2.55) {Implementability Cotyledon\\$\mathrm{CTL}(IOR,TYR)=\mathrm{ISR}(IOR,TYR)$};
 
     % Right: Buildability Cotyledon
-    \node (tyr) [buildbox] at (10.0, 2.7) {Technology $TYR$ \&\\Coupling Recipe $SCR$};
-    \node (bsr) [buildbox] at (10.0, 1.1) {Buildable Resultant\\$Z_b=\mathrm{RSY}(SCR)\in\mathrm{CTL}(TYR)$};
-    \node (mode) [buildbox] at (10.0, -0.6) {System Mode\\$Z_m\in\mathrm{SYSMO}(Z_b)$\\{\scriptsize (finite Kripke structure)}};
+    \node (tyr) [buildbox] at (12.0, 2.7) {Technology $TYR$ \&\\Coupling Recipe $SCR$};
+    \node (bsr) [buildbox] at (12.0, 1.1) {Buildable Resultant\\$Z_b=\mathrm{RSY}(SCR)\in\mathrm{CTL}(TYR)$};
+    \node (mode) [buildbox] at (12.0, -0.6) {System Mode\\$Z_m\in\mathrm{SYSMO}(Z_b)$\\{\scriptsize (finite Kripke structure)}};
 
     % Cotyledon Group Boxes
     \begin{scope}[on background layer]
@@ -52,9 +52,9 @@ Figure~\ref{fig:cotyledons-bridge} illustrates the structural relationship betwe
     \draw[arrow] (dref) -- node[above, font=\scriptsize] {compile} (phiDyn);
 
     % Classical manual homomorphism vs automated LTL check
-    \draw[homarrow] (mode.south) .. controls (10.0, -3.85) and (0.0, -3.85) .. node[below, font=\scriptsize, text=red!70!black] {Classical T3SD: manual homomorphism $h:Z_m\twoheadrightarrow Z_f$} (dref.south);
-    \draw[ltlarrow] (mode.west) -- node[above, font=\scriptsize] {check $Z_m\models\Phi_{\mathrm{dyn}}$} (phiDyn.east);
-    \draw[ltlarrow] ([yshift=4pt]mode.west) -- node[above, sloped, font=\scriptsize, fill=white, inner sep=1pt] {LTL check $Z_m\models\Phi_{IOR}$ (Thm.~\ref{thm:mode-ior-bridge})} ([yshift=-4pt]afsr.east);
+    \draw[homarrow] (mode.south) .. controls (12.0, -3.85) and (0.0, -3.85) .. node[below, font=\scriptsize, text=red!70!black] {Classical T3SD: manual homomorphism $h:Z_m\twoheadrightarrow Z_f$} (dref.south);
+    \draw[ltlarrow] (mode.west) -- node[below, font=\scriptsize] {check $Z_m\models\Phi_{\mathrm{dyn}}$} (phiDyn.east);
+    \draw[ltlarrow] ([yshift=8pt]mode.west) -- node[above, sloped, font=\fontsize{6}{7}\selectfont] {LTL check $Z_m\models\Phi_{IOR}$ (Thm.~\ref{thm:mode-ior-bridge})} ([yshift=-4pt]afsr.east);
 
     % Into Implementability Cotyledon
     \draw[arrow] ([xshift=18pt]dref.south) to[out=-65, in=180] (isr.west);
@@ -64,7 +64,7 @@ Figure~\ref{fig:cotyledons-bridge} illustrates the structural relationship betwe
   }
   \caption{Reinterpreting T3SD verification through temporal logic. Instead of manually constructing and maintaining a surjective homomorphism $h:Z_m\twoheadrightarrow Z_f$ from a system mode $Z_m\in\mathrm{SYSMO}(Z_b)$ of a buildable resultant $Z_b=\mathrm{RSY}(SCR)$ onto a functional system in $\mathrm{CTL}(IOR)$, the engineer checks $Z_m\models\Phi_{IOR}$ (or $Z_m\models\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$) directly using decidable temporal logic model checking.}
   \label{fig:cotyledons-bridge}
-\end{figure}
+\end{figure*}
 
 In classical T3SD, placing $(D_f,Z_b)$ in the implementability cotyledon $\mathrm{CTL}(IOR,TYR)$ requires manually finding a surjective homomorphism $h:Z_m\twoheadrightarrow Z_f$. Our methodology replaces that manual search with two complementary temporal logic mechanisms:
 \begin{enumerate}
@@ -134,63 +134,57 @@ $(2\Rightarrow 1)$: Conversely, if $Z_m,s_{m,0},T\models_{IO}\Phi_{IOR}$, then b
 \paragraph{General boundary encodings.}
 When the mode $Z_m$ uses concrete port encodings $(I_m,O_m)$ that relate to the requirement alphabets $(IR,OR)$ via injective or surjective interface maps $h_I:I_m\twoheadrightarrow IR$ and $h_O:O_m\twoheadrightarrow OR$ (for instance, reading a single unconnected port from a coupled port vector), Wymore's transported requirement $\mathrm{himio}(IOR,h_I,h_O)$ (Definition~6.72) pulls $\Phi_{IOR}$ back along $(h_I,h_O)$ so that Theorem~\ref{thm:mode-ior-bridge} applies verbatim on the mode's boundary ports.
 
-\begingroup
-\renewcommand{\arraystretch}{1.45}
-\footnotesize
-\begin{tabularx}{\linewidth}{@{}P{0.26\linewidth}YY@{}}
-    \rowcolor{tableheader}
-    \headingfont\bfseries Verification Aspect & \headingfont\bfseries Classical Constructive T3SD & \headingfont\bfseries Temporal Logic T3SD Bridge \\
-    \addlinespace[4pt]
-    Functionality specification & $IOR$ generates $\mathrm{CTL}(IOR)=\mathrm{FSR}(IOR)$ & $IOR$ compiles to $\Phi_{IOR}$ with $\mathrm{AFSR}(\Phi_{IOR})\simeq\mathrm{FSR}(IOR)$ \\
-    \addlinespace[4pt]
-    Mode-to-$IOR$ verification & Select $Z_f\in\mathrm{CTL}(IOR)$ and construct $h:Z_m\twoheadrightarrow Z_f$ by hand & Model-check $Z_m\models\Phi_{IOR}$ directly (or $Z_m\models\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$) \\
-    \addlinespace[4pt]
-    Impact of component refactoring & Must rebuild and re-prove state map $h_S$ & Re-run automated checker against unchanged $\Phi_{IOR}$ / $\Phi_{\mathrm{dyn}}$ \\
-    \addlinespace[4pt]
-    Implementability guarantee & Membership in $\mathrm{CTL}(IOR,TYR)$ via $h$ & Identical membership in $\mathrm{CTL}(IOR,TYR)$ (Thms.~\ref{thm:mode-ior-bridge} \& \ref{thm:dynamics-characterization}) \\
-\end{tabularx}
-\captionof{table}{Comparison of classical constructive T3SD verification and the temporal logic workflow.}
+\begin{table*}[t]
+\caption{Comparison of classical constructive T3SD verification and the temporal logic workflow.}
 \label{tab:comparison}
-\endgroup
-\vspace{6pt}
+\renewcommand{\arraystretch}{1.25}
+\footnotesize
+\begin{tabularx}{\textwidth}{@{}A{0.24\textwidth}YY@{}}
+    \toprule
+    \textbf{Verification Aspect} & \textbf{Classical Constructive T3SD} & \textbf{Temporal Logic T3SD Bridge} \\
+    \midrule
+    Functionality specification & $IOR$ generates $\mathrm{CTL}(IOR)=\mathrm{FSR}(IOR)$ & $IOR$ compiles to $\Phi_{IOR}$ with $\mathrm{AFSR}(\Phi_{IOR})\simeq\mathrm{FSR}(IOR)$ \\
+    Mode-to-$IOR$ verification & Select $Z_f\in\mathrm{CTL}(IOR)$ and construct $h:Z_m\twoheadrightarrow Z_f$ by hand & Model-check $Z_m\models\Phi_{IOR}$ directly (or $Z_m\models\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$) \\
+    Impact of component refactoring & Must rebuild and re-prove state map $h_S$ & Re-run automated checker against unchanged $\Phi_{IOR}$ / $\Phi_{\mathrm{dyn}}$ \\
+    Implementability guarantee & Membership in $\mathrm{CTL}(IOR,TYR)$ via $h$ & Identical membership in $\mathrm{CTL}(IOR,TYR)$ (Thms.~\ref{thm:mode-ior-bridge} \& \ref{thm:dynamics-characterization}) \\
+    \bottomrule
+\end{tabularx}
+\end{table*}
 
 \subsection{Reference-Dynamics Fragment \texorpdfstring{$\Phi_{\mathrm{dyn}}$}{Phi\_dyn}}
 \label{sec:dynamics-encoding-fragment}
 In many systems engineering workflows, the team also maintains an explicit architectural reference machine $Z_{\mathrm{ref}}=(S_{\mathrm{ref}},I_{\mathrm{ref}},O_{\mathrm{ref}},\delta_{\mathrm{ref}},\rho_{\mathrm{ref}})$ from a chosen functional design $D_{\mathrm{ref}}\in\mathrm{CTL}(IOR)$ and wishes to verify that a candidate mode $Z_m\in\mathrm{SYSMO}(Z_b)$ is a homomorphic elaboration of $Z_{\mathrm{ref}}$. We compile the transition and readout tables of $Z_{\mathrm{ref}}$ into a \emph{dynamics-encoding fragment} $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$, summarized in Table~\ref{tab:phi-dyn-fragment}.
 
-\begingroup
-\renewcommand{\arraystretch}{1.35}
-\footnotesize
-\begin{tabularx}{\linewidth}{@{}A{0.22\linewidth} A{0.78\linewidth}@{}}
-    \rowcolor{tableheader}
-    \headingfont\bfseries Element & \headingfont\bfseries Dynamics-encoding fragment $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ \\
-    \addlinespace[2pt]
-    Operators & $G$ (always), $X$ (next), $\rightarrow$, $\wedge$; \textbf{excludes} $F$ (eventually) \\
-    \addlinespace[2pt]
-    Atomic predicates & $\mathit{refState}(s)$ ($h_S(x)=s$); $\mathit{input}(i)$, $\mathit{input}(\mathrm{none})$; $\mathit{output}(o)$, $\mathit{output}(\mathrm{none})$ \\
-    \addlinespace[2pt]
-    Open readout & $G\bigl(\mathit{refState}(s) \rightarrow \mathit{output}(o)\bigr)$ whenever $\rho_{\mathrm{ref}}(s)=o$ \\
-    \addlinespace[2pt]
-    Closed readout & $G\bigl(\mathit{refState}(s) \rightarrow \mathit{output}(\mathrm{none})\bigr)$ whenever $\rho_{\mathrm{ref}}(s)=\mathrm{none}$ \\
-    \addlinespace[2pt]
-    Autonomous step & $G\bigl((\mathit{refState}(s)\wedge\mathit{input}(\mathrm{none})) \rightarrow X(\mathit{refState}(\delta_{\mathrm{ref}}(s,\mathrm{none})))\bigr)$ \\
-    \addlinespace[2pt]
-    Guided step & $G\bigl((\mathit{refState}(s)\wedge\mathit{input}(i)) \rightarrow X(\mathit{refState}(\delta_{\mathrm{ref}}(s,i)))\bigr)$ for each $i\in I_{\mathrm{ref}}$ \\
-    \addlinespace[2pt]
-    Checked on & System mode $Z_m\in\mathrm{SYSMO}(Z_b)$ under surjective $(h_S,h_I,h_O)$ (or identity on shared labels) \\
-\end{tabularx}
-\captionof{table}{The dynamics-encoding fragment $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ compiled from a reference system $Z_{\mathrm{ref}}$.}
+\begin{table*}[t]
+\caption{The dynamics-encoding fragment $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ compiled from a reference system $Z_{\mathrm{ref}}$.}
 \label{tab:phi-dyn-fragment}
-\endgroup
-\vspace{4pt}
+\renewcommand{\arraystretch}{1.25}
+\footnotesize
+\begin{tabularx}{\textwidth}{@{}A{0.22\textwidth} >{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Element} & \textbf{Dynamics-encoding fragment $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$} \\
+    \midrule
+    Operators & $G$ (always), $X$ (next), $\rightarrow$, $\wedge$; \textbf{excludes} $F$ (eventually) \\
+    Atomic predicates & $\mathit{refState}(s)$ ($h_S(x)=s$); $\mathit{input}(i)$, $\mathit{input}(\mathrm{none})$; $\mathit{output}(o)$, $\mathit{output}(\mathrm{none})$ \\
+    Open readout & $G\bigl(\mathit{refState}(s) \rightarrow \mathit{output}(o)\bigr)$ whenever $\rho_{\mathrm{ref}}(s)=o$ \\
+    Closed readout & $G\bigl(\mathit{refState}(s) \rightarrow \mathit{output}(\mathrm{none})\bigr)$ whenever $\rho_{\mathrm{ref}}(s)=\mathrm{none}$ \\
+    Autonomous step & $G\bigl((\mathit{refState}(s)\wedge\mathit{input}(\mathrm{none})) \rightarrow X(\mathit{refState}(\delta_{\mathrm{ref}}(s,\mathrm{none})))\bigr)$ \\
+    Guided step & $G\bigl((\mathit{refState}(s)\wedge\mathit{input}(i)) \rightarrow X(\mathit{refState}(\delta_{\mathrm{ref}}(s,i)))\bigr)$ for each $i\in I_{\mathrm{ref}}$ \\
+    Checked on & System mode $Z_m\in\mathrm{SYSMO}(Z_b)$ under surjective $(h_S,h_I,h_O)$ (or identity on shared labels) \\
+    \bottomrule
+\end{tabularx}
+\end{table*}
 
 \begin{theorem}[Dynamics-Fragment Characterization of Homomorphisms]
 \label{thm:dynamics-characterization}
 Fix a functional design $D_{\mathrm{ref}}\in\mathrm{CTL}(IOR)$ with system component $Z_{\mathrm{ref}}$ and a system mode $Z_m\in\mathrm{SYSMO}(Z_b)$. Then
 \[
+\begin{aligned}
   Z_m \models_{\mathrm{dyn}} \Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})
-  \;\;\Longleftrightarrow\;\;
-  \exists\, h : Z_m \twoheadrightarrow Z_{\mathrm{ref}}\ \text{Wymore system homomorphism}.
+  \;\Longleftrightarrow\;\;
+  &\exists\, h : Z_m \twoheadrightarrow Z_{\mathrm{ref}}\\
+  &\text{Wymore system homomorphism}.
+\end{aligned}
 \]
 \end{theorem}
 

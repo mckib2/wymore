@@ -26,7 +26,7 @@ TEX_SOURCES := \
 
 TEX_OPTIONAL := appendix/pathology-sketches.tex
 
-ASSETS := refs.bib ama.bst wiley-article.cls \
+ASSETS := refs.bib ama.bst syseng.cls wiley-logo.pdf \
 	$(wildcard template-images/*) \
 	$(wildcard figures/*) \
 	$(wildcard generated/*)
