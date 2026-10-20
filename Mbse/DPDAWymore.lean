@@ -281,7 +281,8 @@ theorem stateTrajectory_nonanticipatory
     (h_agree : RSN f {i | i < t} = RSN g {i | i < t}) :
     generateStateTrajectory D q0 f t = generateStateTrajectory D q0 g t := by
   induction t with
-  | zero => simp only [dpda_generateStateTrajectory_zero]
+  | zero =>
+    rw [dpda_generateStateTrajectory_zero, dpda_generateStateTrajectory_zero]
   | succ t ih =>
     simp only [dpda_generateStateTrajectory_succ]
     rw [rsn_eq_iff] at h_agree
@@ -386,7 +387,7 @@ theorem wellFormed_peek (D : DPDASystem STfin IS OZ Γ) (s : Stack Γ)
     (h : WellFormedStack D s) : peek D.z0 s = s.head (wellFormed_nonempty D s h) := by
   cases s with
   | nil => exact absurd rfl (wellFormed_nonempty D [] h)
-  | cons z rest => simp [peek]
+  | cons z rest => rfl
 
 theorem stepSnapshot_preserves_wellFormed (D : DPDASystem STfin IS OZ Γ)
     (hR : RespectsBottomMarker D) (snap : Snapshot STfin Γ) (inp : Option IS)
@@ -436,13 +437,13 @@ theorem stepSnapshot_some_eq_stepInput (D : DPDASystem STfin IS OZ Γ) (c c' : S
 theorem stepSnapshot_none_id (D : DPDASystem STfin IS OZ Γ) (c : Snapshot STfin Γ)
     (h : stepEps D c = none) : stepSnapshot D c none = c := by
   dpda_step_destruct D, c, none, q, s, q_new, new_top
-  · simp [stepSnapshot, hF]
+  · simp [stepSnapshot, hF]; rfl
   · simp [stepEps, hF] at h
 
 theorem stepSnapshot_some_id (D : DPDASystem STfin IS OZ Γ) (c : Snapshot STfin Γ) (a : IS)
     (h : stepInput D c a = none) : stepSnapshot D c (some a) = c := by
   dpda_step_destruct D, c, (some a), q, s, q_new, new_top
-  · simp [stepSnapshot, hF]
+  · simp [stepSnapshot, hF]; rfl
   · simp [stepInput, hF] at h
 
 /-! ## Language / Acceptance over finite words

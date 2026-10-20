@@ -263,7 +263,7 @@ theorem partialHomAssertionalLawsProp_iff_witness {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Typ
   unfold partialHomAssertionalLawsProp
   split_ifs with hne
   · exact partialHomAssertionalLawsCoreProp_iff_witness w
-  · haveI : IsEmpty IZ1 := ⟨fun x => hne ⟨x⟩⟩
+  · have : IsEmpty IZ1 := ⟨fun x => hne ⟨x⟩⟩
     exact partialHomAssertionalLawsNoTransitionProp_iff_witness w
 
 theorem satisfiesFO_partialHomAssertionalLaws {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
@@ -409,7 +409,7 @@ theorem partialAssertionalLaws_iff {SZ IZ OZ : Type}
   unfold compilePartialAssertionalLaws
   split_ifs with hne
   · exact partialAssertionalLawsCore_iff (Z_spec := Z_spec) (Z_impl := Z_impl) s0 f g y
-  · haveI : IsEmpty IZ := ⟨fun x => hne ⟨x⟩⟩
+  · have : IsEmpty IZ := ⟨fun x => hne ⟨x⟩⟩
     exact partialAssertionalLawsNoTransition_iff (Z_spec := Z_spec) (Z_impl := Z_impl) s0 f g y
 
 /-- Impl satisfies spec-side assertional FO at `(s0, f)` on canonical impl trajectories. -/

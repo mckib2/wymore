@@ -1,21 +1,21 @@
-\subsection{Encoding IOR as Temporal Clauses}
+\subsection{Boundary \texorpdfstring{$IOR$s}{IORs} as Temporal Logic Clauses: Empty vs.\ Infinite Functionality Cotyledons}
 \label{sec:case-basics}
 
-The characteristic construction of Section~\ref{sec:trace-observability} applies to every IOR. For structured relations, it reduces to compact laws that look familiar to classical LTL:
+Theorem~\ref{thm:boundary-characteristic} applies to every Wymorian $IOR$, and when the eligibility relation $ER(f)$ is specified by temporal constraints, the characteristic boundary specification $\Phi_{IOR}$ takes the form of standard LTL formulas over boundary input trajectories $f(t)$ and output trajectories $y(t)$. Consider a ladder of three progressively richer boundary requirements over binary inputs $f:\mathbb{N}\to\{0,1\}$:
 \begin{align}
- \text{echo:}\quad
+ \text{Instantaneous echo ($IOR_{\mathrm{echo}}$):}\quad
    &G\bigl(y(t)=f(t)\bigr), \label{eq:echo-phi}\\
- \text{one-tick delay:}\quad
+ \text{One-tick delay ($IOR_{\mathrm{delay}}$):}\quad
    &y(0)=b_0\ \wedge\
      G\bigl(y(t{+}1)=f(t)\bigr), \label{eq:delay-phi}\\
- \text{run length:}\quad
-   &y(t)=\phi_{\mathrm{out}}(f,t). \label{eq:rle-phi}
+ \text{Streaming run-length ($IOR_{\mathrm{RLE}}$):}\quad
+   &G\bigl(y(t)=\phi_{\mathrm{out}}(f,t)\bigr). \label{eq:rle-phi}
 \end{align}
-Each equation abbreviates an eligible-output relation $ER(f)$.
-Note that equation~\eqref{eq:echo-phi} is memoryless. A Moore system with a fixed initial state cannot make $y(0)$ depend on an input first observed at tick zero, so its functionality cotyledon may be empty. Equation~\eqref{eq:delay-phi} adds the minimum delay required by state transitions and is always realizable by a one-bit register. The fragment therefore exposes the timing constraint already present in Wymore's trajectory semantics.
+Each temporal formula defines the trajectory predicate $A_{IOR}(f,y)\Leftrightarrow y\in ER(f)$ of $\Phi_{IOR}$.
 
-For Equation~\eqref{eq:rle-phi}, $\phi_{\mathrm{out}}(f,0)=(0,0)$;
-tick $2k+1$ emits the bit and run length for symbol $f(2k)$; tick $2k+2$
-holds the pair. The next subsection gives the run-length recurrence and the
-two-tick pipeline shift. Finite as well as nondeterministic requirements use
-the same construction with a restricted time set or a multi-valued $ER(f)$.
+Studying Equations~\eqref{eq:echo-phi}--\eqref{eq:delay-phi} side by side illustrates Wymore's Theorem~6.64 ($\mathrm{CTL}(IOR)$ is either empty or infinite) through a transparent temporal lens:
+\begin{itemize}
+    \item \textbf{Why $\mathrm{CTL}(IOR_{\mathrm{echo}})=\emptyset$:} Equation~\eqref{eq:echo-phi} demands $y(0)=f(0)$ at tick zero. However, in any Wymorian discrete system $Z=(S,I,O,\delta,\rho)$ with a fixed initial state $s_0$, the initial output $y(0)=\rho(s_0)$ is determined solely by $s_0$ before the external input $f(0)$ acts through $\delta(s_0,f(0))$ to reach $s(1)$. No single initial state $s_0$ can simultaneously produce $y(0)=0$ when $f(0)=0$ and $y(0)=1$ when $f(0)=1$. Thus $\Phi_{IOR_{\mathrm{echo}}}$ exposes an immediate causality contradiction with Moore readout semantics, and $\mathrm{CTL}(IOR_{\mathrm{echo}})$ is empty.
+    \item \textbf{Why $\mathrm{CTL}(IOR_{\mathrm{delay}})$ is infinite:} Equation~\eqref{eq:delay-phi} accounts for the minimum one-tick state-transition latency by fixing a known startup output $y(0)=b_0$ and requiring $X\,y(t)=f(t)$ thereafter. A two-state 1-bit shift register satisfies $\Phi_{IOR_{\mathrm{delay}}}$, and once one functional design exists, $\mathrm{CTL}(IOR_{\mathrm{delay}})$ contains infinitely many isomorphic and elaborated systems.
+\end{itemize}
+For the streaming run-length requirement~\eqref{eq:rle-phi}, each input symbol is sampled and processed across a two-phase sense/act cycle, emitting a pair $(\text{bit},\text{count})$ that tracks how many consecutive identical symbols have been observed. As with $IOR_{\mathrm{delay}}$, the multi-stage pipeline latency of the coupled hardware architecture must be reflected in $\Phi_{IOR_{\mathrm{RLE}}}$ so that the boundary specification is causally realizable.

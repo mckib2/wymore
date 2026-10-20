@@ -93,14 +93,14 @@ theorem dyck1_respectsBottom : RespectsBottomMarker dyck1 := by
     | some i =>
       simp only [dyck1_F, dyck1F, peek] at hF
       by_cases hi : i = lp
-      · simp only [if_pos hi] at hF
+      · simp only [ite_eq_left hi] at hF
         rw [Option.some.injEq, Prod.mk.injEq] at hF
         obtain ⟨_, rfl⟩ := hF
         simp only [WellFormedStack, updateStack, List.cons_append, List.nil_append] at hWF ⊢
         exact hWF
-      · simp only [if_neg hi] at hF
+      · simp only [ite_eq_right hi] at hF
         by_cases hz : z = zA
-        · simp only [if_pos hz] at hF
+        · simp only [ite_eq_left hz] at hF
           rw [Option.some.injEq, Prod.mk.injEq] at hF
           obtain ⟨_, rfl⟩ := hF
           subst hz
@@ -109,7 +109,7 @@ theorem dyck1_respectsBottom : RespectsBottomMarker dyck1 := by
           | cons b rest' =>
             simp only [WellFormedStack, updateStack, List.nil_append] at hWF ⊢
             exact hWF
-        · simp [if_neg hz] at hF
+        · simp [ite_eq_right hz] at hF
 
 /-- A single Dyck-1 step preserves the well-formed-stack invariant. -/
 theorem dyck1_step_wellFormed (snap : Snapshot (Fin 1) (Fin 2)) (inp : Option (Fin 2))

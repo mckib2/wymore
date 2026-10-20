@@ -515,8 +515,7 @@ def flatUnconnIn {n : Nat} (N : NestedCoupling n) :
   left_inv := by
     intro P
     apply Subtype.ext
-    show (flatInTag _).symm ⟨(flatInTag _ P.val).1, (flatInTag _ P.val).2⟩ = P.val
-    rw [Equiv.symm_apply_apply]
+    exact Equiv.symm_apply_apply (flatInTag N.toNestedComponents) P.val
   right_inv := by
     intro Q
     apply Subtype.ext
@@ -530,8 +529,7 @@ def flatUnconnOut {n : Nat} (N : NestedCoupling n) :
   left_inv := by
     intro P
     apply Subtype.ext
-    show (flatOutTag _).symm ⟨(flatOutTag _ P.val).1, (flatOutTag _ P.val).2⟩ = P.val
-    rw [Equiv.symm_apply_apply]
+    exact Equiv.symm_apply_apply (flatOutTag N.toNestedComponents) P.val
   right_inv := by
     intro Q
     apply Subtype.ext
@@ -620,9 +618,12 @@ theorem flat_component_input {n : Nat} (N : NestedCoupling n) (k : Fin (∑ i, N
         (⟨i, ⟨ip, hInner⟩⟩ : Σ i, (nestRecipe N).VSCR.Port i) ∈ UISCR (nestRecipe N)
     · have hUflat : (⟨k, port⟩ : Σ k, (flatRecipe N).VSCR.Port k) ∈ UISCR (flatRecipe N) :=
         (flat_mem_uiscr_iff N ⟨k, port⟩).mpr ⟨hInner, hOuter⟩
-      rw [rsy_component_input_uiscr _ _ _ _ _ _ hUflat,
-        rsy_component_input_uiscr (N.sub i) (N.hOut i) j _ (x i) port hInner,
-        rsy_component_input_uiscr (nestRecipe N) (nest_hOut N) i extIn x _ hOuter]
+      have h1 := rsy_component_input_uiscr (flatRecipe N) (flat_hOut N) k (flatHI N extIn)
+        (flatHS N x) port hUflat
+      have h2 := rsy_component_input_uiscr (N.sub i) (N.hOut i) j
+        (rsy_component_input_fun (nestRecipe N) (nest_hOut N) i extIn x) (x i) port hInner
+      have h3 := rsy_component_input_uiscr (nestRecipe N) (nest_hOut N) i extIn x ⟨ip, hInner⟩ hOuter
+      rw [h1, h2, h3]
       rfl
     · have hCouter : (⟨i, ⟨ip, hInner⟩⟩ : Σ i, (nestRecipe N).VSCR.Port i) ∈
           CISCR (nestRecipe N) := by
@@ -645,12 +646,13 @@ theorem flat_component_input {n : Nat} (N : NestedCoupling n) (k : Fin (∑ i, N
       have htyNest : (nestRecipe N).VSCR.OutPortVal OQ.1 OQ.2 =
           (nestRecipe N).VSCR.PortVal i ⟨ip, hInner⟩ :=
         (nestRecipe N).connectivity.2.2.2 OQ ⟨i, ⟨ip, hInner⟩⟩ hspecNest
-      rw [rsy_component_input_of_conn (flatRecipe N) (flat_hOut N) k (flatHI N extIn)
-            (flatHS N x) port X hspecFlat htyFlat,
-        rsy_component_input_uiscr (N.sub i) (N.hOut i) j _ (x i) port hInner,
-        rsy_component_input_of_conn (nestRecipe N) (nest_hOut N) i extIn x ⟨ip, hInner⟩ OQ
-          hspecNest htyNest,
-        flat_outAt, nest_outAt]
+      have h1 := rsy_component_input_of_conn (flatRecipe N) (flat_hOut N) k (flatHI N extIn)
+        (flatHS N x) port X hspecFlat htyFlat
+      have h2 := rsy_component_input_uiscr (N.sub i) (N.hOut i) j
+        (rsy_component_input_fun (nestRecipe N) (nest_hOut N) i extIn x) (x i) port hInner
+      have h3 := rsy_component_input_of_conn (nestRecipe N) (nest_hOut N) i extIn x ⟨ip, hInner⟩ OQ
+        hspecNest htyNest
+      rw [h1, h2, h3, flat_outAt, nest_outAt]
       exact outAt_tag_congr N x hXtag _ _
   · have hCinner : ip ∈ CISCR (N.sub i) := by
       simpa [UISCR, Set.mem_compl_iff] using hInner
@@ -667,10 +669,11 @@ theorem flat_component_input {n : Nat} (N : NestedCoupling n) (k : Fin (∑ i, N
       (flatRecipe N).connectivity.2.2.2 X ⟨k, port⟩ hspecFlat
     have htyInner : (N.sub i).VSCR.OutPortVal op.1 op.2 = (N.sub i).VSCR.PortVal j port :=
       (N.sub i).connectivity.2.2.2 op ip hspecInner
-    rw [rsy_component_input_of_conn (flatRecipe N) (flat_hOut N) k (flatHI N extIn)
-          (flatHS N x) port X hspecFlat htyFlat,
-      rsy_component_input_of_conn (N.sub i) (N.hOut i) j _ (x i) port op hspecInner htyInner,
-      flat_outAt]
+    have h1 := rsy_component_input_of_conn (flatRecipe N) (flat_hOut N) k (flatHI N extIn)
+      (flatHS N x) port X hspecFlat htyFlat
+    have h2 := rsy_component_input_of_conn (N.sub i) (N.hOut i) j
+      (rsy_component_input_fun (nestRecipe N) (nest_hOut N) i extIn x) (x i) port op hspecInner htyInner
+    rw [h1, h2, flat_outAt]
     exact outAt_tag_congr N x hXtag _ _
 
 /--

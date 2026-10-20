@@ -1,7 +1,6 @@
 import Lean
 import Mbse.FiniteWymore
 import Mathlib.Data.Fintype.Basic
-import Mathlib.Tactic.DeriveFintype
 
 open Lean Elab Command Term Meta
 
@@ -33,10 +32,28 @@ def elabWymoreSystem : CommandElab := fun stx => do
     let szCtors := szElems.getElems.map (fun e => mkIdent (toCtorName e))
     let izCtors := izElems.getElems.map (fun e => mkIdent (toCtorName e))
     let ozCtors := ozElems.getElems.map (fun e => mkIdent (toCtorName e))
+    -- Fully-qualified constructors for Fintype instances. Mathlib's `deriving Fintype`
+    -- (enum path via `Finset.mk enumList enumList_nodup`) is broken on Lean 4.35 /
+    -- current mathlib: `List.Nodup` is not accepted where `Multiset.Nodup` is required.
+    let szCtorTerms := szElems.getElems.map (fun e =>
+      mkIdent (szName.getId ++ toCtorName e))
+    let izCtorTerms := izElems.getElems.map (fun e =>
+      mkIdent (izName.getId ++ toCtorName e))
+    let ozCtorTerms := ozElems.getElems.map (fun e =>
+      mkIdent (ozName.getId ++ toCtorName e))
 
-    elabCommand (← `(command| inductive $szName:ident where $[| $szCtors:ident]* deriving Fintype, DecidableEq, Repr))
-    elabCommand (← `(command| inductive $izName:ident where $[| $izCtors:ident]* deriving Fintype, DecidableEq, Repr))
-    elabCommand (← `(command| inductive $ozName:ident where $[| $ozCtors:ident]* deriving Fintype, DecidableEq, Repr))
+    elabCommand (← `(command| inductive $szName:ident where $[| $szCtors:ident]* deriving DecidableEq, Repr))
+    elabCommand (← `(command| inductive $izName:ident where $[| $izCtors:ident]* deriving DecidableEq, Repr))
+    elabCommand (← `(command| inductive $ozName:ident where $[| $ozCtors:ident]* deriving DecidableEq, Repr))
+    elabCommand (← `(command| instance : Fintype $szName:ident where
+      elems := {$[$szCtorTerms:ident],*}
+      complete := by intro x; cases x <;> simp))
+    elabCommand (← `(command| instance : Fintype $izName:ident where
+      elems := {$[$izCtorTerms:ident],*}
+      complete := by intro x; cases x <;> simp))
+    elabCommand (← `(command| instance : Fintype $ozName:ident where
+      elems := {$[$ozCtorTerms:ident],*}
+      complete := by intro x; cases x <;> simp))
 
     let mut nzS := #[]
     let mut nzI := #[]

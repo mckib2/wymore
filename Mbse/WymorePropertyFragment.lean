@@ -368,19 +368,19 @@ noncomputable def partialDynamicsTable' {SZ IZ OZ : Type} [Fintype SZ] [Decidabl
   classical
   by_cases h : Nonempty IZ
   · exact partialDynamicsTable Z
-  · haveI : IsEmpty IZ := ⟨fun x => h ⟨x⟩⟩
+  · have : IsEmpty IZ := ⟨fun x => h ⟨x⟩⟩
     exact partialDynamicsTableEmptyInput Z
 
 theorem partialDynamicsTable'_eq {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ]
     [DecidableEq SZ] [DecidableEq IZ] [Nonempty IZ] (Z : DiscreteSystem SZ IZ OZ) :
     partialDynamicsTable' Z = partialDynamicsTable Z := by
-  simp [partialDynamicsTable', dif_pos ‹Nonempty IZ›]
+  simp [partialDynamicsTable', dite_eq_left ‹Nonempty IZ›]
 
 theorem partialDynamicsTable'_eq_emptyInput {SZ OZ : Type} [Fintype SZ] [DecidableEq SZ]
     [Fintype IZ] [DecidableEq IZ] [IsEmpty IZ] (Z : DiscreteSystem SZ IZ OZ) :
     partialDynamicsTable' Z = partialDynamicsTableEmptyInput Z := by
   have h : ¬Nonempty IZ := fun hne => hne.elim ‹IsEmpty IZ›.elim
-  simp [partialDynamicsTable', dif_neg h]
+  simp [partialDynamicsTable', dite_eq_right h]
 
 theorem partialDynamicsTableCore_classifies {SZ IZ OZ : Type} [Fintype SZ] [DecidableEq SZ]
     (Z : DiscreteSystem SZ IZ OZ) (φ : LTL (WymoreAtom SZ IZ OZ))
@@ -534,7 +534,7 @@ theorem partialDynamicsTable'_classifies {SZ IZ OZ : Type} [Fintype SZ] [Fintype
   by_cases h : Nonempty IZ
   · rw [partialDynamicsTable'_eq] at hmem
     exact partialDynamicsTable_classifies Z φ hmem
-  · haveI : IsEmpty IZ := ⟨fun x => h ⟨x⟩⟩
+  · have : IsEmpty IZ := ⟨fun x => h ⟨x⟩⟩
     rw [partialDynamicsTable'_eq_emptyInput] at hmem
     dsimp [partialDynamicsTableEmptyInput] at hmem
     rcases partialDynamicsTableCore_classifies Z φ hmem with hR | hC | hA
@@ -571,7 +571,7 @@ theorem mem_partialDynamicsTable_autonomous_in {SZ IZ OZ : Type} [Fintype SZ] [F
   by_cases h : Nonempty IZ
   · rw [partialDynamicsTable'_eq]
     simp [partialDynamicsTable, List.mem_append, mem_partialDynamicsTable_autonomous]
-  · haveI : IsEmpty IZ := ⟨fun x => h ⟨x⟩⟩
+  · have : IsEmpty IZ := ⟨fun x => h ⟨x⟩⟩
     rw [partialDynamicsTable'_eq_emptyInput]
     dsimp [partialDynamicsTableEmptyInput, partialDynamicsTableCore]
     simp [List.mem_append]
@@ -588,7 +588,7 @@ theorem mem_partialDynamicsTable_readout_in {SZ IZ OZ : Type} [Fintype SZ] [Fint
   by_cases h : Nonempty IZ
   · rw [partialDynamicsTable'_eq]
     simp [partialDynamicsTable, List.mem_append, mem_partialReadoutOnlyTable, hR]
-  · haveI : IsEmpty IZ := ⟨fun x => h ⟨x⟩⟩
+  · have : IsEmpty IZ := ⟨fun x => h ⟨x⟩⟩
     rw [partialDynamicsTable'_eq_emptyInput]
     dsimp [partialDynamicsTableEmptyInput, partialDynamicsTableCore]
     simp [List.mem_append, mem_partialReadoutOnlyTable, hR]
@@ -601,7 +601,7 @@ theorem mem_partialDynamicsTable_closedReadout_in {SZ IZ OZ : Type} [Fintype SZ]
   by_cases h : Nonempty IZ
   · rw [partialDynamicsTable'_eq]
     simp [partialDynamicsTable, List.mem_append, mem_partialClosedReadoutTable, hR]
-  · haveI : IsEmpty IZ := ⟨fun x => h ⟨x⟩⟩
+  · have : IsEmpty IZ := ⟨fun x => h ⟨x⟩⟩
     rw [partialDynamicsTable'_eq_emptyInput]
     dsimp [partialDynamicsTableEmptyInput, partialDynamicsTableCore]
     simp [List.mem_append, mem_partialClosedReadoutTable, hR]
@@ -727,7 +727,7 @@ theorem partial_satisfies_implies_nz_agreement {SZ IZ OZ : Type} [Fintype SZ] [F
     simp only [wymoreTrace, generateStateTrajectory_succ, generateStateTrajectory_zero] at hnext
     exact hnext
   | some i =>
-    haveI : Nonempty IZ := ⟨i⟩
+    have : Nonempty IZ := ⟨i⟩
     let f : ITZW IZ := fun _ => some i
     have hφ := h s f (partialTransitionClause Z_spec s i)
       (mem_partialDynamicsTable_transition_in Z_spec s i)

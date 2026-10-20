@@ -335,8 +335,9 @@ def fcnsy {IZ SZ : Type} (F : IZ → SZ) (n : Nat) [Fintype SZ] [Fintype IZ] [In
 theorem fcnsy_output_one_time_unit {IZ SZ : Type} (F : IZ → SZ) [Fintype SZ] [Fintype IZ]
     [Inhabited SZ] (x : SZ) (f : ITZ IZ) (t : Time) :
     (generateOutputTrajectory (fcnsy F 1) x f (t + 1)).map (fun r => r 0) = some (F (f t)) := by
-  simpa [generateOutputTrajectory, fcnsy, liftInput] using
-    _root_.fcnsy_output_one_time_unit F x (liftInput f) t (f t) rfl
+  simp [generateOutputTrajectory, _root_.generateOutputTrajectory,
+    _root_.generateStateTrajectory_succ, fcnsy, FSMSystem.toDiscreteSystem,
+    DiscreteSystem.ofTotal, liftInput]
 
 /-! ## Chapter 3: System Coupling Recipes and Connectivity -/
 

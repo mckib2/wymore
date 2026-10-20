@@ -49,6 +49,8 @@ theorem checkFsmExtEqual_true_iff (F_spec F_impl : FSMSystem SZ IZ OZ) :
     checkFsmExtEqual F_spec F_impl = true ↔ FSMExtEqual F_spec F_impl := by
   simp [checkFsmExtEqual, decide_eq_true_eq]
 
+-- Kept as `def` (not `theorem`): section `Fintype`/`DecidableEq` instances are required by
+-- callers such as `constructIdentityHom_from_decide`, and `omit`ing them breaks synthesis.
 def constructIdentityHomWitness (F_spec F_impl : FSMSystem SZ IZ OZ)
     (h : FSMExtEqual F_spec F_impl) : FSMIdentityHomomorphicImageWitness F_spec F_impl :=
   identityFsmWitness h

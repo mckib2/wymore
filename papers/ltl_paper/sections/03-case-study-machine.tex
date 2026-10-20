@@ -1,91 +1,113 @@
-\subsection{Recipe for a Turing Machine}
+\subsection{Coupled Architecture: From Infinite-Tape Idealization to Finite Buildable Modes}
 \label{sec:case-machine}
 
-An interesting system example is a Turing machine. The components are ordinary discrete systems. They share one state type (a bit, a count in $\mathbb{N}$, a sense/act phase, and an auxiliary pending bit) and one port alphabet, also a pair. Their next-state clauses make them pairwise distinct:
+We model a streaming run-length encoder as a coupled system assembled from four elementary discrete components in a technology catalog $TYR$: an input \emph{tape} ($Z_0$), a phase-clock \emph{head} ($Z_1$), an output \emph{register} ($Z_2$), and an \emph{instruction table} ($Z_3$). Table~\ref{tab:rle-components} summarizes each component's behavior, and Figure~\ref{fig:rle-architecture} depicts the system coupling recipe $SCR$.
 
-\begin{center}
+\begingroup
+\renewcommand{\arraystretch}{1.3}
 \footnotesize
-\begin{tabular}{@{}llll@{}}
-\toprule
- & role & driven step & readout \\
-\midrule
-$0$ & tape & latch the scanned bit & echo the bit \\
-$1$ & head & flip the phase & echo the phase \\
-$2$ & register & store the incoming pair & echo the pair \\
-$3$ & table & same bit increments; a new bit resets the count to $1$ & emit the pair \\
-\bottomrule
-\end{tabular}
-\end{center}
+\begin{tabularx}{\linewidth}{@{}c l X l@{}}
+\rowcolor{tableheader}
+\headingfont\bfseries ID & \headingfont\bfseries Component & \headingfont\bfseries Driven Transition ($\delta_i$) & \headingfont\bfseries Readout ($\rho_i$) \\
+\addlinespace[2pt]
+$Z_0$ & Tape & Latch incoming scanned bit $b\in\{0,1\}$ & Emit latched bit $(b,0)$ \\
+\addlinespace[2pt]
+$Z_1$ & Head & Toggle sense/act phase ($0\leftrightarrow 1$) on each tick & Emit current phase \\
+\addlinespace[2pt]
+$Z_2$ & Register & Latch incoming $(\text{bit},\text{count})$ pair from table & Emit stored $(\text{bit},\text{count})$ \\
+\addlinespace[2pt]
+$Z_3$ & Table & Sense tick ($c=0$): sample bit $b$ from tape; Act tick ($c=1$): increment count if $b$ matches previous run bit, else reset count to $1$ & Emit $(\text{bit},\text{count})$ \\
+\end{tabularx}
+\captionof{table}{The four discrete components in the technology catalog $TYR$ for the coupled RLE machine.}
+\label{tab:rle-components}
+\endgroup
+\vspace{4pt}
 
-The coupling recipe has three internal connections: tape output to table input, table output to register input, and a self-loop (that closes the head's otherwise unused port). The only free input is the tape load and the output is the register pair. The head flips on every driven tick, giving the sense/act clock. The count is a natural number, so there is no maximum run length (i.e., this is an infinite state machine!).
+\begin{figure}[t]
+  \centering
+  \resizebox{0.96\linewidth}{!}{%
+  \begin{tikzpicture}[auto, >=Latex, thick,
+    comp/.style={draw=teal!70!black, fill=teal!6, rectangle, rounded corners=4pt, minimum width=2.8cm, minimum height=1.15cm, align=center, font=\footnotesize},
+    boundary/.style={draw=black!60, dashed, rounded corners=8pt, inner sep=10pt},
+    wire/.style={->, >=Latex, thick, draw=black!80},
+    port/.style={circle, draw=black!75, fill=white, inner sep=1.6pt}
+  ]
+    % Components
+    \node (tape) [comp] at (0, 1.3) {\textbf{Tape ($Z_0$)}\\{\scriptsize Latch input bit $b$}};
+    \node (table) [comp] at (4.4, 1.3) {\textbf{Instruction Table ($Z_3$)}\\{\scriptsize Sense bit / update $(\text{bit},\text{cnt})$}};
+    \node (reg) [comp] at (8.8, 1.3) {\textbf{Register ($Z_2$)}\\{\scriptsize Latch output pair}};
+    \node (head) [comp] at (4.4, -0.7) {\textbf{Head ($Z_1$)}\\{\scriptsize Toggle sense/act phase}};
 
-The technology TYR is the set of these four components. Wymore resultants update
-synchronously from pre-step readouts, so each connection is a Moore pipeline stage:
-the table sees the tape's previous readout, and the register sees the table's
-previous readout. The latency induced by this construction must be accounted for in the IOR specification.
+    % System boundary box
+    \begin{scope}[on background layer]
+      \node (sysbox) [boundary, fill=gray!4, fit=(tape)(table)(reg)(head), label={[font=\footnotesize\bfseries, text=black!75]above:Coupled Resultant $Z_b = \mathrm{RSY}(SCR) \in \mathrm{CTL}(TYR)$}] {};
+    \end{scope}
 
-\subsubsection{Boundary requirement and pipeline delay}
+    % External Input
+    \draw[wire, draw=blue!75!black, very thick] (-3.3, 1.3) -- node[above, pos=0.38, font=\scriptsize\bfseries, text=blue!75!black] {Free Input} node[below, pos=0.38, font=\scriptsize] {$f(t)\in\{0,1\}$} (tape.west);
+
+    % Internal connections
+    \draw[wire] (tape.east) -- node[above, font=\scriptsize] {scanned bit} node[below, font=\scriptsize] {(1-tick stage)} (table.west);
+    \draw[wire] (table.east) -- node[above, font=\scriptsize] {$(\text{bit},\text{cnt})$} node[below, font=\scriptsize] {(1-tick stage)} (reg.west);
+
+    % Head self-loop
+    \draw[wire] (head.east) .. controls +(0.9,0.5) and +(0.9,-0.5) .. node[right, font=\scriptsize] {phase feedback} (head.east);
+
+    % External Output
+    \draw[wire, draw=purple!75!black, very thick] (reg.east) -- node[above, pos=0.62, font=\scriptsize\bfseries, text=purple!75!black] {Free Output} node[below, pos=0.62, font=\scriptsize] {$y(t)=(\text{bit},\text{cnt})$} (12.2, 1.3);
+  \end{tikzpicture}%
+  }
+  \caption{System coupling recipe $SCR$ for the four-component streaming Run-Length Encoder. Because Wymore resultants update synchronously from pre-step readouts, the internal connections from Tape ($Z_0$) to Instruction Table ($Z_3$) and from Instruction Table ($Z_3$) to Output Register ($Z_2$) form a two-stage Moore pipeline.}
+  \label{fig:rle-architecture}
+\end{figure}
+
+As shown in Figure~\ref{fig:rle-architecture}, the coupling recipe $SCR$ connects the tape's output port to the instruction table's input port, connects the instruction table's output port to the register's input port, and closes the head's auxiliary port with a self-loop. This leaves a single free system input (the external bit stream $f(t)$ arriving at the tape) and a single free system output (the encoded pair $y(t)=(\text{bit},\text{count})$ emitted by the register).
+
+\subsubsection{Stage 1: Idealized Infinite-Tape Specification (\texorpdfstring{$IOR_\infty$}{IOR\_inf})}
 \label{sec:case-machine-reference}
-
-The set of possible inputs is every infinite binary sequence $f:\mathbb{N}\to\{0,1\}$. One symbol is taken per sense/act pair, so symbol $k$ is $f(2k)$. Consecutive symbols are compared:
-\[
-  \mathrm{runLen}(f,0)=1,
+In a top-down systems engineering workflow, the analyst first specifies the idealized mathematical behavior on an unbounded stream of binary inputs $f:\mathbb{N}\to\{0,1\}$ with no upper bound on run length ($\mathrm{count}\in\mathbb{N}$). One input symbol is sampled per two-tick sense/act cycle, so the $k$-th sampled symbol is $f(2k)$. Comparing consecutive sampled symbols defines the idealized unbounded run-length recurrence:
+\begin{equation}
+  \mathrm{runLen}_\infty(f,0)=1,
   \qquad
-  \mathrm{runLen}(f,k{+}1)=
+  \mathrm{runLen}_\infty(f,k{+}1)=
   \begin{cases}
-    \mathrm{runLen}(f,k)+1 & \text{if }f\bigl(2(k{+}1)\bigr)=f(2k),\\
+    \mathrm{runLen}_\infty(f,k)+1 & \text{if }f\bigl(2(k{+}1)\bigr)=f(2k),\\
     1 & \text{otherwise.}
   \end{cases}
-\]
-The trajectory $\phi_{\mathrm{out}}$ of Equation~\eqref{eq:rle-phi} therefore
-emits $\bigl(f(2k),\mathrm{runLen}(f,k)\bigr)$ on tick $2k+1$ and holds that
-pair on tick $2k+2$. Let $R_{\mathrm{pipe}}$ be the coupled IOR with boundary requirement
-\[
-  \Phi_{R_{\mathrm{pipe}}}(f,y)
+  \label{eq:rle-inf-recurrence}
+\end{equation}
+At the table level, the unshifted trajectory $\phi_{\mathrm{out},\infty}(f,t)$ starts at $(0,0)$ for $t=0$, emits $\bigl(f(2k),\mathrm{runLen}_\infty(f,k)\bigr)$ on act completion tick $2k+1$, and holds that pair on sense tick $2k+2$.
+
+However, in the coupled resultant $\mathrm{RSY}(SCR)$, synchronous Moore communication across the two internal wires (\texttt{tape} $\to$ \texttt{table} and \texttt{table} $\to$ \texttt{register}) introduces a two-tick pipeline shift between the external tape input and the external register output. Incorporating this architectural pipeline delay into the boundary specification yields the characteristic temporal formula for the idealized pipeline requirement $IOR_\infty$:
+\begin{equation}
+  \Phi_{IOR_\infty}(f,y)
   \quad\Longleftrightarrow\quad
+  G\left(
   y(t)=
   \begin{cases}
     (0,0), & t<2,\\
-    \phi_{\mathrm{out}}(f,t-2), & t\ge 2.
+    \phi_{\mathrm{out},\infty}(f,t-2), & t\ge 2.
   \end{cases}
-\]
-This is the characteristic fragment of the pipeline IOR: all bit trajectories
-are admissible, and the displayed trajectory is the eligible output. The
-functional design $D_{\mathrm{ref}}$ packages a pipeline reference
-$Z_{\mathrm{ref}}$ whose state stores the tape value, phase, table state, and
-register pair needed to realize the requirement.
+  \right)
+  \label{eq:phi-ior-inf}
+\end{equation}
+For example, when input symbols $0,0,1$ arrive at ticks $0,2,4$, the register outputs $(0,0)$ during startup ticks $0,1,2$ and then emits $(0,1)$, $(0,2)$, and $(1,1)$ at ticks $3,5,7$ (holding each pair across the subsequent even tick). While $IOR_\infty$ and its unbounded resultant $Z_{b,\infty}$ provide a clean mathematical baseline, their state spaces are countably infinite ($\mathrm{count}\in\mathbb{N}$) and therefore cannot be fabricated in finite hardware or exhaustively checked by a finite-state model checker.
 
-For example, for the symbols $0,0,1$ at input ticks $0,2,4$, the register emits $(0,1)$,
-$(0,2)$, $(1,1)$ at ticks $3,5,7$. The coupling recipe determines the two-tick
-shift.
-
-\subsubsection{Homomorphism and fragment}
+\subsubsection{Stage 2: Refinement to a Finite-Tape Buildable Machine (\texorpdfstring{$Z_{b,N}$ and $Z_{m,N}$}{Zb,N and Zm,N})}
 \label{sec:case-machine-zones}
+To move from an idealized infinite-state model to a physically buildable machine, the engineer refines the technology catalog to $TYR_N$, where the counter register in each component has a finite hardware capacity $N\ge 1$ ($\mathrm{count}\in\{0,1,\dots,N\}$). Correspondingly, the refined boundary requirement $IOR_N$ caps consecutive run counts at saturating capacity $N$:
+\begin{equation}
+  \mathrm{runLen}_N(f,0)=\min(1,N),
+  \qquad
+  \mathrm{runLen}_N(f,k{+}1)=
+  \begin{cases}
+    \min\bigl(\mathrm{runLen}_N(f,k)+1,\,N\bigr) & \text{if }f\bigl(2(k{+}1)\bigr)=f(2k),\\
+    \min(1,N) & \text{otherwise.}
+  \end{cases}
+  \label{eq:rle-fin-recurrence}
+\end{equation}
+Notice that for every input run of length at most $N$, the finite-tape trajectory $\phi_{\mathrm{out},N}(f,t)$ is identical to the unbounded trajectory $\phi_{\mathrm{out},\infty}(f,t)$, while runs exceeding $N$ saturate cleanly at $N$.
 
-The homomorphism from the four-component resultant to $Z_{\mathrm{ref}}$ keeps
-four observations: the tape bit, head phase, register pair, and table state.
-The input map projects the bit from the free tape port, and the output map
-projects the pair from the free register port. These maps are surjective and
-preserve each coupled transition and readout. Hence
-\[
-  Z_{\mathrm{RLE}}\models_{\mathrm{dyn}}\Phi_{Z_{\mathrm{ref}}}
-  \quad\Longleftrightarrow\quad
-  \exists h:Z_{\mathrm{RLE}}\to Z_{\mathrm{ref}},
-\]
-and the exhibited $h$ proves the left side. Here $Z_{\mathrm{RLE}}$ denotes the
-resultant of the four-component coupling recipe. It is buildable in the stated
-technology, so $D_{\mathrm{ref}}$ and the buildable design form an element of
-$\mathrm{ISR}(R_{\mathrm{pipe}},TYR)$.
+Because every component $Z_{0,N},Z_{1,N},Z_{2,N},Z_{3,N}\in TYR_N$ is now a finite discrete system, the coupled resultant $Z_{b,N}=\mathrm{RSY}(SCR_N)\in\mathrm{CTL}(TYR_N)$ is a finite-state machine. Furthermore, when initialized in its all-zero reset configuration $s_{b,0}$, the resultant's reachable operational behavior forms a finite system mode $Z_{m,N}\in\mathrm{SYSMO}(Z_{b,N})$ whose state space $S_{m,N}$ is a small fraction of the full Cartesian product $\prod_{i=0}^3 S_{i,N}$ (for example, at capacity $N=3$, the full resultant has $512$ states while the active system mode $Z_{m,3}$ has only $43$ reachable states).
 
-Classical T3SD retains the three maps just described as conformance evidence.
-The assertional workflow retains $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ as the reference-indexed target. A revised component is checked against this fragment and supplies the required witness for its encoding.
-
-\subsubsection{Re-encoding and rejection}
-\label{sec:case-machine-lift}
-
-Flipping the table's phase convention gives an isomorphic component. Both
-tables satisfy the dynamics fragment compiled from the same table reference,
-with different witnessing state maps. Component conformance then lifts through
-elaboration. A head that holds its phase fails the corresponding fragment
-because it cannot realize the phase-flipping head. The two cases distinguish
-state encoding from behavior.
+By Theorem~\ref{thm:mode-ior-bridge} and Theorem~\ref{thm:dynamics-characterization}, we can now certify that $(D_{\mathrm{ref},N},Z_{b,N})$ belongs to the implementability cotyledon $\mathrm{CTL}(IOR_N,TYR_N)$ either by checking $Z_{m,N}\models_{IO}\Phi_{IOR_N}$ directly on the boundary ports or by checking $Z_{m,N}\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref},N})$ against the pipeline reference design $Z_{\mathrm{ref},N}\in\mathrm{CTL}(IOR_N)$.

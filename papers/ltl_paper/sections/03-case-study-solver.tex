@@ -1,13 +1,41 @@
-\subsection{Finite Checking}
+\subsection{Automated LTL Verification of Buildable System Modes}
 \label{sec:case-solver}
 
-We describe the coupled system symbolically.  We can construct finite projections to enable automated checks of bounded behavior. Capping the count at $n$ preserves the
-same transition whenever the current count is below $n$.
+Once the finite-capacity technology catalog $TYR_N$ is fixed, the boundary specification $\Phi_{IOR_N}$ of Equation~\eqref{eq:rle-fin-recurrence} compiles into six families of propositional LTL safety clauses over the boundary input bit $i_{\mathrm{in}}\in\{0,1\}$, the boundary register output $y=(\mathit{outBit},\mathit{outCnt})\in\{0,1\}\times\{0,\dots,N\}$, and the sense/act phase indicator $\mathit{phase}\in\{0,1\}$:
+\begin{align}
+  \varphi_{\mathrm{init}} &: \quad (\mathit{outCnt}=0)\ \wedge\ X(\mathit{outCnt}=0)\ \wedge\ XX(\mathit{outCnt}=0), \label{eq:ltl-init}\\
+  \varphi_{\mathrm{mode}} &: \quad G\bigl((\mathit{phase}=0 \leftrightarrow X(\mathit{phase}=1)) \wedge (\mathit{phase}=1 \leftrightarrow X(\mathit{phase}=0))\bigr), \label{eq:ltl-mode}\\
+  \varphi_{\mathrm{hold}} &: \quad \bigwedge_{b=0}^{1}\bigwedge_{c=1}^{N} G\bigl((\mathit{phase}=1 \wedge \mathit{outBit}=b \wedge \mathit{outCnt}=c) \rightarrow X(\mathit{outBit}=b \wedge \mathit{outCnt}=c)\bigr), \label{eq:ltl-hold}\\
+  \varphi_{\mathrm{start}} &: \quad \bigwedge_{b=0}^{1} G\bigl((\mathit{phase}=0 \wedge i_{\mathrm{in}}=b \wedge X(\mathit{outCnt}=0)) \rightarrow XXX(\mathit{outBit}=b \wedge \mathit{outCnt}=1)\bigr), \label{eq:ltl-start}\\
+  \varphi_{\mathrm{inc}} &: \quad \bigwedge_{b=0}^{1}\bigwedge_{c=1}^{N} G\Bigl(\bigl(\mathit{phase}=0 \wedge i_{\mathrm{in}}=b \wedge X(\mathit{outBit}=b \wedge \mathit{outCnt}=c)\bigr) \nonumber\\[-4pt]
+  &\hspace{7.8em} \rightarrow XXX\bigl(\mathit{outBit}=b \wedge \mathit{outCnt}=\min(c{+}1,N)\bigr)\Bigr), \label{eq:ltl-inc}\\
+  \varphi_{\mathrm{reset}} &: \quad \bigwedge_{b=0}^{1}\bigwedge_{c=1}^{N} G\Bigl(\bigl(\mathit{phase}=0 \wedge i_{\mathrm{in}}=b \wedge X(\mathit{outBit}=\neg b \wedge \mathit{outCnt}=c)\bigr) \nonumber\\[-4pt]
+  &\hspace{7.8em} \rightarrow XXX(\mathit{outBit}=b \wedge \mathit{outCnt}=1)\Bigr). \label{eq:ltl-reset}
+\end{align}
+Each clause has a direct systems engineering interpretation: $\varphi_{\mathrm{init}}$ specifies the three-tick pipeline startup window ($t=0,1,2$); $\varphi_{\mathrm{mode}}$ enforces the alternating sense/act phase clock; $\varphi_{\mathrm{hold}}$ enforces that the register holds its output pair across the second half of each cycle; and $\varphi_{\mathrm{start}}$, $\varphi_{\mathrm{inc}}$, and $\varphi_{\mathrm{reset}}$ govern the three-tick input-to-output pipeline response ($XXX$) on the first symbol, a matching symbol (saturating at $N$), and a run-breaking symbol, respectively.
 
-For any finite projection, satisfaction of $\Phi_{\mathrm{dyn}}$ becomes a
-propositional search for the three surjective maps subject to the readout,
-guided-step, autonomous-step, and surjectivity clauses. A satisfying assignment
-is a Wymore homomorphism; unsatisfiability establishes that no such map exists.
-The matched- and mismatched-tick instances in Section~\ref{sec:case-ticks}
-exercise both outcomes. The same encoding can be generated for each finite
-component or abstraction in a larger coupling.
+We implemented an automated verification script (\texttt{scripts/ltl\_ior\_checker.py}) that constructs the coupled resultant $Z_{b,N}=\mathrm{RSY}(SCR_N)$ from any candidate component catalog $TYR_N$, isolates the reachable operational system mode $Z_{m,N}\in\mathrm{SYSMO}(Z_{b,N})$, and model-checks both the boundary LTL specification $\Phi_{IOR_N}$ (Equations~\eqref{eq:ltl-init}--\eqref{eq:ltl-reset}) and the compiled dynamics fragment $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref},N})$. Table~\ref{tab:solver-results} reports the verification results across nine benchmark designs.
+
+\begingroup
+\vspace{4pt}
+\noindent
+\centering
+\footnotesize
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\linewidth}{@{}X r r r r c c r@{}}
+\rowcolor{tableheader}
+\headingfont\bfseries Candidate Design & \headingfont\bfseries Cap $N$ & \headingfont\bfseries $|S_{\mathrm{resultant}}|$ & \headingfont\bfseries $|S_{\mathrm{mode}}|$ & \headingfont\bfseries Clauses & \headingfont\bfseries Verdict & \headingfont\bfseries Violated & \headingfont\bfseries Time (ms) \\
+\addlinespace[2pt]
+\input{generated/solver-results.tex}
+\end{tabularx}
+\captionof{table}{Automated LTL verification results for finite-tape buildable RLE resultants $Z_{b,N}=\mathrm{RSY}(SCR_N)$ and their operational system modes $Z_{m,N}\in\mathrm{SYSMO}(Z_{b,N})$ against $\Phi_{IOR_N}$ and $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref},N})$.}
+\label{tab:solver-results}
+\vspace{4pt}
+\endgroup
+
+The nine rows of Table~\ref{tab:solver-results} highlight three practical capabilities of the temporal logic bridge:
+\begin{enumerate}
+    \item \textbf{Scaling across finite tape capacities (\texttt{rle-coupled-cap2}, \texttt{cap3}, \texttt{cap4}):} Increasing the hardware run-length capacity from $N=2$ to $N=4$ expands the coupled resultant state space $|S_{\mathrm{resultant}}|$ from $288$ to $800$ states and the reachable operational mode $|S_{\mathrm{mode}}|$ from $31$ to $55$ states. In every case, the checker automatically verifies all $6N+4$ LTL clauses in under $5\,\mathrm{ms}$, certifying by Theorem~\ref{thm:mode-ior-bridge} that $(D_{\mathrm{ref},N},Z_{b,N})\in\mathrm{CTL}(IOR_N,TYR_N)$ without requiring the engineer to construct or prove a homomorphism by hand.
+    \item \textbf{Zero-maintenance verification across component refactorings (\texttt{rle-reencoded-table}, \texttt{rle-instrumented-reg}):} In \texttt{rle-reencoded-table}, the instruction table's internal phase bit is inverted ($0\leftrightarrow 1$), yielding an isomorphic component (Theorem~\ref{thm:encoding-invariance}). In \texttt{rle-instrumented-reg}, the output register is elaborated with an internal diagnostic parity toggle, doubling the resultant state space from $512$ to $1024$ states and expanding the active mode from $43$ to $79$ states (Theorem~\ref{thm:elaboration-coupling}). Whereas classical T3SD would require redefining the state-space projection $h_S$ for both revisions, the boundary LTL specification $\Phi_{IOR_3}$ remains completely unchanged and verifies both architectures automatically.
+    \item \textbf{Pinpoint diagnostics on faulty or timing-mismatched designs (\texttt{rle-stuck-head} through \texttt{rle-mismatched-1tick}):} When a component fault or timing mismatch is introduced, the checker rejects the candidate in less than $0.3\,\mathrm{ms}$ and reports the exact violated temporal clause: a head stuck in phase $0$ violates $\varphi_{\mathrm{mode}}$; a tape that fails to latch new bits violates $\varphi_{\mathrm{start}}$; an instruction table that increments instead of resetting on a bit change violates $\varphi_{\mathrm{reset}}$; and a naive 1-tick unshifted specification (\texttt{rle-mismatched-1tick}) violates $\varphi_{\mathrm{hold}}$ at tick $t=2$, diagnosing the pipeline latency mismatch analyzed in Section~\ref{sec:case-ticks}.
+\end{enumerate}

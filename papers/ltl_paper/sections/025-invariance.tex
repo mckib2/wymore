@@ -1,80 +1,35 @@
-\subsection{Fragment Invariance and Reuse}
+\subsection{Invariance and Compositional Reuse Across Architectural Refactoring}
 \label{sec:invariance}
 
-The compiled fragment is determined by $Z_{\mathrm{ref}}$. A witnessing
-homomorphism also depends on the implementation and on both encodings. This
-difference determines what can be reused when a design changes.
+A major pain point of constructive T3SD is that a homomorphism $h=(h_S,h_I,h_O):Z_m\twoheadrightarrow Z_f$ is tied to the specific internal state representations of both machines. If an engineer refactors a component's state encoding, reorders ports, or elaborates a subsystem with diagnostic counters, the explicit map $h_S$ breaks and must be redefined. By contrast, the temporal specifications $\Phi_{IOR}$ and $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ remain fixed while the underlying implementation evolves.
 
-Representational changes over a system lifecycle should not invalidate an
-established behavioral result.
-
-\begin{theorem}[Encoding invariance]
+\begin{theorem}[Encoding and Copy Invariance]
 \label{thm:encoding-invariance}
-Replacing either $Z_{\mathrm{ref}}$ or $Z_{\mathrm{impl}}$ by an isomorphic
-system preserves satisfaction of the compiled dynamics fragment. The same
-holds for T3SD copies that rename or permute ports.
+Replacing either the reference system $Z_{\mathrm{ref}}$ or the candidate mode $Z_m$ by an isomorphic discrete system preserves satisfaction of $\Phi_{IOR}$ (on matching boundaries) and of $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$. The same invariance holds for T3SD copies ($\mathrm{COPY}$, Definition~4.27) that rename or permute component ports.
 \end{theorem}
 
-\begin{proof}[Proof sketch]
-Compose the witnessing homomorphism with the isomorphism in the required
-direction. The inverse isomorphism proves the reverse implication. T3SD copies
-carry the corresponding bijections on state and boundary indices, so the same
-composition argument applies.
+\begin{proof}[Intuitive proof]
+Isomorphisms and port copies are invertible system homomorphisms. Composing a witnessing homomorphism with an isomorphism on either side preserves surjectivity as well as the transition and readout commuting equations~\eqref{eq:wymore-hom-def}, so conformance transfers in both directions.
 \end{proof}
 
-Component-level evidence must lift to assembled resultants if verification is
-to scale with system architecture.
+Beyond representation changes, systems engineering architectures are hierarchical: components in a coupling recipe $SCR$ are elaborated independently by subsystem teams and then integrated into a coupled resultant $\mathrm{RSY}(SCR)$.
 
-\begin{theorem}[Elaboration and coupling]
+\begin{theorem}[Compositional Elaboration and Coupling]
 \label{thm:elaboration-coupling}
-Dynamics-fragment conformance composes through successive homomorphic
-realisations on either side. For two coupling recipes with the same free
-boundary, port-preserving component homomorphisms induce a homomorphism between
-their resultants.
+Temporal dynamics conformance composes transitively through successive homomorphic elaborations and system modes (under autonomous stutter preservation, Wymore Theorem~5.97). Furthermore, given two coupling recipes $SCR$ and $SCR'$ sharing the same wiring topology, port-preserving component conformance $Z'_i\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_i)$ for each component $i\in\{1,\dots,n\}$ lifts to resultant conformance $\mathrm{RSY}(SCR')\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(\mathrm{RSY}(SCR))$ (Wymore Theorem~4.56).
 \end{theorem}
 
-\begin{proof}[Proof sketch]
-Composition of the state, input, and output maps preserves surjectivity and the
-homomorphism equations. For coupled systems, take the componentwise product of
-the state maps. Port preservation makes the internal-wire values agree, so the
-product map preserves the resultant transition and readout functions. Standard
-T3SD coupling results supply the corresponding resultant construction
-\citep{Wymore1993}.
+\begin{proof}[Intuitive proof]
+By Theorem~\ref{thm:dynamics-characterization}, componentwise conformance supplies port-preserving homomorphisms $h_i:Z'_i\twoheadrightarrow Z_i$. Taking the Cartesian product of the state maps $h_S(x)_i=h_{S,i}(x_i)$ and matching port maps along internal wires ensures that every internal connection in $SCR'$ carries a value that projects to the corresponding internal connection in $SCR$. Thus the product map commutes with the synchronous resultant transition and readout functions of $\mathrm{RSY}(SCR')$ and $\mathrm{RSY}(SCR)$.
 \end{proof}
 
-Reindexing components, flattening nested recipes, and removing
-boundary-irrelevant components are structural instances of
-Theorem~\ref{thm:elaboration-coupling}. Section~\ref{sec:case-machine-lift}
-illustrates component elaboration by changing the instruction table's phase
-encoding.
+Finally, on finite-state systems, mutual satisfaction of compiled dynamics fragments characterizes behavioral equivalence up to isomorphism:
 
-Together, these results replace one monolithic obligation with a hierarchy of checks.
-Each component can be checked against its reference fragment; the coupling
-theorem lifts the component results when the required coupling witness is
-supplied; subsequent elaborations reuse the established fragment. Finite
-components admit propositional checking, while infinite components may use
-symbolic proofs or finite abstractions. The RLE case proves conformance of the
-full resultant directly and illustrates fragment reuse on its instruction
-table. The underlying search problem remains difficult in general, while
-decomposition and reuse provide a route to larger architectures.
-
-A characteristic fragment should distinguish finite behavior, not merely admit
-coarse mutual projections.
-
-\begin{theorem}[Finite canonicity]
+\begin{theorem}[Finite Canonicity]
 \label{thm:finite-canonicity}
-Let $Z_1$ and $Z_2$ be finite systems. If each satisfies the dynamics fragment
-compiled from the other, then $Z_1$ and $Z_2$ are isomorphic.
+Let $Z_1$ and $Z_2$ be finite discrete systems. If $Z_1\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_2)$ and $Z_2\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_1)$, then $Z_1$ and $Z_2$ are isomorphic.
 \end{theorem}
 
-\begin{proof}[Proof sketch]
-Mutual satisfaction yields surjective homomorphisms in both directions by
-Theorem~\ref{thm:dynamics-characterization}. Finiteness forces the state,
-input, and output maps to be bijective. Their inverses preserve the same
-transition and readout equations, giving an isomorphism.
+\begin{proof}[Intuitive proof]
+Mutual satisfaction yields surjective homomorphisms $Z_1\twoheadrightarrow Z_2$ and $Z_2\twoheadrightarrow Z_1$. By the pigeonhole principle on finite state, input, and output sets, mutually surjective maps between finite sets must be bijections, yielding a Wymore system isomorphism.
 \end{proof}
-
-Theorems~\ref{thm:encoding-invariance}--\ref{thm:finite-canonicity} support
-incremental verification while preserving Wymore's implementation semantics.
-Composition lifts established component results, and finite presentations turn
-local conformance obligations into generated decision problems.

@@ -3,7 +3,7 @@ import Mbse.PartialDynamicsHomFragment
 import Mbse.TemporalLogic
 import Mbse.Homomorphism
 import Mbse.Wymore
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Real.Basic
 
 /-!
 # Bounded-horizon unrolling of Φ_dyn

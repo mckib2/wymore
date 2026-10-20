@@ -3,7 +3,7 @@ import Mbse.PartialDynamicsHomFragment
 import Mbse.HomWitnessConstruction
 import Mbse.Homomorphism
 import Mbse.FiniteWymore
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Real.Basic
 
 /-!
 # Cascade composition gallery (awkward buildability)
@@ -95,7 +95,7 @@ theorem double_preserves_transition (s : Double01110Assembled) (b : Bit) :
     · simp [hacc]
     · simp [hacc]
   · have hpos : ¬ armed = 0 := hz
-    simp only [if_neg hpos]
+    simp only [ite_eq_right hpos]
     by_cases hacc : pattern01110Out (pattern01110Next second b)
     · simp [hacc, hpos]
     · simp [hacc, hpos]

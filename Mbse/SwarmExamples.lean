@@ -1,6 +1,6 @@
 import Mbse.FiniteWymore
-import Mathlib.Data.Real.Basic
-import Mathlib.Data.Real.Archimedean
+import Mathlib.Basic.Real.Basic
+import Mathlib.Algebra.Order.Archimedean.Real.Basic
 import Mathlib.Algebra.Order.Floor.Ring
 
 /-!

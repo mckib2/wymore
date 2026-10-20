@@ -106,7 +106,7 @@ theorem satisfiesFNS_of_function {A B : Type} (f : A → B) : SatisfiesFNS f := 
   · intro a
     exact ⟨f a, rfl⟩
   · intro a b₁ b₂ h₁ h₂
-    simp only [FunctionGraph, Set.mem_setOf_eq] at h₁ h₂
+    simp only [FunctionGraph, Set.mem_ofPred_eq] at h₁ h₂
     rw [h₁, h₂]
 
 /--
@@ -265,7 +265,7 @@ theorem stateTrajectoryGraph_singleValued {SZ IZ OZ : Type} (Z : DiscreteSystem 
     (h₁ : (t, y₁) ∈ StateTrajectoryGraph Z f s0)
     (h₂ : (t, y₂) ∈ StateTrajectoryGraph Z f s0) :
     y₁ = y₂ := by
-  simp only [StateTrajectoryGraph, Set.mem_setOf_eq] at h₁ h₂
+  simp only [StateTrajectoryGraph, Set.mem_ofPred_eq] at h₁ h₂
   exact h₁.trans h₂.symm
 
 /--

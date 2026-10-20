@@ -490,9 +490,7 @@ def transientStateMode (Z : DiscreteSystem S₂ I₂ O₂) (x' : S₂)
     SystemMode (transientStateSystem Z x' hne) Z :=
   primaryModeOfMaps _ _ (fun _ => x') Subtype.val id
     (fun _ _ _ => rfl) Subtype.val_injective Function.injective_id
-    (fun _ p => by
-      change x' = Z.NZ x' (some p.val)
-      exact p.property.symm)
+    (fun _ p => p.property.symm)
     (fun _ => by simp [transientStateSystem])
 
 theorem transientState_generates_transientMode
@@ -823,7 +821,7 @@ theorem inevitable_next_manifestation
   have hg0 : g 0 = M.inputMap p := by
     have hpos : 0 < M.timeIndex x₁ p := M.behavior.duration_pos x₁ p
     dsimp [g]
-    rw [dif_pos hpos]
+    rw [dite_eq_left hpos]
     apply Option.some_inj.mp
     rw [Option.some_get]
     simpa using hat
@@ -835,7 +833,7 @@ theorem inevitable_next_manifestation
     intro u hu
     change f (u + s) = some (g u)
     have hu' : u < M.timeIndex x₁ p := hu
-    simp only [g, dif_pos hu']
+    simp only [g, dite_eq_left hu']
     rw [Nat.add_comm]
     exact (Option.some_get (htotal u hu')).symm
   rw [hagree]

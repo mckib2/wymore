@@ -182,36 +182,45 @@ lemma rle_oneToOne : IsOneToOneRelation rleCSCR := by
   constructor
   · intro x y1 y2 h1 h2
     simp only [rleCSCR, Set.mem_insert_iff, Set.mem_singleton_iff] at h1 h2
-    rcases h1 with h1 | h1 | h1 <;> rcases h2 with h2 | h2 | h2 <;>
-      simp_all [tapeToTable, tableToReg, headLoop]
+    rcases h1 with h1 | h1 | h1 <;> rcases h2 with h2 | h2 | h2
+    · exact (Prod.mk.inj h1).2.trans (Prod.mk.inj h2).2.symm
+    · nomatch (Prod.mk.inj h1).1.symm.trans (Prod.mk.inj h2).1
+    · nomatch (Prod.mk.inj h1).1.symm.trans (Prod.mk.inj h2).1
+    · nomatch (Prod.mk.inj h1).1.symm.trans (Prod.mk.inj h2).1
+    · exact (Prod.mk.inj h1).2.trans (Prod.mk.inj h2).2.symm
+    · nomatch (Prod.mk.inj h1).1.symm.trans (Prod.mk.inj h2).1
+    · nomatch (Prod.mk.inj h1).1.symm.trans (Prod.mk.inj h2).1
+    · nomatch (Prod.mk.inj h1).1.symm.trans (Prod.mk.inj h2).1
+    · exact (Prod.mk.inj h1).2.trans (Prod.mk.inj h2).2.symm
   · intro x1 x2 y h1 h2
     simp only [rleCSCR, Set.mem_insert_iff, Set.mem_singleton_iff] at h1 h2
-    rcases h1 with h1 | h1 | h1 <;> rcases h2 with h2 | h2 | h2 <;>
-      simp_all [tapeToTable, tableToReg, headLoop]
+    rcases h1 with h1 | h1 | h1 <;> rcases h2 with h2 | h2 | h2
+    · exact (Prod.mk.inj h1).1.trans (Prod.mk.inj h2).1.symm
+    · nomatch (Prod.mk.inj h1).2.symm.trans (Prod.mk.inj h2).2
+    · nomatch (Prod.mk.inj h1).2.symm.trans (Prod.mk.inj h2).2
+    · nomatch (Prod.mk.inj h1).2.symm.trans (Prod.mk.inj h2).2
+    · exact (Prod.mk.inj h1).1.trans (Prod.mk.inj h2).1.symm
+    · nomatch (Prod.mk.inj h1).2.symm.trans (Prod.mk.inj h2).2
+    · nomatch (Prod.mk.inj h1).2.symm.trans (Prod.mk.inj h2).2
+    · nomatch (Prod.mk.inj h1).2.symm.trans (Prod.mk.inj h2).2
+    · exact (Prod.mk.inj h1).1.trans (Prod.mk.inj h2).1.symm
 
 lemma rle_properDomain : IsProperDomain rleCSCR := by
   intro h
   rw [Set.eq_univ_iff_forall] at h
   obtain ⟨y, hy⟩ := h (⟨2, ()⟩ : Σ i, rleVSCR.OutPort i)
   simp only [rleCSCR, Set.mem_insert_iff, Set.mem_singleton_iff] at hy
-  rcases hy with hy | hy | hy
-  · simp [tapeToTable] at hy
-  · simp [tableToReg] at hy
-  · simp [headLoop] at hy
+  rcases hy with hy | hy | hy <;> nomatch (Prod.mk.inj hy).1
 
 lemma rle_properRange : IsProperRange rleCSCR := by
   intro h
   rw [Set.eq_univ_iff_forall] at h
   obtain ⟨x, hx⟩ := h (⟨0, ()⟩ : Σ i, rleVSCR.Port i)
   simp only [rleCSCR, Set.mem_insert_iff, Set.mem_singleton_iff] at hx
-  rcases hx with hx | hx | hx
-  · simp [tapeToTable] at hx
-  · simp [tableToReg] at hx
-  · simp [headLoop] at hx
+  rcases hx with hx | hx | hx <;> nomatch (Prod.mk.inj hx).2
 
 lemma rle_compat : PortCompatibility rleVSCR rleCSCR := by
   intro _ _ hop
-  simp only [rleCSCR, Set.mem_insert_iff, Set.mem_singleton_iff] at hop
   rcases hop with hop | hop | hop <;> cases hop <;> rfl
 
 lemma rle_connectivity : IsSystemConnectivity rleVSCR rleCSCR :=
@@ -227,21 +236,13 @@ theorem tape_load_unconnected :
     (⟨0, ()⟩ : Σ i, rleSCR.VSCR.Port i) ∉ CISCR rleSCR := by
   rw [mem_ciscr_iff]
   rintro ⟨op, hop⟩
-  simp only [rleSCR, rleCSCR] at hop
-  rcases hop with hop | hop | hop
-  · simp [tapeToTable] at hop
-  · simp [tableToReg] at hop
-  · simp [headLoop] at hop
+  rcases hop with hop | hop | hop <;> nomatch (Prod.mk.inj hop).2
 
 /-- The register's output is unconnected: it is the run-pair output. -/
 theorem reg_output_unconnected :
     (⟨2, ()⟩ : Σ i, rleSCR.VSCR.OutPort i) ∉ COSCR rleSCR := by
   rintro ⟨ip, hip⟩
-  simp only [rleSCR, rleCSCR] at hip
-  rcases hip with hip | hip | hip
-  · simp [tapeToTable] at hip
-  · simp [tableToReg] at hip
-  · simp [headLoop] at hip
+  rcases hip with hip | hip | hip <;> nomatch (Prod.mk.inj hip).1
 
 def rleTechnology : Technology :=
   ⟨{ AnyDiscreteSystem.of tape,
@@ -284,10 +285,10 @@ noncomputable def rle_resultant_in_bsr : BuildableSystemDesign rleTechnology whe
   buildable := rle_resultant_is_buildable
 
 noncomputable def rleOnlyIn : UnconnInPort rleSCR :=
-  ⟨⟨0, ()⟩, by simpa [UISCR] using tape_load_unconnected⟩
+  ⟨⟨0, ()⟩, tape_load_unconnected⟩
 
 noncomputable def rleOnlyOut : UnconnOutPort rleSCR :=
-  ⟨⟨2, ()⟩, by simpa [UOSCR] using reg_output_unconnected⟩
+  ⟨⟨2, ()⟩, reg_output_unconnected⟩
 
 /-! ## The abstract pipeline at the boundary -/
 
@@ -360,7 +361,7 @@ lemma rle_input_table (ext : rsy_IZ rleSCR) (x : rsy_SZ rleSCR) :
   have h := rsy_component_input_heq rleSCR rle_hOut 3 ext x ()
     (⟨0, ()⟩ : Σ j, rleSCR.VSCR.OutPort j) (Or.inl rfl)
   have hout : rsyOutAt rleSCR rle_hOut x ⟨0, ()⟩ = ((x 0).bit, 0) := by
-    rw [rsyOutAt_eq_componentReadoutAt]
+    rw [rsyOutAt_eq_componentReadoutAt rleSCR rle_hOut 0 () x]
     exact componentReadoutAt_of_RZ (rle_hOut 0) rfl ()
   exact (eq_of_heq h).trans hout
 
@@ -371,7 +372,7 @@ lemma rle_input_reg (ext : rsy_IZ rleSCR) (x : rsy_SZ rleSCR) :
     (⟨3, ()⟩ : Σ j, rleSCR.VSCR.OutPort j) (Or.inr (Or.inl rfl))
   have hout : rsyOutAt rleSCR rle_hOut x ⟨3, ()⟩ =
       ((x 3).bit, (x 3).count) := by
-    rw [rsyOutAt_eq_componentReadoutAt]
+    rw [rsyOutAt_eq_componentReadoutAt rleSCR rle_hOut 3 () x]
     exact componentReadoutAt_of_RZ (rle_hOut 3) rfl ()
   exact (eq_of_heq h).trans hout
 
@@ -405,7 +406,7 @@ lemma rleResultant_NZ_table (ext : rsy_IZ rleSCR) (x : rsy_SZ rleSCR) :
 
 lemma rleResultant_out_reg (x : rsy_SZ rleSCR) :
     rsyOutAt rleSCR rle_hOut x ⟨2, ()⟩ = ((x 2).bit, (x 2).count) := by
-  rw [rsyOutAt_eq_componentReadoutAt]
+  rw [rsyOutAt_eq_componentReadoutAt rleSCR rle_hOut 2 () x]
   exact componentReadoutAt_of_RZ (rle_hOut 2) rfl ()
 
 noncomputable def pipelineHom : HomomorphicImageWitness pipelineRef rleResultant where
@@ -987,20 +988,20 @@ noncomputable def tableResultantHom : HomomorphicImageWitness rleRef tableResult
   preserves_transition := by
     intro x oi
     cases oi with
-    | none =>
-      simp [tableResultant, rsy, rsy_NZ, tableSCR, tableVSCR, instrTable, rleCell, rleRef,
-        DiscreteSystem.ofTotal]
+    | none => rfl
     | some ext =>
-      simp [tableResultant, rsy, rsy_NZ, tableSCR, tableVSCR, instrTable, rleCell, rleRef,
-        DiscreteSystem.ofTotal, cellNext]
-      apply congrArg (fun p : Pair => rleStep (x 0) p.1)
-      simpa [tableOnlyIn] using
+      have hin : rsy_component_input_fun tableSCR table_hOut 0 ext x () = ext tableOnlyIn :=
         rsy_component_input_uiscr tableSCR table_hOut 0 ext x () tableOnlyIn.property
+      show rleStep (x 0) (rsy_component_input_fun tableSCR table_hOut 0 ext x ()).1 =
+        rleStep (x 0) (ext tableOnlyIn).1
+      rw [hin]
   preserves_readout := by
     intro x
-    have hread := rsyOutAt_eq_componentReadoutAt tableSCR table_hOut 0 () x
-    simp [tableResultant, rsy, rsy_RZ, rleRef, DiscreteSystem.ofTotal, Option.map, hread,
-      componentReadoutAt, table_choose_readout, tableOnlyOut]
+    have hout : rsyOutAt tableSCR table_hOut x ⟨0, ()⟩ = ((x 0).bit, (x 0).count) := by
+      rw [rsyOutAt_eq_componentReadoutAt tableSCR table_hOut 0 () x]
+      exact componentReadoutAt_of_RZ (table_hOut 0) (table_readout_eq (x 0)) ()
+    simp [tableResultant, rsy, rsy_RZ, rleRef, DiscreteSystem.ofTotal, Option.map,
+      tableOnlyOut, hout]
 
 theorem table_resultant_buildable :
     IsBuildableWith rleTechnology tableSCR table_hOut tableResultant :=
@@ -1009,5 +1010,304 @@ theorem table_resultant_buildable :
 theorem table_resultant_satisfies_fragment :
     SystemSatisfiesPartialDynamicsHom rleRef tableResultant :=
   partialDynamicsHom_of_hom ⟨tableResultantHom⟩
+
+/-! ## Finite-tape / bounded-count refinement (`Fin (N + 1)`) -/
+
+abbrev FinPair (N : Nat) := Bool × Fin (N + 1)
+
+@[ext] structure RleFinState (N : Nat) where
+  bit : Bool
+  count : Fin (N + 1)
+  phase : Bool
+  pending : Bool
+deriving DecidableEq, Repr
+
+def rleFinStateEquiv (N : Nat) : RleFinState N ≃ Bool × Fin (N + 1) × Bool × Bool where
+  toFun s := (s.bit, s.count, s.phase, s.pending)
+  invFun t := ⟨t.1, t.2.1, t.2.2.1, t.2.2.2⟩
+  left_inv s := by cases s; rfl
+  right_inv t := by rcases t with ⟨_, _, _, _⟩; rfl
+
+instance (N : Nat) : Finite (RleFinState N) :=
+  Finite.of_equiv _ (rleFinStateEquiv N).symm
+
+def rleFinInit (N : Nat) : RleFinState N := ⟨false, ⟨0, Nat.zero_lt_succ N⟩, false, false⟩
+
+def finZero (N : Nat) : Fin (N + 1) := ⟨0, Nat.zero_lt_succ N⟩
+
+def finOne (N : Nat) (hN : 0 < N) : Fin (N + 1) := ⟨1, Nat.succ_lt_succ hN⟩
+
+def finCapInc (N : Nat) (c : Fin (N + 1)) : Fin (N + 1) :=
+  ⟨min (c.val + 1) N, Nat.lt_succ_of_le (Nat.min_le_right _ _)⟩
+
+def rleFinStep (N : Nat) (hN : 0 < N) (s : RleFinState N) (b : Bool) : RleFinState N :=
+  if s.phase then
+    { s with phase := false }
+  else
+    ⟨b, if s.count.val ≠ 0 ∧ b = s.bit then finCapInc N s.count else finOne N hN, true, b⟩
+
+def cellFinNext (N : Nat) (hN : 0 < N) (k : Fin 4) (s : RleFinState N)
+    (f : Unit → FinPair N) : RleFinState N :=
+  match k.1 with
+  | 0 => { rleFinInit N with bit := (f ()).1 }
+  | 1 => { s with phase := !s.phase }
+  | 2 => { rleFinInit N with bit := (f ()).1, count := (f ()).2 }
+  | _ => rleFinStep N hN s (f ()).1
+
+def cellFinRead (N : Nat) (k : Fin 4) (s : RleFinState N) : Unit → FinPair N :=
+  match k.1 with
+  | 0 => fun _ => (s.bit, finZero N)
+  | 1 => fun _ => (s.phase, finZero N)
+  | _ => fun _ => (s.bit, s.count)
+
+def rleFinCell (N : Nat) (hN : 0 < N) (k : Fin 4) :
+    DiscreteSystem (RleFinState N) (Unit → FinPair N) (Unit → FinPair N) :=
+  DiscreteSystem.ofTotal (fun s f => cellFinNext N hN k s f) (fun s => cellFinRead N k s)
+    ⟨rleFinInit N⟩
+
+def cellFinSig (N : Nat) (hN : 0 < N) (k : Fin 4) : Bool × Nat × Bool × Bool :=
+  let s := (rleFinCell N hN k).NZ (rleFinInit N) (some (fun _ => (true, finOne N hN)))
+  (s.phase, s.count.val, s.bit, s.pending)
+
+lemma cellFinSig_val (N : Nat) (hN : 0 < N) (k : Fin 4) :
+    cellFinSig N hN k = (match k with
+      | 0 => (false, 0, true, false)
+      | 1 => (true, 0, false, false)
+      | 2 => (false, 1, true, false)
+      | 3 => (true, 1, true, true)) := by
+  fin_cases k <;>
+    simp [cellFinSig, rleFinCell, DiscreteSystem.ofTotal, cellFinNext,
+      rleFinStep, rleFinInit, finOne]
+
+theorem rleFinCell_distinct (N : Nat) (hN : 0 < N) (i j : Fin 4) (hne : i ≠ j) :
+    ¬ HEq (rleFinCell N hN i) (rleFinCell N hN j) := by
+  intro h
+  have he : cellFinSig N hN i = cellFinSig N hN j := by
+    have hsys : rleFinCell N hN i = rleFinCell N hN j := eq_of_heq h
+    simp [cellFinSig, hsys]
+  fin_cases i <;> fin_cases j <;> first
+    | exact absurd rfl hne
+    | simp [cellFinSig_val, Prod.mk.injEq] at he
+
+theorem rleFinCell_alwaysOutputs (N : Nat) (hN : 0 < N) (k : Fin 4) :
+    AlwaysOutputs (rleFinCell N hN k) :=
+  fun s => ⟨cellFinRead N k s, by simp [rleFinCell, DiscreteSystem.ofTotal]⟩
+
+def rleFinVSCR (N : Nat) (hN : 0 < N) : PortSystemVector 4 where
+  SZ := fun _ => RleFinState N
+  Port := fun _ => Unit
+  PortVal := fun _ _ => FinPair N
+  OutPort := fun _ => Unit
+  OutPortVal := fun _ _ => FinPair N
+  Z := rleFinCell N hN
+  distinct := rleFinCell_distinct N hN
+
+lemma rleFin_compat (N : Nat) (hN : 0 < N) :
+    PortCompatibility (rleFinVSCR N hN) rleCSCR := by
+  intro _ _ hop
+  rcases hop with hop | hop | hop <;> cases hop <;> rfl
+
+def rleFinSCR (N : Nat) (hN : 0 < N) : SystemCouplingRecipe 4 where
+  VSCR := rleFinVSCR N hN
+  CSCR := rleCSCR
+  connectivity := ⟨rle_oneToOne, rle_properDomain, rle_properRange, rleFin_compat N hN⟩
+
+def rleFinTechnology (N : Nat) (hN : 0 < N) : Technology :=
+  ⟨{ AnyDiscreteSystem.of (rleFinCell N hN 0),
+      AnyDiscreteSystem.of (rleFinCell N hN 1),
+      AnyDiscreteSystem.of (rleFinCell N hN 2),
+      AnyDiscreteSystem.of (rleFinCell N hN 3) },
+    ⟨AnyDiscreteSystem.of (rleFinCell N hN 0), by simp⟩⟩
+
+theorem rleFin_vscr_subset (N : Nat) (hN : 0 < N) :
+    VSCRSubsetTechnology (rleFinSCR N hN).VSCR (rleFinTechnology N hN) := by
+  intro i
+  refine memTechnology_of _ _ ?_
+  fin_cases i
+  · exact Or.inl rfl
+  · exact Or.inr (Or.inl rfl)
+  · exact Or.inr (Or.inr (Or.inl rfl))
+  · refine Or.inr (Or.inr (Or.inr ?_))
+    rw [Set.mem_singleton_iff]
+    rfl
+
+abbrev rleFin_hOut (N : Nat) (hN : 0 < N) :
+    ∀ k, AlwaysOutputs ((rleFinSCR N hN).VSCR.Z k) :=
+  fun k => rleFinCell_alwaysOutputs N hN k
+
+noncomputable def rleFinResultant (N : Nat) (hN : 0 < N) :
+    DiscreteSystem (rsy_SZ (rleFinSCR N hN)) (rsy_IZ (rleFinSCR N hN))
+      (rsy_OZ (rleFinSCR N hN)) :=
+  rsy (rleFinSCR N hN) (rleFin_hOut N hN)
+
+theorem rleFin_resultant_is_buildable (N : Nat) (hN : 0 < N) :
+    IsBuildableWith (rleFinTechnology N hN) (rleFinSCR N hN) (rleFin_hOut N hN)
+      (rleFinResultant N hN) :=
+  ⟨rleFin_vscr_subset N hN, IsResultantOf.of_rsy (rleFinSCR N hN) (rleFin_hOut N hN)⟩
+
+theorem rleFinResultant_isFinite (N : Nat) (hN : 0 < N) :
+    IsFinite (rleFinResultant N hN) := by
+  refine ⟨?_, ?_, ?_⟩
+  · unfold rsy_SZ rleFinSCR rleFinVSCR
+    infer_instance
+  · unfold rsy_IZ UnconnInPort rleFinSCR rleFinVSCR
+    infer_instance
+  · unfold rsy_OZ UnconnOutPort rleFinSCR rleFinVSCR
+    infer_instance
+
+noncomputable def rleFinOnlyIn (N : Nat) (hN : 0 < N) : UnconnInPort (rleFinSCR N hN) :=
+  ⟨⟨0, ()⟩, tape_load_unconnected⟩
+
+noncomputable def rleFinOnlyOut (N : Nat) (hN : 0 < N) : UnconnOutPort (rleFinSCR N hN) :=
+  ⟨⟨2, ()⟩, reg_output_unconnected⟩
+
+@[ext] structure PipelineFinState (N : Nat) where
+  tapeBit : Bool
+  headPhase : Bool
+  reg : FinPair N
+  table : RleFinState N
+deriving DecidableEq, Repr
+
+def pipelineFinInit (N : Nat) : PipelineFinState N :=
+  ⟨false, true, (false, finZero N), { rleFinInit N with phase := true }⟩
+
+def pipelineFinStep (N : Nat) (hN : 0 < N) (s : PipelineFinState N) (b : Bool) :
+    PipelineFinState N :=
+  ⟨b, !s.headPhase, (s.table.bit, s.table.count), rleFinStep N hN s.table s.tapeBit⟩
+
+def pipelineFinRef (N : Nat) (hN : 0 < N) :
+    DiscreteSystem (PipelineFinState N) Bool (FinPair N) :=
+  DiscreteSystem.ofTotal (pipelineFinStep N hN) PipelineFinState.reg ⟨pipelineFinInit N⟩
+
+def pipelineFinHS (N : Nat) (hN : 0 < N) (x : rsy_SZ (rleFinSCR N hN)) : PipelineFinState N :=
+  ⟨(x 0).bit, (x 1).phase, ((x 2).bit, (x 2).count), x 3⟩
+
+lemma rleFin_input_tape (N : Nat) (hN : 0 < N) (ext : rsy_IZ (rleFinSCR N hN))
+    (x : rsy_SZ (rleFinSCR N hN)) :
+    rsy_component_input_fun (rleFinSCR N hN) (rleFin_hOut N hN) 0 ext x () =
+      ext (rleFinOnlyIn N hN) := by
+  simpa [rleFinOnlyIn] using
+    rsy_component_input_uiscr (rleFinSCR N hN) (rleFin_hOut N hN) 0 ext x ()
+      (rleFinOnlyIn N hN).property
+
+lemma rleFin_input_table (N : Nat) (hN : 0 < N) (ext : rsy_IZ (rleFinSCR N hN))
+    (x : rsy_SZ (rleFinSCR N hN)) :
+    rsy_component_input_fun (rleFinSCR N hN) (rleFin_hOut N hN) 3 ext x () =
+      ((x 0).bit, finZero N) := by
+  have h := rsy_component_input_heq (rleFinSCR N hN) (rleFin_hOut N hN) 3 ext x ()
+    (⟨0, ()⟩ : Σ j, (rleFinSCR N hN).VSCR.OutPort j) (Or.inl rfl)
+  have hout : rsyOutAt (rleFinSCR N hN) (rleFin_hOut N hN) x ⟨0, ()⟩ =
+      ((x 0).bit, finZero N) := by
+    rw [rsyOutAt_eq_componentReadoutAt (rleFinSCR N hN) (rleFin_hOut N hN) 0 () x]
+    exact componentReadoutAt_of_RZ (rleFin_hOut N hN 0) rfl ()
+  exact (eq_of_heq h).trans hout
+
+lemma rleFin_input_reg (N : Nat) (hN : 0 < N) (ext : rsy_IZ (rleFinSCR N hN))
+    (x : rsy_SZ (rleFinSCR N hN)) :
+    rsy_component_input_fun (rleFinSCR N hN) (rleFin_hOut N hN) 2 ext x () =
+      ((x 3).bit, (x 3).count) := by
+  have h := rsy_component_input_heq (rleFinSCR N hN) (rleFin_hOut N hN) 2 ext x ()
+    (⟨3, ()⟩ : Σ j, (rleFinSCR N hN).VSCR.OutPort j) (Or.inr (Or.inl rfl))
+  have hout : rsyOutAt (rleFinSCR N hN) (rleFin_hOut N hN) x ⟨3, ()⟩ =
+      ((x 3).bit, (x 3).count) := by
+    rw [rsyOutAt_eq_componentReadoutAt (rleFinSCR N hN) (rleFin_hOut N hN) 3 () x]
+    exact componentReadoutAt_of_RZ (rleFin_hOut N hN 3) rfl ()
+  exact (eq_of_heq h).trans hout
+
+lemma rleFinResultant_NZ_none (N : Nat) (hN : 0 < N) (x : rsy_SZ (rleFinSCR N hN)) :
+    (rleFinResultant N hN).NZ x none = x := by
+  funext i
+  fin_cases i <;> rfl
+
+lemma rleFinResultant_out_reg (N : Nat) (hN : 0 < N) (x : rsy_SZ (rleFinSCR N hN)) :
+    rsyOutAt (rleFinSCR N hN) (rleFin_hOut N hN) x ⟨2, ()⟩ = ((x 2).bit, (x 2).count) := by
+  rw [rsyOutAt_eq_componentReadoutAt (rleFinSCR N hN) (rleFin_hOut N hN) 2 () x]
+  exact componentReadoutAt_of_RZ (rleFin_hOut N hN 2) rfl ()
+
+noncomputable def pipelineFinHom (N : Nat) (hN : 0 < N) :
+    HomomorphicImageWitness (pipelineFinRef N hN) (rleFinResultant N hN) where
+  HS := pipelineFinHS N hN
+  HI := fun ext => (ext (rleFinOnlyIn N hN)).1
+  HO := fun out => out (rleFinOnlyOut N hN)
+  HS_surjective := by
+    intro s
+    refine ⟨fun i =>
+      if i = 0 then { rleFinInit N with bit := s.tapeBit }
+      else if i = 1 then { rleFinInit N with phase := s.headPhase }
+      else if i = 2 then { rleFinInit N with bit := s.reg.1, count := s.reg.2 }
+      else s.table, ?_⟩
+    cases s
+    simp [pipelineFinHS]
+  HI_surjective := fun b => ⟨fun _ => (b, finZero N), rfl⟩
+  HO_surjective := fun p => ⟨fun _ => p, rfl⟩
+  preserves_transition := by
+    intro x oi
+    cases oi with
+    | none =>
+      rw [rleFinResultant_NZ_none N hN]
+      rfl
+    | some ext =>
+      apply PipelineFinState.ext
+      · show (rsy_component_input_fun (rleFinSCR N hN) (rleFin_hOut N hN) 0 ext x ()).1 = _
+        rw [rleFin_input_tape N hN]; rfl
+      · rfl
+      · show (rsy_component_input_fun (rleFinSCR N hN) (rleFin_hOut N hN) 2 ext x (),
+            rsy_component_input_fun (rleFinSCR N hN) (rleFin_hOut N hN) 2 ext x ()).1 = _
+        rw [rleFin_input_reg N hN]; rfl
+      · show rleFinStep N hN (x 3)
+            (rsy_component_input_fun (rleFinSCR N hN) (rleFin_hOut N hN) 3 ext x ()).1 = _
+        rw [rleFin_input_table N hN]; rfl
+  preserves_readout := by
+    intro x
+    have hout := rleFinResultant_out_reg N hN x
+    simp [rleFinResultant, rsy, rsy_RZ, pipelineFinRef, DiscreteSystem.ofTotal,
+      pipelineFinHS, Option.map, rleFinOnlyOut, hout]
+
+theorem rleFinResultant_realises_pipelineFin (N : Nat) (hN : 0 < N) :
+    IsHomomorphicImage (pipelineFinRef N hN) (rleFinResultant N hN) :=
+  ⟨pipelineFinHom N hN⟩
+
+theorem rleFinResultant_satisfies_pipelineFin_fragment (N : Nat) (hN : 0 < N) :
+    SystemSatisfiesPartialDynamicsHom (pipelineFinRef N hN) (rleFinResultant N hN) :=
+  partialDynamicsHom_of_hom (rleFinResultant_realises_pipelineFin N hN)
+
+def pipelineFinSpec (N : Nat) (hN : 0 < N) (f : ITZ Bool) : Time → PipelineFinState N
+  | 0 => pipelineFinInit N
+  | t + 1 => pipelineFinStep N hN (pipelineFinSpec N hN f t) (f t)
+
+def pipelineFinOut (N : Nat) (hN : 0 < N) (f : ITZ Bool) (t : Time) : FinPair N :=
+  (pipelineFinSpec N hN f t).reg
+
+lemma pipelineFinSpec_eq (N : Nat) (hN : 0 < N) (f : ITZ Bool) (t : Time) :
+    generateStateTrajectory (pipelineFinRef N hN) (pipelineFinInit N) (liftInput f) t =
+      pipelineFinSpec N hN f t := by
+  induction t with
+  | zero => rfl
+  | succ t ih =>
+    rw [_root_.generateStateTrajectory_succ, ih]
+    rfl
+
+theorem pipelineFinRef_out (N : Nat) (hN : 0 < N) (f : ITZ Bool) (t : Time) :
+    generateOutputTrajectory (pipelineFinRef N hN) (pipelineFinInit N) (liftInput f) t =
+      some (pipelineFinOut N hN f t) := by
+  rw [generateOutputTrajectory_val, pipelineFinSpec_eq]
+  rfl
+
+def pipelineFinIOR (N : Nat) (hN : 0 < N) : InputOutputRequirement Bool (FinPair N) :=
+  IORTemporalFragment.functionalIOR (pipelineFinOut N hN)
+
+theorem pipelineFinRef_satisfies (N : Nat) (hN : 0 < N) :
+    SatisfiesIOR (pipelineFinRef N hN) (pipelineFinIOR N hN) (pipelineFinInit N) Set.univ := by
+  unfold pipelineFinIOR
+  rw [IORTemporalFragment.satisfies_functionalIOR_iff]
+  exact pipelineFinRef_out N hN
+
+def pipelineFinRef_fsd (N : Nat) (hN : 0 < N) :
+    FunctionalSystemDesign (pipelineFinIOR N hN) where
+  S := PipelineFinState N
+  Z := pipelineFinRef N hN
+  DSZ := pipelineFinInit N
+  TSZ := Set.univ
+  satisfies := pipelineFinRef_satisfies N hN
 
 end RunLengthMachine

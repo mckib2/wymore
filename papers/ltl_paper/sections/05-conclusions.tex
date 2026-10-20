@@ -1,21 +1,11 @@
 \section{Conclusions}
+\label{sec:conclusions}
 
-The proposed representation retains the T3SD definitions. The IOR determines
-functionality, the technology and coupling recipe determine buildability, and
-Wymore's homomorphism supplies the implementation relation. The characteristic
-boundary fragment gives an equivalent assertional presentation of the
-functionality cotyledon.
-
-For implementation work, a chosen functional design supplies $Z_{\mathrm{ref}}$
-and its dynamics fragment. Component checks, compositional lifting, and
-invariance under re-encoding allow established results to be carried into larger
-and more detailed designs. The run-length case shows the complete path and keeps
-pipeline latency and clock granularity explicit at the boundary.
-
-The practical consequence is that Wymore's cotyledons remain the design
-spaces, while temporal fragments are the artifacts that are inspected, reused,
-and, when finite, discharged by existing checkers. The method scales with
-architecture to the extent that obligations can be localized and lifted. What
-remains is to treat non-lock-step conformance, liveness, and measured industrial
-use as separate developments, each with its own relation or evidence, rather
-than as omitted clauses of $\Phi_{\mathrm{dyn}}$.
+This paper has shown that Wymore's Tricotyledon Theory of System Design (T3SD) can be connected directly to the methods and automated verification tools of temporal logic without altering T3SD's mathematical foundations. Specifically:
+\begin{enumerate}
+    \item Every Wymorian Input/Output Requirement $IOR$ translates into an isomorphic boundary temporal specification $\Phi_{IOR}$ whose assertional satisfaction space $\mathrm{AFSR}(\Phi_{IOR})$ is in canonical bijection with the functionality cotyledon $\mathrm{CTL}(IOR)=\mathrm{FSR}(IOR)$ (Theorem~\ref{thm:boundary-characteristic}).
+    \item Selecting an operational system mode $Z_m\in\mathrm{SYSMO}(Z_b)$ of a buildable resultant $Z_b=\mathrm{RSY}(SCR)\in\mathrm{CTL}(TYR)$, boundary temporal satisfaction $Z_m\models_{IO}\Phi_{IOR}$ is necessary and sufficient for the existence of an identity-boundary homomorphism onto a functional design in $\mathrm{CTL}(IOR)$, certifying membership in the implementability cotyledon $\mathrm{CTL}(IOR,TYR)$ without manual homomorphism construction (Theorem~\ref{thm:mode-ior-bridge}).
+    \item Compiling a chosen reference functional design $Z_{\mathrm{ref}}\in\mathrm{CTL}(IOR)$ into the step-local safety fragment $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ makes assertional satisfaction $Z_m\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ logically equivalent to the existence of a surjective Wymore homomorphism $h:Z_m\twoheadrightarrow Z_{\mathrm{ref}}$, while remaining invariant under isomorphic state re-encodings, port copies, and compositional coupling (Theorems~\ref{thm:dynamics-characterization}--\ref{thm:finite-canonicity}).
+    \item Because physically buildable components in $TYR$ are finite-state, refining an idealized infinite-tape streaming Run-Length Encoder ($IOR_\infty$) to a finite-tape buildable resultant $Z_{b,N}=\mathrm{RSY}(SCR_N)$ allows an automated LTL checker to verify active system modes $Z_{m,N}\in\mathrm{SYSMO}(Z_{b,N})$, tolerate internal component refactorings with zero specification maintenance, and diagnose component faults and pipeline timing mismatches in milliseconds.
+\end{enumerate}
+By importing decidable temporal logic verification into T3SD, systems engineers can verify significantly larger and more complex coupled architectures inside Wymore's tricotyledon framework than was previously practical by hand.

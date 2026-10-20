@@ -14,7 +14,7 @@ namespace CombinationalProperties
 open PropertyFragment Combinational SpecFromProperties HomomorphismProperties ObservablesFromSpec PropertySemantics
 
 /-- Identity homomorphic-image witness when implementation readout matches spec table. -/
-def identityCombWitness {IZ OZ : Type} (F : IZ → OZ) [Fintype IZ] [Fintype OZ]
+theorem identityCombWitness {IZ OZ : Type} (F : IZ → OZ) [Fintype IZ] [Fintype OZ]
     (C_impl : CombinationalSystem IZ OZ)
     (hF : ∀ i, C_impl.RZ i = F i) :
     CombIdentityHomomorphicImageWitness (synthesizeCombSpec F) C_impl where

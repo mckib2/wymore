@@ -34,7 +34,7 @@ end GeneralFSMBridge
 namespace PropertyFragment.General
 
 open TemporalLogic PropertySemantics SystemToLTL PropertyFragment.FSM
-open FSM GeneralFSMBridge
+open GeneralFSMBridge
 
 def systemTrace {SZ IZ OZ : Type} [Fintype SZ] [Fintype IZ] [Fintype OZ]
     (Z : DiscreteSystem SZ IZ OZ) (hOut : AlwaysOutputs Z) (s0 : SZ) (f : ITZ IZ) :

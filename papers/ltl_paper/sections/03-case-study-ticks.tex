@@ -1,28 +1,86 @@
-\subsection{Matched Ticks}
+\subsection{Pipeline Latency, Clock Discipline, and Matched Ticks}
 \label{sec:case-ticks}
 
-A homomorphism equates one tick of the build with one tick of the reference. The head in Section~\ref{sec:case-machine} makes the modeling obligation obvious: sense, then act, is two ticks. A minimal counterexample isolates the resulting obstruction.
+A recurring source of confusion in model-based systems engineering is distinguishing a genuine behavioral bug from a timing-abstraction mismatch between an idealized specification and a staged hardware implementation. Because a Wymore homomorphism equates one tick of the buildable mode $Z_m$ with one tick of the functional design $Z_f$, both the two-phase sense/act clock of the RLE head and the two-stage Moore pipeline delay of the coupling recipe $SCR$ must be respected at the system boundary.
 
-Staged implementations require a way to distinguish behavioral errors from
-mismatched timing abstractions.
+\begin{figure}[t]
+  \centering
+  \resizebox{0.98\linewidth}{!}{%
+  \begin{tikzpicture}[>=Latex, thick, font=\footnotesize]
+    % Grid and Tick Header (3.0 = 2 * 1.5, 13.5 = 9 * 1.5; exact grid multiples)
+    \draw[gray!35] (3.0, -3.5) grid[xstep=1.5, ystep=0.7] (13.5, 0.7);
+    \node[anchor=east, font=\footnotesize\bfseries] at (2.8, 0.35) {Clock Tick $t$};
+    \foreach \t in {0,1,2,3,4,5,6} {
+      \pgfmathsetmacro{\x}{3.0 + \t*1.5 + 0.75}
+      \node[font=\footnotesize\bfseries] at (\x, 0.35) {$t=\t$};
+    }
 
-\begin{proposition}[Matched-tick requirement]
+    % Row labels
+    \node[anchor=east] at (2.8, -0.35) {Head Phase $c(t)$};
+    \node[anchor=east, text=blue!75!black] at (2.8, -1.05) {Input $f(t)$};
+    \node[anchor=east, text=teal!75!black] at (2.8, -1.75) {Tape Out $\rho_0(t)$};
+    \node[anchor=east, text=orange!80!black] at (2.8, -2.45) {Table Out $\rho_3(t)$};
+    \node[anchor=east, text=purple!75!black] at (2.8, -3.15) {Register Out $y(t)$};
+
+    % Row values: Head Phase
+    \foreach \t/\ph in {0/{0 (sense)},1/{1 (act)},2/{0 (sense)},3/{1 (act)},4/{0 (sense)},5/{1 (act)},6/{0 (sense)}} {
+      \pgfmathsetmacro{\x}{3.0 + \t*1.5 + 0.75}
+      \node[font=\scriptsize] at (\x, -0.35) {\ph};
+    }
+
+    % Row values: Input f(t)
+    \foreach \t/\val in {0/{\mathbf{b_0=0}},1/0,2/{\mathbf{b_1=0}},3/0,4/{\mathbf{b_2=1}},5/1,6/1} {
+      \pgfmathsetmacro{\x}{3.0 + \t*1.5 + 0.75}
+      \node[font=\scriptsize, text=blue!75!black] at (\x, -1.05) {$\val$};
+    }
+
+    % Row values: Tape Out
+    \foreach \t/\val in {0/{(0,0)},1/{\mathbf{(b_0,0)}},2/{(0,0)},3/{\mathbf{(b_1,0)}},4/{(0,0)},5/{\mathbf{(b_2,0)}},6/{(1,0)}} {
+      \pgfmathsetmacro{\x}{3.0 + \t*1.5 + 0.75}
+      \node[font=\scriptsize, text=teal!75!black] at (\x, -1.75) {$\val$};
+    }
+
+    % Row values: Table Out
+    \foreach \t/\val in {0/{(0,0)},1/{(0,0)},2/{\mathbf{(0,1)}},3/{(0,1)},4/{\mathbf{(0,2)}},5/{(0,2)},6/{\mathbf{(1,1)}}} {
+      \pgfmathsetmacro{\x}{3.0 + \t*1.5 + 0.75}
+      \node[font=\scriptsize, text=orange!80!black] at (\x, -2.45) {$\val$};
+    }
+
+    % Row values: Register Out y(t)
+    \foreach \t/\val in {0/{(0,0)},1/{(0,0)},2/{(0,0)},3/{\mathbf{(0,1)}},4/{(0,1)},5/{\mathbf{(0,2)}},6/{(0,2)}} {
+      \pgfmathsetmacro{\x}{3.0 + \t*1.5 + 0.75}
+      \node[font=\scriptsize, text=purple!75!black] at (\x, -3.15) {$\val$};
+    }
+
+    % Propagation arrows for symbol b_0 (t=0 -> t=1 -> t=2 -> t=3)
+    \draw[->, blue!70!black, dashed, thick] (3.95, -1.2) -- (5.05, -1.6);
+    \draw[->, teal!70!black, dashed, thick] (5.45, -1.9) -- (6.55, -2.3);
+    \draw[->, orange!80!black, dashed, thick] (6.95, -2.6) -- (8.05, -3.0);
+
+    % Propagation arrows for symbol b_1 (t=2 -> t=3 -> t=4 -> t=5)
+    \draw[->, blue!70!black, dashed, thick] (6.95, -1.2) -- (8.05, -1.6);
+    \draw[->, teal!70!black, dashed, thick] (8.45, -1.9) -- (9.55, -2.3);
+    \draw[->, orange!80!black, dashed, thick] (9.95, -2.6) -- (11.05, -3.0);
+  \end{tikzpicture}%
+  }
+  \caption{Synchronous Moore pipeline timing across the four-component RLE resultant for input symbols $b_0=0$, $b_1=0$, $b_2=1$. Dashed arrows trace each sampled symbol from external input $f(2k)$ through the tape readout at $2k+1$, the instruction table update at $2k+2$, and finally the external register output $y(2k+3)$.}
+  \label{fig:rle-timing}
+\end{figure}
+
+Figure~\ref{fig:rle-timing} traces the exact tick-by-tick propagation across the coupled RLE machine:
+\begin{enumerate}
+    \item At tick $t=2k$, the external input bit $f(2k)$ arrives at the tape's input port and is latched into the tape state at tick $2k+1$.
+    \item During tick $2k+1$, the instruction table reads the tape's new output $\rho_0(2k+1)$ on its sense phase, and on the subsequent act transition produces the updated run-length pair $(f(2k),\mathrm{runLen}_N(f,k))$ in the table readout $\rho_3(2k+2)$.
+    \item During tick $2k+2$, the output register latches $\rho_3(2k+2)$, making the encoded pair visible at the external boundary output $y(2k+3)$ and holding it through $y(2k+4)$.
+\end{enumerate}
+
+If an engineer writes an idealized requirement that ignores either the two-phase sense/act cycle or the internal register stages, the model checker immediately rejects the pairing and identifies the exact tick where the timing abstractions diverge:
+
+\begin{proposition}[Matched-Tick Requirement for Multi-Phase Implementations]
 \label{prop:matched-ticks}
-Let the reference be a bit that flips on every driven tick, and let the
-implementation carry sense and act phases while flipping only on act ticks.
-The implementation fails the one-tick dynamics fragment. If the reference is
-restated with two ticks per flip, the implementation and reference are
-isomorphic.
+Let $Z_{\mathrm{ref},1}$ be a single-tick reference bit that toggles on every driven tick, and let $Z_m$ be a two-phase implementation whose head alternates between sense ($c=0$) and act ($c=1$) while toggling its bit only on act ticks. Then $Z_m\not\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref},1})$. Conversely, when the reference $Z_{\mathrm{ref},2}$ is stated at the matched two-tick sense/act granularity, $Z_m\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref},2})$ holds via a system isomorphism.
 \end{proposition}
 
-\begin{proof}[Proof sketch]
-Readout preservation forces the state map to ignore the phase. On a sense tick,
-the implementation holds while the one-tick reference flips, so transition
-preservation would equate a reference bit with its negation. With the two-tick
-reference, the phase and bit coordinates correspond directly and the identity
-boundary maps complete an isomorphism.
+\begin{proof}[Intuitive proof]
+Readout preservation $h_O(\rho_m(x))=\rho_{\mathrm{ref},1}(h_S(x))$ forces the state projection $h_S$ to depend only on the output bit. On a sense tick ($c=0$), the two-phase implementation holds its bit while the single-tick reference toggles, so one-step transition commutation would require $b = \neg b$, a contradiction. Restating the reference at the two-tick sense/act clock aligns both state coordinates and makes the identity map an isomorphism.
 \end{proof}
-
-The corresponding finite queries are respectively unsatisfiable and
-satisfiable. A relation allowing $k$ build ticks per reference tick would
-define a different conformance relation.

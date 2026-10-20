@@ -281,11 +281,11 @@ noncomputable def normIO (p : NormIOParam) : InputOutputRequirement p.I p.O wher
       (p.hOut (generateStateTrajectory p.Z p.x (liftInput f) t))
   er_subset := by
     intro f hf g hg
-    simp only [dif_pos hf] at hg
+    simp only [dite_eq_left hf] at hg
     exact ⟨f, hf, hg⟩
   er_nonempty := by
     intro f hf
-    simp only [dif_pos hf]
+    simp only [dite_eq_left hf]
     refine ⟨fun t => Classical.choose (p.hOut (generateStateTrajectory p.Z p.x (liftInput f) t)), ?_⟩
     intro t ht
     exact Classical.choose_spec
@@ -294,7 +294,7 @@ noncomputable def normIO (p : NormIOParam) : InputOutputRequirement p.I p.O wher
     intro g hg
     obtain ⟨f, hf, hmatch⟩ := hg
     refine ⟨f, hf, ?_⟩
-    simp only [dif_pos hf]
+    simp only [dite_eq_left hf]
     exact hmatch
 
 /--
@@ -327,7 +327,7 @@ theorem normIO_members_in_fsr (p : NormIOParam) {T : Set Time}
         {g | ∀ t ∈ timeScale p.olr,
           generateOutputTrajectory p.Z p.x (liftInput f) t = some (g t)}
       else ∅)
-    rw [dif_pos hfF]
+    rw [dite_eq_left hfF]
     intro t ht
     exact totalOutputOf_spec p.Z p.hOut p.x (liftInput f) t
   · intro t ht
@@ -495,7 +495,7 @@ def himio_isHomomorphicIOR_of_injectiveHI {IR1 OR1 IR2 OR2 : Type}
     ext g1
     have hInjT : Function.Injective (mapTraj HI) := fun x y hxy =>
       funext fun t => hInj (congrFun hxy t)
-    simp only [himio, Set.mem_image, Set.mem_setOf_eq]
+    simp only [himio, Set.mem_image, Set.mem_ofPred_eq]
     constructor
     · rintro ⟨f2', hf2', heq, g2, hg2, rfl⟩
       cases hInjT heq

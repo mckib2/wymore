@@ -15,7 +15,6 @@ with identity homomorphic images under the same `SZ`/`IZ`/`OZ` types.
 namespace PropertyFragment.FSM
 
 open TemporalLogic PropertySemantics SystemToLTL
-open FSM
 
 variable {SZ IZ OZ : Type}
 variable [Nonempty IZ]
@@ -168,7 +167,7 @@ theorem fsm_satisfies_implies_readout_agreement {F_spec F_impl : FSMSystem SZ IZ
     (h : FSMSatisfiesDynamics F_spec F_impl) :
     ∀ s, F_impl.RZ s = F_spec.RZ s := by
   intro s
-  haveI : Fintype IZ := F_spec.iz_finite
+  have : Fintype IZ := F_spec.iz_finite
   have hne : (Finset.univ : Finset IZ).Nonempty := Finset.univ_nonempty
   let f : ITZ IZ := fun _ => hne.choose
   have hφ := h s f (readoutClause F_spec s) (mem_fsmDynamicsTable_readout F_spec s)
@@ -256,7 +255,8 @@ theorem fsm_extEqual_iff_identityHom (F_spec F_impl : FSMSystem SZ IZ OZ) :
   · intro ⟨w⟩
     exact ⟨fun s => (w.preserves_readout s).symm, fun s i => (w.preserves_transition s i).symm⟩
 
-def identityFsmWitness {F_spec F_impl : FSMSystem SZ IZ OZ} (h : FSMExtEqual F_spec F_impl) :
+omit [Nonempty IZ] in
+theorem identityFsmWitness {F_spec F_impl : FSMSystem SZ IZ OZ} (h : FSMExtEqual F_spec F_impl) :
     FSMIdentityHomomorphicImageWitness F_spec F_impl where
   preserves_readout := fun s => (h.1 s).symm
   preserves_transition := fun s i => (h.2 s i).symm
@@ -301,7 +301,7 @@ theorem fsm_readout_agreement (F_spec F_impl : FSMSystem SZ IZ OZ)
     (h : FSMSatisfiesOutputTable F_spec F_impl) :
     ∀ s, F_impl.RZ s = F_spec.RZ s := by
   intro s
-  haveI : Fintype IZ := F_spec.iz_finite
+  have : Fintype IZ := F_spec.iz_finite
   have hne : (Finset.univ : Finset IZ).Nonempty := Finset.univ_nonempty
   let f : ITZ IZ := fun _ => hne.choose
   have hφ := h s f (safetyOutput s (F_spec.RZ s)) (fsmOutputTable_mem F_spec s)

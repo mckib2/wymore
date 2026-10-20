@@ -1,9 +1,9 @@
 import Mbse.Isomorphism
 import Mbse.PartialDynamicsHomFragment
 import Mbse.Wymore
-import Mathlib.Data.Finite.Prod
-import Mathlib.Data.Finite.Sum
-import Mathlib.Data.Finite.Sigma
+import Mathlib.Basic.Finite.Prod
+import Mathlib.Basic.Finite.Sum
+import Mathlib.Basic.Finite.Sigma
 import Mathlib.Tactic.DeriveFintype
 import Mathlib.Tactic.FinCases
 
@@ -82,7 +82,7 @@ inductive HeadMove
   | left
   | right
   | stay
-  deriving DecidableEq, Repr, Fintype
+  deriving DecidableEq, Repr
 
 /-- A command delivered to the tape: hold, or write a symbol and move the head. -/
 inductive TapeCmd (Γ : Type)
@@ -133,7 +133,7 @@ instance tapeState_infinite {Γ : Type} [Inhabited Γ] : Infinite (TapeState Γ)
 /-- The tape's input ports: the command port (wired to the control). -/
 inductive TapeIn
   | cmd
-  deriving DecidableEq, Repr, Fintype
+  deriving DecidableEq, Repr
 
 /--
 The tape's output ports.  Coupling connectivity is one-to-one, so exposing the scanned symbol both
@@ -142,19 +142,27 @@ to the control and at the system boundary requires two ports.
 inductive TapeOut
   | scan
   | window
-  deriving DecidableEq, Repr, Fintype
+  deriving DecidableEq, Repr
 
 /-- The control's input ports: the scanned symbol (wired) and an external load command. -/
 inductive CtlIn
   | sym
   | load
-  deriving DecidableEq, Repr, Fintype
+  deriving DecidableEq, Repr
 
 /-- The control's output ports: the tape command (wired) and an external halted flag. -/
 inductive CtlOut
   | cmd
   | halted
-  deriving DecidableEq, Repr, Fintype
+  deriving DecidableEq, Repr
+
+instance : Finite CtlIn :=
+  Finite.of_injective (fun | CtlIn.sym => false | CtlIn.load => true)
+    (by rintro (_ | _) (_ | _) h <;> first | rfl | cases h)
+
+instance : Finite CtlOut :=
+  Finite.of_injective (fun | CtlOut.cmd => false | CtlOut.halted => true)
+    (by rintro (_ | _) (_ | _) h <;> first | rfl | cases h)
 
 /-- Port value sets of the tape's input ports. -/
 def TapeInVal (Γ : Type) : TapeIn → Type
@@ -378,8 +386,8 @@ theorem tmZ_distinct (Γ Λ : Type) [Inhabited Γ] [Finite Γ] [Finite Λ] (M : 
     exact not_heq_of_infinite_finite _ _
   fin_cases i <;> fin_cases j
   · exact absurd rfl hne
-  · simpa using key
-  · simpa using fun h => key (HEq.symm h)
+  · exact key
+  · exact fun h => key (HEq.symm h)
   · exact absurd rfl hne
 
 /-- The connectable vector of the Turing machine coupling. -/
@@ -479,16 +487,16 @@ theorem tm_connectivity (Γ Λ : Type) [Inhabited Γ] [Finite Γ] [Finite Λ] (M
     have hmem : (⟨1, CtlOut.halted⟩ : TMOutIdx) ∈ {x : TMOutIdx | ∃ y, (x, y) ∈ tmCSCR} :=
       heq ▸ Set.mem_univ _
     obtain ⟨y, hy⟩ := hmem
-    simp only [tmCSCR, Set.mem_insert_iff, Set.mem_singleton_iff, Prod.mk.injEq,
-      wireCmd, wireScan] at hy
-    rcases hy with ⟨h, -⟩ | ⟨h, -⟩ <;> simp [Sigma.mk.injEq] at h
+    rcases (mem_tmCSCR_iff _).mp hy with h | h
+    · have e := congrArg Prod.fst h; nomatch e
+    · have e := congrArg Prod.fst h; nomatch e
   · intro heq
     have hmem : (⟨1, CtlIn.load⟩ : TMInIdx) ∈ {y : TMInIdx | ∃ x, (x, y) ∈ tmCSCR} :=
       heq ▸ Set.mem_univ _
     obtain ⟨x, hx⟩ := hmem
-    simp only [tmCSCR, Set.mem_insert_iff, Set.mem_singleton_iff, Prod.mk.injEq,
-      wireCmd, wireScan] at hx
-    rcases hx with ⟨-, h⟩ | ⟨-, h⟩ <;> simp [Sigma.mk.injEq] at h
+    rcases (mem_tmCSCR_iff _).mp hx with h | h
+    · have e := congrArg Prod.snd h; nomatch e
+    · have e := congrArg Prod.snd h; nomatch e
   · intro op ip hm
     rcases (mem_tmCSCR_iff _).mp hm with h | h
     · have h1 : op = wireCmd.1 := congrArg Prod.fst h
@@ -532,27 +540,27 @@ theorem ctl_load_mem_uiscr : (⟨1, CtlIn.load⟩ : TMInIdx) ∈ UISCR (tmSCR Γ
   obtain ⟨op, hop⟩ := hC
   rcases (mem_tmCSCR_iff _).mp hop with h | h
   · have e : (⟨1, CtlIn.load⟩ : TMInIdx) = wireCmd.2 := congrArg Prod.snd h
-    simp [wireCmd, Sigma.mk.injEq] at e
+    nomatch e
   · have e : (⟨1, CtlIn.load⟩ : TMInIdx) = wireScan.2 := congrArg Prod.snd h
-    simp [wireScan, Sigma.mk.injEq] at e
+    nomatch e
 
 theorem tape_window_mem_uoscr : (⟨0, TapeOut.window⟩ : TMOutIdx) ∈ UOSCR (tmSCR Γ Λ M) := by
   intro hC
   obtain ⟨ip, hip⟩ := hC
   rcases (mem_tmCSCR_iff _).mp hip with h | h
   · have e : (⟨0, TapeOut.window⟩ : TMOutIdx) = wireCmd.1 := congrArg Prod.fst h
-    simp [wireCmd, Sigma.mk.injEq] at e
+    nomatch e
   · have e : (⟨0, TapeOut.window⟩ : TMOutIdx) = wireScan.1 := congrArg Prod.fst h
-    simp [wireScan, Sigma.mk.injEq] at e
+    nomatch e
 
 theorem ctl_halted_mem_uoscr : (⟨1, CtlOut.halted⟩ : TMOutIdx) ∈ UOSCR (tmSCR Γ Λ M) := by
   intro hC
   obtain ⟨ip, hip⟩ := hC
   rcases (mem_tmCSCR_iff _).mp hip with h | h
   · have e : (⟨1, CtlOut.halted⟩ : TMOutIdx) = wireCmd.1 := congrArg Prod.fst h
-    simp [wireCmd, Sigma.mk.injEq] at e
+    nomatch e
   · have e : (⟨1, CtlOut.halted⟩ : TMOutIdx) = wireScan.1 := congrArg Prod.fst h
-    simp [wireScan, Sigma.mk.injEq] at e
+    nomatch e
 
 end Ports
 
@@ -596,7 +604,7 @@ theorem tm_input_tape_cmd :
     TapeIn.cmd ⟨1, CtlOut.cmd⟩ (Or.inl rfl)
   have hout : rsyOutAt (tmSCR Γ Λ M) (tmSCR_alwaysOutputs Γ Λ M) x ⟨1, CtlOut.cmd⟩ =
       CtlState.cmd (x 1) := by
-    rw [rsyOutAt_eq_componentReadoutAt]
+    rw [rsyOutAt_eq_componentReadoutAt (tmSCR Γ Λ M) (tmSCR_alwaysOutputs Γ Λ M) 1 CtlOut.cmd x]
     exact componentReadoutAt_of_RZ (tmSCR_alwaysOutputs Γ Λ M 1) rfl CtlOut.cmd
   exact (eq_of_heq h).trans hout
 
@@ -608,7 +616,7 @@ theorem tm_input_ctl_sym :
     CtlIn.sym ⟨0, TapeOut.scan⟩ (Or.inr rfl)
   have hout : rsyOutAt (tmSCR Γ Λ M) (tmSCR_alwaysOutputs Γ Λ M) x ⟨0, TapeOut.scan⟩ =
       TapeState.head (x 0) := by
-    rw [rsyOutAt_eq_componentReadoutAt]
+    rw [rsyOutAt_eq_componentReadoutAt (tmSCR Γ Λ M) (tmSCR_alwaysOutputs Γ Λ M) 0 TapeOut.scan x]
     exact componentReadoutAt_of_RZ (tmSCR_alwaysOutputs Γ Λ M 0) rfl TapeOut.scan
   exact (eq_of_heq h).trans hout
 
@@ -652,14 +660,14 @@ theorem tmResultant_NZ_none : (tmResultant Γ Λ M).NZ x none = x := by
 theorem tmResultant_out_window :
     rsyOutAt (tmSCR Γ Λ M) (tmSCR_alwaysOutputs Γ Λ M) x ⟨0, TapeOut.window⟩ =
       TapeState.head (x 0) := by
-  rw [rsyOutAt_eq_componentReadoutAt]
+  rw [rsyOutAt_eq_componentReadoutAt (tmSCR Γ Λ M) (tmSCR_alwaysOutputs Γ Λ M) 0 TapeOut.window x]
   exact componentReadoutAt_of_RZ (tmSCR_alwaysOutputs Γ Λ M 0) rfl TapeOut.window
 
 /-- The boundary output on the control's halted port is the halted flag. -/
 theorem tmResultant_out_halted :
     rsyOutAt (tmSCR Γ Λ M) (tmSCR_alwaysOutputs Γ Λ M) x ⟨1, CtlOut.halted⟩ =
       CtlState.haltedFlag (x 1) := by
-  rw [rsyOutAt_eq_componentReadoutAt]
+  rw [rsyOutAt_eq_componentReadoutAt (tmSCR Γ Λ M) (tmSCR_alwaysOutputs Γ Λ M) 1 CtlOut.halted x]
   exact componentReadoutAt_of_RZ (tmSCR_alwaysOutputs Γ Λ M 1) rfl CtlOut.halted
 
 /-- The resultant always produces output, so it can itself be a component of a further coupling. -/

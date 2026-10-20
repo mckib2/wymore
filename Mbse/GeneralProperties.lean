@@ -84,9 +84,9 @@ theorem fsm_property_iff_hom_via_embed {SZ IZ OZ : Type} [Nonempty IZ]
       F_spec.toDiscreteSystem F_impl.toDiscreteSystem
       (FSM.fsm_alwaysOutputs F_spec) (FSM.fsm_alwaysOutputs F_impl) ↔
       FSMIsIdentityHomomorphicImage F_spec F_impl := by
-  haveI : Fintype SZ := F_spec.sz_finite
-  haveI : Fintype IZ := F_spec.iz_finite
-  haveI : Fintype OZ := F_spec.oz_finite
+  have : Fintype SZ := F_spec.sz_finite
+  have : Fintype IZ := F_spec.iz_finite
+  have : Fintype OZ := F_spec.oz_finite
   simp only [PropertyFragment.General.SystemSatisfiesDynamics_iff_fsm]
   exact fsm_property_iff_hom F_spec F_impl
 

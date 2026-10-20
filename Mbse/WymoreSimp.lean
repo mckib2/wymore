@@ -17,6 +17,6 @@ namespace Trajectory
 
 @[wymore] theorem FunctionGraph_mem {A B : Type} (f : A → B) (a : A) (b : B) :
     (a, b) ∈ FunctionGraph f ↔ b = f a := by
-  simp [FunctionGraph, Set.mem_setOf_eq]
+  simp [FunctionGraph]
 
 end Trajectory

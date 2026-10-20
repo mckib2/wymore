@@ -46,7 +46,7 @@ structure ExtensionalDynamicsSpec (SZ IZ OZ : Type) (Z : DiscreteSystem SZ IZ OZ
   rzLaw : ∀ (s : SZ), Z.RZ s = Z.RZ s
 
 /-- Compile reference observables as an extensional Φ object (no finite enumeration). -/
-def compileObservablesExt {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
+theorem compileObservablesExt {SZ IZ OZ : Type} (Z : DiscreteSystem SZ IZ OZ) :
     ExtensionalDynamicsSpec SZ IZ OZ Z :=
   { nzLaw := fun _ _ => rfl, rzLaw := fun _ => rfl }
 
@@ -168,7 +168,7 @@ theorem extensional_satisfies_implies_extEqual {SZ IZ OZ : Type}
     SystemExtEqualOpen Z_spec Z_impl hSpec hImpl :=
   h
 
-def identityOpenWitness {SZ IZ OZ : Type}
+theorem identityOpenWitness {SZ IZ OZ : Type}
     {Z_spec Z_impl : DiscreteSystem SZ IZ OZ}
     (hSpec : AlwaysOutputs Z_spec) (hImpl : AlwaysOutputs Z_impl)
     (h : SystemExtEqualOpen Z_spec Z_impl hSpec hImpl) :

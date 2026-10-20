@@ -170,7 +170,7 @@ noncomputable def pairSystem := rsy pairSCR pairSCR_hOut
 /-- The lone component's output port is external in the singular recipe. -/
 def lonePort : UnconnOutPort loneSCR :=
   ⟨⟨0, ()⟩, by
-    simp only [UOSCR, Set.mem_compl_iff, COSCR, Set.mem_setOf_eq, not_exists]
+    simp only [UOSCR, Set.mem_compl_iff, COSCR, Set.mem_ofPred_eq, not_exists]
     intro ip hip
     exact hip.elim⟩
 
@@ -547,7 +547,10 @@ theorem constantMode_state_at_mul
     M.stateMap (constantState Z₁ x p m) =
       constantState Z₂ (M.stateMap x) (M.inputMap p) (d * m) := by
   have h := constant_compiled_state M hinput d htime x (fun _ => p) m
-  simpa [constantState, expandConstantInput] using h.symm
+  have hexpand : expandConstantInput M (fun _ => p) d = fun _ => M.inputMap p := by
+    funext _t; rfl
+  simp only [constantState, hexpand] at h ⊢
+  exact h.symm
 
 /-! ## Exercise 5.148 -/
 

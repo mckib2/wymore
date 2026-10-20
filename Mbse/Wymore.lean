@@ -1338,14 +1338,14 @@ theorem conjunctiveSCR_is_conjunctive {n : Nat} (SCR : SystemCouplingRecipe n) :
 
 lemma mem_uiscr_conjunctive {n : Nat} (SCR : SystemCouplingRecipe n) (h : IsConjunctive SCR)
     (ip : Σ (i : Fin n), SCR.VSCR.Port i) : ip ∈ UISCR SCR := by
-  rw [UISCR, Set.mem_compl_iff, CISCR, Set.mem_setOf_eq]
+  rw [UISCR, Set.mem_compl_iff, CISCR, Set.mem_ofPred_eq]
   rintro ⟨op, hop⟩
   rw [h] at hop
   cases hop
 
 lemma mem_uoscr_conjunctive {n : Nat} (SCR : SystemCouplingRecipe n) (h : IsConjunctive SCR)
     (op : Σ (i : Fin n), SCR.VSCR.OutPort i) : op ∈ UOSCR SCR := by
-  rw [UOSCR, Set.mem_compl_iff, COSCR, Set.mem_setOf_eq]
+  rw [UOSCR, Set.mem_compl_iff, COSCR, Set.mem_ofPred_eq]
   rintro ⟨ip, hop⟩
   rw [h] at hop
   cases hop
@@ -1795,9 +1795,9 @@ theorem every_port_system_is_resultant {SZ Port OutPort : Type}
   refine ⟨singularSCR_is_singular V hOutNE hInNE, ?_, ?_, ?_⟩
   · rfl
   · intro x g
-    simpa using singular_scr_NZ_eq hConj (fun _ => hOut) (fun _ => x) g
+    exact singular_scr_NZ_eq hConj (fun _ => hOut) (fun _ => x) g
   · intro x p
-    simpa using singular_scr_RZ_eq hConj (fun _ => hOut) (fun _ => x) p
+    exact singular_scr_RZ_eq hConj (fun _ => hOut) (fun _ => x) p
 
 theorem csy_alwaysOutputs {n : Nat} (VSCR : PortSystemVector n)
     (hOut : ∀ i, AlwaysOutputs (VSCR.Z i)) : AlwaysOutputs (csy VSCR hOut) := by
@@ -1829,7 +1829,7 @@ def feedbackSCR_CSCR {n : Nat} (SCR : SystemCouplingRecipe n) :
 theorem feedbackSCR_portCompatibility {n : Nat} (p : RSYParam n) :
     PortCompatibility (openLoopPortVector p) (feedbackSCR_CSCR p.SCR) := by
   intro op ip h
-  rcases Set.mem_setOf.mp h with ⟨scrOp, scrIp, hpair, heq⟩
+  rcases Set.mem_ofPred.mp h with ⟨scrOp, scrIp, hpair, heq⟩
   dsimp [PortCompatibility, openLoopPortVector, openLoopInputPort, openLoopOutputPort]
   have hop : op.2 = scrOp := congr_arg Sigma.snd (congr_arg Prod.fst heq)
   have hip : ip.2 = scrIp := congr_arg Sigma.snd (congr_arg Prod.snd heq)
@@ -1840,8 +1840,8 @@ theorem feedbackSCR_connectivity {n : Nat} (p : RSYParam n) :
     IsSystemConnectivity (openLoopPortVector p) (feedbackSCR_CSCR p.SCR) := by
   refine ⟨ ⟨ ?_, ?_ ⟩, ⟨ ?_, ⟨ ?_, ?_ ⟩ ⟩⟩
   · intro x y1 y2 h1 h2
-    rcases Set.mem_setOf.mp h1 with ⟨op1, ip1, hpair1, heq1⟩
-    rcases Set.mem_setOf.mp h2 with ⟨op2, ip2, hpair2, heq2⟩
+    rcases Set.mem_ofPred.mp h1 with ⟨op1, ip1, hpair1, heq1⟩
+    rcases Set.mem_ofPred.mp h2 with ⟨op2, ip2, hpair2, heq2⟩
     have hop : op1 = op2 := by
       have h1x := (congr_arg Prod.fst heq1).symm
       have h2x := congr_arg Prod.fst heq2
@@ -1852,8 +1852,8 @@ theorem feedbackSCR_connectivity {n : Nat} (p : RSYParam n) :
     rw [hy1, hy2]
     exact congrArg (Sigma.mk 0) hip
   · intro x1 x2 y h1 h2
-    rcases Set.mem_setOf.mp h1 with ⟨op1, ip1, hpair1, heq1⟩
-    rcases Set.mem_setOf.mp h2 with ⟨op2, ip2, hpair2, heq2⟩
+    rcases Set.mem_ofPred.mp h1 with ⟨op1, ip1, hpair1, heq1⟩
+    rcases Set.mem_ofPred.mp h2 with ⟨op2, ip2, hpair2, heq2⟩
     have hip : ip1 = ip2 := by
       have h1y := (congr_arg Prod.snd heq1).symm
       have h2y := congr_arg Prod.snd heq2
@@ -1872,10 +1872,10 @@ theorem feedbackSCR_connectivity {n : Nat} (p : RSYParam n) :
         {x | ∃ y, (x, y) ∈ feedbackSCR_CSCR p.SCR} := by
       intro hmem
       obtain ⟨ip, hpair⟩ := hmem
-      rcases Set.mem_setOf.mp hpair with ⟨scrOp, scrIp, hp, heq'⟩
+      rcases Set.mem_ofPred.mp hpair with ⟨scrOp, scrIp, hp, heq'⟩
       have hop' : op = scrOp := congr_arg Sigma.snd (congr_arg Prod.fst heq')
       subst hop'
-      exact hopdom (Set.mem_setOf.mpr ⟨scrIp, hp⟩)
+      exact hopdom (Set.mem_ofPred.mpr ⟨scrIp, hp⟩)
     exact hnot (heq ▸ Set.mem_univ (⟨0, op⟩ : Σ (_ : Fin 1), openLoopOutputPort p.SCR))
   · intro heq
     obtain ⟨ip, hipdom⟩ := show ∃ ip, ip ∉ {y | ∃ x, (x, y) ∈ p.SCR.CSCR} from by
@@ -1886,10 +1886,10 @@ theorem feedbackSCR_connectivity {n : Nat} (p : RSYParam n) :
         {y | ∃ x, (x, y) ∈ feedbackSCR_CSCR p.SCR} := by
       intro hmem
       obtain ⟨op, hpair⟩ := hmem
-      rcases Set.mem_setOf.mp hpair with ⟨scrOp, scrIp, hp, heq'⟩
+      rcases Set.mem_ofPred.mp hpair with ⟨scrOp, scrIp, hp, heq'⟩
       have hip' : ip = scrIp := congr_arg Sigma.snd (congr_arg Prod.snd heq')
       subst hip'
-      exact hipdom (Set.mem_setOf.mpr ⟨scrOp, hp⟩)
+      exact hipdom (Set.mem_ofPred.mpr ⟨scrOp, hp⟩)
     exact hnot (heq ▸ Set.mem_univ (⟨0, ip⟩ : Σ (_ : Fin 1), openLoopInputPort p.SCR))
   · exact feedbackSCR_portCompatibility p
 
@@ -1907,38 +1907,38 @@ lemma mem_feedbackSCR_CSCR_iff {n : Nat} (SCR : SystemCouplingRecipe n)
     (⟨0, op⟩, ⟨0, ip⟩) ∈ feedbackSCR_CSCR SCR ↔ (op, ip) ∈ SCR.CSCR := by
   constructor
   · intro h
-    rcases Set.mem_setOf.mp h with ⟨scrOp, scrIp, hp, heq⟩
+    rcases Set.mem_ofPred.mp h with ⟨scrOp, scrIp, hp, heq⟩
     have hop : op = scrOp := congr_arg Sigma.snd (congr_arg Prod.fst heq)
     have hip : ip = scrIp := congr_arg Sigma.snd (congr_arg Prod.snd heq)
     simpa [hop, hip] using hp
   · intro hp
-    exact Set.mem_setOf.mpr ⟨op, ip, hp, rfl⟩
+    exact Set.mem_ofPred.mpr ⟨op, ip, hp, rfl⟩
 
 lemma mem_ciscr_feedbackSCR_iff {n : Nat} (p : RSYParam n) (ip : openLoopInputPort p.SCR) :
     (⟨0, ip⟩ : Σ (_ : Fin 1), openLoopInputPort p.SCR) ∈ CISCR (feedbackSCR p) ↔
       ip ∈ CISCR p.SCR := by
-  dsimp [CISCR, feedbackSCR, feedbackSCR_CSCR, Set.mem_setOf_eq]
+  dsimp [CISCR, feedbackSCR, feedbackSCR_CSCR, Set.mem_ofPred_eq]
   constructor
   · rintro ⟨op, hmem⟩
-    rcases Set.mem_setOf.mp hmem with ⟨scrOp, scrIp, hp, heq⟩
+    rcases Set.mem_ofPred.mp hmem with ⟨scrOp, scrIp, hp, heq⟩
     have hip : ip = scrIp := congr_arg Sigma.snd (congr_arg Prod.snd heq)
     subst hip
     exact ⟨scrOp, hp⟩
   · rintro ⟨scrOp, hp⟩
-    exact ⟨⟨0, scrOp⟩, Set.mem_setOf.mpr ⟨scrOp, ip, hp, rfl⟩⟩
+    exact ⟨⟨0, scrOp⟩, Set.mem_ofPred.mpr ⟨scrOp, ip, hp, rfl⟩⟩
 
 lemma mem_coscr_feedbackSCR_iff {n : Nat} (p : RSYParam n) (op : openLoopOutputPort p.SCR) :
     (⟨0, op⟩ : Σ (_ : Fin 1), openLoopOutputPort p.SCR) ∈ COSCR (feedbackSCR p) ↔
       op ∈ COSCR p.SCR := by
-  dsimp [COSCR, feedbackSCR, feedbackSCR_CSCR, Set.mem_setOf_eq]
+  dsimp [COSCR, feedbackSCR, feedbackSCR_CSCR, Set.mem_ofPred_eq]
   constructor
   · rintro ⟨ip, hmem⟩
-    rcases Set.mem_setOf.mp hmem with ⟨scrOp, scrIp, hp, heq⟩
+    rcases Set.mem_ofPred.mp hmem with ⟨scrOp, scrIp, hp, heq⟩
     have hop : op = scrOp := congr_arg Sigma.snd (congr_arg Prod.fst heq)
     subst hop
     exact ⟨scrIp, hp⟩
   · rintro ⟨scrIp, hp⟩
-    exact ⟨⟨0, scrIp⟩, Set.mem_setOf.mpr ⟨op, scrIp, hp, rfl⟩⟩
+    exact ⟨⟨0, scrIp⟩, Set.mem_ofPred.mpr ⟨op, scrIp, hp, rfl⟩⟩
 
 lemma mem_uiscr_feedbackSCR {n : Nat} (p : RSYParam n) (ip : openLoopInputPort p.SCR) :
     (⟨0, ip⟩ : Σ (_ : Fin 1), openLoopInputPort p.SCR) ∈ UISCR (feedbackSCR p) ↔
@@ -2136,28 +2136,32 @@ theorem rsy_feedback_NZ_eq {n : Nat} (p : RSYParam n) (x : rsy_SZ p.SCR)
     by_cases hU : ⟨i, port⟩ ∈ UISCR p.SCR
     · have hU_fb := (mem_uiscr_feedbackSCR p ⟨i, port⟩).mpr hU
       rw [rsy_component_input_uiscr p.SCR p.hOut i extIn x port hU]
-      dsimp [rsy_component_input_fun, rsyIZ_to_feedbackIZ, feedbackSCR, openLoopInputPort]
-      split_ifs with hl
-      · rfl
-      · exact absurd hU_fb hl
+      change extIn ⟨⟨i, port⟩, hU⟩ =
+        rsy_component_input_fun (feedbackSCR p) (feedbackRSYParam p).hOut 0
+          (rsyIZ_to_feedbackIZ p extIn) (feedbackStateEmb p x) ⟨i, port⟩
+      rw [rsy_component_input_uiscr (feedbackSCR p) (feedbackRSYParam p).hOut 0
+        (rsyIZ_to_feedbackIZ p extIn) (feedbackStateEmb p x) ⟨i, port⟩ hU_fb]
+      rfl
     · have hC : ⟨i, port⟩ ∈ CISCR p.SCR := by simpa [UISCR, Set.mem_compl_iff] using hU
       have hC_fb := (mem_ciscr_feedbackSCR_iff p ⟨i, port⟩).mpr hC
-      have hnot_fb : ⟨0, ⟨i, port⟩⟩ ∉ UISCR (feedbackSCR p) := fun hmem =>
-        hU ((mem_uiscr_feedbackSCR p ⟨i, port⟩).mp hmem)
       rw [rsy_component_input_ciscr p.SCR p.hOut i extIn x port hC]
-      dsimp [rsy_component_input_fun, rsyIZ_to_feedbackIZ, feedbackSCR, openLoopInputPort]
-      split_ifs with h
-      · exact absurd h hnot_fb
+      change _ =
+        rsy_component_input_fun (feedbackSCR p) (feedbackRSYParam p).hOut 0
+          (rsyIZ_to_feedbackIZ p extIn) (feedbackStateEmb p x) ⟨i, port⟩
+      rw [rsy_component_input_ciscr (feedbackSCR p) (feedbackRSYParam p).hOut 0
+        (rsyIZ_to_feedbackIZ p extIn) (feedbackStateEmb p x) ⟨i, port⟩ hC_fb]
       let op_scr := connectedOutput p.SCR ⟨i, port⟩ hC
       let op_fb := connectedOutput (feedbackSCR p) ⟨0, ⟨i, port⟩⟩ hC_fb
       have hop_scr := connectedOutput_spec p.SCR ⟨i, port⟩ hC
       have hop_fb := connectedOutput_spec (feedbackSCR p) ⟨0, ⟨i, port⟩⟩ hC_fb
       have hcomp_scr := p.SCR.connectivity.2.2.2 op_scr ⟨i, port⟩ hop_scr
-      have hcomp_fb := (feedbackSCR p).connectivity.2.2.2 op_fb ⟨0, ⟨i, port⟩⟩ hop_fb
+      have hcomp_fb := (feedbackSCR p).connectivity.2.2.2 op_fb ⟨0, ⟨i, port⟩⟩ (connectedOutput_spec (feedbackSCR p) ⟨0, ⟨i, port⟩⟩ hC_fb)
       have hop_eq : op_fb = ⟨0, op_scr⟩ :=
-        (feedbackSCR p).connectivity.1.2 op_fb ⟨0, op_scr⟩ ⟨0, ⟨i, port⟩⟩ hop_fb
+        (feedbackSCR p).connectivity.1.2 op_fb ⟨0, op_scr⟩ ⟨0, ⟨i, port⟩⟩
+          (connectedOutput_spec (feedbackSCR p) ⟨0, ⟨i, port⟩⟩ hC_fb)
           ((mem_feedbackSCR_CSCR_iff p.SCR op_scr ⟨i, port⟩).mpr hop_scr)
-      have hop_fb_at : (⟨0, op_scr⟩, ⟨0, ⟨i, port⟩⟩) ∈ (feedbackSCR p).CSCR := hop_eq ▸ hop_fb
+      have hop_fb_at : (⟨0, op_scr⟩, ⟨0, ⟨i, port⟩⟩) ∈ (feedbackSCR p).CSCR :=
+        hop_eq ▸ (connectedOutput_spec (feedbackSCR p) ⟨0, ⟨i, port⟩⟩ hC_fb)
       have hcomp_fb_at :=
         (feedbackSCR p).connectivity.2.2.2 ⟨0, op_scr⟩ ⟨0, ⟨i, port⟩⟩ hop_fb_at
       have hchoose := Trajectory.choose_alwaysOutputs ((openLoopPortVector p).Z 0)
@@ -2185,15 +2189,10 @@ theorem rsy_feedback_NZ_eq {n : Nat} (p : RSYParam n) (x : rsy_SZ p.SCR)
           hcomp_fb_at ▸ rsyOutAt (feedbackSCR p) (feedbackRSYParam p).hOut (feedbackStateEmb p x)
               ⟨0, op_scr⟩ =
             hcomp_fb ▸ rsyOutAt (feedbackSCR p) (feedbackRSYParam p).hOut (feedbackStateEmb p x) op_fb := by
-        have hreadout :=
-          rsyOutAt_feedback_op_transport p x (op₁ := ⟨0, op_scr⟩) (op₂ := op_fb) hop_eq.symm
-        apply Eq.symm
-        trans hcomp_fb ▸ (hop_eq.symm ▸ rsyOutAt (feedbackSCR p) (feedbackRSYParam p).hOut
-            (feedbackStateEmb p x) ⟨0, op_scr⟩)
-        · exact congrArg (fun v => hcomp_fb ▸ v) (Eq.symm hreadout)
-        · dsimp [PortCompatibility, openLoopPortVector, rsyOutAt, feedbackSCR, feedbackStateEmb, csyOut,
-            hcomp_fb, hcomp_fb_at, hop_fb_at]
-          simp only [eqRec_eq_cast, cast_cast]
+        revert hcomp_fb
+        rw [hop_eq]
+        intro hcomp_fb'
+        rfl
       exact step_scr_conn.trans (step_scr_port.trans (step_fb_port.trans step_fb_conn))
 
 noncomputable def scrOutValOfFeedback {n : Nat} (p : RSYParam n) (op : UnconnOutPort p.SCR)

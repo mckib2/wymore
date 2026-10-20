@@ -243,8 +243,6 @@ noncomputable def nextState (x : D.State) (p : D.Input) : D.State := by
     (D.mode.timeIndex (D.stateProjection x) (D.inputProjection p))
   refine ⟨y, ?_⟩
   refine ⟨ZM.NZ (D.stateProjection x) (some (D.inputProjection p)), ?_⟩
-  change D.hom.HS y =
-    D.mode.stateMap (ZM.NZ (D.stateProjection x) (some (D.inputProjection p)))
   rw [D.mode.transition]
   rw [homomorphicImage_preserves_state_trajectory D.hom x.val
     (liftInput (D.behaviorInput x p))]
@@ -453,8 +451,6 @@ noncomputable def cnsNextState (hinput : HasConstantInput D.mode)
     (D.mode.timeIndex (D.stateProjection x) (D.inputProjection p))
   refine ⟨y, ?_⟩
   refine ⟨ZM.NZ (D.stateProjection x) (some (D.inputProjection p)), ?_⟩
-  change D.hom.HS y =
-    D.mode.stateMap (ZM.NZ (D.stateProjection x) (some (D.inputProjection p)))
   rw [D.mode.transition]
   rw [homomorphicImage_preserves_state_trajectory D.hom x.val
     (liftInput (D.cnsFiberInput x p))]

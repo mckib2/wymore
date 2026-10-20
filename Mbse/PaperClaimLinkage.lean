@@ -217,6 +217,10 @@ theorem audit_solverWitness :
 Cotyledon bridge.  `Φ` yields `Implements`.  Identity-boundary `IOR` transfer extracts the
 homomorphism from `Φ` and then applies Theorem 6.58; the identity equations are extra.
 Non-identity port maps use `satisfies_ior_transported`, not Theorem 6.58.
+
+Mode-level packages: `implements_of_mode_satisfies_phiDyn` lifts a mode's `Φ_dyn` satisfaction
+to Def. 5.71; `mode_satisfies_phiIOR_iff_exists_fsd_hom` is the Φ_IOR equivalence whose
+constructive witness may be the mode itself as `D_f` with identity maps.
 -/
 theorem audit_cotyledonBridge :
     (∀ {S1 S2 IR OR : Type} {Z_spec : DiscreteSystem S1 IR OR} {Z_impl : DiscreteSystem S2 IR OR}
@@ -229,10 +233,25 @@ theorem audit_cotyledonBridge :
         WymoreRequirements.SatisfiesIOR Z_impl IOR DSZ_impl T) ∧
     (∀ {S1 I1 O1 S2 I2 O2 : Type} {Z_spec : DiscreteSystem S1 I1 O1} {Z_impl : DiscreteSystem S2 I2 O2},
       SystemSatisfiesPartialDynamicsHom Z_spec Z_impl →
-        Nonempty (WymoreImplementation.Implements Z_spec Z_impl)) :=
+        Nonempty (WymoreImplementation.Implements Z_spec Z_impl)) ∧
+    (∀ {S1 I1 O1 SM IM OM S2 I2 O2 : Type}
+      {Z_spec : DiscreteSystem S1 I1 O1} {ZM : DiscreteSystem SM IM OM}
+      {Z_b : DiscreteSystem S2 I2 O2},
+      WymoreSystemModes.SystemMode ZM Z_b →
+      SystemSatisfiesPartialDynamicsHom Z_spec ZM →
+        Nonempty (WymoreImplementation.Implements Z_spec Z_b)) ∧
+    (∀ {SM IR OR : Type} (ZM : DiscreteSystem SM IR OR)
+      (IOR : WymoreRequirements.InputOutputRequirement IR OR) (s0 : SM) (T : Set Time),
+      IORTemporalFragment.Satisfies ZM (IORTemporalFragment.ofIOR IOR) s0 T ↔
+        ∃ (fsd : WymoreRequirements.FunctionalSystemDesign IOR)
+          (w : HomomorphicImageWitness fsd.Z ZM),
+          w.HI = id ∧ w.HO = id ∧ w.HS s0 = fsd.DSZ ∧ fsd.TSZ = T) :=
   ⟨fun hPhi hHI hHO IOR DSZ_impl T hSpec =>
     AssertionalCotyledonBridge.satisfies_ior_of_phi_idIO hPhi hHI hHO IOR DSZ_impl T hSpec,
-   fun hPhi => AssertionalCotyledonBridge.implements_of_partialDynamicsHom hPhi⟩
+   fun hPhi => AssertionalCotyledonBridge.implements_of_partialDynamicsHom hPhi,
+   fun M hPhi => AssertionalCotyledonBridge.implements_of_mode_satisfies_phiDyn M hPhi,
+   fun ZM IOR s0 T =>
+     AssertionalCotyledonBridge.mode_satisfies_phiIOR_iff_exists_fsd_hom ZM IOR s0 T⟩
 
 /--
 Case study.  The two-zone variant catalog is not this audit: the machine is tape, head, state
@@ -240,8 +259,13 @@ register, and instruction table, and that catalog describes a different recipe. 
 here is streaming run-length encoding of an infinite bit trajectory.  The wired resultant
 realises its pipeline reference exactly when it satisfies the fragment; the table-level phase
 re-encoding does not change the verdict; a stuck head is rejected; and the same four-component
-resultant is both buildable and paired with the pipeline IOR as an implementable design.
+resultant is both buildable and paired with the pipeline IOR as an implementable design
+(**resultant-level** Def. 5.71 via primary self-mode — not the Python checker's reachable mode
+or its reported state cardinalities).
 The trace `0,0,1` and the count cap are finite readings of the same step, not second algorithms.
+
+Matched-tick flip-bit nonconformance lives in `audit_tickGranularity`; it is not the Python
+solver row `rle-mismatched-1tick` (pipeline-hold LTL failure).
 -/
 theorem audit_runLength :
     (SystemSatisfiesPartialDynamicsHom RunLengthMachine.pipelineRef
@@ -265,5 +289,22 @@ theorem audit_runLength :
     ⟨AssertionalCotyledonBridge.rle_in_isr⟩,
     RunLengthMachine.pipeline_trace_001,
     RunLengthMachine.rleStep_cap_eq (by decide : RunLengthMachine.rleInit.count < 4)⟩
+
+/--
+Finite-tape / bounded-count RLE refinement.  For every capacity `N > 0`, the finite resultant
+satisfies the pipeline fragment, is finite, and inhabits the implementability cotyledon.
+Same resultant-level self-mode honesty note as `audit_runLength`.
+-/
+theorem audit_rleFin :
+    (∀ (N : Nat) (hN : 0 < N),
+      SystemSatisfiesPartialDynamicsHom (RunLengthMachine.pipelineFinRef N hN)
+        (RunLengthMachine.rleFinResultant N hN)) ∧
+    (∀ (N : Nat) (hN : 0 < N), IsFinite (RunLengthMachine.rleFinResultant N hN)) ∧
+    (∀ (N : Nat) (hN : 0 < N),
+      Nonempty (WymoreTechnology.ImplementableSystemDesign
+        (RunLengthMachine.pipelineFinIOR N hN) (RunLengthMachine.rleFinTechnology N hN))) :=
+  ⟨fun N hN => RunLengthMachine.rleFinResultant_satisfies_pipelineFin_fragment N hN,
+    fun N hN => RunLengthMachine.rleFinResultant_isFinite N hN,
+    fun N hN => ⟨AssertionalCotyledonBridge.rleFin_in_isr N hN⟩⟩
 
 end BlockerAudit

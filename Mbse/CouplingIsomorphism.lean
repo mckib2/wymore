@@ -62,7 +62,7 @@ theorem reindex_connectivity {n : Nat} (SCR : SystemCouplingRecipe n) (F : Fin n
   · intro hall
     apply hdom
     ext x
-    simp only [Set.mem_setOf_eq, Set.mem_univ, iff_true]
+    simp only [Set.mem_ofPred_eq, Set.mem_univ, iff_true]
     have : (reindexOutTag SCR.VSCR F).symm x ∈ { x | ∃ y, (x, y) ∈ reindexCSCR SCR F } := by
       rw [hall]; trivial
     refine ⟨reindexInTag SCR.VSCR F this.choose, ?_⟩
@@ -71,7 +71,7 @@ theorem reindex_connectivity {n : Nat} (SCR : SystemCouplingRecipe n) (F : Fin n
   · intro hall
     apply hrng
     ext y
-    simp only [Set.mem_setOf_eq, Set.mem_univ, iff_true]
+    simp only [Set.mem_ofPred_eq, Set.mem_univ, iff_true]
     have : (reindexInTag SCR.VSCR F).symm y ∈ { y | ∃ x, (x, y) ∈ reindexCSCR SCR F } := by
       rw [hall]; trivial
     refine ⟨reindexOutTag SCR.VSCR F this.choose, ?_⟩
@@ -167,7 +167,10 @@ theorem reindex_component_input {n : Nat} (SCR : SystemCouplingRecipe n) (F : Fi
   by_cases hU : (⟨i, port⟩ : Σ j, (reindexRecipe SCR F).VSCR.Port j) ∈ UISCR (reindexRecipe SCR F)
   · have hU' : (⟨F i, port⟩ : Σ j, SCR.VSCR.Port j) ∈ UISCR SCR :=
       (reindex_mem_uiscr SCR F _).mp hU
-    rw [rsy_component_input_uiscr _ _ _ _ _ _ hU, rsy_component_input_uiscr _ _ _ _ _ _ hU']
+    have h1 := rsy_component_input_uiscr (reindexRecipe SCR F) (fun k => hOut (F k)) i
+      (reindexHI SCR F extIn) (reindexHS SCR F x) port hU
+    have h2 := rsy_component_input_uiscr SCR hOut (F i) extIn x port hU'
+    rw [h1, h2]
     rfl
   · have hC : (⟨i, port⟩ : Σ j, (reindexRecipe SCR F).VSCR.Port j) ∈
         CISCR (reindexRecipe SCR F) :=
@@ -320,9 +323,8 @@ theorem elab_readout {n : Nat} {SCR : SystemCouplingRecipe n} (E : Componentwise
     (E.outPorts op.1).port op.2 (rsyOutAt (elabRecipe E) hOut2 y op) =
       rsyOutAt SCR hOut1 (fun i => (E.hom i).HS (y i)) op := by
   obtain ⟨i, q⟩ := op
-  simpa [rsyOutAt_eq_componentReadoutAt] using
-    alwaysOutputs_port_readout (SCR.VSCR.Z i) (E.Z i) (E.hom i).HS (E.hom i).HO
-      (E.outPorts i) (hOut1 i) (hOut2 i) (E.hom i).preserves_readout (y i) q
+  exact alwaysOutputs_port_readout (SCR.VSCR.Z i) (E.Z i) (E.hom i).HS (E.hom i).HO
+    (E.outPorts i) (hOut1 i) (hOut2 i) (E.hom i).preserves_readout (y i) q
 
 /-- Componentwise resolved inputs intertwine with the port homomorphisms. -/
 theorem elab_component_input {n : Nat} {SCR : SystemCouplingRecipe n}
@@ -576,7 +578,7 @@ theorem elimOutTag_injective {n m : Nat} {SCR : SystemCouplingRecipe n}
   rintro ⟨i, p⟩ ⟨j, q⟩ h
   have hij : i = j := E.inj (congrArg Sigma.fst h)
   subst hij
-  have hpq : p = q := by simpa [elimOutTag] using h
+  have hpq : p = q := eq_of_heq (Sigma.mk.inj_iff.mp h).2
   simp [hpq]
 
 theorem elimInTag_injective {n m : Nat} {SCR : SystemCouplingRecipe n}
@@ -584,7 +586,7 @@ theorem elimInTag_injective {n m : Nat} {SCR : SystemCouplingRecipe n}
   rintro ⟨i, p⟩ ⟨j, q⟩ h
   have hij : i = j := E.inj (congrArg Sigma.fst h)
   subst hij
-  have hpq : p = q := by simpa [elimInTag] using h
+  have hpq : p = q := eq_of_heq (Sigma.mk.inj_iff.mp h).2
   simp [hpq]
 
 /-- Every tagged output port of a retained component comes from `VSCR$`. -/
@@ -770,7 +772,10 @@ theorem elim_component_input {n m : Nat} {SCR : SystemCouplingRecipe n}
   by_cases hU : (⟨i, port⟩ : Σ j, (elimRecipe E).VSCR.Port j) ∈ UISCR (elimRecipe E)
   · have hU' : (⟨E.ι i, port⟩ : Σ j, SCR.VSCR.Port j) ∈ UISCR SCR :=
       (elim_mem_uiscr E _).mp hU
-    rw [rsy_component_input_uiscr _ _ _ _ _ _ hU, rsy_component_input_uiscr _ _ _ _ _ _ hU']
+    have h1 := rsy_component_input_uiscr (elimRecipe E) (fun k => hOut (E.ι k)) i
+      (elimHI E extIn) (elimHS E x) port hU
+    have h2 := rsy_component_input_uiscr SCR hOut (E.ι i) extIn x port hU'
+    rw [h1, h2]
     rfl
   · have hC : (⟨i, port⟩ : Σ j, (elimRecipe E).VSCR.Port j) ∈ CISCR (elimRecipe E) := by
       simpa [UISCR, Set.mem_compl_iff] using hU

@@ -294,8 +294,11 @@ theorem elabZ_distinct (i j : Fin 2) (hne : i ≠ j) : ¬ HEq (elabZ Γ Λ M i) 
     exact not_heq_of_infinite_finite _ _
   fin_cases i <;> fin_cases j
   · exact absurd rfl hne
-  · simpa using key
-  · simpa using fun h => key (HEq.symm h)
+  · -- `elabZ 0` / `elabZ 1` are `Fin.cases` of the two zones.
+    simp only [elabZ]
+    exact key
+  · simp only [elabZ]
+    exact fun h => key (HEq.symm h)
   · exact absurd rfl hne
 
 /-- Componentwise homomorphisms: forget the counter, decode the control state. -/

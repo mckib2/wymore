@@ -117,7 +117,7 @@ lemma rsy_component_input_at_eq_trajectory {n : Nat} (SCR : SystemCouplingRecipe
     (port : SCR.VSCR.Port i) :
     rsy_component_input_at SCR hOut i f x t port =
       (rsy_component_input_trajectory SCR hOut i f x t).get rfl port := by
-  dsimp [rsy_component_input_at, rsy_component_input_trajectory, rsyClosedLoopLiftInput, liftInput]
+  rfl
 
 theorem rsy_state_trajectory {n : Nat} (SCR : SystemCouplingRecipe n)
     (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k)) (x : rsyClosedLoopSZ SCR)
@@ -167,9 +167,8 @@ theorem rsy_output_trajectory {n : Nat} (SCR : SystemCouplingRecipe n)
     congrArg (fun g => g B') (Trajectory.choose_alwaysOutputs (SCR.VSCR.Z i) (hOut i) s ho)
   have hfinal : rsyOutAt SCR hOut (generateStateTrajectory (rsy SCR hOut) x (rsyClosedLoopLiftInput SCR f) t) ⟨i, B'⟩ = o B' :=
     hout.trans hchoose
-  dsimp [rsy] at hfinal
-  simp only [generateOutputTrajectory, rsy, rsy_RZ, Option.map_some, ho, Subtype.coe_mk, s]
-  rw [hfinal]
+  simp only [generateOutputTrajectory, rsy, rsy_RZ, Option.map_some, ho, s] at hfinal ⊢
+  exact congrArg some hfinal
 
 theorem rsy_closed_loop_state_trajectory {n : Nat} (p : RSYParam n)
     (x : rsyClosedLoopSZ p.SCR) (f : rsyClosedLoopITZ p.SCR) (t : Time) :
@@ -493,7 +492,12 @@ lemma cfscr_open_loop_state_eq_build {n : Nat} (SCR : SystemCouplingRecipe n)
   induction t with
   | zero => rfl
   | succ t ih =>
-    rw [generateStateTrajectory_succ, cfscrBuild_succ, ih, rsy_open_loop_is_csy SCR hOut]
+    rw [cfscrBuild_succ]
+    change (rsy_open_loop_system SCR hOut).NZ
+      (generateStateTrajectory (rsy_open_loop_system SCR hOut) x
+        (rsyOpenLoopLiftInput SCR (cfscr SCR hOut f x)) t)
+      (rsyOpenLoopLiftInput SCR (cfscr SCR hOut f x) t) = _
+    rw [ih, rsy_open_loop_is_csy SCR hOut]
     funext i
     simp only [csy, rsyOpenLoopLiftInput, liftInput, Option.map_some, cfscr]
     refine congr_arg (fun opt => (SCR.VSCR.Z i).NZ (cfscrBuild SCR hOut f x t i) opt) (congrArg some ?_)
@@ -654,17 +658,17 @@ theorem conjunctive_rsy_agrees_csy {n : Nat} (SCR : SystemCouplingRecipe n)
   Singular recipes are conjunctive; `CFSCR(f,x) = f` after open-loop identification.
 -/
 theorem singular_cfscr_eq_closed_loop_trajectory {V : PortSystemVector 1}
-    [∀ i p, Inhabited (V.PortVal i p)]
+    [inst : ∀ i p, Inhabited (V.PortVal i p)]
     (hOutNE : Nonempty (Σ (i : Fin 1), V.OutPort i))
     (hInNE : Nonempty (Σ (i : Fin 1), V.Port i))
     (hOut : ∀ i, AlwaysOutputs (V.Z i))
     (f : rsyClosedLoopITZ (singularSCR V hOutNE hInNE))
     (x : rsy_SZ (singularSCR V hOutNE hInNE)) :
-    cfscr (singularSCR V hOutNE hInNE) hOut f x =
+    @cfscr 1 (singularSCR V hOutNE hInNE) inst hOut f x =
       conjunctiveClosedLoopAsOpenLoop (singularSCR V hOutNE hInNE)
-        (singularSCR_is_conjunctive V hOutNE hInNE) f := by
-  let SCR := singularSCR V hOutNE hInNE
-  exact conjunctive_cfscr_eq_closed_loop_trajectory SCR (singularSCR_is_conjunctive V hOutNE hInNE) hOut f x
+        (singularSCR_is_conjunctive V hOutNE hInNE) f :=
+  @conjunctive_cfscr_eq_closed_loop_trajectory 1 (singularSCR V hOutNE hInNE) inst
+    (singularSCR_is_conjunctive V hOutNE hInNE) hOut f x
 
 /--
   [textbook/exercise3.132/theorem/singular_rsy_eq_component]

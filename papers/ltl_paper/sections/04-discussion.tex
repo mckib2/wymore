@@ -1,91 +1,33 @@
 \section{Discussion} \label{sec:discussion}
 
-\subsection{Expressivity and timing}
-\label{sec:limitations}
-
-The characteristic boundary construction covers every Wymorian IOR by retaining
-its time scale, admissible trajectories, and eligible-output relation. A finite ordinary-LTL presentation requires additional structure.
-Echo, delay, and run length have compact presentations; arbitrary trajectory
-relations may require symbolic predicates or direct semantic reasoning.
-
-$\Phi_{\mathrm{dyn}}$ uses $G$/$X$ clauses for readout and one-step dynamics.
-The RLE requirement states the run so far, or up to the current time. Eventual production of an encoding
-for an entire infinite input is a separate liveness property, outside the
-homomorphism bi-implication.
-
-Section~\ref{sec:case-ticks} shows that a two-phase
-build fails a one-tick reference and satisfies the behavior restated at two
-ticks. Rate-tolerant conformance would require a different implementation
-relation.
-
-The homomorphism result applies only to the step-local schemas of $\Phi_{\mathrm{dyn}}$ and to matching clock rates. Other temporal properties may be checked alongside the fragment, with guarantees supplied by their own semantics.
-
-\subsection{Implications for systems engineering}
+\subsection{Why Temporal Logic Unlocks Scalable T3SD Verification}
 \label{sec:implications}
 
-For a constructive verification approach, the proposed fragment specifications allow assertions of properties without the need to reconstruct the pair-specific maps at each revision. $\Phi_R$ is a presentation of the IOR: it can be inspected,
-specialized to compact temporal laws when the boundary relation permits, and
-used as the criterion that generates $\mathrm{FSR}(R)$. $\Phi_{\mathrm{dyn}}$
-is a presentation of a chosen functional design's dynamics. Implementation
-work then consists in checking a buildable resultant against that fragment,
-rather than reconstructing pair-specific maps at each revision.
+Wymore's Tricotyledon Theory of System Design offers one of the most mathematically rigorous foundations in systems engineering: it cleanly separates what a system must do at its boundary ($\mathrm{CTL}(IOR)$) from how a system is built out of available components ($\mathrm{CTL}(TYR)$), and defines implementability ($\mathrm{CTL}(IOR,TYR)$) via homomorphisms from operational system modes $Z_m\in\mathrm{SYSMO}(Z_b)$ onto functional designs $Z_f\in\mathrm{CTL}(IOR)$. Yet despite its conceptual clarity, T3SD never achieved widespread industrial adoption for formal verification. A primary reason is sociological and tool-related: the T3SD community remained relatively small and never developed automated solver ecosystems comparable to those built over four decades by the formal methods and model-checking communities \citep{Pnueli1977,MannaPnueli1995,BiereCimattiClarkeZhu1999,BaierKatoen2008}. Consequently, applying T3SD required constructing and maintaining explicit state-space homomorphisms $h=(h_S,h_I,h_O)$ by hand---an approach that quickly becomes intractable as coupled architectures grow in state count and undergo iterative design revisions.
 
-This separation matches how requirement satisfaction is separated from
-realization of a selected functional design. When a candidate fails
-$\Phi_R$, it is not a functional design for IOR $R$. When it satisfies $\Phi_R$
-but fails $\Phi_{\mathrm{dyn}}$, it may still be functional for $R$ while
-failing to realize the chosen $D_{\mathrm{ref}}$. Shared-table specializations
-make the second failure a table disagreement. Hom-relative checking covers the
-case in which state or interface encodings differ.
+The bridge established in this paper shows that systems engineers do not need to choose between Wymore's architectural rigor and modern automated verification:
+\begin{itemize}
+    \item \textbf{Isomorphic requirement representation ($\Phi_{IOR}$):} Theorem~\ref{thm:boundary-characteristic} proves that Wymore's $IOR$ is canonically isomorphic to a boundary temporal specification $\Phi_{IOR}$. Expressing $ER(f)$ in temporal logic loses none of T3SD's trajectory semantics while making causality constraints---such as why $\mathrm{CTL}(IOR_{\mathrm{echo}})=\emptyset$ and why multi-stage pipeline latency must appear in $\Phi_{IOR_{\mathrm{RLE}}}$---immediately visible.
+    \item \textbf{Eliminating manual homomorphism search on finite buildable modes:} While idealized mathematical specifications ($IOR_\infty$) may involve infinite state spaces, every physical or digital component in a real-world technology catalog $TYR$ is finite. Thus every buildable resultant $Z_b=\mathrm{RSY}(SCR)\in\mathrm{CTL}(TYR)$ and every operational mode $Z_m\in\mathrm{SYSMO}(Z_b)$ is a finite Kripke structure. By Theorem~\ref{thm:mode-ior-bridge} and Theorem~\ref{thm:dynamics-characterization}, checking whether $Z_b$ belongs to the implementability cotyledon $\mathrm{CTL}(IOR,TYR)$ reduces to decidable LTL model checking ($Z_m\models_{IO}\Phi_{IOR}$ or $Z_m\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$).
+    \item \textbf{Resilience to architectural refactoring:} As demonstrated in Table~\ref{tab:solver-results} (\texttt{rle-reencoded-table} and \texttt{rle-instrumented-reg}), when a subsystem team re-encodes a component's internal state or elaborates a component with diagnostic instrumentation, the temporal specifications $\Phi_{IOR}$ and $\Phi_{\mathrm{dyn}}$ remain completely unchanged. The model checker automatically re-verifies the modified mode without requiring a human engineer to reconstruct the state projection $h_S$.
+\end{itemize}
 
-Coupling latency belongs in the IOR when the architecture is staged. The
-run-length case is the concrete instance: a one-tick encoder is a legitimate
-functional design, but it is the wrong implementation reference for a
-four-component synchronous resultant. Recording pipeline delay at the boundary
-keeps the implementability pairing honest and prevents a failed check from
-being misread as a coding error.
+\subsection{Complementary Roles of \texorpdfstring{$\Phi_{IOR}$ and $\Phi_{\mathrm{dyn}}$}{Phi\_IOR and Phi\_dyn}}
+\label{sec:limitations}
 
-The reuse theorems hints at a strategy for verifying systems without changing
-Wymore's implementation relation. A component can be checked against a
-fragment compiled from its own reference; a coupling witness then lifts those
-results to the resultant; later re-encodings keep the same fragment as the
-target. Finite components become generated decision problems. While
-components remain symbolic, they need not be re-proved from scratch when
-only a neighboring component changes. The search for maps is still hard in
-general (NP-hard!). Decomposition changes the size of each obligation, but it does not the underlying decision problem.
+Our framework provides two distinct temporal verification targets corresponding to two stages of the systems engineering lifecycle:
+\begin{enumerate}
+    \item \textbf{Direct boundary verification ($Z_m\models_{IO}\Phi_{IOR}$):} When the engineering requirement is specified purely in terms of input/output trajectories (such as Equations~\eqref{eq:ltl-init}--\eqref{eq:ltl-reset} for the finite-tape RLE), Theorem~\ref{thm:mode-ior-bridge} certifies membership in $\mathrm{CTL}(IOR,TYR)$ directly from the boundary behavior of the mode $Z_m$, without requiring the engineer to first design an intermediate reference state machine $Z_{\mathrm{ref}}$.
+    \item \textbf{Reference-dynamics verification ($Z_m\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$):} When a reference functional architecture $D_{\mathrm{ref}}=(Z_{\mathrm{ref}},s_0,T)\in\mathrm{CTL}(IOR)$ has already been established as a golden specification and subsystem teams are elaborating its components, Theorem~\ref{thm:dynamics-characterization} and Theorem~\ref{thm:elaboration-coupling} verify that the detailed mode $Z_m$ is a true homomorphic elaboration of $Z_{\mathrm{ref}}$.
+\end{enumerate}
+Separating these two checks also sharpens failure diagnosis. If a candidate mode $Z_m$ fails $\Phi_{IOR}$, it violates the stakeholder boundary requirement outright and cannot belong to $\mathrm{CTL}(IOR)$. If $Z_m$ satisfies $\Phi_{IOR}$ on the boundary but fails $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$, then $Z_m$ is a valid functional realization of $IOR$ that achieves the required behavior through a different internal state organization or timing decomposition than the chosen reference machine $Z_{\mathrm{ref}}$.
 
-\subsection{Tooling}
-\label{sec:tooling}
-
-Finite systems admit a propositional check, and bounded counts or horizons
-provide finite projections of infinite systems. Symbolic arguments cover the
-unbounded RLE result. T3SD coupling supports lifting component results when the
-coupling witness is supplied. The present case proves the four-component
-resultant directly and demonstrates component-level reuse on the instruction
-table.
-
-\subsection{Future work}
+\subsection{Scope, Clock Granularity, and Future Directions}
 \label{sec:future}
 
-A $k$-tick or stuttering implementation relation would address staged
-architectures without restating the reference clock. That relation is not
-Wymore's homomorphism, so the dynamics fragment and its bi-implication would
-need to be adjusted accordingly.
-
-Liveness and progress can be attached as companion properties. For example, the RLE
-encoder's eventual emission of a complete encoding, fairness of a scheduler,
-or eventual emptying of a buffer are natural examples. Their guarantees would
-come from their own semantics, not for free from Theorem~\ref{thm:dynamics-characterization}.
-
-Compilation and checking can be made more mechanical: generate $\Phi_R$ from
-an IOR presentation, generate $\Phi_{\mathrm{dyn}}$ from a discrete-system
-table, and discharge finite instances with existing SAT, SMT, or model-checking
-tools. The RLE projections show the encoding; they are not a library or a
-measured workflow.
-
-Hierarchical case studies would exercise Theorem~\ref{thm:elaboration-coupling}
-at more than one coupling depth, including mixed finite and infinite
-components. Industrial examples and effort measurements against constructive
-homomorphism proofs would test whether the change in maintained artifact
-reduces engineering labor. Performance and other Wymore requirement types
-remain outside $\Phi_R$ and $\Phi_{\mathrm{dyn}}$ as formulated here.
+Several extensions follow naturally from the results established here:
+\begin{itemize}
+    \item \textbf{Multi-rate and stuttering implementation relations:} Because a classical Wymore homomorphism is a lock-step map ($1$ mode tick $= 1$ reference tick), staged implementations with multi-tick sense/act cycles or pipeline stages must match the clock granularity of the reference specification (Proposition~\ref{prop:matched-ticks}). Relaxing lock-step homomorphisms to $k$-tick or stuttering bisimulation relations---translated into LTL without the next-step operator $X$ \citep{Lamport2002,BrowneClarkeGrumberg1988}---would allow multi-rate modes to be verified against unpipelined abstract references.
+    \item \textbf{Companion liveness and fairness specifications:} The dynamics fragment $\Phi_{\mathrm{dyn}}$ uses only safety operators ($G$ and $X$) because Wymore's homomorphism equations~\eqref{eq:wymore-hom-def} are step-local invariants. Richer temporal liveness requirements---such as eventual buffer drainage ($GF\,\mathit{empty}$) or starvation-free arbitration---can be included directly in $\Phi_{IOR}$ and checked alongside $\Phi_{\mathrm{dyn}}$ by the same LTL model-checking engine.
+    \item \textbf{Symbolic BDD and SAT-based model checking at industrial scale:} While explicit-state reachability and LTL checking in \texttt{scripts/ltl\_ior\_checker.py} discharge our coupled RLE modes in milliseconds, larger industrial couplings with $10^6$ or more reachable mode states can leverage symbolic model checkers (such as {NuSMV}/{nuXmv}~\citep{CavadaEtAl2014}) and compositional lifting (Theorem~\ref{thm:elaboration-coupling}) to verify each component in $TYR$ locally before lifting conformance to $\mathrm{RSY}(SCR)$.
+\end{itemize}

@@ -153,8 +153,10 @@ theorem sharedSkeleton_component_input
     (inPorts i).proj _ port
   rw [hproj]
   rsy_port_cases SCR, (⟨i, port⟩ : Σ j, SCR.VSCR.Port j) with hU
-  · rw [rsy_component_input_uiscr SCR' hOut' i e y port hU,
-      rsy_component_input_uiscr SCR hOut i _ _ port hU]
+  · have h1 := rsy_component_input_uiscr SCR' hOut' i e y port hU
+    have h2 := rsy_component_input_uiscr SCR hOut i
+      (fun ip => (inPorts ip.val.1).port ip.val.2 (e ip)) (fun k => HS k (y k)) port hU
+    rw [h1, h2]
     rfl
   · have hC : (⟨i, port⟩ : Σ j, SCR.VSCR.Port j) ∈ CISCR SCR :=
       (not_mem_uiscr_iff_mem_ciscr SCR _).mp hU
@@ -165,15 +167,16 @@ theorem sharedSkeleton_component_input
       compat' op ⟨i, port⟩ hspec
     have htyS : SCR.VSCR.OutPortVal op.1 op.2 = SCR.VSCR.PortVal i port :=
       SCR.connectivity.2.2.2 op ⟨i, port⟩ hspec
-    rw [rsy_component_input_of_conn SCR' hOut' i e y port op hspec hty',
-      rsy_component_input_of_conn SCR hOut i _ _ port op hspec htyS]
+    have h1 := rsy_component_input_of_conn SCR' hOut' i e y port op hspec hty'
+    have h2 := rsy_component_input_of_conn SCR hOut i
+      (fun ip => (inPorts ip.val.1).port ip.val.2 (e ip)) (fun k => HS k (y k)) port op hspec htyS
+    rw [h1, h2]
     have hreadout :
         (outPorts op.1).port op.2 (rsyOutAt SCR' hOut' y op) =
           rsyOutAt SCR hOut (fun k => HS k (y k)) op := by
       obtain ⟨j, q⟩ := op
-      simpa [rsyOutAt_eq_componentReadoutAt] using
-        alwaysOutputs_port_readout (SCR.VSCR.Z j) (Z' j) (HS j) (HO j)
-          (outPorts j) (hOut j) (hOut' j) (hread j) (y j) q
+      exact alwaysOutputs_port_readout (SCR.VSCR.Z j) (Z' j) (HS j) (HO j)
+        (outPorts j) (hOut j) (hOut' j) (hread j) (y j) q
     rw [← hreadout]
     exact (heq_fun_apply hty' htyS (matched op ⟨i, port⟩ hspec)
       (rsyOutAt SCR' hOut' y op)).symm

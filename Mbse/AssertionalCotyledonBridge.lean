@@ -132,6 +132,87 @@ theorem implements_of_partialDynamicsHom
   obtain ⟨w⟩ := hHom
   exact ⟨Implements.ofHomomorphicImage w⟩
 
+/--
+Mode-level dynamics bridge: if a system mode `ZM` of an elaborating system `Z_b`
+satisfies the dynamics-encoding fragment of `Z_spec`, then `Z_b` implements `Z_spec`
+in the sense of Wymore Definition 5.71.
+-/
+theorem implements_of_mode_satisfies_phiDyn
+    {S1 I1 O1 SM IM OM S2 I2 O2 : Type}
+    {Z_spec : DiscreteSystem S1 I1 O1}
+    {ZM : DiscreteSystem SM IM OM}
+    {Z_b : DiscreteSystem S2 I2 O2}
+    (M : WymoreSystemModes.SystemMode ZM Z_b)
+    (hPhi : SystemSatisfiesPartialDynamicsHom Z_spec ZM) :
+    Nonempty (Implements Z_spec Z_b) := by
+  obtain ⟨w⟩ := hom_of_partialDynamicsHom hPhi
+  exact ⟨{
+    ModeState := SM
+    ModeInput := IM
+    ModeOutput := OM
+    modeSystem := ZM
+    mode := M
+    hom := w
+  }⟩
+
+/--
+Mode-to-IOR equivalence (boundary fragment isomorphism + Theorem 6.58 on the reverse):
+On matching boundary alphabets `(IR, OR)`, a system mode `ZM` satisfies the characteristic
+boundary temporal property `IORTemporalFragment.ofIOR IOR` from initial state `s0` on `T`
+if and only if there exists a functional design `fsd : FunctionalSystemDesign IOR` and an
+identity-boundary homomorphism `w : HomomorphicImageWitness fsd.Z ZM` projecting `s0` to `fsd.DSZ`.
+
+The forward witness may take `fsd.Z = ZM` with `w = HomomorphicImageWitness.refl ZM`
+(the mode itself as the functional design).  That is the constructive content of the paper's
+`(2 ⇒ 1)` direction; it is not a separately discovered architectural reference.
+-/
+theorem mode_satisfies_phiIOR_iff_exists_fsd_hom
+    {SM IR OR : Type}
+    (ZM : DiscreteSystem SM IR OR)
+    (IOR : InputOutputRequirement IR OR) (s0 : SM) (T : Set Time) :
+    IORTemporalFragment.Satisfies ZM (IORTemporalFragment.ofIOR IOR) s0 T ↔
+      ∃ (fsd : FunctionalSystemDesign IOR) (w : HomomorphicImageWitness fsd.Z ZM),
+        w.HI = id ∧ w.HO = id ∧ w.HS s0 = fsd.DSZ ∧ fsd.TSZ = T := by
+  rw [IORTemporalFragment.satisfies_ofIOR_iff]
+  constructor
+  · intro hSat
+    refine ⟨{ S := SM, Z := ZM, DSZ := s0, TSZ := T, satisfies := hSat },
+      HomomorphicImageWitness.refl ZM, rfl, rfl, rfl, rfl⟩
+  · rintro ⟨fsd, w, hHI, hHO, hHS, rfl⟩
+    have hSat := fsd.satisfies
+    rw [← hHS] at hSat
+    exact (himsy_idIO_satisfies_iff w hHI hHO s0 fsd.TSZ IOR).mpr hSat
+
+/--
+Direct mode-to-implementability bridge: when a system mode `ZM` of a buildable resultant `Z_b`
+satisfies the boundary temporal fragment `IORTemporalFragment.ofIOR IOR`, the mode and resultant
+inhabit the Implementability Cotyledon `CTL(IOR, TYR) = ImplementableSystemDesign IOR TYR`.
+
+The packaged `fsd` is the mode itself (`afsrEquivFSR` of `(ZM, s0, T)`), and `impl` is
+`Implements.ofSystemMode M` (identity hom on the mode, Def. 5.71).  No separate state-space
+projection onto a distinct architectural reference is constructed.
+-/
+def implementableDesign_of_mode_satisfies_phiIOR
+    {SM IR OR SZ2 IZ2 OZ2 : Type} {IOR : InputOutputRequirement IR OR} {TYR : Technology}
+    {ZM : DiscreteSystem SM IR OR}
+    {n : Nat} (SCR : SystemCouplingRecipe n) (hOut : ∀ k, AlwaysOutputs (SCR.VSCR.Z k))
+    (Z_b : DiscreteSystem SZ2 IZ2 OZ2)
+    (hBuild : IsBuildableWith TYR SCR hOut Z_b)
+    (M : WymoreSystemModes.SystemMode ZM Z_b)
+    (s0 : SM) (T : Set Time)
+    (hSat : IORTemporalFragment.Satisfies ZM (IORTemporalFragment.ofIOR IOR) s0 T) :
+    ImplementableSystemDesign IOR TYR where
+  fsd := IORTemporalFragment.afsrEquivFSR IOR ⟨SM, ZM, s0, T, hSat⟩
+  n := n
+  SCR := SCR
+  hOut := hOut
+  SZ2 := SZ2
+  IZ2 := IZ2
+  OZ2 := OZ2
+  Z2 := Z_b
+  buildable := hBuild
+  impl := Implements.ofSystemMode M
+
 /-! ## 3. Bridge to Chapter 7: Implementability Cotyledon ($CTL(IOR, TYR) = ISR$) -/
 
 /-- An implementable design projects to its functionality-cotyledon component. -/
@@ -293,6 +374,10 @@ open RunLengthMachine
 The wired four-component resultant implements the pipeline-aware run-length requirement.
 Membership is obtained from `SystemSatisfiesPartialDynamicsHom`, not from a hand-supplied
 homomorphism. Theorem 6.58 is not used: the boundary maps are projections.
+
+This is a **resultant-level** Def. 5.71 witness via `Implements.ofHomomorphicImage` (primary
+self-mode of `rleResultant`).  It is not the Python checker's reachable operational mode, and
+it does not certify that checker's reachable-state cardinalities.
 -/
 noncomputable def rle_in_isr : ImplementableSystemDesign pipelineIOR rleTechnology :=
   Classical.choice <|
@@ -303,5 +388,23 @@ noncomputable def rle_in_isr : ImplementableSystemDesign pipelineIOR rleTechnolo
       rleResultant
       rle_resultant_is_buildable
       rleResultant_satisfies_pipeline_fragment
+
+/--
+Finite-tape / bounded-count RLE resultant in the implementability cotyledon
+`CTL(pipelineFinIOR N, rleFinTechnology N)`.
+
+Same honesty note as `rle_in_isr`: resultant-level self-mode via `ofHomomorphicImage`, not a
+reachable-mode restriction or checker-reported state counts.
+-/
+noncomputable def rleFin_in_isr (N : Nat) (hN : 0 < N) :
+    ImplementableSystemDesign (pipelineFinIOR N hN) (rleFinTechnology N hN) :=
+  Classical.choice <|
+    ctl_ior_tyr_nonempty_of_partialDynamicsHom
+      (pipelineFinRef_fsd N hN)
+      (rleFinSCR N hN)
+      (rleFin_hOut N hN)
+      (rleFinResultant N hN)
+      (rleFin_resultant_is_buildable N hN)
+      (rleFinResultant_satisfies_pipelineFin_fragment N hN)
 
 end AssertionalCotyledonBridge

@@ -38,7 +38,7 @@ noncomputable def ChoiceFunction.ofNonempty (A : Type) [Nonempty A] : ChoiceFunc
   classical
   exact
     { pick := fun B => if h : B.Nonempty then h.choose else Classical.arbitrary A
-      pick_mem := fun B hB => by rw [dif_pos hB]; exact hB.choose_spec }
+      pick_mem := fun B hB => by rw [dite_eq_left hB]; exact hB.choose_spec }
 
 /-- The chosen element of a nonempty preimage `f ⁻¹' {y}` is a genuine preimage of `y`. -/
 theorem ChoiceFunction.apply_pick_preimage {A B : Type} (ch : ChoiceFunction A) {f : A → B}
@@ -213,12 +213,12 @@ theorem isFinite_of_isHomomorphicImage {SZ1 IZ1 OZ1 SZ2 IZ2 OZ2 : Type}
     {Z1 : DiscreteSystem SZ1 IZ1 OZ1} {Z2 : DiscreteSystem SZ2 IZ2 OZ2}
     (hfin2 : IsFinite Z2) (hHom : IsHomomorphicImage Z1 Z2) : IsFinite Z1 := by
   rcases hHom with ⟨W⟩
-  haveI : Finite SZ2 := hfin2.1
-  haveI : Finite IZ2 := hfin2.2.1
-  haveI : Finite OZ2 := hfin2.2.2
-  haveI : Finite SZ1 := Finite.of_surjective W.HS W.HS_surjective
-  haveI : Finite IZ1 := Finite.of_surjective W.HI W.HI_surjective
-  haveI : Finite OZ1 := Finite.of_surjective W.HO W.HO_surjective
+  have : Finite SZ2 := hfin2.1
+  have : Finite IZ2 := hfin2.2.1
+  have : Finite OZ2 := hfin2.2.2
+  have : Finite SZ1 := Finite.of_surjective W.HS W.HS_surjective
+  have : Finite IZ1 := Finite.of_surjective W.HI W.HI_surjective
+  have : Finite OZ1 := Finite.of_surjective W.HO W.HO_surjective
   exact ⟨inferInstance, inferInstance, inferInstance⟩
 
 /--

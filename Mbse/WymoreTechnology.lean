@@ -424,12 +424,7 @@ theorem singular_member_buildable {SZ Port OutPort : Type}
     let hOut' : ∀ k, AlwaysOutputs (SCR.VSCR.Z k) := fun _ => hOut
     IsBuildableWith TYR SCR hOut' (rsy SCR hOut') := by
   intro V SCR hOut'
-  refine ⟨fun i => ?_, IsResultantOf.of_rsy _ _⟩
-  have : SCR.VSCR.Z i = Z := by
-    have hi : i = 0 := Trajectory.fin_one_eq i 0
-    subst hi
-    rfl
-  simpa [this] using hmem
+  refine ⟨fun i => hmem, IsResultantOf.of_rsy _ _⟩
 
 /--
   [textbook/theorem7.25/theorem/concurrent_copies_buildable]

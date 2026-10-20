@@ -4,7 +4,7 @@ import Mbse.HomWitnessConstruction
 import Mbse.FSMProperties
 import Mbse.FiniteWymore
 import Mbse.Homomorphism
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Real.Basic
 
 /-!
 # Wymore textbook exercises and gallery systems
@@ -505,8 +505,8 @@ theorem shift5_progress_shiftIn (s : Shift5State) (b : Bit) :
       pattern01110Next (Shift5State.progress s) b := by
   simp only [Shift5State.progress, Shift5State.shiftIn]
   by_cases h : s.bits.length < 5
-  · simp only [dif_pos h, List.foldl_append, List.foldl_cons, List.foldl_nil]
-  · simp only [dif_neg h]
+  · simp only [dite_eq_left h, List.foldl_append, List.foldl_cons, List.foldl_nil]
+  · simp only [dite_eq_right h]
     have hlen : s.bits.length = 5 := by
       have := s.length_le
       omega

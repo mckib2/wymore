@@ -1,263 +1,220 @@
 \section{Methodology} \label{sec:methodology}
 
-\subsection{From Constructive Evidence to Temporal Assertions}
-Figure~\ref{fig:comparison} separates the source of functional intent from the
-reference used for implementation checking. The IOR $R$ generates
-$\mathrm{FSR}(R)$ and its characteristic fragment $\Phi_R$. A chosen
-$D_{\mathrm{ref}}\in\mathrm{FSR}(R)$ supplies the system $Z_{\mathrm{ref}}$
-from which $\Phi_{\mathrm{dyn}}$ is compiled.
+\subsection{Bridging the Functionality and Buildability Cotyledons via Temporal Logic}
+Figure~\ref{fig:cotyledons-bridge} illustrates the structural relationship between Wymore's three cotyledons and the temporal logic bridge developed in this section. On the left, an Input/Output Requirement $IOR$ defines the functionality cotyledon $\mathrm{CTL}(IOR)=\mathrm{FSR}(IOR)$, which is either empty or infinite. On the right, a technology $TYR$ and coupling recipe $SCR$ define a buildable resultant $Z_b=\mathrm{RSY}(SCR)\in\mathrm{CTL}(TYR)$, from which an operational system mode $Z_m\in\mathrm{SYSMO}(Z_b)$ is isolated.
 
 \begin{figure}[t]
   \centering
   \resizebox{\linewidth}{!}{%
-  \begin{tikzpicture}[auto, >=stealth, thick,
-    block/.style={draw=blue!60, fill=blue!5, rectangle, rounded corners, minimum width=3.1cm, minimum height=0.95cm, align=center, thick},
-    model/.style={draw=orange!60, fill=orange!5, rectangle, rounded corners, minimum width=3.1cm, minimum height=0.95cm, align=center, thick},
-    arrow/.style={->, >=stealth, thick, draw=black!70},
-    dashedarrow/.style={->, >=stealth, dashed, thick, draw=blue!80}
+  \begin{tikzpicture}[auto, >=Latex, thick,
+    cotyledon/.style={draw=black!55, dashed, rounded corners=8pt, inner sep=8pt},
+    funcbox/.style={draw=blue!65!black, fill=blue!6, rectangle, rounded corners=4pt, minimum width=3.3cm, minimum height=0.9cm, align=center, font=\footnotesize},
+    buildbox/.style={draw=teal!65!black, fill=teal!6, rectangle, rounded corners=4pt, minimum width=3.3cm, minimum height=0.9cm, align=center, font=\footnotesize},
+    logicbox/.style={draw=orange!75!black, fill=orange!8, rectangle, rounded corners=4pt, minimum width=3.4cm, minimum height=0.9cm, align=center, font=\footnotesize},
+    isrbox/.style={draw=purple!70!black, fill=purple!6, rectangle, rounded corners=4pt, minimum width=3.8cm, minimum height=0.95cm, align=center, font=\footnotesize\bfseries},
+    arrow/.style={->, >=Latex, thick, draw=black!75},
+    homarrow/.style={->, >=Latex, dashed, thick, draw=red!70!black},
+    ltlarrow/.style={->, >=Latex, very thick, draw=orange!80!black}
   ]
-    \begin{scope}
-      \node (iorA) [block] at (0,2.4) {Input/output\\requirement $R$};
-      \node (fsrA) [block] at (0,0.8) {Functionality cotyledon\\$\mathrm{FSR}(R)$};
-      \node (drefA) [model] at (0,-0.8) {Chosen design\\$D_{\mathrm{ref}}$};
-      \node (implA) [model] at (4.0,-0.8) {Buildable resultant\\$Z_{\mathrm{impl}}$};
-      \path[arrow] (iorA) -- node[right, font=\footnotesize] {generates} (fsrA);
-      \path[arrow] (fsrA) -- node[right, font=\footnotesize] {choose} (drefA);
-      \path[arrow] (implA) -- node[above, font=\footnotesize]
-        {$h:Z_{\mathrm{impl}}\to Z_{\mathrm{ref}}$} (drefA);
-      \node[inner sep=7pt, fit=(iorA)(fsrA)(drefA)(implA)] (panelAbox) {};
-      \node[below=0.2cm of panelAbox, font=\headingfont\bfseries] {A. Classical Constructive T3SD};
+    % Left: Functionality Cotyledon
+    \node (ior) [funcbox] at (0, 2.7) {Input/Output Requirement\\$IOR=(OLR,IR,ITR,OR,OTR,ER)$};
+    \node (fsr) [funcbox] at (0, 1.1) {Functionality Cotyledon\\$\mathrm{CTL}(IOR)=\mathrm{FSR}(IOR)$\\{\scriptsize (empty or $\infty$, Thm.~6.64)}};
+    \node (dref) [funcbox] at (0, -0.6) {Functional System Design\\$D_f=(Z_f,s_0,T)\in\mathrm{CTL}(IOR)$};
+
+    % Center: Temporal Logic & Implementability
+    \node (phiIOR) [logicbox] at (5.0, 2.7) {Boundary Temporal Spec\\$\Phi_{IOR}=(T_{IOR},ITR,A_{IOR})$};
+    \node (afsr) [logicbox] at (5.0, 1.1) {Assertional Space\\$\mathrm{AFSR}(\Phi_{IOR})\simeq\mathrm{FSR}(IOR)$};
+    \node (phiDyn) [logicbox] at (5.0, -0.6) {Compiled Dynamics Fragment\\$\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ {\scriptsize ($G,X,\rightarrow,\wedge$)}};
+    \node (isr) [isrbox] at (5.0, -2.55) {Implementability Cotyledon\\$\mathrm{CTL}(IOR,TYR)=\mathrm{ISR}(IOR,TYR)$};
+
+    % Right: Buildability Cotyledon
+    \node (tyr) [buildbox] at (10.0, 2.7) {Technology $TYR$ \&\\Coupling Recipe $SCR$};
+    \node (bsr) [buildbox] at (10.0, 1.1) {Buildable Resultant\\$Z_b=\mathrm{RSY}(SCR)\in\mathrm{CTL}(TYR)$};
+    \node (mode) [buildbox] at (10.0, -0.6) {System Mode\\$Z_m\in\mathrm{SYSMO}(Z_b)$\\{\scriptsize (finite Kripke structure)}};
+
+    % Cotyledon Group Boxes
+    \begin{scope}[on background layer]
+      \node[cotyledon, fill=blue!2, fit=(ior)(fsr)(dref), label={[font=\footnotesize\bfseries, text=blue!70!black]above:Functionality Space}] {};
+      \node[cotyledon, fill=orange!2, fit=(phiIOR)(afsr)(phiDyn), label={[font=\footnotesize\bfseries, text=orange!80!black]above:Temporal Logic Bridge}] {};
+      \node[cotyledon, fill=teal!2, fit=(tyr)(bsr)(mode), label={[font=\footnotesize\bfseries, text=teal!70!black]above:Buildability Space}] {};
     \end{scope}
-    \begin{scope}[xshift=10.0cm]
-      \node (iorB) [block] at (0,2.4) {Input/output\\requirement $R$};
-      \node (phiR) [block] at (0,0.8) {Boundary fragment\\$\Phi_R$};
-      \node (afsr) [block] at (0,-0.8) {Assertional space\\$\mathrm{AFSR}(\Phi_R)\simeq\mathrm{FSR}(R)$};
-      \node (drefB) [model] at (4.0,2.4) {$D_{\mathrm{ref}}$ with system\\$Z_{\mathrm{ref}}$};
-      \node (phiDyn) [block] at (4.0,0.8) {Dynamics fragment\\$\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$};
-      \node (implB) [model] at (4.0,-0.8) {Buildable resultant\\$Z_{\mathrm{impl}}$};
-      \path[dashedarrow] (iorB) -- node[right, font=\footnotesize] {compile} (phiR);
-      \path[dashedarrow] (phiR) -- node[right, font=\footnotesize] {generates} (afsr);
-      \path[arrow] (drefB) -- node[right, font=\footnotesize] {compile} (phiDyn);
-      \path[dashedarrow] (implB) -- node[right, font=\footnotesize] {check} (phiDyn);
-      \node[inner sep=8pt, fit=(iorB)(phiR)(afsr)(drefB)(phiDyn)(implB)] (panelBbox) {};
-      \node[below=0.2cm of panelBbox, font=\headingfont\bfseries] {B. Assertional presentation};
-    \end{scope}
+
+    % Vertical / internal arrows
+    \draw[arrow] (ior) -- node[left, font=\scriptsize] {generates} (fsr);
+    \draw[arrow] (fsr) -- node[left, font=\scriptsize] {select $Z_f$} (dref);
+    \draw[arrow] (tyr) -- node[right, font=\scriptsize] {$\mathrm{RSY}(SCR)$} (bsr);
+    \draw[arrow] (bsr) -- node[right, font=\scriptsize] {isolate mode} (mode);
+
+    % Horizontal bridge arrows
+    \draw[ltlarrow, <->] (ior) -- node[above, font=\scriptsize] {isomorphic} (phiIOR);
+    \draw[ltlarrow, <->] (fsr) -- node[above, font=\scriptsize] {Thm.~\ref{thm:boundary-characteristic}} (afsr);
+    \draw[arrow] (phiIOR) -- (afsr);
+    \draw[arrow] (dref) -- node[above, font=\scriptsize] {compile} (phiDyn);
+
+    % Classical manual homomorphism vs automated LTL check
+    \draw[homarrow] (mode.south) .. controls (10.0, -3.85) and (0.0, -3.85) .. node[below, font=\scriptsize, text=red!70!black] {Classical T3SD: manual homomorphism $h:Z_m\twoheadrightarrow Z_f$} (dref.south);
+    \draw[ltlarrow] (mode.west) -- node[above, font=\scriptsize] {check $Z_m\models\Phi_{\mathrm{dyn}}$} (phiDyn.east);
+    \draw[ltlarrow] ([yshift=4pt]mode.west) -- node[above, sloped, font=\scriptsize, fill=white, inner sep=1pt] {LTL check $Z_m\models\Phi_{IOR}$ (Thm.~\ref{thm:mode-ior-bridge})} ([yshift=-4pt]afsr.east);
+
+    % Into Implementability Cotyledon
+    \draw[arrow] ([xshift=18pt]dref.south) to[out=-65, in=180] (isr.west);
+    \draw[arrow] ([xshift=-18pt]mode.south) to[out=-115, in=0] (isr.east);
+    \draw[ltlarrow] (phiDyn.south) -- node[right, font=\scriptsize] {certifies} (isr.north);
   \end{tikzpicture}%
   }
-  \caption{The IOR generates functionality in both presentations. A chosen functional
-  design supplies $Z_{\mathrm{ref}}$ for the separate implementation check.}
-  \label{fig:comparison}
+  \caption{Reinterpreting T3SD verification through temporal logic. Instead of manually constructing and maintaining a surjective homomorphism $h:Z_m\twoheadrightarrow Z_f$ from a system mode $Z_m\in\mathrm{SYSMO}(Z_b)$ of a buildable resultant $Z_b=\mathrm{RSY}(SCR)$ onto a functional system in $\mathrm{CTL}(IOR)$, the engineer checks $Z_m\models\Phi_{IOR}$ (or $Z_m\models\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$) directly using decidable temporal logic model checking.}
+  \label{fig:cotyledons-bridge}
 \end{figure}
 
-\subsection{Characteristic Boundary Fragment}
+In classical T3SD, placing $(D_f,Z_b)$ in the implementability cotyledon $\mathrm{CTL}(IOR,TYR)$ requires manually finding a surjective homomorphism $h:Z_m\twoheadrightarrow Z_f$. Our methodology replaces that manual search with two complementary temporal logic mechanisms:
+\begin{enumerate}
+    \item \textbf{Boundary-level verification ($\Phi_{IOR}$):} Every Wymorian $IOR$ translates into an isomorphic boundary temporal specification $\Phi_{IOR}$. By Wymore's Theorem~6.58, a system mode $Z_m\in\mathrm{SYSMO}(Z_b)$ on matching boundary alphabets admits an identity-boundary homomorphism onto a functional system in $\mathrm{CTL}(IOR)$ if and only if $Z_m$ satisfies $\Phi_{IOR}$ directly.
+    \item \textbf{Reference-dynamics verification ($\Phi_{\mathrm{dyn}}$):} When a specific reference architecture $Z_{\mathrm{ref}}\in\mathrm{CTL}(IOR)$ is selected (or when boundary ports require non-identity projections $h_I,h_O$), compiling the transition and readout tables of $Z_{\mathrm{ref}}$ into a step-local temporal safety fragment $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ makes assertional satisfaction $Z_m\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ equivalent to existence of a Wymore homomorphism $h:Z_m\twoheadrightarrow Z_{\mathrm{ref}}$.
+\end{enumerate}
+
+\subsection{Isomorphism Between Wymorian \texorpdfstring{$IOR$s}{IORs} and Boundary Temporal Specifications}
 \label{sec:trace-observability}
-Let $R=(OLR,IR,ITR,OR,OTR,ER)$ be any Wymore IOR, and let $T_R$ be the time scale selected by $OLR$. Its characteristic boundary fragment is
-\[
-  \Phi_R=(T_R,ITR,A_R),
+Let $IOR=(OLR,IR,ITR,OR,OTR,ER)$ be any Wymore Input/Output Requirement, and let $T_{IOR}\subseteq\mathbb{N}$ be the operational time scale determined by $OLR$. We define its \emph{characteristic boundary temporal specification} as the triple
+\begin{equation}
+  \Phi_{IOR}=(T_{IOR},\,ITR,\,A_{IOR}),
   \qquad
-  A_R(f,g)\;\Longleftrightarrow\;g\in ER(f).
-\]
-This fragment captures complete input and output trajectories. It retains finite or
-infinite operational length, any admissible-input set, and the full
-eligible-output relation, including nondeterministic relations.
+  A_{IOR}(f,g)\;\Longleftrightarrow\;g\in ER(f),
+  \label{eq:phi-ior-def}
+\end{equation}
+where $A_{IOR}(f,g)$ is a state-free temporal trajectory predicate over complete input trajectories $f\in IR^T$ and output trajectories $g\in OR^T$. Notice that $\Phi_{IOR}$ drops the standalone $OTR$ component of the 6-tuple without loss of information, because Wymore's $IOR$ axioms guarantee that $OTR$ is exactly the union of the eligible output sets $\bigcup_{f\in ITR}ER(f)$.
 
-For $Z=(S,I,O,\delta,\rho)$, initial state $s_0$, and nonempty $T\subseteq T_R$, define $Z,s_0,T\models_{IO}\Phi_R$ when, for every $f\in ITR$ and every complete input $h$ agreeing with $f$ on $T_R$, there exists $g$ with $A_R(f,g)$ such that the output generated by $Z$ on $h$ agrees with $g$ on $T$. Let $\mathrm{AFSR}(\Phi_R)$ package $Z$, $s_0$, $T$, and a proof of this assertional satisfaction relation.
+For any discrete system $Z=(S,IR,OR,\delta,\rho)$, initial state $s_0\in S$, and nonempty observation window $T\subseteq T_{IOR}$, we say that $(Z,s_0,T)$ \emph{assertionally satisfies} $\Phi_{IOR}$, written $Z,s_0,T\models_{IO}\Phi_{IOR}$, when for every admissible input $f\in ITR$ and every input trajectory $h$ agreeing with $f$ on $T_{IOR}$, there exists an output trajectory $g$ satisfying $A_{IOR}(f,g)$ such that the generated output of $Z$ on $h$ from $s_0$ agrees with $g$ at every tick $t\in T$. Let $\mathrm{AFSR}(\Phi_{IOR})$ denote the assertional functionality space of tuples $(Z,s_0,T)$ satisfying $Z,s_0,T\models_{IO}\Phi_{IOR}$.
 
-Temporal assertions are useful only if they preserve the functional designs
-admitted by the original IOR:
-
-\begin{theorem}[Characteristic boundary fragment]
+\begin{theorem}[Boundary $IOR$--Temporal Logic Isomorphism]
 \label{thm:boundary-characteristic}
-For every Wymorian IOR $R$,
+For every Wymorian input/output requirement $IOR$, discrete system $Z$, initial state $s_0$, and time subset $T$,
 \[
- Z,s_0,T\models_{IO}\Phi_R
+ Z,s_0,T\models_{IO}\Phi_{IOR}
  \quad\Longleftrightarrow\quad
- SatisfiesIOR(Z,R,s_0,T).
+ \mathrm{SatisfiesIOR}(Z,IOR,s_0,T).
 \]
-Consequently there is a canonical bijection
+Consequently, there is a canonical bijection between the assertional functionality space and the functionality cotyledon,
 \[
-  \mathrm{AFSR}(\Phi_R)\simeq\mathrm{FSR}(R)
+  \mathrm{AFSR}(\Phi_{IOR})\;\simeq\;\mathrm{FSR}(IOR)=\mathrm{CTL}(IOR),
 \]
-that fixes the system, designated state, and time scale.
+that acts as the identity on the underlying system $Z$, initial state $s_0$, and time scale $T$.
 \end{theorem}
 
-\begin{proof}[Proof sketch]
-Substitute $T_R$, $ITR$, and $A_R(f,g)\Leftrightarrow g\in ER(f)$ into the
-assertional satisfaction definition. Its clauses are those of
-$SatisfiesIOR$. The bijection preserves the design data and converts the
-satisfaction certificate in either direction.
+\begin{proof}[Intuitive proof]
+Unfolding the definition of $A_{IOR}(f,g)\Leftrightarrow g\in ER(f)$ inside $Z,s_0,T\models_{IO}\Phi_{IOR}$ yields the exact trajectory quantification of Wymore's $\mathrm{SatisfiesIOR}$ (Definition~6.31 of \citet{Wymore1993}). Because the satisfaction condition is identical for every triple $(Z,s_0,T)$, packaging $(Z,s_0,T)$ with its satisfaction proof gives a one-to-one correspondence between $\mathrm{AFSR}(\Phi_{IOR})$ and $\mathrm{FSR}(IOR)$.
 \end{proof}
 
-The fragment omits a separate $OTR$ field because Wymore's IOR axioms define
-that set through the ranges of $ER$. The theorem covers finite and infinite
-horizons, restricted input sets, and deterministic or relational eligible
-outputs. Finite ordinary-LTL formulas are available when the trajectory
-relation has a suitable presentation; Section~\ref{sec:case-basics} gives
-three examples.
+Theorem~\ref{thm:boundary-characteristic} holds for arbitrary operational horizons (finite or infinite), restricted input domains $ITR$, and deterministic or nondeterministic eligibility relations $ER$. When $ER(f)$ is defined by temporal recurrences over finite alphabets, $A_{IOR}(f,g)$ can be written directly as a standard LTL formula over input and output propositions, as we illustrate in Section~\ref{sec:case-study}.
 
-Implementation checking uses a second construction. Choose
-$D_{\mathrm{ref}}\in\mathrm{FSR}(R)$ and write
-$Z_{\mathrm{ref}}:=D_{\mathrm{ref}}.Z$. The transition and readout tables of
-$Z_{\mathrm{ref}}$ generate $\Phi_{\mathrm{dyn}}$. Thus $\Phi_R$
-characterizes functional designs for $R$, while $\Phi_{\mathrm{dyn}}$
-characterizes systems that realize the selected functional design.
+\subsection{Direct Mode-to-\texorpdfstring{$IOR$}{IOR} Verification Without Manual Homomorphisms}
+\label{sec:mode-ior-bridge}
+We now connect the boundary temporal specification $\Phi_{IOR}$ to the buildability cotyledon $\mathrm{CTL}(TYR)$ and the implementability cotyledon $\mathrm{CTL}(IOR,TYR)$. Suppose a candidate architecture $Z_b=\mathrm{RSY}(SCR)\in\mathrm{CTL}(TYR)$ has been assembled from components in $TYR$, and let $Z_m\in\mathrm{SYSMO}(Z_b)$ be an operational system mode of $Z_b$.
 
-Recovering the maps from the fragment at every state requires runs starting from every state
-of $Z_{\mathrm{impl}}$. Restricting the initial-state class leaves unreachable
-states unconstrained. For a designated initial state, the result applies to the
-subsystem it generates. The statements below use all states unless a reachable
-subsystem is named.
+Why did classical T3SD require searching for a functional design $Z_f\in\mathrm{CTL}(IOR)$ and a surjective homomorphism $h:Z_m\twoheadrightarrow Z_f$? Because in T3SD, requirement satisfaction is a property of abstract functional designs in $\mathrm{CTL}(IOR)$, and Wymore's Theorem~6.58 transfers $\mathrm{SatisfiesIOR}$ along an identity-boundary homomorphism ($h_I=\mathrm{id}_{IR}$, $h_O=\mathrm{id}_{OR}$). Combining Theorem~6.58 with Theorem~\ref{thm:boundary-characteristic} reveals that this intermediate homomorphism search can be bypassed entirely when checking a system mode:
+
+\begin{theorem}[Direct Mode-to-$IOR$ Implementability]
+\label{thm:mode-ior-bridge}
+Let $Z_b=\mathrm{RSY}(SCR)\in\mathrm{CTL}(TYR)$ be a buildable resultant in technology $TYR$, and let $Z_m=(S_m,IR,OR,\delta_m,\rho_m)\in\mathrm{SYSMO}(Z_b)$ be a system mode of $Z_b$ with initial state $s_{m,0}\in S_m$ and observation horizon $T\subseteq T_{IOR}$. Then the following are equivalent:
+\begin{enumerate}
+    \item There exists a functional system design $D_f=(Z_f,s_{f,0},T)\in\mathrm{CTL}(IOR)$ and an identity-boundary Wymore homomorphism $h=(h_S,\mathrm{id}_{IR},\mathrm{id}_{OR}):Z_m\twoheadrightarrow Z_f$ with $h_S(s_{m,0})=s_{f,0}$.
+    \item The system mode satisfies the characteristic boundary temporal specification directly:
+    \[
+        Z_m,s_{m,0},T\;\models_{IO}\;\Phi_{IOR}.
+    \]
+\end{enumerate}
+Whenever either condition holds, $Z_b$ implements $D_f$ via the mode $Z_m$ and forms an implementable system design in $\mathrm{CTL}(IOR,TYR)=\mathrm{ISR}(IOR,TYR)$.
+\end{theorem}
+
+\begin{proof}[Intuitive proof]
+$(1\Rightarrow 2)$: Suppose $h:Z_m\twoheadrightarrow Z_f$ is a Wymore homomorphism with $h_I=\mathrm{id}_{IR}$, $h_O=\mathrm{id}_{OR}$, and $h_S(s_{m,0})=s_{f,0}$, where $D_f=(Z_f,s_{f,0},T)\in\mathrm{CTL}(IOR)$. Because $h$ commutes with $\delta$ and $\rho$ at every step, induction on time $t$ shows that $Z_m$ initialized at $s_{m,0}$ and $Z_f$ initialized at $s_{f,0}$ generate the exact same boundary output trajectory $y(t)$ for every input trajectory $f$. By Wymore's Theorem~6.58, $Z_m$ therefore satisfies $IOR$, which by Theorem~\ref{thm:boundary-characteristic} is equivalent to $Z_m,s_{m,0},T\models_{IO}\Phi_{IOR}$.
+
+$(2\Rightarrow 1)$: Conversely, if $Z_m,s_{m,0},T\models_{IO}\Phi_{IOR}$, then by Theorem~\ref{thm:boundary-characteristic}, $D_m:=(Z_m,s_{m,0},T)$ is itself a member of $\mathrm{CTL}(IOR)$. The identity homomorphism $\mathrm{id}:Z_m\twoheadrightarrow Z_m$ witnesses that $Z_m$ is a homomorphic image of the mode $Z_m\in\mathrm{SYSMO}(Z_b)$, so $Z_b$ implements $D_m$ (Wymore Definition~5.71) and $(D_m,Z_b)\in\mathrm{CTL}(IOR,TYR)$.
+\end{proof}
+
+\paragraph{General boundary encodings.}
+When the mode $Z_m$ uses concrete port encodings $(I_m,O_m)$ that relate to the requirement alphabets $(IR,OR)$ via injective or surjective interface maps $h_I:I_m\twoheadrightarrow IR$ and $h_O:O_m\twoheadrightarrow OR$ (for instance, reading a single unconnected port from a coupled port vector), Wymore's transported requirement $\mathrm{himio}(IOR,h_I,h_O)$ (Definition~6.72) pulls $\Phi_{IOR}$ back along $(h_I,h_O)$ so that Theorem~\ref{thm:mode-ior-bridge} applies verbatim on the mode's boundary ports.
 
 \begingroup
-\renewcommand{\arraystretch}{1.5}
-\begin{tabularx}{\linewidth}{@{}P{0.28\linewidth}YY@{}}
+\renewcommand{\arraystretch}{1.45}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}P{0.26\linewidth}YY@{}}
     \rowcolor{tableheader}
-    \headingfont\bfseries Feature & \headingfont\bfseries Constructive & \headingfont\bfseries Assertional \\
+    \headingfont\bfseries Verification Aspect & \headingfont\bfseries Classical Constructive T3SD & \headingfont\bfseries Temporal Logic T3SD Bridge \\
     \addlinespace[4pt]
-    Functionality & $R$ generates $\mathrm{FSR}(R)$ & $R$ compiles to $\Phi_R$ and $\mathrm{AFSR}(\Phi_R)\simeq\mathrm{FSR}(R)$ \\
+    Functionality specification & $IOR$ generates $\mathrm{CTL}(IOR)=\mathrm{FSR}(IOR)$ & $IOR$ compiles to $\Phi_{IOR}$ with $\mathrm{AFSR}(\Phi_{IOR})\simeq\mathrm{FSR}(IOR)$ \\
     \addlinespace[4pt]
-    Implementation evidence & Explicit homomorphism $h$ & Satisfaction of compiled $\Phi_{\mathrm{dyn}}$ \\
+    Mode-to-$IOR$ verification & Select $Z_f\in\mathrm{CTL}(IOR)$ and construct $h:Z_m\twoheadrightarrow Z_f$ by hand & Model-check $Z_m\models\Phi_{IOR}$ directly (or $Z_m\models\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$) \\
     \addlinespace[4pt]
-    Guarantee & Trajectory simulation under $h$ & The same simulation, by the bi-implication \\
+    Impact of component refactoring & Must rebuild and re-prove state map $h_S$ & Re-run automated checker against unchanged $\Phi_{IOR}$ / $\Phi_{\mathrm{dyn}}$ \\
     \addlinespace[4pt]
-    Maintained artifact & Pair-specific maps $h_S,h_I,h_O$ & Reference-indexed fragment $\Phi_{\mathrm{dyn}}$ \\
+    Implementability guarantee & Membership in $\mathrm{CTL}(IOR,TYR)$ via $h$ & Identical membership in $\mathrm{CTL}(IOR,TYR)$ (Thms.~\ref{thm:mode-ior-bridge} \& \ref{thm:dynamics-characterization}) \\
 \end{tabularx}
-\captionof{table}{The proposed workflow changes the maintained evidence, not Wymore's functionality or implementation semantics.}
+\captionof{table}{Comparison of classical constructive T3SD verification and the temporal logic workflow.}
 \label{tab:comparison}
 \endgroup
 \vspace{6pt}
 
-
-\subsection{Dynamics-Encoding Fragment}
+\subsection{Reference-Dynamics Fragment \texorpdfstring{$\Phi_{\mathrm{dyn}}$}{Phi\_dyn}}
 \label{sec:dynamics-encoding-fragment}
-
-For the classical implementation question, the relevant reference is
-$Z_{\mathrm{ref}}$, the system component of $D_{\mathrm{ref}}$. We compile its
-state-transition and readout tables into a \emph{dynamics-encoding} fragment
-$\Phi_{\mathrm{dyn}}$. Throughout, ``homomorphism'' means the surjective,
-transition- and readout-preserving triple $h=(h_S,h_I,h_O)$ of
-\citet{Wymore1993}; the appendix states the indexed definition.
-
-Table~\ref{tab:phi-dyn-fragment} presents the fragment that makes the
-bi-implication hold. Clauses are compiled from $Z_{\mathrm{ref}}$ and checked
-on $Z_{\mathrm{impl}}$ under surjective maps $h_S,h_I,h_O$, or under identity
-when labels are shared. At each tick, $\mathit{refState}(s)$ means that
-$h_S$ maps the implementation state to reference state $s$. Inputs and outputs
-are interpreted similarly through $h_I$ and $h_O$.
+In many systems engineering workflows, the team also maintains an explicit architectural reference machine $Z_{\mathrm{ref}}=(S_{\mathrm{ref}},I_{\mathrm{ref}},O_{\mathrm{ref}},\delta_{\mathrm{ref}},\rho_{\mathrm{ref}})$ from a chosen functional design $D_{\mathrm{ref}}\in\mathrm{CTL}(IOR)$ and wishes to verify that a candidate mode $Z_m\in\mathrm{SYSMO}(Z_b)$ is a homomorphic elaboration of $Z_{\mathrm{ref}}$. We compile the transition and readout tables of $Z_{\mathrm{ref}}$ into a \emph{dynamics-encoding fragment} $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$, summarized in Table~\ref{tab:phi-dyn-fragment}.
 
 \begingroup
 \renewcommand{\arraystretch}{1.35}
 \footnotesize
 \begin{tabularx}{\linewidth}{@{}A{0.22\linewidth} A{0.78\linewidth}@{}}
     \rowcolor{tableheader}
-    \headingfont\bfseries Element & \headingfont\bfseries Dynamics-encoding fragment $\Phi_{\mathrm{dyn}}$ \\
+    \headingfont\bfseries Element & \headingfont\bfseries Dynamics-encoding fragment $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ \\
     \addlinespace[2pt]
-    Operators & $G$ (always), $X$ (next), $\rightarrow$, $\wedge$; \textbf{not} $F$ (eventually) \\
+    Operators & $G$ (always), $X$ (next), $\rightarrow$, $\wedge$; \textbf{excludes} $F$ (eventually) \\
     \addlinespace[2pt]
-    Atoms & $\mathit{state}(s)$ / $\mathit{refState}(s)$; $\mathit{input}(i)$, $\mathit{input}(\mathrm{none})$; $\mathit{output}(o)$, $\mathit{output}(\mathrm{none})$ \\
+    Atomic predicates & $\mathit{refState}(s)$ ($h_S(x)=s$); $\mathit{input}(i)$, $\mathit{input}(\mathrm{none})$; $\mathit{output}(o)$, $\mathit{output}(\mathrm{none})$ \\
     \addlinespace[2pt]
-    Open readout & $G\bigl(\mathit{refState}(s) \rightarrow \mathit{output}(o)\bigr)$ whenever $\rho_{\text{ref}}(s)=o$ \\
+    Open readout & $G\bigl(\mathit{refState}(s) \rightarrow \mathit{output}(o)\bigr)$ whenever $\rho_{\mathrm{ref}}(s)=o$ \\
     \addlinespace[2pt]
-    Closed readout & $G\bigl(\mathit{refState}(s) \rightarrow \mathit{output}(\mathrm{none})\bigr)$ whenever $\rho_{\text{ref}}(s)=\mathrm{none}$ \\
+    Closed readout & $G\bigl(\mathit{refState}(s) \rightarrow \mathit{output}(\mathrm{none})\bigr)$ whenever $\rho_{\mathrm{ref}}(s)=\mathrm{none}$ \\
     \addlinespace[2pt]
-    Autonomous step & $G\bigl((\mathit{refState}(s)\wedge\mathit{input}(\mathrm{none})) \rightarrow X(\mathit{refState}(\delta_{\text{ref}}(s,\mathrm{none})))\bigr)$ \\
+    Autonomous step & $G\bigl((\mathit{refState}(s)\wedge\mathit{input}(\mathrm{none})) \rightarrow X(\mathit{refState}(\delta_{\mathrm{ref}}(s,\mathrm{none})))\bigr)$ \\
     \addlinespace[2pt]
-    Guided step & $G\bigl((\mathit{refState}(s)\wedge\mathit{input}(i)) \rightarrow X(\mathit{refState}(\delta_{\text{ref}}(s,i)))\bigr)$ for each $i\in I_{\text{ref}}$ \\
+    Guided step & $G\bigl((\mathit{refState}(s)\wedge\mathit{input}(i)) \rightarrow X(\mathit{refState}(\delta_{\mathrm{ref}}(s,i)))\bigr)$ for each $i\in I_{\mathrm{ref}}$ \\
     \addlinespace[2pt]
-    Compiled from & System component $Z_{\mathrm{ref}}$ of $D_{\mathrm{ref}}$ \\
-    \addlinespace[2pt]
-    Checked on & Buildable system $Z_{\text{impl}}$ under surjective $h_S,h_I,h_O$ (or identity on shared labels) \\
-    % \addlinespace[2pt]
-    % Outside fragment & $F$; incomplete $\Phi_{\mathrm{dyn}}$; output-table-only; arbitrary FO-LTL outside the clause schemas \\
+    Checked on & System mode $Z_m\in\mathrm{SYSMO}(Z_b)$ under surjective $(h_S,h_I,h_O)$ (or identity on shared labels) \\
 \end{tabularx}
-\captionof{table}{Dynamics-encoding fragment $\Phi_{\mathrm{dyn}}$ for which assertional satisfaction is equivalent to existence of a Wymore system homomorphism.}
+\captionof{table}{The dynamics-encoding fragment $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ compiled from a reference system $Z_{\mathrm{ref}}$.}
 \label{tab:phi-dyn-fragment}
 \endgroup
 \vspace{4pt}
 
-LTL inspires the notation for this fragment; however, predicate-indexed
-clauses allow infinite or real-valued $S$, $I$, and $O$. Closed readouts and
-autonomous steps remain are explicitly allowed; finite-state instances can be flattened for automated checking.
-
-A property that we would like is that an assertional check must provide the same implementation evidence as the Wymore homomorphism it replaces:
-
-\begin{theorem}[Dynamics-fragment characterization]
+\begin{theorem}[Dynamics-Fragment Characterization of Homomorphisms]
 \label{thm:dynamics-characterization}
-Fix $D_{\mathrm{ref}}\in\mathrm{FSR}(R)$ and its system
-$Z_{\mathrm{ref}}$. Then
+Fix a functional design $D_{\mathrm{ref}}\in\mathrm{CTL}(IOR)$ with system component $Z_{\mathrm{ref}}$ and a system mode $Z_m\in\mathrm{SYSMO}(Z_b)$. Then
 \[
-  Z_{\text{impl}} \models_{\mathrm{dyn}} \Phi_{Z_{\text{ref}}}
+  Z_m \models_{\mathrm{dyn}} \Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})
   \;\;\Longleftrightarrow\;\;
-  \exists\, h : Z_{\text{impl}} \to Z_{\text{ref}}\ \text{Wymore system homomorphism}.
+  \exists\, h : Z_m \twoheadrightarrow Z_{\mathrm{ref}}\ \text{Wymore system homomorphism}.
 \]
 \end{theorem}
 
-\begin{proof}[Proof sketch]
-A Wymore homomorphism satisfies the readout and transition equations at each
-implementation state. Applying those equations along a run yields the four
-clause families of Table~\ref{tab:phi-dyn-fragment}. Conversely, start a run
-from an arbitrary implementation state and inspect the clauses at tick zero.
-They recover the readout equation and each autonomous or guided transition
-equation. Appendix~\ref{app:hom-biimp} gives the indexed argument.
+\begin{proof}[Intuitive proof]
+If $h=(h_S,h_I,h_O):Z_m\twoheadrightarrow Z_{\mathrm{ref}}$ is a Wymore homomorphism, its readout and transition equations~\eqref{eq:wymore-hom-def} hold at every state of $Z_m$, so every state/input/output triple along any run of $Z_m$ satisfies the four $G$/$X$ clause families in Table~\ref{tab:phi-dyn-fragment}. Conversely, if every run of $Z_m$ satisfies the clauses of Table~\ref{tab:phi-dyn-fragment} under surjective maps $(h_S,h_I,h_O)$, initializing a run at an arbitrary state $x\in S_m$ and inspecting tick $t=0$ recovers the static readout equation $h_O(\rho_m(x))=\rho_{\mathrm{ref}}(h_S(x))$ and the one-step transition equation $h_S(\delta_m(x,p))=\delta_{\mathrm{ref}}(h_S(x),h_I(p))$. Appendix~\ref{app:hom-biimp} gives the full derivation.
 \end{proof}
 
-A conforming candidate must, of course, also be buildable before it supports a T3SD
-implementation decision:
-
-\begin{corollary}[Cotyledon implementability]
+\begin{corollary}[Implementability Cotyledon Membership]
 \label{cor:cotyledon-implementability}
-If $Z_{\mathrm{impl}}\models_{\mathrm{dyn}}\Phi_{Z_{\mathrm{ref}}}$ and
-$Z_{\mathrm{impl}}$ is the resultant of a buildable design in $TYR$, then
-$D_{\mathrm{ref}}$ and that buildable design form an element of
-$\mathrm{ISR}(R,TYR)$.
+If $Z_b=\mathrm{RSY}(SCR)\in\mathrm{CTL}(TYR)$ is buildable in technology $TYR$ and possesses a system mode $Z_m\in\mathrm{SYSMO}(Z_b)$ such that $Z_m\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ for $D_{\mathrm{ref}}\in\mathrm{CTL}(IOR)$, then $Z_b$ implements $D_{\mathrm{ref}}$ and $(D_{\mathrm{ref}},Z_b)\in\mathrm{CTL}(IOR,TYR)=\mathrm{ISR}(IOR,TYR)$.
 \end{corollary}
 
-\begin{proof}[Proof sketch]
-Theorem~\ref{thm:dynamics-characterization} gives the homomorphism, hence a witness of
-implementation. Pair this with the given functional and
-buildable designs. Requirement inheritance uses the homomorphism for identity
-boundary maps and transport for general maps.
-\end{proof}
-
-Shared design vocabularies should turn failed assertions into direct table
-discrepancies:
-
-\begin{proposition}[Shared-table specialization]
+\begin{proposition}[Shared-Table Specialization]
 \label{prop:shared-table}
-If $Z_{\mathrm{ref}}$ and $Z_{\mathrm{impl}}$ share $(S,I,O)$ and use
-the identity state, input, and output maps, satisfaction of
-$\Phi_{Z_{\mathrm{ref}}}$ is
-equivalent to pointwise agreement of their transition and readout functions.
+When $Z_{\mathrm{ref}}$ and $Z_m$ share $(S,I,O)$ under identity maps, $Z_m\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ holds if and only if their transition and readout tables agree pointwise.
 \end{proposition}
-
-\begin{proof}[Proof sketch]
-With canonical labels the three projection maps are identities. The readout
-clauses give equality of $\rho$ at each state, and the transition clauses give
-equality of $\delta$ for every optional input. The converse follows by
-substitution in the clauses.
-\end{proof}
-
-Cross-type elaborations use the hom-relative reading of
-Theorem~\ref{thm:dynamics-characterization}. Note that finite propositional projections can support automated checking when the relevant spaces are finite.
-
-It is worth noting that $\Phi_{\mathrm{dyn}}$ is a well-known fragment of temporal logic. Each clause is
-$G$ of a Horn implication whose consequent lies under at most one $X$, making
-satisfaction a per-state safety condition. Compiling a transition table into a
-formula is a characteristic-formula construction, and the maps required by a
-Wymore homomorphism are bounded morphisms. This identification connects T3SD
-implementation checking to established theory and tools
-(Section~\ref{sec:case-solver}).
 
 \input{sections/025-invariance}
 
-\subsection{Property Checking}
+\subsection{Decidable LTL Model Checking for Finite Buildable Modes}
 \label{sec:automated-checking}
-
-Property checking of $Z_{\text{impl}} \models_{\mathcal{L}} \Phi$ may use
-finite-horizon unrolling, finite-state abstraction, or theory-specific solvers
-on bounded queries \citep{BaierKatoen2008,deMouraZ32008}. Unbounded FO-LTL
-over infinite or real-valued coordinates is undecidable in general. Finite
-projections, bounded horizons, restricted input classes, and symbolic proofs
-cover different parts of the resulting verification problem.
-
-We leave mechanical verification to future work, considering only the theoretical aspects here.
+Why does translating $IOR$s and homomorphisms into temporal logic yield a decisive practical advantage for systems engineering? Consider the asymmetry between the functionality cotyledon $\mathrm{CTL}(IOR)$ and the buildability cotyledon $\mathrm{CTL}(TYR)$:
+\begin{itemize}
+    \item \textbf{Abstract functional models may be infinite, but buildable machines are finite.} Idealized specifications often use unbounded mathematical types (such as an infinite tape or a counter in $\mathbb{N}$). However, every physical or digital component in a real-world technology catalog $TYR$---registers, sensors, actuators, communication buffers, and lookup tables---has a finite state space and finite port alphabets.
+    \item \textbf{Coupled resultants and system modes of finite components are finite Kripke structures.} Because the state space of a coupled resultant $Z_b=\mathrm{RSY}(SCR)$ is the Cartesian product $\prod_{i=1}^n S_i$ of its component state spaces, any resultant built from finite components in $TYR$ is a finite discrete system. Consequently, every operational system mode $Z_m\in\mathrm{SYSMO}(Z_b)$ is a finite-state transition system.
+    \item \textbf{Decidable, push-button verification.} Over a finite system mode $Z_m$, any boundary requirement $\Phi_{IOR}$ expressed in propositional LTL (as well as any finite-state dynamics fragment $\Phi_{\mathrm{dyn}}$) is decidable by standard LTL model checking \citep{BaierKatoen2008,BiereCimattiClarkeZhu1999}. Instead of solving an NP-hard homomorphism search by hand or maintaining brittle state-space projections across architectural revisions, the engineer runs an off-the-shelf model checker on $Z_m\models\Phi_{IOR}$. If the mode conforms, Theorem~\ref{thm:mode-ior-bridge} certifies membership in $\mathrm{CTL}(IOR,TYR)$; if it fails, the model checker returns a concrete counterexample trace pinpointing the violated temporal clause.
+\end{itemize}

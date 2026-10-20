@@ -1,14 +1,16 @@
 name = "mbse"
 version = "0.1.0"
 defaultTargets = ["mbse", "Appendix3"]
+# Mathlib 4.35 enables requiresModuleSystem; this package still uses classic headers.
+allowNonModules = true
 
 [[lean_lib]]
 name = "Mbse"
+allowNonModules = true
 
 [[require]]
 name = "mathlib"
-scope = "leanprover-community"
-rev = "v4.30.0"
+path = "/home/nicholas/mathlib4"
 
 [[lean_lib]]
 name = "MbseLTS"

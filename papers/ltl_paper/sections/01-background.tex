@@ -1,95 +1,88 @@
 \section{Background} \label{sec:background}
 
-\subsection{Tricotyledon Theory of System Design}
-Wymore's Tricotyledon Theory of System Design (T3SD) partitions design into three cotyledons \citep{Wymore1993}:
+\subsection{Discrete Systems and the Three Cotyledons of T3SD}
+In Wymore's framework, a discrete system (DSYSTEM) is a deterministic Moore-type quintuple $Z=(S,I,O,\delta,\rho)$ consisting of a nonempty state set $S$, an input alphabet $I$, an output alphabet $O$, a next-state transition function $\delta$, and a state readout function $\rho$ \citep{Wymore1993}. Here ``discrete'' refers to the discrete time scale $T=\mathbb{N}$; the sets $S$, $I$, and $O$ may be finite, countably infinite, or continuous at each tick. Given an initial state $s_0\in S$ and an input trajectory $f:T\to I$, iterating $\delta$ from $s_0$ generates a unique state trajectory $g(t)=\mathrm{STZ}(Z,s_0,f)(t)$ and a corresponding output trajectory $y(t)=\rho(g(t))=\mathrm{OTZ}(Z,s_0,f)(t)$.
+
+T3SD organizes a system design problem around three mathematical spaces, called \emph{cotyledons} because of their leaf-shaped depiction in Wymore's diagrams \citep{Wymore1993}:
 \begin{enumerate}
-    \item \textbf{Functionality.} $\mathrm{CTL}(IOR)=\mathrm{FSR}(IOR)$ contains functional system designs: a system, designated state, time scale, and proof of satisfaction of $IOR=(OLR,IR,ITR,OR,OTR,ER)$. For each admissible input trajectory in $ITR$, $ER$ gives the eligible outputs.
-    \item \textbf{Buildability.} $\mathrm{CTL}(TYR)=\mathrm{BSR}(TYR)$ contains resultants $Z=\mathrm{RSY}(SCR)$ of recipes whose components belong to technology $TYR$.
-    \item \textbf{Implementability.} $\mathrm{CTL}(IOR,TYR)=\mathrm{ISR}(IOR,TYR)$ pairs functional and buildable designs for which the build implements the functional design.
+    \item \textbf{Functionality Cotyledon $\mathrm{CTL}(IOR)=\mathrm{FSR}(IOR)$.} An Input/Output Requirement is a 6-tuple $IOR=(OLR,IR,ITR,OR,OTR,ER)$, where $OLR$ specifies the operational length (defining the required time scale $T_{IOR}$), $IR$ and $OR$ are the boundary input and output alphabets, $ITR\subseteq IR^T$ and $OTR\subseteq OR^T$ are the admissible input and output trajectory sets, and $ER\subseteq ITR\times OTR$ is the eligibility relation pairing each admissible input trajectory $f\in ITR$ with its set of acceptable output trajectories $ER(f)\subseteq OTR$. A \emph{functional system design} $D_f=(Z_f,s_0,T_f)\in\mathrm{CTL}(IOR)$ packages a discrete system $Z_f$ with boundary alphabets $(IR,OR)$, a designated initial state $s_0$, and a nonempty observation horizon $T_f\subseteq T_{IOR}$ such that for every $f\in ITR$ (and any input extension agreeing with $f$ on $T_{IOR}$), the generated output trajectory of $Z_f$ from $s_0$ agrees on $T_f$ with some eligible trajectory $g\in ER(f)$. By Wymore's Theorem~6.64, $\mathrm{CTL}(IOR)$ is either empty (when $IOR$ violates Moore causality) or infinite \citep{Wymore1993}.
+    \item \textbf{Buildability Cotyledon $\mathrm{CTL}(TYR)=\mathrm{BSR}(TYR)$.} A technology $TYR$ is a nonempty catalog of available discrete component systems (such as hardware registers, sensors, clocks, or software modules). A System Coupling Recipe $SCR=(VSCR,CSCR)$ specifies a vector $VSCR$ of component systems together with an internal port-to-port wiring relation $CSCR$. When every component in $VSCR$ belongs to $TYR$, synchronous composition of the wired components produces a unique \emph{resultant} discrete system $Z_b=\mathrm{RSY}(SCR)$ whose external inputs and outputs are the unconnected ports $\mathrm{UISCR}(SCR)$ and $\mathrm{UOSCR}(SCR)$. The buildability cotyledon $\mathrm{CTL}(TYR)$ consists of all such pairs $(SCR,Z_b)$ buildable from $TYR$.
+    \item \textbf{Implementability Cotyledon $\mathrm{CTL}(IOR,TYR)=\mathrm{ISR}(IOR,TYR)$.} Informally, engineers picture the implementability cotyledon as the ``overlap'' between functionality and buildability. Formally, because functional designs specify abstract boundary behavior whereas buildable designs specify coupled component architectures with potentially different state spaces and port structures, $\mathrm{CTL}(IOR,TYR)$ is the set of pairs $(D_f,D_b)\in\mathrm{CTL}(IOR)\times\mathrm{CTL}(TYR)$ linked by Wymore's \emph{implementation} relation (\texttt{IMPSY}, Definition~5.71) \citep{Wymore1993}.
 \end{enumerate}
 
-We often informally say that the implementability cotyledon is the ``overlap'' between the functionality and buildability cotyledons (not strictly correct, as the elements of the cotyledons are not comparable; but nonetheless useful for intuition).
+\subsection{System Modes, Homomorphisms, and Implementation}
+\label{sec:background-modes-hom}
+Why does a buildable resultant $Z_b=\mathrm{RSY}(SCR)$ rarely satisfy an abstract functional model $Z_f\in\mathrm{CTL}(IOR)$ by simple state-space equality? In practice, a buildable architecture includes implementation artifacts: multi-phase internal clocks, pipeline latches, diagnostic states, or unused port encodings. Conversely, an idealized functional model may have an infinite state space (such as an unbounded counter), while any physical machine operates within a bounded operational regime.
 
-\paragraph{Classical constructive practice.}
-To avoid quantifying directly over boundary trajectories, classical practice selects
-$D_{\mathrm{ref}}\in\mathrm{FSR}(IOR)$ and exhibits a surjective, transition- and
-readout-preserving homomorphism from the buildable resultant to the system component
-$Z_{\mathrm{ref}}:=D_{\mathrm{ref}}.Z$. T3SD shows that this homomorphism transfers requirement satisfaction when the input and output maps are identities.
-
-We restrict attention to Wymore discrete systems (DSYSTEMS): deterministic 5-tuples $Z=(S,I,O,\delta,\rho)$ \citep{Wymore1993}. ``Discrete'' refers to the clock; $S$, $I$, and $O$ may be infinite or real-valued at each tick. Given $f:T\to I$ and $s_0\in S$, Wymore's trajectory theorems yield unique state and output trajectories. Systems of interest are open: verification concerns observable boundary behavior \citep{salado2019mbse}.
+Wymore bridges this gap in Chapter~5 of \citet{Wymore1993} through two concepts:
+\begin{itemize}
+    \item \textbf{System Mode ($\mathrm{SYSMO}$, Definition~5.6).} A discrete system $Z_m=(S_m,I_m,O_m,\delta_m,\rho_m)$ is a \emph{system mode} of a buildable system $Z_b=(S_b,I_b,O_b,\delta_b,\rho_b)$, written $Z_m\in\mathrm{SYSMO}(Z_b)$, if $Z_m$ embeds into $Z_b$ via injective maps on states, inputs, and outputs such that each step of $Z_m$ corresponds to a well-defined trajectory segment of $Z_b$ within that invariant operational regime (for example, restricting $Z_b$ to its reachable post-reset states, an active clock phase, or a bounded operating envelope). Every system is trivially a mode of itself via its primary self-mode.
+    \item \textbf{System Homomorphism ($\mathrm{HIMSY}$, Definition~4.3).} A functional system $Z_f=(S_f,I_f,O_f,\delta_f,\rho_f)$ is a \emph{homomorphic image} of $Z_m$ if there exist \emph{surjective} maps $h_S:S_m\twoheadrightarrow S_f$, $h_I:I_m\twoheadrightarrow I_f$, and $h_O:O_m\twoheadrightarrow O_f$ that commute with state transitions and readouts at every state $x\in S_m$ and input $p\in I_m$:
+    \begin{equation}
+        h_S(\delta_m(x,p)) = \delta_f(h_S(x),h_I(p)), \qquad h_O(\rho_m(x)) = \rho_f(h_S(x)).
+        \label{eq:wymore-hom-def}
+    \end{equation}
+\end{itemize}
+By Wymore's Definition~5.71, a buildable resultant $Z_b$ \emph{implements} a functional system $Z_f$ if and only if $Z_f$ is a homomorphic image of at least one system mode $Z_m\in\mathrm{SYSMO}(Z_b)$. Crucially, Wymore's Theorem~6.58 proves that when $Z_m$ and $Z_f$ share the boundary alphabets $(IR,OR)$ with identity port maps ($h_I=\mathrm{id}_{IR}$, $h_O=\mathrm{id}_{OR}$), any homomorphism $h_S:S_m\twoheadrightarrow S_f$ preserves $IOR$ satisfaction exactly:
+\begin{equation}
+    \mathrm{SatisfiesIOR}(Z_m,IOR,s_0,T) \;\Longleftrightarrow\; \mathrm{SatisfiesIOR}(Z_f,IOR,h_S(s_0),T).
+    \label{eq:thm-658-preview}
+\end{equation}
 
 \miniheading{Notation}
-Table~\ref{tab:notation} maps Wymore textbook notation \citep{Wymore1993} to the more ergonomic functional notation used here.
+Table~\ref{tab:notation} summarizes Wymore's textbook nomenclature \citep{Wymore1993} alongside the standard mathematical notation used throughout this paper.
 
 \begingroup
-\renewcommand{\arraystretch}{1.4}
+\renewcommand{\arraystretch}{1.35}
 \footnotesize
-\begin{tabularx}{\linewidth}{@{}A{0.22\linewidth} A{0.32\linewidth} >{\raggedright\arraybackslash}X@{}}
+\begin{tabularx}{\linewidth}{@{}A{0.25\linewidth} A{0.33\linewidth} >{\raggedright\arraybackslash}X@{}}
     \rowcolor{tableheader}
-    \headingfont\bfseries Name & \headingfont\bfseries Wymore & \headingfont\bfseries Mathematical notation \\
+    \headingfont\bfseries Concept & \headingfont\bfseries Wymore (T3SD) & \headingfont\bfseries Notation in This Paper \\
     \addlinespace[3pt]
-    Discrete system 5-tuple & $(SZ, IZ, OZ, \text{NZ}, \text{RZ})$ & $(S, I, O, \delta, \rho)$ \\
+    Discrete system 5-tuple & $(SZ, IZ, OZ, \text{NZ}, \text{RZ})$ & $Z = (S, I, O, \delta, \rho)$ \\
     Input/Output Requirement & $\text{IOR} = (\text{OLR},\text{IR},\text{ITR},\text{OR},\text{OTR},\text{ER})$ & $IOR = (OLR, IR, ITR, OR, OTR, ER)$ \\
     Functionality Cotyledon & $\text{CTL}(\text{IOR}) = \text{FSR}(\text{IOR})$ & $\mathrm{CTL}(IOR) = \mathrm{FSR}(IOR)$ \\
     Buildability Cotyledon & $\text{CTL}(\text{TYR}) = \text{BSR}(\text{TYR})$ & $\mathrm{CTL}(TYR) = \mathrm{BSR}(TYR)$ \\
-    Implementability Cotyledon & $\text{CTL}(\text{IOR}, \text{TYR}) = \text{ISR}$ & $\mathrm{CTL}(IOR, TYR) = \mathrm{ISR}(IOR, TYR)$ \\
-    Coupling recipe / resultant & $\text{SCR} = (\text{VSCR}, \text{CSCR}),\ \text{RSY}(\text{SCR})$ & $SCR = (VSCR, CSCR),\ RSY(SCR)$ \\
-    Next state function & $\text{NZ}(x, p)$ & $\delta(s, i)$ \\
-    Readout function & $\text{RZ}(x)$ & $\rho(s)$ \\
-    Time scale & $\text{TZ}$ & $T$ \\
-    Input / state / output trajectories & $\text{ITZ}$, $\text{STZ}$, $\text{OTZ}$ & $f,g,y$ \\
-    Homomorphism maps & $\text{HS}, \text{HI}, \text{HO}$ & $h_S, h_I, h_O$ \\
+    Implementability Cotyledon & $\text{CTL}(\text{IOR}, \text{TYR}) = \text{ISR}(\text{IOR},\text{TYR})$ & $\mathrm{CTL}(IOR, TYR) = \mathrm{ISR}(IOR, TYR)$ \\
+    Coupling recipe \& resultant & $\text{SCR} = (\text{VSCR}, \text{CSCR}),\ \text{RSY}(\text{SCR})$ & $SCR = (VSCR, CSCR),\ Z_b = \mathrm{RSY}(SCR)$ \\
+    System modes of $Z_b$ & $\text{SYSMO}(Z_b)$ & $Z_m \in \mathrm{SYSMO}(Z_b)$ \\
+    Homomorphic image / maps & $Z_f \in \text{HIMSY}(Z_m)$ via $(\text{HS},\text{HI},\text{HO})$ & $h = (h_S, h_I, h_O) : Z_m \twoheadrightarrow Z_f$ \\
+    Implementation relation & $Z_f \in \text{IMPSY}(Z_b)$ & $\exists Z_m \in \mathrm{SYSMO}(Z_b),\ h : Z_m \twoheadrightarrow Z_f$ \\
+    Boundary / dynamics fragments & --- & $\Phi_{IOR}$ (boundary),\ $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ (dynamics) \\
 \end{tabularx}
-\captionof{table}{Wymore-to-functional notation map (abridged).}
+\captionof{table}{Correspondence between Wymore's T3SD terminology \citep{Wymore1993} and the mathematical notation used in this paper.}
 \label{tab:notation}
 \endgroup
 \vspace{4pt}
 
-Conventions: $D_{\mathrm{ref}}$ is a chosen functional design in $\mathrm{FSR}(IOR)$,
-$Z_{\mathrm{ref}}$ is its system component, and $Z_{\mathrm{impl}}$ is the resultant
-of the buildable design under verification. The symbol $h$ denotes a Wymorian system
-homomorphism, $\Phi_R$ denotes the characteristic boundary fragment of $R$, and
-$\Phi_{\mathrm{dyn}}$ denotes the dynamics fragment compiled from $Z_{\mathrm{ref}}$.
-
-\subsection{Temporal Logics}
-Temporal logics provide notation and checking methods for time-indexed traces
-\citep{BaierKatoen2008,Pnueli1977}. This paper identifies two fragments aligned
-with Wymore's definitions. The characteristic boundary fragment retains the
-predicates and trajectory relation of an IOR. The dynamics fragment uses the operators in Table~\ref{tab:ltl-operators}. Some IOR relations
-require symbolic predicates as they lack a finite ordinary LTL formula.
+\subsection{Temporal Logics and Model Checking}
+\label{sec:background-ltl}
+Linear Temporal Logic (LTL) and its first-order extensions provide a mathematically precise language for asserting properties of time-indexed trajectories \citep{Pnueli1977,MannaPnueli1995,BaierKatoen2008,VardiWolper1986,Thomas1990}. Rather than specifying a system by writing down an explicit state set and transition table, a temporal formula specifies the admissible infinite or finite traces directly using Boolean connectives ($\wedge,\vee,\neg,\rightarrow$) and temporal modalities such as $G\,\varphi$ (``always $\varphi$'') and $X\,\varphi$ (``at the next tick, $\varphi$''), summarized in Table~\ref{tab:ltl-operators}.
 
 \begingroup
 \renewcommand{\arraystretch}{1.35}
 \footnotesize
 \begin{tabularx}{\linewidth}{@{}P{0.12\linewidth} P{0.16\linewidth} A{0.28\linewidth} A{0.38\linewidth}@{}}
     \rowcolor{tableheader}
-    \headingfont\bfseries Op. & \headingfont\bfseries Name & \headingfont\bfseries Role in $\Phi_{\mathrm{dyn}}$ & \headingfont\bfseries Reading \\
+    \headingfont\bfseries Op. & \headingfont\bfseries Name & \headingfont\bfseries Role in T3SD Bridge & \headingfont\bfseries Semantics at Tick $t$ \\
     \addlinespace[2pt]
-    $G\,\varphi$ & always & Required (outer safety) & $\varphi$ at every tick \\
+    $G\,\varphi$ & always & Global safety / invariants & $\varphi$ holds at all ticks $\tau \ge t$ \\
     \addlinespace[2pt]
-    $X\,\varphi$ & next & Required (transitions) & $\varphi$ at the next tick \\
+    $X\,\varphi$ & next & One-step transition / delay & $\varphi$ holds at tick $t+1$ \\
     \addlinespace[2pt]
-    $\varphi \rightarrow \psi$ & implication & Required (guards) & if $\varphi$ then $\psi$ \\
+    $\varphi \rightarrow \psi$ & implication & Guarded transitions / readouts & If $\varphi$ holds at $t$, then $\psi$ holds at $t$ \\
     \addlinespace[2pt]
-    $\varphi \wedge \psi$ & conjunction & Required (joint guards) & both hold at the tick \\
+    $\varphi \wedge \psi$ & conjunction & Joint state/input guards & Both $\varphi$ and $\psi$ hold at $t$ \\
     \addlinespace[2pt]
-    $F\,\varphi$ & eventually & \textbf{Excluded} from $\Phi_{\mathrm{dyn}}$ & some future tick (outside fragment) \\
+    $F\,\varphi$ & eventually & Liveness (outside $\Phi_{\mathrm{dyn}}$) & $\varphi$ holds at some future tick $\tau \ge t$ \\
 \end{tabularx}
-\captionof{table}{Temporal operators aligned with the dynamics-encoding fragment.}
+\captionof{table}{Core temporal logic operators used to express boundary requirements $\Phi_{IOR}$ and compiled dynamics $\Phi_{\mathrm{dyn}}$.}
 \label{tab:ltl-operators}
 \endgroup
+\vspace{4pt}
+
+When a discrete system $Z_m$ has finite state, input, and output sets, its closed-loop execution defines a finite Kripke structure whose paths are infinite sequences of $(s(t),i(t),y(t))$ triples. Deciding whether every run of a finite-state system satisfies an LTL formula ($Z_m\models\varphi$) is PSPACE-complete \citep{SistlaClarke1985} and supported by decades of industrial-strength explicit-state, symbolic BDD, and SAT/SMT-based model checkers \citep{BurchClarkeMcMillanDill1992,BiereCimattiClarkeZhu1999,BaierKatoen2008,deMouraZ32008}.
 
 \subsection{Related Work}
 \label{sec:related-work}
-
-Three bodies of work are relavant to the current work. Safety fragments use invariant,
-step-local formulas and support mature checking methods
-\citep{Sistla1994,MannaPnueli1995,BiereCimattiClarkeZhu1999}. Characteristic
-formulas compile operational models into logical descriptions, commonly up to
-simulation or bisimulation \citep{GrafSifakis1986,SteffenIngolfsdottir1994};
-here the induced relation is Wymore's homomorphic image, whose maps resemble
-bounded morphisms \citep{BlackburnDeRijkeVenema2001}. T3SD modernization, DEVS,
-contract-based requirements, and supervisory control provide related settings where assertional validation is desirable \citep{salado2019wymore,wach2021devs,salado2019mbse,RamadgeWonham1989}.
-This paper establishes the correspondence between Wymore functionality and
-implementation. Searching for finite maps is NP-hard in general
-\citep{HellNesetril1990}.
+Three research threads inform our approach. First, in formal verification, safety fragments of temporal logic characterize step-local invariants \citep{Sistla1994,MannaPnueli1995}, and characteristic-formula constructions encode operational models into modal or temporal formulas up to simulation or bisimulation \citep{Milner1989,GrafSifakis1986,SteffenIngolfsdottir1994,AcetoEtAl2012}. In our setting, the induced relation is Wymore's surjective system homomorphism, which corresponds algebraically to a bounded morphism on deterministic coalgebras \citep{Rutten2000,BlackburnDeRijkeVenema2001}. Second, in combinatorial complexity, finding a surjective homomorphism between finite transition systems is NP-hard in general \citep{HellNesetril1990,BodirskyKaraMartin2012}, motivating our shift from manual homomorphism construction to direct LTL verification of system modes. Third, recent MBSE research has sought to modernize T3SD and connect it with SysML, DEVS, and contract-based design \citep{salado2019wymore,salado2019mbse,wach2021devs,ZeiglerPraehoferKim2000,BenvenisteEtAl2018,INCOSE2023}. Our work complements those efforts by importing the decidable verification machinery of temporal logic directly into Wymore's tricotyledon framework.
