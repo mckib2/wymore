@@ -73,6 +73,10 @@ import Mbse.SolverWitness
 import Mbse.PaperClaimLinkage
 import Mbse.ClassicalAssertionalBridge
 import Mbse.AssertionalCotyledonBridge
+import Mbse.DocExport
+import Mbse.TechdocAttr
+import Mbse.TechdocDerive
+import Mbse.ToyCascade
 import Mbse.WymoreExercises
 import Mbse.TextbookExercises
 import Mbse.ComposedCaseStudy

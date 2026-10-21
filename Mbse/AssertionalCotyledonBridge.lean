@@ -1,4 +1,5 @@
 import Mbse.PartialDynamicsHomFragment
+import Mbse.TechdocAttr
 import Mbse.WymoreRequirements
 import Mbse.WymoreImplementation
 import Mbse.WymoreTechnology
@@ -371,14 +372,16 @@ noncomputable def tm_coupled_in_isr (Γ Λ : Type) [Inhabited Γ] [Finite Γ] [F
 open RunLengthMachine
 
 /--
-The wired four-component resultant implements the pipeline-aware run-length requirement.
-Membership is obtained from `SystemSatisfiesPartialDynamicsHom`, not from a hand-supplied
-homomorphism. Theorem 6.58 is not used: the boundary maps are projections.
+Streaming run-length encoding (four-component machine).
+Four-component RLE technology with tape→table→register cascade and head self-loop;
+pipelineIOR; ImplementableSystemDesign via resultant-level Implements.ofHomomorphicImage.
 
 This is a **resultant-level** Def. 5.71 witness via `Implements.ofHomomorphicImage` (primary
 self-mode of `rleResultant`).  It is not the Python checker's reachable operational mode, and
-it does not certify that checker's reachable-state cardinalities.
+it does not certify that checker's reachable-state cardinalities. Membership is obtained from
+`SystemSatisfiesPartialDynamicsHom`; Theorem 6.58 is not used (boundary maps are projections).
 -/
+@[techdoc "rle"]
 noncomputable def rle_in_isr : ImplementableSystemDesign pipelineIOR rleTechnology :=
   Classical.choice <|
     ctl_ior_tyr_nonempty_of_partialDynamicsHom

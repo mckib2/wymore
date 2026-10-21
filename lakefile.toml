@@ -22,3 +22,8 @@ name = "Appendix3"
 [[lean_exe]]
 name = "mbse"
 root = "Main"
+
+[[lean_exe]]
+name = "mbse-doc-export"
+root = "MainDocExport"
+supportInterpreter = true

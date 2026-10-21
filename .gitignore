@@ -1,2 +1,9 @@
 /.lake
 build/
+*.aux
+*.log
+*.out
+*.toc
+# techdoc intermediate TeX junk under examples (PDFs stay under build/)
+examples/techdoc/**/*.aux
+examples/techdoc/**/*.log
