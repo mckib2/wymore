@@ -3,6 +3,7 @@ import Mbse.ComposedCaseStudy
 import Mbse.MinskyKit
 import Mbse.FibCaseStudy
 import Mbse.SwarmExamples
+import Mbse.WymoreTechnology
 import Mbse.AssertionalFC
 import Mbse.DynamicsLivenessExplore
 import Mbse.DynamicsLivenessUResponse
@@ -19,10 +20,14 @@ Documented, importable demos for papers and CI smoke tests:
 * [`ComposedCaseStudy`](ComposedCaseStudy.lean) — gallery: cascade double-`01110` + Plus3
 * [`SwarmExamples`](SwarmExamples.lean) — UAV swarm mask case study
 * [`AssertionalFC`](AssertionalFC.lean) — public verification API
+
+SAINT UoP / mission models live outside this package in
+`/home/nicholas/lmsaint/saint-mbse` (`SaintMbse`).
 -/
 
 namespace MbseExamples
 
+open WymoreTechnology
 open WymoreExercises ComposedCaseStudy MinskyKit FibCaseStudy
   DynamicsLivenessExplore DynamicsLivenessUResponse
   PartialDynamicsHomFragment Homomorphism

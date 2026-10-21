@@ -1,35 +1,35 @@
 \subsection{Invariance and Compositional Reuse Across Architectural Refactoring}
 \label{sec:invariance}
 
-A major pain point of constructive T3SD is that a homomorphism $h=(h_S,h_I,h_O):Z_m\twoheadrightarrow Z_f$ is tied to the specific internal state representations of both machines. If an engineer refactors a component's state encoding, reorders ports, or elaborates a subsystem with diagnostic counters, the explicit map $h_S$ breaks and must be redefined. By contrast, the temporal specifications $\Phi_{IOR}$ and $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ remain fixed while the underlying implementation evolves.
+A practical limitation of constructive T3SD is that a homomorphism $h=(h_S,h_I,h_O):Z_m\twoheadrightarrow Z_f$ is tied to the specific internal state representations of both machines. If an engineer refactors a component's state encoding, reorders ports, or elaborates a subsystem with diagnostic counters, the explicit map $h_S$ must be redefined. By contrast, the temporal specifications $\Phi_{IOR}$ and $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ remain unchanged while the underlying implementation evolves.
 
 \begin{theorem}[Encoding and Copy Invariance]
 \label{thm:encoding-invariance}
-Replacing either the reference system $Z_{\mathrm{ref}}$ or the candidate mode $Z_m$ by an isomorphic discrete system preserves satisfaction of $\Phi_{IOR}$ (on matching boundaries) and of $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$. The same invariance holds for T3SD copies ($\mathrm{COPY}$, Definition~4.27) that rename or permute component ports.
+Replacing either the reference system $Z_{\mathrm{ref}}$ or the candidate mode $Z_m$ by an isomorphic discrete system preserves satisfaction of $\Phi_{IOR}$ (on matching boundaries) and of $\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$. The same invariance holds when component ports are renamed or permuted via a bijective port relabeling (termed a system copy, $\mathrm{COPY}$, in Definition~4.27 of \citet{Wymore1993}).
 \end{theorem}
 
-\begin{proof}[Intuitive proof]
-Isomorphisms and port copies are invertible system homomorphisms. Composing a witnessing homomorphism with an isomorphism on either side preserves surjectivity as well as the transition and readout commuting equations~\eqref{eq:wymore-hom-def}, so conformance transfers in both directions.
+\begin{proof}
+System isomorphisms and bijective port copies are invertible system homomorphisms. Composing a witnessing homomorphism with an isomorphism on either side preserves surjectivity as well as the transition and readout commuting equations~\eqref{eq:wymore-hom-def}, so temporal conformance transfers in both directions.
 \end{proof}
 
 Beyond representation changes, systems engineering architectures are hierarchical: components in a coupling recipe $SCR$ are elaborated independently by subsystem teams and then integrated into a coupled resultant $\mathrm{RSY}(SCR)$.
 
 \begin{theorem}[Compositional Elaboration and Coupling]
 \label{thm:elaboration-coupling}
-Temporal dynamics conformance composes transitively through successive homomorphic elaborations and system modes (under autonomous stutter preservation, Wymore Theorem~5.97). Furthermore, given two coupling recipes $SCR$ and $SCR'$ sharing the same wiring topology, port-preserving component conformance $Z'_i\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_i)$ for each component $i\in\{1,\dots,n\}$ lifts to resultant conformance $\mathrm{RSY}(SCR')\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(\mathrm{RSY}(SCR))$ (Wymore Theorem~4.56).
+Temporal dynamics conformance composes transitively through successive homomorphic elaborations and system modes (preserving autonomous steps, Theorem~5.97 of \citet{Wymore1993}). Furthermore, given two coupling recipes $SCR$ and $SCR'$ sharing the same wiring topology, port-preserving component conformance $Z'_i\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_i)$ for each component $i\in\{1,\dots,n\}$ lifts to resultant conformance $\mathrm{RSY}(SCR')\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(\mathrm{RSY}(SCR))$ (Theorem~4.56 of \citet{Wymore1993}).
 \end{theorem}
 
-\begin{proof}[Intuitive proof]
+\begin{proof}
 By Theorem~\ref{thm:dynamics-characterization}, componentwise conformance supplies port-preserving homomorphisms $h_i:Z'_i\twoheadrightarrow Z_i$. Taking the Cartesian product of the state maps $h_S(x)_i=h_{S,i}(x_i)$ and matching port maps along internal wires ensures that every internal connection in $SCR'$ carries a value that projects to the corresponding internal connection in $SCR$. Thus the product map commutes with the synchronous resultant transition and readout functions of $\mathrm{RSY}(SCR')$ and $\mathrm{RSY}(SCR)$.
 \end{proof}
 
-Finally, on finite-state systems, mutual satisfaction of compiled dynamics fragments characterizes behavioral equivalence up to isomorphism:
+Finally, when comparing alternative finite-state architectures during trade studies or refactoring, mutual satisfaction of compiled dynamics fragments provides an automated test for behavioral isomorphism:
 
 \begin{theorem}[Finite Canonicity]
 \label{thm:finite-canonicity}
 Let $Z_1$ and $Z_2$ be finite discrete systems. If $Z_1\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_2)$ and $Z_2\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_1)$, then $Z_1$ and $Z_2$ are isomorphic.
 \end{theorem}
 
-\begin{proof}[Intuitive proof]
-Mutual satisfaction yields surjective homomorphisms $Z_1\twoheadrightarrow Z_2$ and $Z_2\twoheadrightarrow Z_1$. By the pigeonhole principle on finite state, input, and output sets, mutually surjective maps between finite sets must be bijections, yielding a Wymore system isomorphism.
+\begin{proof}
+By Theorem~\ref{thm:dynamics-characterization}, mutual satisfaction yields surjective Wymore homomorphisms $Z_1\twoheadrightarrow Z_2$ and $Z_2\twoheadrightarrow Z_1$. By the pigeonhole principle on finite state, input, and output sets, mutually surjective maps between finite sets must be bijections, yielding a Wymore system isomorphism (Exercise~4.83 of \citet{Wymore1993}). Mutual simulation or bisimulation alone would be strictly weaker: Wymore's $\mathrm{HIMSY}$ requires surjective $h_S$, so a $2$-state system cannot be a homomorphic image of a $3$-state system in the reverse direction, and cardinality mismatch is ruled out before the bijection step.
 \end{proof}

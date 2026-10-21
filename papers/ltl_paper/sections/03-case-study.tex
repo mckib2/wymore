@@ -1,9 +1,8 @@
 \section{Case Study: Streaming Run-Length Encoder}
 \label{sec:case-study}
 
-To demonstrate how temporal logic bridges the functionality cotyledon $\mathrm{CTL}(IOR)$ and the buildability cotyledon $\mathrm{CTL}(TYR)$ in practice, we develop a complete verification case study around a streaming Run-Length Encoder (RLE) assembled from four coupled discrete components: an input tape, a read/act head, an instruction table, and an output register. We trace the design from an idealized infinite-tape requirement $IOR_\infty$ to a family of finite-tape buildable machines $Z_{b,N}=\mathrm{RSY}(SCR_N)\in\mathrm{CTL}(TYR_N)$, isolate their operational system modes $Z_{m,N}\in\mathrm{SYSMO}(Z_{b,N})$, and verify membership in the implementability cotyledon $\mathrm{CTL}(IOR_N,TYR_N)$ automatically using propositional LTL model checking.
+To demonstrate how temporal logic bridges the functionality cotyledon $\mathrm{CTL}(IOR)$ and the buildability cotyledon $\mathrm{CTL}(TYR)$, we develop a verification case study around a streaming Run-Length Encoder (RLE) assembled from four coupled discrete components: an input tape ($Z_0$), a sense/act head ($Z_1$), an output register ($Z_2$), and an instruction table ($Z_3$). Following a top-down systems engineering progression, we begin with an idealized infinite-tape requirement $IOR_\infty$ in $\mathrm{CTL}(IOR_\infty)$, refine the design to a family of finite-tape buildable machines $Z_{b,N}=\mathrm{RSY}(SCR_N)\in\mathrm{CTL}(TYR_N)$, isolate their operational system modes $Z_{m,N}\in\mathrm{SYSMO}(Z_{b,N})$, and verify membership in the implementability cotyledon $\mathrm{CTL}(IOR_N,TYR_N)$ using propositional LTL model checking.
 
-\input{sections/03-case-study-basics}
 \input{sections/03-case-study-machine}
 \input{sections/03-case-study-ticks}
 \input{sections/03-case-study-solver}

@@ -1,7 +1,7 @@
 \subsection{Pipeline Latency, Clock Discipline, and Matched Ticks}
 \label{sec:case-ticks}
 
-A recurring source of confusion in model-based systems engineering is distinguishing a genuine behavioral bug from a timing-abstraction mismatch between an idealized specification and a staged hardware implementation. Because a Wymore homomorphism equates one tick of the buildable mode $Z_m$ with one tick of the functional design $Z_f$, both the two-phase sense/act clock of the RLE head and the two-stage Moore pipeline delay of the coupling recipe $SCR$ must be respected at the system boundary.
+A common source of verification failures in model-based systems engineering is a timing-abstraction mismatch between an idealized specification and a staged hardware implementation. Because a Wymore homomorphism equates one tick of the buildable mode $Z_m$ with one tick of the functional design $Z_f$, both the two-phase sense/act clock of the RLE head and the two-stage Moore pipeline delay of the coupling recipe $SCR$ must be reflected at the system boundary.
 
 \begin{figure*}[t]
   \centering
@@ -67,20 +67,20 @@ A recurring source of confusion in model-based systems engineering is distinguis
   \label{fig:rle-timing}
 \end{figure*}
 
-Figure~\ref{fig:rle-timing} traces the exact tick-by-tick propagation across the coupled RLE machine:
+Figure~\ref{fig:rle-timing} traces the tick-by-tick signal propagation across the coupled RLE machine:
 \begin{enumerate}
-    \item At tick $t=2k$, the external input bit $f(2k)$ arrives at the tape's input port and is latched into the tape state at tick $2k+1$.
-    \item During tick $2k+1$, the instruction table reads the tape's new output $\rho_0(2k+1)$ on its sense phase, and on the subsequent act transition produces the updated run-length pair $(f(2k),\mathrm{runLen}_N(f,k))$ in the table readout $\rho_3(2k+2)$.
+    \item At tick $t=2k$, the external input bit $f(2k)$ arrives at the input tape and is latched into the tape state at tick $2k+1$.
+    \item During tick $2k+1$, the instruction table reads the tape's new output $\rho_0(2k+1)$ on its sense phase ($c=0$), and on the subsequent act transition ($c=1$) produces the updated run-length pair $(f(2k),\mathrm{runLen}_N(f,k))$ in the table readout $\rho_3(2k+2)$.
     \item During tick $2k+2$, the output register latches $\rho_3(2k+2)$, making the encoded pair visible at the external boundary output $y(2k+3)$ and holding it through $y(2k+4)$.
 \end{enumerate}
 
-If an engineer writes an idealized requirement that ignores either the two-phase sense/act cycle or the internal register stages, the model checker immediately rejects the pairing and identifies the exact tick where the timing abstractions diverge:
+If an engineer writes an idealized reference specification that updates on every tick or omits the internal pipeline stages, no lock-step Wymore homomorphism can exist from the two-phase operational mode $Z_{m,N}$:
 
-\begin{proposition}[Matched-Tick Requirement for Multi-Phase Implementations]
+\begin{proposition}[Matched-Tick Requirement for Multi-Phase Modes]
 \label{prop:matched-ticks}
-Let $Z_{\mathrm{ref},1}$ be a single-tick reference bit that toggles on every driven tick, and let $Z_m$ be a two-phase implementation whose head alternates between sense ($c=0$) and act ($c=1$) while toggling its bit only on act ticks. Then $Z_m\not\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref},1})$. Conversely, when the reference $Z_{\mathrm{ref},2}$ is stated at the matched two-tick sense/act granularity, $Z_m\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref},2})$ holds via a system isomorphism.
+Let $Z_{\mathrm{ref},1}$ be a single-phase reference system whose output updates on every driven tick, and let $Z_m$ be a two-phase system mode whose sense/act head alternates between sense ($c=0$, holding the previous output) and act ($c=1$, updating the output). Then $Z_m\not\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref},1})$. Conversely, when the reference $Z_{\mathrm{ref},2}$ is stated at the matched two-tick sense/act clock and pipeline latency, $Z_m\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref},2})$ holds.
 \end{proposition}
 
-\begin{proof}[Intuitive proof]
-Readout preservation $h_O(\rho_m(x))=\rho_{\mathrm{ref},1}(h_S(x))$ forces the state projection $h_S$ to depend only on the output bit. On a sense tick ($c=0$), the two-phase implementation holds its bit while the single-tick reference toggles, so one-step transition commutation would require $b = \neg b$, a contradiction. Restating the reference at the two-tick sense/act clock aligns both state coordinates and makes the identity map an isomorphism.
+\begin{proof}
+Readout preservation $h_O(\rho_m(x))=\rho_{\mathrm{ref},1}(h_S(x))$ requires the projected reference state $h_S(x)$ to carry the current boundary output of $Z_m$. On a sense tick ($c=0$), the two-phase mode $Z_m$ holds its boundary output constant while the single-phase reference $Z_{\mathrm{ref},1}$ transitions to a distinct next-step output, violating one-step transition commutation $h_S(\delta_m(x,p))=\delta_{\mathrm{ref},1}(h_S(x),h_I(p))$. Stating $Z_{\mathrm{ref},2}$ at the matched two-tick sense/act granularity aligns the hold and update steps across both systems.
 \end{proof}
