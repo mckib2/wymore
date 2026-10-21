@@ -49,7 +49,7 @@ make techdoc-rle
 Outputs under `build/techdoc/<id>/`:
 
 - `design.json` — derived Lean export
-- `figures/{technology,coupling,poi}.pdf` — compiled TikZ figures
+- `figures/{technology,coupling,poi,lsc}.pdf` — compiled TikZ figures
 - `report.pdf` — narrative document including those figures
 
 ### Manual / golden JSON (no Lean rebuild)

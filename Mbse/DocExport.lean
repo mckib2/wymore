@@ -55,12 +55,21 @@ structure CouplingDoc where
   boundaryPorts : List BoundaryPortDoc := []
   deriving Repr, Inhabited
 
+structure LscDoc where
+  chartName : String := ""
+  preCondition : String := ""
+  mainCondition : String := ""
+  inMessage : String := ""
+  outMessage : String := ""
+  deriving Repr, Inhabited
+
 structure IorDoc where
   name : String
   inputType : String := ""
   outputType : String := ""
   horizon : String := "infinite"  -- "infinite" | "finite <n>"
   description : String := ""
+  lsc : Option LscDoc := none
   deriving Repr, Inhabited
 
 structure ImplementsDoc where
@@ -133,14 +142,27 @@ private def couplingToJson (c : CouplingDoc) : Json :=
     ("boundaryPorts", Json.arr (c.boundaryPorts.map boundaryToJson).toArray)
   ]
 
-private def iorToJson (i : IorDoc) : Json :=
+private def lscToJson (l : LscDoc) : Json :=
   Json.mkObj [
+    ("chartName", Json.str l.chartName),
+    ("preCondition", Json.str l.preCondition),
+    ("mainCondition", Json.str l.mainCondition),
+    ("inMessage", Json.str l.inMessage),
+    ("outMessage", Json.str l.outMessage)
+  ]
+
+private def iorToJson (i : IorDoc) : Json :=
+  let base := [
     ("name", Json.str i.name),
     ("inputType", Json.str i.inputType),
     ("outputType", Json.str i.outputType),
     ("horizon", Json.str i.horizon),
     ("description", Json.str i.description)
   ]
+  let fields := match i.lsc with
+    | some l => base ++ [("lsc", lscToJson l)]
+    | none => base
+  Json.mkObj fields
 
 private def implementsToJson (i : ImplementsDoc) : Json :=
   Json.mkObj [

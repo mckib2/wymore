@@ -17,6 +17,11 @@ def _escape(s: str) -> str:
         s.replace("×", "<<TIMES>>")
         .replace("→", "<<TO>>")
         .replace("↔", "<<IFF>>")
+        .replace("∈", "<<IN>>")
+        .replace("∉", "<<NOTIN>>")
+        .replace("⊆", "<<SUBSET>>")
+        .replace("∀", "<<FORALL>>")
+        .replace("∃", "<<EXISTS>>")
         .replace("—", "---")
         .replace("–", "--")
     )
@@ -33,6 +38,11 @@ def _escape(s: str) -> str:
         s.replace("<<TIMES>>", r"$\times$")
         .replace("<<TO>>", r"$\to$")
         .replace("<<IFF>>", r"$\leftrightarrow$")
+        .replace("<<IN>>", r"\in ")
+        .replace("<<NOTIN>>", r"\notin ")
+        .replace("<<SUBSET>>", r"\subseteq ")
+        .replace("<<FORALL>>", r"\forall ")
+        .replace("<<EXISTS>>", r"\exists ")
     )
 
 
@@ -397,16 +407,117 @@ def poi_tikz(doc: IsrPackageDoc) -> str:
     return _standalone(body)
 
 
+def _format_lsc_cond(cond: str) -> str:
+    """Format an LSC condition string nicely for LaTeX math mode."""
+    s = cond.strip()
+    s = s.replace("∈", r"\in ").replace("∉", r"\notin ")
+
+    # Check for <ior>.itr
+    m_itr = re.search(r"^(.*?)\s*(\\in|\\notin)\s*([\w]+)\.itr\s*$", s)
+    if m_itr:
+        var = m_itr.group(1).strip()
+        rel = m_itr.group(2)
+        ior_id = _escape(m_itr.group(3))
+        return f"{var} {rel} \\mathtt{{{ior_id}.itr}}"
+
+    # Check for <ior>.er <var>
+    m_er = re.search(r"^(.*?)\s*(\\in|\\notin)\s*([\w]+)\.er\s+([\w]+)\s*$", s)
+    if m_er:
+        var_out = m_er.group(1).strip()
+        rel = m_er.group(2)
+        ior_id = _escape(m_er.group(3))
+        var_in = m_er.group(4).strip()
+        return f"{var_out} {rel} \\mathtt{{{ior_id}.er}}({var_in})"
+
+    return _escape(s)
+
+
+def lsc_tikz(doc: IsrPackageDoc) -> str:
+    """Render publication-quality Universal Live Sequence Chart (LSC) corresponding to the IOR."""
+    ior = doc.ior
+    lsc = ior.lsc
+
+    chart_name = _escape((lsc.chart_name if lsc and lsc.chart_name else f"LSC_{ior.name}"))
+    in_type = _escape(ior.input_type or "IR")
+    out_type = _escape(ior.output_type or "OR")
+    horizon = _escape(ior.horizon or "infinite")
+    ior_name = _escape(ior.name)
+
+    raw_pre = lsc.pre_condition if lsc and lsc.pre_condition else f"f ∈ {ior.name}.itr"
+    raw_main = lsc.main_condition if lsc and lsc.main_condition else f"g ∈ {ior.name}.er f"
+    pre_cond = _format_lsc_cond(raw_pre)
+    main_cond = _format_lsc_cond(raw_main)
+    in_msg = _escape((lsc.in_message if lsc and lsc.in_message else f"in(f(t)) : {ior.input_type}"))
+    out_msg = _escape((lsc.out_message if lsc and lsc.out_message else f"out(g(t)) : {ior.output_type}"))
+
+    body = f"""\\begin{{tikzpicture}}[
+{theme.TIKZ_BASE_STYLE}
+]
+% Lifeline Heads
+\\node[lifelinehead] (env) at (0, 0) {{\\textbf{{Env}}}};
+\\node[lifelinehead] (sys) at (7.4, 0) {{\\textbf{{Sys}}}};
+
+% Pre-Chart (Cold Trigger Region)
+\\node[coldframe, minimum width=9.2cm, minimum height=2.2cm, anchor=north] (pre_box) at (3.7, -1.25) {{}};
+\\node[font=\\footnotesize\\sffamily\\bfseries, text=coldBlue, anchor=south west] at (pre_box.north west)
+  {{Pre-Chart: Cold Trigger ($f \\in \\mathrm{{ITR}}$)}};
+
+% Main-Chart (Hot Guarantee Region)
+\\node[hotframe, minimum width=9.2cm, minimum height=2.9cm, anchor=north] (main_box) at (3.7, -4.25) {{}};
+\\node[font=\\footnotesize\\sffamily\\bfseries, text=hotRed, anchor=south west] at (main_box.north west)
+  {{Main-Chart: Hot Guarantee ($g \\in \\mathrm{{ER}}(f)$)}};
+
+% Vertical Lifeline Rays (drawn on top of chart fills so they are continuously visible)
+\\draw[dashed, thick, black!45] (env.south) -- (0, -7.8);
+\\draw[dashed, thick, black!45] (sys.south) -- (7.4, -7.8);
+
+% Cold Input Message (Env -> Sys)
+\\draw[-{{Stealth}}, dashed, thick, draw=coldBlue] (0, -1.95) --
+  node[above=2pt, font=\\scriptsize\\sffamily, text=coldBlue] {{\\texttt{{{in_msg}}}}} (7.4, -1.95);
+
+% Cold Guard Condition
+\\node[lsccond, draw=coldBlue, dashed] at (3.7, -2.75)
+  {{\\textbf{{Cold Condition:}} ${pre_cond}$\\\\[1pt]\\scriptsize(Eligible Input Trajectory)}};
+
+% Tick Synchronization
+\\draw[dashdotted, thick, black!40] (-0.7, -4.9) --
+  node[above=1pt, font=\\tiny\\sffamily, text=black!60] {{Discrete Tick Sync $t \\in \\mathrm{{TSR}}$ \\quad (Horizon: {horizon})}} (8.1, -4.9);
+
+% Hot Output Message (Sys -> Env)
+\\draw[-{{Stealth}}, solid, thick, draw=hotRed] (7.4, -5.6) --
+  node[above=2pt, font=\\scriptsize\\sffamily, text=hotRed] {{\\texttt{{{out_msg}}}}} (0, -5.6);
+
+% Hot Envelope Condition
+\\node[lsccond, draw=hotRed, solid, thick] at (3.7, -6.45)
+  {{\\textbf{{Hot Guarantee:}} ${main_cond}$\\\\[1pt]\\scriptsize(Full Envelope Membership)}};
+
+% Outer Universal LSC Frame
+\\begin{{scope}}[on background layer]
+\\node[draw=black!55, thick, rounded corners=6pt, fit=(env)(sys)(pre_box)(main_box), inner sep=16pt,
+      label={{[anchor=south west, font=\\small\\sffamily\\bfseries, text=black!85]north west:Universal LSC: \\texttt{{{chart_name}}} \\enspace$\\vert$\\enspace $\\mathcal{{L}}(\\mathtt{{{ior_name}}})$}}] (chart_frame) {{}};
+\\end{{scope}}
+
+% Semantic Equivalence Footer
+\\node[font=\\scriptsize\\sffamily, text=black!70, anchor=north] at ($(chart_frame.south)+(0,-0.25)$)
+  {{Assertional Semantics: $\\mathrm{{Satisfies}}(Z, \\mathcal{{L}}(\\mathrm{{IOR}})) \\iff \\mathrm{{SatisfiesIOR}}(Z, \\mathrm{{IOR}})$ \\enspace(\\texttt{{Mbse.IORToLSC}})}};
+
+\\end{{tikzpicture}}
+"""
+    return _standalone(body)
+
+
 def write_figure_sources(doc: IsrPackageDoc, fig_dir: Path) -> dict[str, Path]:
     fig_dir.mkdir(parents=True, exist_ok=True)
     sources = {
         "technology": fig_dir / "technology.tex",
         "coupling": fig_dir / "coupling.tex",
         "poi": fig_dir / "poi.tex",
+        "lsc": fig_dir / "lsc.tex",
     }
     sources["technology"].write_text(technology_tikz(doc), encoding="utf-8")
     sources["coupling"].write_text(coupling_tikz(doc), encoding="utf-8")
     sources["poi"].write_text(poi_tikz(doc), encoding="utf-8")
+    sources["lsc"].write_text(lsc_tikz(doc), encoding="utf-8")
     return sources
 
 

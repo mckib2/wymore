@@ -83,12 +83,22 @@ class CouplingDoc:
 
 
 @dataclass
+class LscDoc:
+    chart_name: str = ""
+    pre_condition: str = ""
+    main_condition: str = ""
+    in_message: str = ""
+    out_message: str = ""
+
+
+@dataclass
 class IorDoc:
     name: str
     input_type: str = ""
     output_type: str = ""
     horizon: str = "infinite"
     description: str = ""
+    lsc: LscDoc | None = None
 
 
 @dataclass
@@ -213,12 +223,24 @@ def load_isr_package(data: dict[str, Any]) -> IsrPackageDoc:
     ior_raw = data.get("ior")
     if not isinstance(ior_raw, dict):
         raise SchemaError("ior must be an object")
+    lsc_obj = None
+    lsc_raw = ior_raw.get("lsc")
+    if isinstance(lsc_raw, dict):
+        lsc_obj = LscDoc(
+            chart_name=_opt_str(lsc_raw, "chartName"),
+            pre_condition=_opt_str(lsc_raw, "preCondition"),
+            main_condition=_opt_str(lsc_raw, "mainCondition"),
+            in_message=_opt_str(lsc_raw, "inMessage"),
+            out_message=_opt_str(lsc_raw, "outMessage"),
+        )
+
     ior = IorDoc(
         name=_req_str(ior_raw, "name", "ior"),
         input_type=_opt_str(ior_raw, "inputType"),
         output_type=_opt_str(ior_raw, "outputType"),
         horizon=_opt_str(ior_raw, "horizon", "infinite"),
         description=_opt_str(ior_raw, "description"),
+        lsc=lsc_obj,
     )
 
     impl_raw = data.get("implements")

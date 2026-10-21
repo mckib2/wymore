@@ -13,6 +13,8 @@ COLOR_DEFS = r"""
 \definecolor{poiPurple}{HTML}{5F3DC4}
 \definecolor{shelfSlate}{HTML}{495057}
 \definecolor{accentAmber}{HTML}{D97706}
+\definecolor{hotRed}{HTML}{C92A2A}
+\definecolor{coldBlue}{HTML}{1864AB}
 """
 
 PREAMBLE_PACKAGES = r"""
@@ -92,4 +94,36 @@ isrnode/.style={
   minimum height=1.4cm,
   align=center,
   font=\small\sffamily
+},
+lifelinehead/.style={
+  draw=compBorder,
+  fill=compFill,
+  thick,
+  rounded corners=3pt,
+  minimum width=2.2cm,
+  minimum height=0.85cm,
+  align=center,
+  font=\small\sffamily\bfseries
+},
+coldframe/.style={
+  draw=coldBlue,
+  dashed,
+  thick,
+  fill=coldBlue!4,
+  rounded corners=4pt
+},
+hotframe/.style={
+  draw=hotRed,
+  solid,
+  thick,
+  fill=hotRed!4,
+  rounded corners=4pt
+},
+lsccond/.style={
+  draw=black!30,
+  fill=white,
+  rounded corners=2pt,
+  font=\scriptsize\sffamily,
+  inner sep=3pt,
+  align=center
 }""".strip()

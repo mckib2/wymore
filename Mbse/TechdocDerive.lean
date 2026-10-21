@@ -511,6 +511,13 @@ def deriveIsrPackage (id : String) : MetaM IsrPackageDoc := do
       outputType := or_
       horizon := horizon
       description := ""
+      lsc := some {
+        chartName := s!"LSC_{shortName ior}"
+        preCondition := s!"f ∈ {shortName ior}.itr"
+        mainCondition := s!"g ∈ {shortName ior}.er f"
+        inMessage := s!"in(f(t)) : {ir}"
+        outMessage := s!"out(g(t)) : {or_}"
+      }
     }
     functionalSystem := functionalSystem
     buildableSystem := buildableSystem

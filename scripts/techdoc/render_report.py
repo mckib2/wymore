@@ -164,10 +164,18 @@ $wire_rows
 \end{longtable}
 
 \section{Input/Output Requirement (IOR)}
+\begin{figure}[H]
+  \centering
+  \adjustimage{max width=0.88\linewidth, max height=0.38\textheight, keepaspectratio}{figures/lsc.pdf}
+  \caption{Universal Live Sequence Chart (LSC) corresponding to requirement \texttt{$ior_name}.}
+\end{figure}
+
 \begin{itemize}\setlength{\itemsep}{2pt}
-  \item \textbf{Name:} \texttt{$ior_name}
+  \item \textbf{Requirement Name:} \texttt{$ior_name}
   \item \textbf{Alphabet:} \texttt{$ior_in} $$\longrightarrow$$ \texttt{$ior_out}
   \item \textbf{Horizon:} $ior_horizon
+  \item \textbf{Universal LSC Encoding:} $$\mathcal{L}(\mathtt{$ior_name})$$ (\texttt{Mbse.IORToLSC})
+  \item \textbf{Semantic Equivalence:} $$\mathrm{Satisfies}(Z, \mathcal{L}(\mathrm{IOR})) \iff \mathrm{SatisfiesIOR}(Z, \mathrm{IOR})$$
   \item \textbf{Description:} $ior_desc
 \end{itemize}
 
