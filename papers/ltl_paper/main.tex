@@ -36,13 +36,13 @@
 \pubyear{2026}
 \volume{0}
 \doi{10.1002/sys.00000}
-\received{15 October 2026}
-\revised{18 October 2026}
-\accepted{20 October 2026}
+\received{TBD October 2026}
+\revised{TBD 2026}
+\accepted{TBD 2026}
 \correspondence{Nicholas McKibben, Department of Systems and Industrial Engineering, University of Arizona, Tucson, AZ 85721, USA (\href{mailto:mckib2@arizona.edu}{mckib2@arizona.edu})}
 \funding{None}
 
-\keywords{Tricotyledon Theory of System Design (T3SD) \kwsep Linear Temporal Logic (LTL) \kwsep formal verification \kwsep Model-Based Systems Engineering (MBSE) \kwsep system homomorphism \kwsep system modes}
+\keywords{Tricotyledon Theory of System Design (T3SD) \kwsep Linear Temporal Logic (LTL) \kwsep formal verification \kwsep Model-Based Systems Engineering (MBSE) \kwsep system modes}
 
 \title{Reinterpreting the Functionality Cotyledon: Temporal Logic for T3SD}
 
@@ -57,7 +57,7 @@
 }
 
 \abstract{%
-In Wymore's Tricotyledon Theory of System Design (T3SD), an input/output requirement defines the functionality cotyledon of systems satisfying desired boundary trajectories, while a technology catalog and coupling recipe define the buildability cotyledon of component architectures. Certifying implementability requires isolating an operational mode of a buildable design and exhibiting a surjective homomorphism onto a functional design, a manual process that becomes arduous for coupled systems and lacks automated tooling. This paper bridges T3SD and temporal logic to bring automated model checking into Wymore's framework. First, we prove that every Wymorian input/output requirement is isomorphic to a boundary specification in temporal logic. Second, we show that certifying a buildable system mode reduces to checking temporal specifications directly, avoiding manual homomorphism construction while preserving conformance across state re-encodings and component elaborations. Because buildable components are finite-state, Linear Temporal Logic (LTL) model checking over their operational modes is decidable and automated, which we demonstrate by refining an infinite-tape run-length encoder into a verified finite-tape machine.%
+In Wymore's Tricotyledon Theory of System Design (T3SD), an input/output requirement (IOR) defines the functionality cotyledon of systems satisfying desired boundary trajectories, while a set of technologies along with coupling recipes define the buildability cotyledon of component architectures. Certifying implementability requires isolating an operational mode of a buildable design and exhibiting a surjective homomorphism that maps onto a functional design, a manual process that becomes arduous for highly coupled systems and lacks automated tooling. This paper develops a correspondance between T3SD and temporal logic to enable automated model checking within Wymore's framework. First, we prove that every IOR is isomorphic to a boundary specification in temporal logic. Second, we show that certifying a buildable system mode reduces to checking temporal specifications directly, avoiding manual homomorphism construction while preserving conformance across state re-encodings and component elaborations. Because buildable components are generally finite-state, Linear Temporal Logic (LTL) model checking over their operational modes is decidable and automated, which we demonstrate by building a run-length encoder specification using a finite-tape machine.%
 }
 
 \begin{document}

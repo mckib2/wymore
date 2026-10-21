@@ -3,9 +3,9 @@
 
 The main text relies on three foundational correspondence results: the boundary isomorphism between $\Phi_{IOR}$ and $\mathrm{CTL}(IOR)$ (Theorem~\ref{thm:boundary-characteristic}), the direct mode-to-$IOR$ implementability equivalence (Theorem~\ref{thm:mode-ior-bridge}), and the dynamics-fragment characterization of Wymore homomorphisms (Theorem~\ref{thm:dynamics-characterization}). We present the self-contained mathematical proofs of these correspondences here.
 
-\subsection{The Boundary \texorpdfstring{$IOR$}{IOR}--Temporal Logic Correspondence}
+\subsection{Boundary \texorpdfstring{$IOR$}{IOR}--Temporal Logic Correspondence}
 
-Fix a Wymorian Input/Output Requirement
+Fix a Wymorian input/output requirement
 \[
   IOR=(OLR,IR,ITR,OR,OTR,ER)
 \]
@@ -30,7 +30,7 @@ To deduce Theorem~\ref{thm:mode-ior-bridge} for a system mode $Z_m=(S_m,IR,OR,\d
     \item Conversely, if $Z_m,s_{m,0},T\models_{IO}\Phi_{IOR}$, then by Theorem~\ref{thm:boundary-characteristic}, $D_m=(Z_m,s_{m,0},T)\in\mathrm{CTL}(IOR)$. The identity homomorphism $\mathrm{id}_{Z_m}:Z_m\twoheadrightarrow Z_m$ witnesses that $Z_b$ implements $D_m$ via the mode $Z_m\in\mathrm{SYSMO}(Z_b)$, placing $(D_m,Z_b)$ in the implementability cotyledon $\mathrm{CTL}(IOR,TYR)=\mathrm{ISR}(IOR,TYR)$.
 \end{itemize}
 
-\subsection{The Reference-Dynamics Correspondence}
+\subsection{Reference-Dynamics Correspondence}
 \label{app:hom-setup}
 
 We now prove Theorem~\ref{thm:dynamics-characterization}. Write the reference system and candidate system mode as
@@ -98,4 +98,4 @@ which is~\eqref{eq:trace-step-law}.
 $(\Leftarrow)$: Suppose~\eqref{eq:trace-readout-law}--\eqref{eq:trace-step-law} hold at every tick of every run. Let $x\in S_m$ be any mode state and $q$ be any optional mode input. Choose a run initialized at $s_0=x$ with initial input $f(0)=q$. Evaluating~\eqref{eq:trace-readout-law} at $t=0$ (where $g(0)=x$ and $y(0)=\rho_m(x)$) yields~\eqref{eq:hom-readout-static}. Evaluating~\eqref{eq:trace-step-law} at $t=0$ (where $g(1)=\delta_m(x,q)$) yields~\eqref{eq:hom-step-static}.
 \end{proof}
 
-Recall that $Z_m\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ is defined as the existence of surjective maps $(h_S,h_I,h_O)$ under which the temporal run clauses~\eqref{eq:trace-readout-law}--\eqref{eq:trace-step-law} hold on every run of $Z_m$. Lemma~\ref{lem:static-run-bridge} then equates those clauses (under the fixed surjective maps) with the static homomorphism laws~\eqref{eq:hom-readout-static}--\eqref{eq:hom-step-static}. Consequently, $Z_m\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ if and only if there exists a surjective Wymore homomorphism $h:Z_m\twoheadrightarrow Z_{\mathrm{ref}}$, completing the proof of Theorem~\ref{thm:dynamics-characterization} and Corollary~\ref{cor:cotyledon-implementability}. Surjectivity is part of this existential witness and is not entailed by the $G$/$X$ clause families alone.
+Recall that $Z_m\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ is defined as the existence of surjective maps $(h_S,h_I,h_O)$ under which the temporal run clauses~\eqref{eq:trace-readout-law}--\eqref{eq:trace-step-law} hold on every run of $Z_m$. Lemma~\ref{lem:static-run-bridge} then equates those clauses (under the fixed surjective maps) with the static homomorphism laws~\eqref{eq:hom-readout-static}--\eqref{eq:hom-step-static}. Consequently, $Z_m\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_{\mathrm{ref}})$ if and only if there exists a surjective Wymore homomorphism $h:Z_m\twoheadrightarrow Z_{\mathrm{ref}}$, completing the proof of Theorem~\ref{thm:dynamics-characterization} and Corollary~\ref{cor:cotyledon-implementability}. Note that surjectivity is part of this existential witness and is not entailed by the $G$/$X$ clause families alone.
