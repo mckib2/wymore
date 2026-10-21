@@ -378,6 +378,7 @@
 \renewcommand{\@biblabel}[1]{}
 \def\@bibitem#1{%
   \item
+  \Hy@raisedlink{\hyper@anchorstart{cite.#1}\hyper@anchorend}%
   \if@filesw\immediate\write\@auxout{\string\bibcite{#1}{\the\value{\@listctr}}}\fi
   \the\value{\@listctr}.\space\ignorespaces
 }

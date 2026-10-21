@@ -16,7 +16,7 @@ Beyond representation changes, systems engineering architectures are hierarchica
 
 \begin{theorem}[Compositional Elaboration and Coupling]
 \label{thm:elaboration-coupling}
-Temporal dynamics conformance composes transitively through successive homomorphic elaborations and system modes (preserving autonomous steps, Theorem~5.97 of \citet{Wymore1993}). Furthermore, given two coupling recipes $SCR$ and $SCR'$ sharing the same wiring topology, port-preserving component conformance $Z'_i\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_i)$ for each component $i\in\{1,\dots,n\}$ lifts to resultant conformance $\mathrm{RSY}(SCR')\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(\mathrm{RSY}(SCR))$ (Theorem~4.56 of \citet{Wymore1993}).
+Temporal dynamics conformance composes transitively through successive homomorphic elaborations and system modes (preserving autonomous steps, Theorem~5.97 of \citet{Wymore1993}). Furthermore, given two coupling recipes $SCR$ and $SCR'$ sharing the same wiring topology, port-preserving component conformance $Z'_i\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_i)$ for each component $i\in\{1,\dots,n\}$ propagates to resultant conformance $\mathrm{RSY}(SCR')\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(\mathrm{RSY}(SCR))$ (Theorem~4.56 of \citet{Wymore1993}).
 \end{theorem}
 
 \begin{proof}
@@ -25,7 +25,7 @@ By Theorem~\ref{thm:dynamics-characterization}, componentwise conformance suppli
 
 Finally, when comparing alternative finite-state architectures during trade studies or refactoring, mutual satisfaction of compiled dynamics fragments provides an automated test for behavioral isomorphism:
 
-\begin{theorem}[Finite ``Canonicity'']
+\begin{theorem}[Finite Canonicity]
 \label{thm:finite-canonicity}
 Let $Z_1$ and $Z_2$ be finite discrete systems. If $Z_1\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_2)$ and $Z_2\models_{\mathrm{dyn}}\Phi_{\mathrm{dyn}}(Z_1)$, then $Z_1$ and $Z_2$ are isomorphic.
 \end{theorem}

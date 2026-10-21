@@ -16,17 +16,18 @@
 %     state/IO may be infinite or real-valued.
 %   Functionality Cotyledon CTL(IOR) / FSR(IOR) — set of systems satisfying IOR.
 %   Input/Output Requirement IOR — 6-tuple (OLR, IR, ITR, OR, OTR, ER) specifying boundary intent.
-%   Buildability Cotyledon CTL(TYR) / BSR(TYR) — systems buildable as resultants RSY(SCR) in TYR.
-%   Implementability Cotyledon CTL(IOR, TYR) / ISR(IOR, TYR) — implementable designs in technology.
-%   Functional design D_ref ∈ FSR(IOR); Z_ref is its system component.
-%   Buildable system Z_impl — candidate system in BSR(TYR) under verification.
+%   Buildability Cotyledon CTL(TYR) / BSR(TYR) — designs (Z_b,SCR) buildable as resultants
+%     RSY(SCR) across all valid SCRs with components from TYR.
+%   Implementability Cotyledon CTL(IOR, TYR) / ISR(IOR, TYR) — implementable design pairs.
+%   Functional design D_ref / D_f ∈ CTL(IOR); Z_ref is its system component.
+%   Buildable resultant Z_b = RSY(SCR) ∈ CTL(TYR); mode Z_m ∈ SYSMO(Z_b).
 %   Wymore system homomorphism / homomorphic image — surjective
 %     h_S,h_I,h_O preserving transitions and readout.
-%   Property set Φ — temporal formulas in dialect L.
-%   Assertional Cotyledon FC_L(Φ) — { Z | Z ⊨_L Φ }.
-%   Dynamics-encoding fragment Φ_dyn — G/X/implication table-as-clauses fragment
-%     used for the hom↔Φ bi-implication (complete Φ_dyn, compiled from Z_ref).
-%   Assertional satisfaction — Z ⊨_L Φ / Z ⊨_dyn Φ_dyn.
+%   Boundary temporal spec Φ_IOR; assertional functionality space AFSR(Φ_IOR) ≃ CTL(IOR).
+%   Dynamics-encoding fragment Φ_dyn — G/X safety fragment compiled from Z_ref
+%     (hom↔Φ_dyn bi-implication under surjective witness maps).
+%   Assertional satisfaction — Z ⊨_IO Φ_IOR / Z ⊨_dyn Φ_dyn.
+%   Operational time scale T (not "observation horizon").
 % =================================================================
 
 \documentclass[regular]{syseng}
@@ -57,7 +58,7 @@
 }
 
 \abstract{%
-In Wymore's Tricotyledon Theory of System Design (T3SD), an input/output requirement (IOR) defines the functionality cotyledon of systems satisfying desired boundary trajectories, while a set of technologies along with coupling recipes define the buildability cotyledon of component architectures. Certifying implementability requires isolating an operational mode of a buildable design and exhibiting a surjective homomorphism that maps onto a functional design, a manual process that becomes arduous for highly coupled systems and lacks automated tooling. This paper develops a correspondance between T3SD and temporal logic to enable automated model checking within Wymore's framework. First, we prove that every IOR is isomorphic to a boundary specification in temporal logic. Second, we show that certifying a buildable system mode reduces to checking temporal specifications directly, avoiding manual homomorphism construction while preserving conformance across state re-encodings and component elaborations. Because buildable components are generally finite-state, Linear Temporal Logic (LTL) model checking over their operational modes is decidable and automated, which we demonstrate by building a run-length encoder specification using a finite-tape machine.%
+In Wymore's Tricotyledon Theory of System Design (T3SD), an input/output requirement (IOR) defines the functionality cotyledon of systems satisfying desired boundary trajectories, while a technology catalog defines the buildability cotyledon of coupled architectures assembled across valid system coupling recipes. Certifying implementability requires isolating an operational mode of a buildable resultant and exhibiting a surjective homomorphism that maps onto a functional design, a manual process that becomes arduous for coupled systems and lacks automated tooling. This paper develops a correspondence between T3SD and temporal logic to enable automated model checking within Wymore's framework. First, we prove that every IOR is isomorphic to an assertional boundary specification in temporal logic. Second, we show that certifying a buildable system mode reduces to checking temporal specifications directly, avoiding manual homomorphism construction while preserving conformance across state re-encodings and component elaborations. Because buildable components are generally finite-state, Linear Temporal Logic (LTL) model checking over their operational modes is decidable and automated, which we demonstrate by verifying a coupled streaming run-length encoder across finite-capacity component catalogs.%
 }
 
 \begin{document}
