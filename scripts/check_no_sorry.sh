@@ -122,7 +122,7 @@ WARNING_ALLOWLIST=(
   'HomWitnessConstruction.lean:54:0: Definition `constructIdentityHomWitness` is a proposition'
   # Gallery re-export of a Prop-valued exploration package; `theorem` requires repeating
   # a large conjunction type that tracks the source theorem.
-  'Examples.lean:71:0: Definition `gallery_u_response_summary` is a proposition'
+  'Definition `gallery_u_response_summary` is a proposition'
   # Lake warns when classic (non-`module`) files import mathlib under requiresModuleSystem;
   # lakefile sets allowNonModules = true; migrating all Mbse files to `module` is out of scope.
   'designed for use with the module system'

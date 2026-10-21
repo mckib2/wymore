@@ -8,6 +8,8 @@ import Mbse.WymoreImplementation
 import Mbse.WymoreModeCoupling
 import Mbse.WymoreRequirements
 import Mbse.IORTemporalFragment
+import Mbse.LSC
+import Mbse.IORToLSC
 import Mbse.WymoreTechnology
 import Mbse.WymoreTechnologyImpl
 import Mbse.Notation
