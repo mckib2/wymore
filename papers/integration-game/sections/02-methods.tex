@@ -1,0 +1,259 @@
+\section{Methodology: The Integration Game} \label{sec:methodology}
+
+To make automated MOSA integration amenable to formal verification and reinforcement learning without exposing low-level implementation minutiae, we formulate the mediation problem as \emph{The Integration Game}. The game defines a precise vocabulary of positions (board states), legal moves (mediation operators), winning conditions (three-tier behavioral satisfiability), and quantitative figures of merit (cost and performance trade-offs).
+
+\subsection{Semantic Port Typing and the Wymorian Isomorphism} \label{sec:meth-isomorphism}
+
+The atomic unit of mediated information in the game is a \emph{field} $x = (v, c, \mu)$, consisting of a runtime value $v$ (possibly absent), a semantic \emph{color} $c \in \mathcal{C}$, and optional metadata $\mu$ (such as a timestamp or sequence key). The color space $\mathcal{C} = \mathbb{C} \times \mathbb{L} \times \mathbb{P}$ mirrors the three-tier UDDL hierarchy of Section~\ref{sec:bg-uddl}:
+\begin{equation}
+    c = (C, L, P) \in \mathbb{C} \times \mathbb{L} \times \mathbb{P},
+    \label{eq:color-triple}
+\end{equation}
+where $C \in \mathbb{C}$ identifies the conceptual path or observable in a CDM, $L \in \mathbb{L}$ specifies the logical measurement system, coordinate frame, and units in an LDM, and $P \in \mathbb{P}$ specifies the platform data type and bit layout in a PDM. Each field is additionally accompanied by a transport \emph{carrier} tag (e.g., native in-memory structure vs.\ serialized byte buffer). For transport and interface packaging, fields are grouped into named \emph{messages} whose static structure is described by a \emph{message shape}—an aggregation of named field slots typed by their colors, supporting product aggregations (\texttt{Record}), ordered collections (\texttt{Sequence}), and tagged unions (\texttt{Choice}).
+
+A modular system boundary is characterized by its exposed ports. A producer exposes an \emph{Offer} $O_i = (\mathcal{S}_{\text{out}}, \phi_{\text{out}})$, declaring an output message shape $\mathcal{S}_{\text{out}}$ (the colors of all offered fields) together with \emph{flow attributes} $\phi_{\text{out}}$ describing delivery mechanics (transfer mode $\in \{\mathsf{PUSH}, \mathsf{PULL}\}$, emission rate, and multiplicity). Dually, a consumer exposes a \emph{Need} $N_j = (\mathcal{S}_{\text{in}}, \phi_{\text{in}})$, declaring its required field colors $\mathcal{S}_{\text{in}}$ and expected flow attributes $\phi_{\text{in}}$.
+
+The \emph{Board} $\mathcal{B} = (\mathcal{O}, \mathcal{N}, \mathcal{V}_{\text{op}}, \mathcal{E}_{\text{route}})$ is a directed mediation graph whose boundary nodes are the producer offers $\mathcal{O}$ and consumer needs $\mathcal{N}$, whose interior vertices $\mathcal{V}_{\text{op}}$ are parameterized mediation operators and state stores selected from a catalog, and whose directed edges $\mathcal{E}_{\text{route}}$ (\emph{routes}) connect output ports to input ports. A fundamental rule of the game is that \emph{routes merely transport messages and cannot alter field colors}; any change in $(C, L, P)$ or flow mechanics must be performed explicitly by an interior operator move. A complete wiring and parameterization of the board constitutes a \emph{Play} $\mathcal{P}$.
+
+Although classical T3SD treats component ports as untyped sets, enriching port constraints with field colors $(C, L, P)$ preserves the algebraic structure of Wymorian coupling:
+
+\begin{proposition}[Isomorphism to Semantics-Refined T3SD Coupling] \label{prop:wymore-iso}
+Let $TYR$ be a catalog of discrete component systems and mediation operators whose ports are partitioned into elementary field slots, and let $\tau_{\mathcal{C}}$ assign a color $c = (C, L, P) \in \mathcal{C}$ and transfer mode to each slot. Define the color-refined technology $TYR_{\mathcal{C}}$ by restricting the alphabet of each port slot $p$ to the carrier set $A_{\tau_{\mathcal{C}}(p)}$ permitted by its assigned color and mode. Then a Play $\mathcal{P}$ on the Integration Game board is syntactically legal (every route connects ports of matching color and compatible mode) if and only if $\mathcal{P}$ forms a valid Wymorian System Coupling Recipe $SCR = (VSCR, CSCR)$ over $TYR_{\mathcal{C}}$ in which every wired port pair $(p_{\text{out}}, p_{\text{in}}) \in CSCR$ satisfies $A_{\tau_{\mathcal{C}}(p_{\text{out}})} = A_{\tau_{\mathcal{C}}(p_{\text{in}})}$. Under synchronous composition, $\mathcal{P}$ induces a unique coupled resultant discrete system $Z_b = \mathrm{RSY}(SCR) \in \mathrm{CTL}(TYR_{\mathcal{C}})$.
+\end{proposition}
+
+\begin{proof}[Proof Sketch]
+In T3SD, a System Coupling Recipe $SCR = (VSCR, CSCR)$ is well-formed if and only if $CSCR$ is a bijection between a subset of component output ports and a subset of component input ports such that the output alphabet of each source port equals the input alphabet of its destination port~\cite{Wymore1993}. By indexing the alphabet $A_c$ of each elementary field port by its semantic color triple $c = (C, L, P)$ and transfer mode, the condition $A_{\tau_{\mathcal{C}}(p_{\text{out}})} = A_{\tau_{\mathcal{C}}(p_{\text{in}})}$ holds if and only if $\tau_{\mathcal{C}}(p_{\text{out}}) = \tau_{\mathcal{C}}(p_{\text{in}})$ (up to declared equivalence). Because routes in $\mathcal{P}$ cannot change color, any color transition $\Delta c$ between an Offer and a Need must be realized by placing an interior operator $v \in \mathcal{V}_{\text{op}} \subseteq VSCR$ whose input port has alphabet $A_{c_{\text{in}}}$ and whose output port has alphabet $A_{c_{\text{out}}}$. The synchronous step transition $\delta_b$ and readout $\rho_b$ of the resultant $Z_b = \mathrm{RSY}(SCR)$ follow immediately from the standard Wymorian coupling function.
+\end{proof}
+
+Proposition~\ref{prop:wymore-iso} provides the theoretical justification for our methodology: playing the Integration Game is mathematically equivalent to constructing a coupled resultant $Z_b \in \mathrm{CTL}(TYR_{\mathcal{C}})$ in a semantics-infused buildability cotyledon.
+
+\subsection{Core Game Mechanics and Legal Moves} \label{sec:meth-moves}
+
+To bridge the mediation gap between producer offers and consumer needs without burdening the specification with domain-specific code, all interior operators are classified into four foundational move families (Table~\ref{tab:legal-moves}):
+
+\begin{enumerate}[topsep=2pt, itemsep=1pt, leftmargin=1.8em]
+    \item \textbf{Semantic and Representation Recoloring:} Operators that transform a field along one or more axes of $\mathcal{C} = (C, L, P)$. A \emph{Conceptual Recolor} ($\Delta C$) maps a field between equivalent or related CDM concepts; a \emph{Logical Recolor} ($\Delta L$) converts units, reference frames, or coordinate systems via a defined value conversion function; a \emph{Platform Recolor} ($\Delta P$) widens, narrows, or repacks data types across PDM encodings; and a \emph{Carrier Change} adapts physical serialization without altering $(C, L, P)$.
+    \item \textbf{Structural Aggregation:} Because messages are convenience containers for transport, \emph{Assemble} and \emph{Disassemble} moves pack fields into messages or split messages into constituent fields, while \emph{Project} and \emph{Inject} select subsets of slots or insert constant/derived fields, strictly preserving per-field colors.
+    \item \textbf{Computational Derivation and Filtering:} \emph{Derive} is the general multi-input compute move: it consumes $N \ge 1$ fields (potentially joined from distinct offers) and synthesizes $M \ge 1$ output fields with declared output colors (e.g., combining host position, attitude quaternion, and lever-arm offset to derive sensor position, or executing a state estimator update). \emph{Filter/Validate} drops or forwards messages based on deterministic predicates over values or metadata.
+    \item \textbf{Topology, Storage, and Flow Mediation:} Moves that orchestrate interaction mechanics while leaving field colors invariant. \emph{Fan-out}, \emph{Fan-in}, and \emph{Join} alter flow multiplicity and correlate messages by key; \emph{Stores} (latest-value caches, bounded FIFO queues, or keyed maps) retain state across time; \emph{Flow Mode Changes} bridge mismatched interaction modes (e.g., a push-to-pull store adapter or a scheduled pull-to-push \emph{pump}); and \emph{Temporal Control} enforces freshness via stale gates and rate adaptation.
+\end{enumerate}
+
+\begin{table}[t]
+\centering
+\caption{Taxonomy of legal move families in \emph{The Integration Game} and their effects on colors and flows.}
+\label{tab:legal-moves}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.9cm} >{\raggedright\arraybackslash}p{2.6cm} >{\raggedright\arraybackslash}p{2.9cm} >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Move Family} & \textbf{Operators} & \textbf{Color Effect $(C,L,P)$} & \textbf{Flow \& State Effect in Resultant $Z_b = \mathrm{RSY}(SCR)$} \\
+\midrule
+Recoloring & Conceptual, Logical, Platform, Carrier & Modifies declared axis ($\Delta C$, $\Delta L$, or $\Delta P$) & Stateless synchronous value conversion; may document precision narrowing. \\
+\addlinespace[2pt]
+Structural Aggregation & Assemble, Disassemble, Project, Inject & Preserves colors of constituent fields & Repackages field slots between producer and consumer message shapes. \\
+\addlinespace[2pt]
+Derivation \& Filtering & Derive / Synthesize, Filter / Validate & Produces declared target $(C_{\text{out}}, L_{\text{out}}, P_{\text{out}})$ & Fuses $N$ inputs into $M$ derived fields or drops invalid/out-of-bounds samples. \\
+\addlinespace[2pt]
+Flow, Storage \& Time & Fan/Join, Store, Mode Bridge, Stale Gate & Invariant ($\Delta C = \Delta L = \Delta P = 0$) & Introduces internal memory state $S$, decouples push/pull timing, and enforces freshness bounds. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+    >=Stealth,
+    font=\footnotesize\sffamily,
+    offerbox/.style={draw=techNavy, fill=techNavy!8, thick, rounded corners=3pt, minimum width=3.1cm, minimum height=1.15cm, align=center},
+    needbox/.style={draw=boundGreen, fill=boundGreen!10, thick, rounded corners=3pt, minimum width=3.1cm, minimum height=1.15cm, align=center},
+    opbox/.style={draw=compBorder, fill=compFill, thick, rounded corners=3pt, minimum width=3.1cm, minimum height=1.15cm, align=center},
+    storebox/.style={draw=poiPurple, fill=poiPurple!8, thick, rounded corners=3pt, minimum width=3.1cm, minimum height=1.15cm, align=center},
+    route/.style={->, thick, draw=wireInk},
+    clabel/.style={font=\scriptsize\sffamily\bfseries, text=black!75}
+]
+    % Producer Offers (Left Boundary, x = 0)
+    \node[offerbox] (o1) at (0, 1.15) {
+        \textbf{Offer 1: NavMsg}\\[0pt]
+        {\scriptsize $(C_{\text{ac}}, L_{\text{wgs}}, P_{\text{f64}})$}\\[-1pt]
+        {\scriptsize Mode: \texttt{PUSH @ 50Hz}}
+    };
+    \node[offerbox] (o2) at (0, -1.15) {
+        \textbf{Offer 2: AttMsg}\\[0pt]
+        {\scriptsize $(C_{\text{att}}, L_{\text{body}}, P_{\text{quat}})$}\\[-1pt]
+        {\scriptsize Mode: \texttt{PUSH @ 100Hz}}
+    };
+
+    % Interior Board Column 1 (x = 4.2)
+    \node[opbox] (dis) at (4.2, 1.15) {
+        \textbf{1. Disassemble}\\[0pt]
+        {\scriptsize Project pos slot ($\Delta c = 0$)}\\[-1pt]
+        {\scriptsize Out: $(C_{\text{ac}}, L_{\text{wgs}}, P_{\text{f64}})$}
+    };
+    \node[opbox] (join) at (4.2, -1.15) {
+        \textbf{2. Temporal Join}\\[0pt]
+        {\scriptsize Window $\Delta t \le 10\,\text{ms}$}\\[-1pt]
+        {\scriptsize Correlates $O_1 + O_2$}
+    };
+
+    % Interior Board Column 2 (x = 8.4)
+    \node[opbox, fill=fsrBlue!8, draw=fsrBlue] (der) at (8.4, -1.15) {
+        \textbf{3. Derive \& Recolor}\\[0pt]
+        {\scriptsize $\Delta C, \Delta L$: Lever-Arm}\\[-1pt]
+        {\scriptsize Out: $(C_{\text{sens}}, L_{\text{ned}}, P_{\text{f64}})$}
+    };
+    \node[opbox, fill=bsrTeal!8, draw=bsrTeal] (prec) at (8.4, 1.15) {
+        \textbf{4. Platform Recolor}\\[0pt]
+        {\scriptsize $\Delta P$: \texttt{f64} $\to$ \texttt{f32}}\\[-1pt]
+        {\scriptsize Out: $(C_{\text{sens}}, L_{\text{ned}}, P_{\text{f32}})$}
+    };
+
+    % Interior Board Column 3 (x = 12.6)
+    \node[storebox] (store) at (12.6, 1.15) {
+        \textbf{5. Latest Store}\\[0pt]
+        {\scriptsize Retains latest sample}\\[-1pt]
+        {\scriptsize Color: $(C_{\text{sens}}, L_{\text{ned}}, P_{\text{f32}})$}
+    };
+    \node[storebox] (gate) at (12.6, -1.15) {
+        \textbf{6. Mode Bridge \& Gate}\\[0pt]
+        {\scriptsize Freshness $\le 50\,\text{ms}$}\\[-1pt]
+        {\scriptsize Adapts \texttt{PUSH} $\to$ \texttt{PULL}}
+    };
+
+    % Consumer Need (Right Boundary, x = 16.8)
+    \node[needbox] (need) at (16.8, -1.15) {
+        \textbf{Need: SensorPos}\\[0pt]
+        {\scriptsize $(C_{\text{sens}}, L_{\text{ned}}, P_{\text{f32}})$}\\[-1pt]
+        {\scriptsize Mode: \texttt{PULL (On-Demand)}}
+    };
+
+    % Routes
+    \draw[route] (o1) -- node[above=1pt, clabel] {\texttt{PUSH}} (dis);
+    \draw[route] (o2) -- node[above=1pt, clabel] {\texttt{PUSH}} (join);
+    \draw[route] (dis) -- node[right=2pt, clabel] {pos field} (join);
+    \draw[route] (join) -- node[above=1pt, clabel] {Joined} (der);
+    \draw[route] (der) -- node[right=2pt, clabel] {$\Delta C, \Delta L$} (prec);
+    \draw[route] (prec) -- node[above=1pt, clabel] {$\Delta P$} (store);
+    \draw[route] (store) -- node[right=2pt, clabel] {Cached} (gate);
+    \draw[route] (gate) -- node[above=1pt, clabel] {\texttt{PULL}} (need);
+
+    % Background Board Frame
+    \begin{scope}[on background layer]
+        \node[draw=black!45, dashed, thick, fill=black!2, rounded corners=5pt, fit=(dis)(join)(der)(prec)(store)(gate), inner sep=8pt,
+              label={[anchor=south west, font=\footnotesize\sffamily\bfseries, text=black!75]north west:Mediation Board Play $\mathcal{P}$ (Coupled Resultant $Z_b = \mathrm{RSY}(\mathcal{P})$)}] {};
+    \end{scope}
+\end{tikzpicture}%
+}
+\caption{An example Play $\mathcal{P}$ on the Integration Game board. Two asynchronous push-mode producer offers are disassembled, temporally joined, transformed across conceptual and logical axes via a lever-arm derivation, narrowed in platform precision, and buffered in a latest-value store with a stale-gated mode bridge to satisfy a pull-mode consumer need.}
+\label{fig:mediation-board}
+\end{figure}
+
+Figure~\ref{fig:mediation-board} illustrates how a Play $\mathcal{P}$ composes these primitive moves to bridge both the $(C, L, P)$ semantic gap and the push-to-pull interaction gap between two producer offers and a consumer need.
+
+\subsection{The Three-Tier Winning Condition} \label{sec:meth-winning}
+
+Evaluating a candidate Play $\mathcal{P}$ yields a structured verdict across three progressive tiers of satisfaction:
+\begin{enumerate}[label=\textbf{Tier \arabic*}, leftmargin=3.4em, topsep=2pt, itemsep=1pt]
+    \item \textbf{(Static Semantic and Structural Compatibility):} For every required field slot in every consumer Need $N_j \in \mathcal{N}$, there exists a directed path through $\mathcal{P}$ originating at one or more producer Offers $O_i \in \mathcal{O}$ along which only legal moves are applied, message aggregations assemble with matching slot structures, and the terminal field color matches $(C_{N_j}, L_{N_j}, P_{N_j})$.
+    \item \textbf{(Flow and Interaction Compatibility):} Along every route in $\mathcal{P}$, port transfer modes are mutually compatible (every $\mathsf{PUSH}$ output connects to a $\mathsf{PUSH}$-capable input, and every $\mathsf{PULL}$ input connects to a $\mathsf{PULL}$-capable output, or a Flow Mode Change operator bridges the transition), all store capacities are strictly positive, and all temporal operators share a consistent time base.
+    \item \textbf{(Behavioral Satisfiability):} Let $Z_b = \mathrm{RSY}(\mathcal{P})$ be the coupled resultant discrete system induced by the play. Given the problem's Input/Output Requirement $IOR$ and its compiled Universal LSC $\mathcal{L}(IOR)$, $Z_b$ satisfies the behavioral contract across the operational timescale $TSR$: specifically, $\mathrm{SatisfiesLSC}(Z_b,\allowbreak \mathcal{L}(IOR),\allowbreak s_0,\allowbreak TSR)$ holds (equivalently, $\mathrm{SatisfiesIOR}(Z_b,\allowbreak IOR,\allowbreak s_0,\allowbreak TSR)$), ensuring that every admissible environmental input trajectory $f \in ITR$ yields an output trajectory within $ER(f)$ without inducing a Hot Breach.
+\end{enumerate}
+
+A Play $\mathcal{P}$ \emph{wins} the Integration Game if and only if it satisfies Tiers~1, 2, and~3 simultaneously. By Proposition~\ref{prop:wymore-iso} and Theorem~\ref{thm:ior-lsc}, any winning play directly certifies that $(Z_b, Z_b)$ belongs to the Wymorian implementability cotyledon $\mathrm{CTL}(IOR, TYR_{\mathcal{C}})$.
+
+\subsection{Generalized Cost Functional and Wymorian Trade-Offs} \label{sec:meth-cost}
+
+In realistic engineering contexts, multiple candidate plays may satisfy all three tiers while exhibiting distinct computational footprints, memory allocations, latencies, and numerical fidelities. Grounded in Wymore's Cost Requirements ($CR$), Performance Requirements ($PR$), and Trade-off Requirements ($TR$), we define a generalized cost functional $\mathcal{J}(\mathcal{P})$ comprising three terms:
+
+\begin{enumerate}[topsep=2pt, itemsep=1pt, leftmargin=1.8em]
+    \item \textbf{Static Construction Cost $C_{\text{static}}(\mathcal{P})$ ($CR$):} Quantifies the structural and resource footprint of the mediation graph:
+    \begin{equation}
+        C_{\text{static}}(\mathcal{P}) = \sum_{v \in \mathcal{V}_{\text{op}}} c_{\text{op}}(v) + \sum_{s \in \mathcal{V}_{\text{store}}} c_{\text{mem}}(\mathrm{cap}_s, \mathrm{ret}_s) + \sum_{r \in \mathcal{E}_{\text{route}}} c_{\text{carrier}}(r),
+        \label{eq:c-static}
+    \end{equation}
+    where $c_{\text{op}}(v)$ weights operator compute complexity, $c_{\text{mem}}$ penalizes buffer capacity and retention overhead, and $c_{\text{carrier}}(r)$ penalizes serialization and inter-process transport hops.
+
+    \item \textbf{Dynamic Operational Cost $C_{\text{dyn}}(\mathcal{P}, f)$ ($PR$):} Quantifies trajectory-level quality-of-service degradation over an input scenario $f \in ITR$ across time $t \in TSR$ (with discount factor $\gamma \in (0, 1]$):
+    \begin{equation}
+        C_{\text{dyn}}(\mathcal{P}, f) = \sum_{t \in TSR} \gamma^t \Big[ w_{\text{lat}}\,\mathrm{Latency}(t) + w_{\text{loss}}\,\mathrm{InfoLoss}(t) + w_{\text{drop}}\,\mathbf{1}_{\{\mathrm{Code}(t) \neq \mathsf{Success}\}} \Big],
+        \label{eq:c-dyn}
+    \end{equation}
+    capturing end-to-end transport latency, precision loss from narrowing conversions, and runtime flow disruptions (queue overflows $\mathsf{No\_Space}$, pull starvation $\mathsf{No\_Data}$, or stale drops).
+
+    \item \textbf{Behavioral Breach Penalty $C_{\text{breach}}(\mathcal{P}, f)$:} Quantifies departure from the required behavioral envelope $ER(f)$:
+    \begin{equation}
+        C_{\text{breach}}(\mathcal{P}, f) = \Omega \cdot \mathbf{1}_{\mathsf{HotBreach}}(\mathcal{P}, f) + \sum_{t \in TSR} \inf_{g \in ER(f)} d_{\text{val}}\big(y_{Z_b}(t),\, g(t)\big),
+        \label{eq:c-breach}
+    \end{equation}
+    where $\Omega \gg 0$ is a severe categorical penalty triggered upon any uLSC Hot Breach, and $d_{\text{val}}$ is a continuous distance metric measuring how far the generated output $y_{Z_b}(t)$ strays outside $ER(f)$.
+\end{enumerate}
+
+Combining these terms over a distribution of operational scenarios $\mathcal{D}(ITR)$ yields the expected composite cost functional:
+\begin{equation}
+    \mathcal{J}(\mathcal{P}) = C_{\text{static}}(\mathcal{P}) + \mathbb{E}_{f \sim \mathcal{D}(ITR)}\!\Big[ C_{\text{dyn}}(\mathcal{P}, f) + C_{\text{breach}}(\mathcal{P}, f) \Big].
+    \label{eq:j-total}
+\end{equation}
+When $\Omega$ is chosen sufficiently large relative to $C_{\text{static}}$ and $C_{\text{dyn}}$, minimizing $\mathcal{J}(\mathcal{P})$ enforces a lexicographic preference order that prioritizes Tier~3 behavioral feasibility ($C_{\text{breach}} = 0$) before trading off operational performance against architectural cost, while still providing a smooth gradient signal ($d_{\text{val}}$) for infeasible candidate plays during learning. Alternatively, the components of $\mathcal{J}(\mathcal{P})$ can be treated as a vector objective to recover the Pareto frontier or formulated as a Constrained Markov Decision Process (CMDP)~\cite{Altman1999CMDP}.
+
+\subsection{Reinforcement Learning Formulations and uLSC Reward Machines} \label{sec:meth-rl}
+
+Because the Integration Game provides a closed-form state space, typed action rules, and a quantitative objective $\mathcal{J}(\mathcal{P})$, it admits two complementary Reinforcement Learning modes (Fig.~\ref{fig:rl-architecture}):
+
+\paragraph{Offline Mode (Board Architecture Synthesis).}
+In offline synthesis, the RL agent acts as an automated systems architect that constructs a winning Play $\mathcal{P}$ prior to deployment. The environment state $s_k \in \mathcal{S}_{\text{synth}}$ represents the partial board graph at construction step $k$, including exposed offer/need ports, placed operators, wired routes, and remaining unsatisfied consumer needs. Legal actions $a_k \in \mathcal{A}_{\text{synth}}(s_k)$ correspond to adding an operator from $TYR_{\mathcal{C}}$, wiring a route between compatible ports, setting store/QoS parameters, or declaring the board complete. Invalid moves (such as connecting mismatched colors without a recolor operator) are masked out via action-space constraints. To prevent sparse-reward failure during multi-hop graph assembly, each construction step receives a potential-based shaping reward~\cite{NgHaradaRussell1999}:
+\begin{equation}
+    r_{\text{shape}}(s_k, a_k, s_{k+1}) = -c_{\text{op}}(a_k) + \big(\Phi_{\mathcal{C}}(s_k) - \Phi_{\mathcal{C}}(s_{k+1})\big),
+    \label{eq:pbrs}
+\end{equation}
+where $\Phi_{\mathcal{C}}(s)$ measures the aggregate semantic distance across $\mathbb{C} \times \mathbb{L} \times \mathbb{P}$ (graph shortest-path distance in the UDDL multiplex model plus logical/platform conversion distance) between currently available live output ports on the board and remaining unsatisfied need ports. Once the board satisfies Tiers~1 and~2, executing rollouts over test trajectories $f \sim \mathcal{D}(ITR)$ yields the terminal return $R_{\text{term}} = -\mathcal{J}(\mathcal{P})$. Candidate learning architectures for this discrete graph-generation regime include Graph Neural Network (GNN) policy encoders~\cite{Battaglia2018GN} trained via Proximal Policy Optimization (PPO) with invalid-action masking~\cite{Schulman2017PPO, Huang2020Masking}, with architecture-search analogies to combinatorial placement~\cite{Mirhoseini2021}; Monte Carlo Tree Search (MCTS) in the style of AlphaZero~\cite{Silver2018AlphaZero} is an alternative when the construction game admits self-play evaluation.
+
+\paragraph{Online Mode (Adaptive Runtime Mediation).}
+Once a board topology $\mathcal{P}$ is deployed, an online RL agent can regulate dynamic flow parameters at runtime $t \in TSR$ in response to nonstationary traffic rates, bursty sensor emissions, or contested network links. The state $s_t \in \mathcal{S}_{\text{dyn}}$ tracks current queue occupancies, cached sample ages, measured arrival rates, and recent result codes; actions $a_t \in \mathcal{A}_{\text{dyn}}$ modulate pump pacing intervals, queue eviction policies, adaptive filter deadbands, or multi-source fan-in selection across redundant offers. Continuous and hybrid actor--critic algorithms such as Soft Actor--Critic (SAC)~\cite{Haarnoja2018SAC} or PPO optimize the per-tick step reward $r_t = -\big(c_{\text{dyn}}(s_t, a_t) + c_{\text{breach}}(s_t, a_t)\big)$.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+    >=Stealth,
+    font=\footnotesize\sffamily,
+    agentbox/.style={draw=accentAmber!90!black, fill=accentAmber!10, very thick, rounded corners=4pt, minimum width=4.5cm, minimum height=1.20cm, align=center},
+    envbox/.style={draw=techNavy, fill=techNavy!8, thick, rounded corners=4pt, minimum width=5.1cm, minimum height=1.15cm, align=center},
+    rmbox/.style={draw=hotRed!85!black, fill=hotRed!6, thick, rounded corners=4pt, minimum width=5.1cm, minimum height=1.15cm, align=center},
+    arrow/.style={->, thick, draw=black!75}
+]
+    % Left: RL Policy
+    \node[agentbox] (agent) at (0, 0) {
+        \textbf{RL Agent Policy $\pi_\theta(\tilde{s})$}\\[0pt]
+        {\scriptsize Offline: Graph Synthesis (GNN + PPO/MCTS)}\\[-1pt]
+        {\scriptsize Online: Flow Control (SAC / PPO)}
+    };
+
+    % Top Right: Mediation Board Environment
+    \node[envbox] (board) at (8.2, 1.10) {
+        \textbf{Integration Game Board $\mathcal{B}$}\\[0pt]
+        {\scriptsize Coupled Resultant $Z_b = \mathrm{RSY}(\mathcal{P})$}\\[-1pt]
+        {\scriptsize State $s \in \mathcal{S}$, Semantic Potential $\Phi_{\mathcal{C}}(s)$}
+    };
+
+    % Bottom Right: uLSC Reward Machine
+    \node[rmbox] (rm) at (8.2, -1.10) {
+        \textbf{uLSC Reward Machine $\mathcal{M}_{\text{LSC}}$}\\[0pt]
+        {\scriptsize State $u \in \{\mathsf{Idle}, \mathsf{Pre}, \mathsf{Main}, \mathsf{Done}, \mathsf{Breach}\}$}\\[-1pt]
+        {\scriptsize Monitors $f \in ITR \implies y_{Z_b} \in ER(f)$}
+    };
+
+    % Connections
+    \draw[arrow] (agent.north) |- node[pos=0.75, above=1.5pt, font=\scriptsize] {Action $a$ (Place Operator / Wire / Tune Flow)} (board.west);
+    \draw[arrow] (board.south) -- node[right=3pt, font=\scriptsize] {Boundary Trace $(f(t), y_{Z_b}(t))$} (rm.north);
+    \draw[arrow] (rm.west) -| node[pos=0.25, below=1.5pt, font=\scriptsize] {Augmented State $\tilde{s} = (s, u)$ \& Reward $r = -\mathcal{J}$} (agent.south);
+    \draw[arrow, dashed, draw=techNavy!80!black] ([yshift=-0.22cm]board.west) -- ++(-1.1,0) |- node[pos=0.75, above=1.5pt, font=\scriptsize, text=techNavy!90!black] {Shaping $\Delta\Phi_{\mathcal{C}}$} (agent.east);
+\end{tikzpicture}
+\caption{Closed-loop Reinforcement Learning architecture for \emph{The Integration Game}. Compiling the Universal LSC $\mathcal{L}(IOR)$ into a finite-state Reward Machine $\mathcal{M}_{\text{LSC}}$ exposes the automaton state $u$ to the agent, restoring the Markov property for trajectory-level behavioral requirements.}
+\label{fig:rl-architecture}
+\end{figure}
+
+\paragraph{Compiling Universal LSCs into Reward Machines.}
+A subtle theoretical obstacle in applying RL to Tier~3 behavioral satisfiability is that trajectory requirements $y_{Z_b} \in ER(f)$ are inherently \emph{non-Markovian}: whether an output at tick $t$ is admissible depends on the history of environmental triggers and prior system emissions over $[0, t]$. To restore the Markov property rigorously, we compile the Universal LSC $\mathcal{L}(IOR)$ into a finite-state \emph{Reward Machine}~\cite{ToroIcarte2022}:
+\begin{equation}
+    \mathcal{M}_{\text{LSC}} = (U, u_0, \Sigma, \delta_u, \sigma_r),
+    \label{eq:reward-machine}
+\end{equation}
+where $U = \{\mathsf{Idle}, \mathsf{PreMatching}, \mathsf{MainActive}, \mathsf{Completed}, \mathsf{Breach}\}$ is the set of chart monitor states, $\Sigma$ is the alphabet of observable boundary events (offer arrivals, need emissions, and quiet ticks), $\delta_u : U \times \Sigma \to U$ advances the chart state as the trajectory unfolds, and $\sigma_r : U \times \Sigma \to \mathbb{R}$ emits dense progress rewards as pre-chart triggers and main-chart milestones are fulfilled (or emits $-\Omega$ upon transitioning to $\mathsf{Breach}$). Augmenting the environment state with the monitor state, $\tilde{s}_t = (s_t, u_t) \in \mathcal{S} \times U$, guarantees that the joint transition dynamics and reward emissions are strictly Markovian with respect to $\tilde{s}_t$, enabling standard off-the-shelf RL algorithms to learn policies that satisfy Wymorian $IOR$s by construction.

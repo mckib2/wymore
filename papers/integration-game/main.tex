@@ -1,0 +1,67 @@
+\documentclass{cser27}
+
+% Additional packages for formal definitions, tables, and TikZ diagrams
+\usepackage{amsthm}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,calc,shapes.geometric,backgrounds,decorations.pathreplacing}
+
+% Shared color palette for diagrams
+\definecolor{techNavy}{HTML}{1F4E79}
+\definecolor{compBorder}{HTML}{343A40}
+\definecolor{compFill}{HTML}{F8F9FA}
+\definecolor{wireInk}{HTML}{212529}
+\definecolor{boundGreen}{HTML}{2B8A3E}
+\definecolor{fsrBlue}{HTML}{1864AB}
+\definecolor{bsrTeal}{HTML}{087F5B}
+\definecolor{poiPurple}{HTML}{5F3DC4}
+\definecolor{shelfSlate}{HTML}{495057}
+\definecolor{accentAmber}{HTML}{D97706}
+\definecolor{hotRed}{HTML}{C92A2A}
+\definecolor{coldBlue}{HTML}{1864AB}
+
+% Theorem-like environments
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+
+% Bibliography file
+\addbibresource{refs.bib}
+
+% Paper Title
+\title{The Integration Game: Dynamic System Integration Inspired by Wymore's T3SD}
+
+% Authors & Affiliations
+\author[a,b]{Nicholas McKibben}
+\author[b]{Michael Mendoza}
+\author[b]{Chris Allport}
+\author[a]{Alejandro Salado}
+
+\affil[a]{Department of Systems \& Industrial Engineering, University of Arizona; \href{mailto:mckib2@arizona.edu}{mckib2@arizona.edu}, \href{mailto:alejandrosalado@arizona.edu}{alejandrosalado@arizona.edu}}
+\affil[b]{Skayl; \href{mailto:chris@skayl.com}{chris@skayl.com}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+The adoption of a Modular Open Systems Approach (MOSA) is intended to enable rapid capability insertion and vendor interoperability across complex cyber-physical systems.  In practice, however, conformance to open architectural standards alone has not yielded plug-and-play integration: modular components authored by independent vendors routinely diverge across semantics, syntax, and behavior.  Resolving these discrepancies remains a predominantly manual and often costly engineering activity.  This paper introduces \emph{The Integration Game}, a formal framework for automated, semantically enabled system integration inspired by A.~Wayne Wymore's Tricotyledon Theory of System Design (T3SD) with semantics encoded using the Universal Domain Description Language (UDDL)\textregistered{}.  We formulate modular data producers, consumers, and mediation operators as a Wymorian buildability technology in which component ports are constrained by a semantic color space (Conceptual, Logical, and Platform) together with interaction flow attributes.  Behavioral satisfiability of a mediated system integration is specified via an Input/Output Requirement (IOR), represented as a Universal Live Sequence Chart (uLSC), while architectural complexity and operational quality of service are evaluated through a generalized trade-off cost functional.  We demonstrate that by casting the search for an implementable system coupling as a sequential decision process equipped with a uLSC Reward Machine, the framework enables Reinforcement Learning (RL) agents to automatically synthesize valid mediation architectures and adaptive control policies.
+\end{abstract}
+
+\keywords{modular open systems approach, systems integration, Tricotyledon Theory of System Design, UDDL, Live Sequence Charts, reinforcement learning}
+
+% Modular Sections
+\input{sections/00-intro.tex}
+\input{sections/01-background.tex}
+\input{sections/02-methods.tex}
+\input{sections/03-results.tex}
+\input{sections/04-discussion.tex}
+\input{sections/05-conclusion.tex}
+
+% Bibliography
+\printbibliography
+
+\end{document}
