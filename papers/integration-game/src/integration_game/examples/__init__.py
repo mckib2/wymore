@@ -1,4 +1,41 @@
-"""Progressive Integration Game example catalog (Examples 1–12)."""
-from .catalog import ALL_EXAMPLES, run_all_examples
+"""Progressive Integration Game Examples Package."""
 
-__all__ = ["ALL_EXAMPLES", "run_all_examples"]
+from integration_game.examples.catalog import (
+    ALL_EXAMPLES,
+    example_01_autonomous,
+    example_02_ping_pong,
+    example_03_kalman,
+    example_04_multi_representation,
+    example_04_rest_db,
+    example_05_piston_hierarchy,
+    example_05_piston_rotary,
+    example_06_calculator,
+    example_07_latency,
+    example_08_fanout,
+    example_09_ticks,
+    example_10_provenance,
+    example_11_temporal_join,
+    example_12_failover,
+    example_13_vending_machine,
+    example_14_cost_sensitivity,
+)
+
+__all__ = [
+    "ALL_EXAMPLES",
+    "example_01_autonomous",
+    "example_02_ping_pong",
+    "example_03_kalman",
+    "example_04_multi_representation",
+    "example_04_rest_db",
+    "example_05_piston_hierarchy",
+    "example_05_piston_rotary",
+    "example_06_calculator",
+    "example_07_latency",
+    "example_08_fanout",
+    "example_09_ticks",
+    "example_10_provenance",
+    "example_11_temporal_join",
+    "example_12_failover",
+    "example_13_vending_machine",
+    "example_14_cost_sensitivity",
+]

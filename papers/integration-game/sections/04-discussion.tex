@@ -1,24 +1,30 @@
 \section{Discussion} \label{sec:discussion}
 
 The reference implementation shows that the Integration Game is
-\emph{playable}: legal moves are machine-checkable, Tier~1--3 verdicts are
-deterministic for a given scenario and uLSC, and fitness improves along
-instructive mediation sequences. Encoding IORs as Universal LSCs compiled to
-Reward Machines makes Tier~3 obligations (deadlines, envelopes, silence)
-first-class and prepares the offline synthesis MDP for reinforcement learning
-without changing the game semantics.
+\emph{playable} and mathematically well-conditioned for reinforcement learning:
+legal moves are machine-checkable, Tier~1--3 verdicts are deterministic for a
+given scenario and uLSC, and the cost functional $\mathcal{J}$ satisfies all
+seven technology-independent axioms (A1--A7) across constructive progressions
+and parameter sweeps. Encoding IORs as Universal LSCs (and multi-sink
+\texttt{CompositeLSC}s) compiled to Reward Machines makes Tier~3 obligations
+(deadlines, value envelopes, and silence) first-class while restoring the Markov
+property for trajectory-level synthesis and control.
 
-Several design resolutions were required to keep claims honest.
-Representation $\rho$ is an ABox packaging axis distinct from platform color
-$P$; carrier remains a route cost attribute. Dynamics are load-bearing:
-caches apply $a<0$, pumps apply $a>0$, and Tier~2 penalizes mode mismatches.
-Provenance predicates gate both static scoring and runtime transfer.
-Cut-progress in the TBA advances only on proper (on-time and in-tolerance)
-fulfillment, so progress metrics cannot mask hot breaches.
+Several design resolutions were essential to align the implementation with
+systems-engineering intuition. First, evaluating open Needs against the
+\emph{live offer frontier} $\mathcal{F}_{\text{live}}$ prevents ungrounded,
+disconnected interior blocks from spoofing semantic proximity (Axiom~A2), while
+using an identical pairwise mismatch metric for candidate frontier pairs and
+wired routes eliminates artificial penalty spikes upon connection (Axiom~A4).
+Second, removing hard saturation caps on clock overruns and value errors—while
+mapping soft penalties through a $C^1$-smooth rational compression—preserves
+strict gradient monotonicity everywhere in the infeasible region (Axiom~A5).
+Third, positing kinematic acceleration $a=\Delta v/\Delta t$ in
+$\mathbf{k}=(x,v,a)$ cleanly unifies discrete push/pull mode changes at stores
+($a<0$) and pumps ($a>0$) with rate-mismatch buffering requirements, without
+burdening the game rules with continuous-time physics minutiae.
 
-Limitations of the present PoC include a discrete global clock, a single
-primary monitored Need per uLSC instance, and hand-authored progressive
-snapshots rather than a trained policy. Scaling to industrial MOSA graphs,
-continuous-time bindings of TSR, and hierarchical offline/online RL remain
-future work---but they can reuse the same Play/Move API and Reward Machine
-interface demonstrated here.
+Limitations of the present proof of concept include a discrete global tick
+clock and hand-authored progressive trajectories rather than a trained neural
+policy. Training GNN-masked PPO and MCTS agents directly against the locked-down
+\texttt{Play}/\texttt{Move} and \texttt{GameConfig} harness is immediate future work.

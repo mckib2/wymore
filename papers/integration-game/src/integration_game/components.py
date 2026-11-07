@@ -1,11 +1,13 @@
 """
 components.py
 Semantically-enabled Wymorian DSYSTEM components and the full technology catalog T.
+All default static costs and intrinsic parameters are sourced from CatalogCostConfig.
 """
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
+from .config import CatalogCostConfig, DEFAULT_CONFIG
 from .primitives import (
     AggregationKind,
     Color,
@@ -90,10 +92,12 @@ class ProducerBoundary(WymorianComponent):
         color: Color,
         mode: TransferMode = TransferMode.PUSH,
         rep: Representation = Representation.NATIVE_STRUCT,
+        reps: Optional[Tuple[Representation, ...]] = None,
         slot: str = "val",
         shape: Optional[MessageShape] = None,
         trust_score: float = 1.0,
         assurance_level: str = "UNVERIFIED",
+        velocity: Optional[float] = None,
     ):
         super().__init__(comp_id=comp_id, static_cost=0.0, is_boundary=True)
         self.offer_name = offer_name
@@ -102,12 +106,14 @@ class ProducerBoundary(WymorianComponent):
         self.slot = slot
         self.trust_score = trust_score
         self.assurance_level = assurance_level
-        offer_shape = shape or MessageShape.single(color=color, slot=slot, reps=(rep,))
+        allowed = reps if reps is not None else (rep,)
+        offer_shape = shape or MessageShape.single(color=color, slot=slot, reps=allowed)
+        nom_vel = velocity if velocity is not None else (1.0 if mode == TransferMode.PUSH else 0.0)
         self.add_offer(
             name=offer_name,
             shape=offer_shape,
             mode=mode,
-            velocity=1.0 if mode == TransferMode.PUSH else 0.0,
+            velocity=nom_vel,
         )
 
     def reset(self) -> None:
@@ -176,10 +182,15 @@ class SourceBlock(WymorianComponent):
         mode: TransferMode = TransferMode.PUSH,
         period: int = 1,
         rep: Representation = Representation.NATIVE_STRUCT,
-        static_cost: float = 0.2,
+        static_cost: Optional[float] = None,
         slot: str = "val",
+        cost_config: Optional[CatalogCostConfig] = None,
     ):
-        super().__init__(comp_id=comp_id, static_cost=static_cost)
+        cfg = cost_config or DEFAULT_CONFIG.catalog_costs
+        super().__init__(
+            comp_id=comp_id,
+            static_cost=static_cost if static_cost is not None else cfg.source,
+        )
         self.color = color
         self.value_fn = value_fn
         self.period = max(1, period)
@@ -189,7 +200,7 @@ class SourceBlock(WymorianComponent):
             "out",
             MessageShape.single(color, slot=slot, reps=(rep,)),
             mode=mode,
-            velocity=1.0 if mode == TransferMode.PUSH else 0.0,
+            velocity=(1.0 / self.period) if mode == TransferMode.PUSH else 0.0,
         )
 
     def step(self, tick: int, env_inputs: Optional[Dict[str, Message]] = None) -> None:
@@ -201,7 +212,7 @@ class SourceBlock(WymorianComponent):
                 color=self.color,
                 dynamics=Dynamics(
                     position=out_if.full_id,
-                    velocity=1.0 if out_if.mode == TransferMode.PUSH else 0.0,
+                    velocity=(1.0 / self.period) if out_if.mode == TransferMode.PUSH else 0.0,
                 ),
                 representation=self.rep,
                 provenance=Provenance(sources=(self.comp_id,), timestamp_tick=tick),
@@ -217,9 +228,14 @@ class SinkBlock(WymorianComponent):
         comp_id: str,
         shape: MessageShape,
         mode: TransferMode = TransferMode.PUSH,
-        static_cost: float = 0.1,
+        static_cost: Optional[float] = None,
+        cost_config: Optional[CatalogCostConfig] = None,
     ):
-        super().__init__(comp_id=comp_id, static_cost=static_cost)
+        cfg = cost_config or DEFAULT_CONFIG.catalog_costs
+        super().__init__(
+            comp_id=comp_id,
+            static_cost=static_cost if static_cost is not None else cfg.sink,
+        )
         self.add_need("in", shape, mode=mode)
 
     def reset(self) -> None:
@@ -249,38 +265,46 @@ class RecolorBlock(WymorianComponent):
         info_loss: float = 0.0,
         static_cost: Optional[float] = None,
         slot: str = "val",
+        out_slot: Optional[str] = None,
         latency: float = 0.0,
+        cost_config: Optional[CatalogCostConfig] = None,
     ):
+        cfg = cost_config or DEFAULT_CONFIG.catalog_costs
         if static_cost is None:
             cost = 0.0
             if in_color.C != out_color.C:
-                cost += 0.5
+                cost += cfg.recolor_c
             if in_color.L != out_color.L:
-                cost += 1.0
+                cost += cfg.recolor_l
             if in_color.P != out_color.P:
-                cost += 0.1
-            static_cost = max(0.1, round(cost, 2))
+                cost += cfg.recolor_p
+            static_cost = max(cfg.recolor_min, round(cost, 2))
         super().__init__(comp_id=comp_id, static_cost=static_cost)
         self.in_color = in_color
         self.out_color = out_color
         self.value_fn = value_fn
         self.info_loss = info_loss
         self.slot = slot
+        self.out_slot = out_slot or slot
         self.latency = latency
-        self.add_need("in", MessageShape.single(in_color, slot=slot, reps=(rep,)), mode=mode)
+        self.add_need("in", MessageShape.single(in_color, slot=self.slot, reps=(rep,)), mode=mode)
         self.add_offer(
             "out",
-            MessageShape.single(out_color, slot=slot, reps=(rep,)),
+            MessageShape.single(out_color, slot=self.out_slot, reps=(rep,)),
             mode=mode,
             velocity=1.0 if mode == TransferMode.PUSH else 0.0,
         )
+
+    def wants_to_pull(self, tick: int) -> bool:
+        return self.interfaces["in"].mode == TransferMode.PULL
 
     def step(self, tick: int, env_inputs: Optional[Dict[str, Message]] = None) -> None:
         in_if = self.interfaces["in"]
         out_if = self.interfaces["out"]
         out_if.outbox = None
         if in_if.inbox is not None:
-            f_in = in_if.inbox.first_field(self.slot)
+            msg_in = in_if.inbox
+            f_in = msg_in.first_field(self.slot)
             in_if.inbox = None
             try:
                 new_val = self.value_fn(f_in.value)
@@ -298,59 +322,98 @@ class RecolorBlock(WymorianComponent):
                     representation=f_in.representation,
                     provenance=f_in.provenance.append_op(self.comp_id, tick),
                 )
-                out_if.outbox = Message.single(f_out, slot=self.slot)
+                out_if.outbox = Message.single(f_out, slot=self.out_slot, key=msg_in.correlation_key)
             except Exception as exc:
                 self.disruption_events.append((tick, ResultCode.ERROR, str(exc)))
 
 
 class RepresentationBridgeBlock(WymorianComponent):
-    """Transcode_Rep: change ρ without altering (C,L,P)."""
+    """Transcode_Rep: change ρ without altering (C,L,P). Supports single-slot or full RECORD shapes."""
 
     def __init__(
         self,
         comp_id: str,
-        color: Color,
+        color: Optional[Color],
         in_rep: Representation,
         out_rep: Representation,
         mode: TransferMode = TransferMode.PUSH,
         decode_fn: Callable[[Any], Any] = lambda x: x,
-        static_cost: float = 0.4,
+        static_cost: Optional[float] = None,
         slot: str = "val",
+        slots: Optional[Dict[str, Color]] = None,
+        in_reps: Optional[Tuple[Representation, ...]] = None,
+        out_reps: Optional[Tuple[Representation, ...]] = None,
+        cost_config: Optional[CatalogCostConfig] = None,
     ):
-        super().__init__(comp_id=comp_id, static_cost=static_cost)
+        cfg = cost_config or DEFAULT_CONFIG.catalog_costs
+        super().__init__(
+            comp_id=comp_id,
+            static_cost=static_cost if static_cost is not None else cfg.rep_bridge,
+        )
         self.color = color
         self.in_rep = in_rep
         self.out_rep = out_rep
         self.decode_fn = decode_fn
         self.slot = slot
-        self.add_need("in", MessageShape.single(color, slot=slot, reps=(in_rep,)), mode=mode)
+        self.slots = slots
+        allowed_in = frozenset(in_reps) if in_reps is not None else frozenset({in_rep})
+        allowed_out = frozenset(out_reps) if out_reps is not None else frozenset({out_rep})
+        if slots is not None:
+            in_shape = MessageShape(kind=AggregationKind.RECORD, slots=dict(slots), allowed_reps=allowed_in)
+            out_shape = MessageShape(kind=AggregationKind.RECORD, slots=dict(slots), allowed_reps=allowed_out)
+        else:
+            if color is None:
+                raise ValueError("RepresentationBridgeBlock requires either `color` or `slots`.")
+            in_shape = MessageShape(kind=AggregationKind.RECORD, slots={slot: color}, allowed_reps=allowed_in)
+            out_shape = MessageShape(kind=AggregationKind.RECORD, slots={slot: color}, allowed_reps=allowed_out)
+        self.add_need("in", in_shape, mode=mode)
         self.add_offer(
             "out",
-            MessageShape.single(color, slot=slot, reps=(out_rep,)),
+            out_shape,
             mode=mode,
             velocity=1.0 if mode == TransferMode.PUSH else 0.0,
         )
+
+    def wants_to_pull(self, tick: int) -> bool:
+        return self.interfaces["in"].mode == TransferMode.PULL
 
     def step(self, tick: int, env_inputs: Optional[Dict[str, Message]] = None) -> None:
         in_if = self.interfaces["in"]
         out_if = self.interfaces["out"]
         out_if.outbox = None
         if in_if.inbox is not None:
-            f_in = in_if.inbox.first_field(self.slot)
+            msg_in = in_if.inbox
             in_if.inbox = None
             try:
-                val = self.decode_fn(f_in.value)
-                f_out = Field(
-                    value=val,
-                    color=self.color,
-                    dynamics=Dynamics(
-                        position=out_if.full_id,
-                        velocity=1.0 if out_if.mode == TransferMode.PUSH else 0.0,
-                    ),
-                    representation=self.out_rep,
-                    provenance=f_in.provenance.append_op(self.comp_id, tick),
-                )
-                out_if.outbox = Message.single(f_out, slot=self.slot)
+                if self.slots is not None and msg_in.kind == AggregationKind.RECORD:
+                    out_fields: Dict[str, Field] = {}
+                    for k, f_in in msg_in.fields.items():
+                        val = self.decode_fn(f_in.value)
+                        out_fields[k] = Field(
+                            value=val,
+                            color=f_in.color,
+                            dynamics=Dynamics(
+                                position=out_if.full_id,
+                                velocity=1.0 if out_if.mode == TransferMode.PUSH else 0.0,
+                            ),
+                            representation=self.out_rep,
+                            provenance=f_in.provenance.append_op(self.comp_id, tick),
+                        )
+                    out_if.outbox = Message.record(out_fields, key=msg_in.correlation_key)
+                else:
+                    f_in = msg_in.first_field(self.slot)
+                    val = self.decode_fn(f_in.value)
+                    f_out = Field(
+                        value=val,
+                        color=f_in.color,
+                        dynamics=Dynamics(
+                            position=out_if.full_id,
+                            velocity=1.0 if out_if.mode == TransferMode.PUSH else 0.0,
+                        ),
+                        representation=self.out_rep,
+                        provenance=f_in.provenance.append_op(self.comp_id, tick),
+                    )
+                    out_if.outbox = Message.single(f_out, slot=self.slot, key=msg_in.correlation_key)
             except Exception as exc:
                 self.disruption_events.append((tick, ResultCode.ERROR, str(exc)))
 
@@ -370,11 +433,14 @@ class CacheStoreBlock(WymorianComponent):
         max_age: Optional[int] = None,
         capacity: int = 1,
         rep: Representation = Representation.NATIVE_STRUCT,
-        static_cost: float = 0.5,
+        static_cost: Optional[float] = None,
         slot: str = "val",
         shape: Optional[MessageShape] = None,
+        cost_config: Optional[CatalogCostConfig] = None,
     ):
-        mem_cost = static_cost + 0.05 * max(0, capacity - 1)
+        cfg = cost_config or DEFAULT_CONFIG.catalog_costs
+        base = static_cost if static_cost is not None else cfg.cache_base
+        mem_cost = round(base + cfg.cache_per_extra_slot * max(0, capacity - 1), 4)
         super().__init__(comp_id=comp_id, static_cost=mem_cost)
         self.color = color
         self.retain_on_read = retain_on_read
@@ -395,21 +461,19 @@ class CacheStoreBlock(WymorianComponent):
         if in_if.inbox is not None:
             msg = in_if.inbox
             in_if.inbox = None
-            # Decelerate all fields
-            new_fields = {
-                k: Field(
-                    value=f.value,
-                    color=f.color,
-                    dynamics=f.dynamics.decelerate_to_rest(self.comp_id),
-                    representation=f.representation,
-                    provenance=f.provenance.append_op(self.comp_id, tick),
-                )
-                for k, f in (msg.fields.items() if msg.kind == AggregationKind.RECORD else [])
-            }
             if msg.kind == AggregationKind.RECORD:
+                new_fields = {
+                    k: Field(
+                        value=f.value,
+                        color=f.color,
+                        dynamics=f.dynamics.decelerate_to_rest(self.comp_id),
+                        representation=f.representation,
+                        provenance=f.provenance.append_op(self.comp_id, tick),
+                    )
+                    for k, f in msg.fields.items()
+                }
                 cached = Message.record(new_fields, key=msg.correlation_key)
             else:
-                # Generic: wrap first field
                 f0 = msg.first_field(self.slot)
                 cached = Message.single(
                     Field(
@@ -427,7 +491,8 @@ class CacheStoreBlock(WymorianComponent):
             if len(q) >= self.capacity:
                 q.pop(0)
                 ticks.pop(0)
-                self.disruption_events.append((tick, ResultCode.NO_SPACE, "cache replace-oldest"))
+                if not self.retain_on_read:
+                    self.disruption_events.append((tick, ResultCode.NO_SPACE, "cache replace-oldest"))
             q.append(cached)
             ticks.append(tick)
 
@@ -459,11 +524,16 @@ class PumpBlock(WymorianComponent):
         color: Color,
         period: int = 1,
         rep: Representation = Representation.NATIVE_STRUCT,
-        static_cost: float = 0.6,
+        static_cost: Optional[float] = None,
         slot: str = "val",
         shape: Optional[MessageShape] = None,
+        cost_config: Optional[CatalogCostConfig] = None,
     ):
-        super().__init__(comp_id=comp_id, static_cost=static_cost)
+        cfg = cost_config or DEFAULT_CONFIG.catalog_costs
+        super().__init__(
+            comp_id=comp_id,
+            static_cost=static_cost if static_cost is not None else cfg.pump,
+        )
         self.color = color
         self.period = max(1, period)
         self.slot = slot
@@ -515,11 +585,17 @@ class RateAdapterBlock(WymorianComponent):
         color: Color,
         emit_period: int = 2,
         rep: Representation = Representation.NATIVE_STRUCT,
-        static_cost: float = 0.5,
+        static_cost: Optional[float] = None,
         slot: str = "val",
+        cost_config: Optional[CatalogCostConfig] = None,
     ):
-        super().__init__(comp_id=comp_id, static_cost=static_cost)
+        cfg = cost_config or DEFAULT_CONFIG.catalog_costs
+        super().__init__(
+            comp_id=comp_id,
+            static_cost=static_cost if static_cost is not None else cfg.rate_adapter,
+        )
         self.emit_period = max(1, emit_period)
+        self.loss_per_period = cfg.rate_adapter_loss_per_period
         self.slot = slot
         shape = MessageShape.single(color, slot=slot, reps=(rep,))
         self.add_need("in", shape, mode=TransferMode.PUSH)
@@ -538,8 +614,9 @@ class RateAdapterBlock(WymorianComponent):
             in_if.inbox = None
         if self.state["latest"] is not None and (tick % self.emit_period) == 0:
             out_if.outbox = self.state["latest"]
-            # Downsampling information loss
-            self.info_loss_events.append((tick, 0.1 * (self.emit_period - 1), "rate downsample"))
+            self.info_loss_events.append(
+                (tick, self.loss_per_period * (self.emit_period - 1), "rate downsample")
+            )
 
 
 class StaleGateBlock(WymorianComponent):
@@ -552,15 +629,21 @@ class StaleGateBlock(WymorianComponent):
         max_age: int = 2,
         mode: TransferMode = TransferMode.PUSH,
         rep: Representation = Representation.NATIVE_STRUCT,
-        static_cost: float = 0.3,
+        static_cost: Optional[float] = None,
         slot: str = "val",
+        shape: Optional[MessageShape] = None,
+        cost_config: Optional[CatalogCostConfig] = None,
     ):
-        super().__init__(comp_id=comp_id, static_cost=static_cost)
+        cfg = cost_config or DEFAULT_CONFIG.catalog_costs
+        super().__init__(
+            comp_id=comp_id,
+            static_cost=static_cost if static_cost is not None else cfg.stale_gate,
+        )
         self.max_age = max_age
         self.slot = slot
-        shape = MessageShape.single(color, slot=slot, reps=(rep,))
-        self.add_need("in", shape, mode=mode)
-        self.add_offer("out", shape, mode=mode, velocity=1.0 if mode == TransferMode.PUSH else 0.0)
+        shape_io = shape or MessageShape.single(color, slot=slot, reps=(rep,))
+        self.add_need("in", shape_io, mode=mode)
+        self.add_offer("out", shape_io, mode=mode, velocity=1.0 if mode == TransferMode.PUSH else 0.0)
 
     def step(self, tick: int, env_inputs: Optional[Dict[str, Message]] = None) -> None:
         in_if = self.interfaces["in"]
@@ -581,7 +664,7 @@ class StaleGateBlock(WymorianComponent):
 # ---------------------------------------------------------------------------
 
 class AssembleBlock(WymorianComponent):
-    """Aggregate single-field inputs into a multi-slot RECORD (or emit partial if wait_for_all=False)."""
+    """Aggregate single-field inputs into a multi-slot RECORD."""
 
     def __init__(
         self,
@@ -590,12 +673,16 @@ class AssembleBlock(WymorianComponent):
         mode: TransferMode = TransferMode.PUSH,
         rep: Representation = Representation.NATIVE_STRUCT,
         wait_for_all: bool = True,
-        static_cost: float = 0.3,
+        static_cost: Optional[float] = None,
+        cost_config: Optional[CatalogCostConfig] = None,
     ):
-        super().__init__(comp_id=comp_id, static_cost=static_cost)
+        cfg = cost_config or DEFAULT_CONFIG.catalog_costs
+        super().__init__(
+            comp_id=comp_id,
+            static_cost=static_cost if static_cost is not None else cfg.assemble,
+        )
         self.slot_colors = slot_colors
         self.wait_for_all = wait_for_all
-        # Accept default single-slot "val" offers; rename into record slots on assemble.
         for slot_name, color in slot_colors.items():
             self.add_need(
                 f"in_{slot_name}",
@@ -629,9 +716,12 @@ class AssembleBlock(WymorianComponent):
                 )
                 in_if.inbox = None
 
-        if len(self.state["staged"]) == len(self.slot_colors):
+        if len(self.state["staged"]) == len(self.slot_colors) or (
+            not self.wait_for_all and len(self.state["staged"]) > 0
+        ):
             assembled = dict(self.state["staged"])
-            self.state["staged"].clear()
+            if self.wait_for_all:
+                self.state["staged"].clear()
             out_if.outbox = Message.record(assembled)
 
 
@@ -644,19 +734,27 @@ class DisassembleBlock(WymorianComponent):
         slot_colors: Dict[str, Color],
         mode: TransferMode = TransferMode.PUSH,
         rep: Representation = Representation.NATIVE_STRUCT,
-        static_cost: float = 0.2,
+        static_cost: Optional[float] = None,
+        normalize_output_slot: bool = False,
+        cost_config: Optional[CatalogCostConfig] = None,
     ):
-        super().__init__(comp_id=comp_id, static_cost=static_cost)
+        cfg = cost_config or DEFAULT_CONFIG.catalog_costs
+        super().__init__(
+            comp_id=comp_id,
+            static_cost=static_cost if static_cost is not None else cfg.disassemble,
+        )
         self.slot_colors = slot_colors
+        self.normalize_output_slot = normalize_output_slot
         self.add_need(
             "in",
             MessageShape(kind=AggregationKind.RECORD, slots=slot_colors, allowed_reps=frozenset({rep})),
             mode=mode,
         )
         for slot_name, color in slot_colors.items():
+            out_slot = "val" if normalize_output_slot else slot_name
             self.add_offer(
                 f"out_{slot_name}",
-                MessageShape.single(color, slot=slot_name, reps=(rep,)),
+                MessageShape.single(color, slot=out_slot, reps=(rep,)),
                 mode=mode,
                 velocity=1.0 if mode == TransferMode.PUSH else 0.0,
             )
@@ -670,8 +768,9 @@ class DisassembleBlock(WymorianComponent):
             in_if.inbox = None
             for slot_name in self.slot_colors:
                 if slot_name in msg.fields:
+                    out_slot = "val" if self.normalize_output_slot else slot_name
                     self.interfaces[f"out_{slot_name}"].outbox = Message.single(
-                        msg.fields[slot_name], slot=slot_name
+                        msg.fields[slot_name], slot=out_slot, key=msg.correlation_key
                     )
 
 
@@ -685,9 +784,14 @@ class ProjectBlock(WymorianComponent):
         keep_slots: List[str],
         mode: TransferMode = TransferMode.PUSH,
         rep: Representation = Representation.NATIVE_STRUCT,
-        static_cost: float = 0.2,
+        static_cost: Optional[float] = None,
+        cost_config: Optional[CatalogCostConfig] = None,
     ):
-        super().__init__(comp_id=comp_id, static_cost=static_cost)
+        cfg = cost_config or DEFAULT_CONFIG.catalog_costs
+        super().__init__(
+            comp_id=comp_id,
+            static_cost=static_cost if static_cost is not None else cfg.project,
+        )
         out_slots = {s: in_slots[s] for s in keep_slots}
         self.keep_slots = keep_slots
         self.add_need(
@@ -709,7 +813,10 @@ class ProjectBlock(WymorianComponent):
         if in_if.inbox is not None:
             msg = in_if.inbox
             in_if.inbox = None
-            out_if.outbox = Message.record({s: msg.fields[s] for s in self.keep_slots if s in msg.fields})
+            out_if.outbox = Message.record(
+                {s: msg.fields[s] for s in self.keep_slots if s in msg.fields},
+                key=msg.correlation_key,
+            )
 
 
 class InjectBlock(WymorianComponent):
@@ -724,9 +831,14 @@ class InjectBlock(WymorianComponent):
         inject_value: Any,
         mode: TransferMode = TransferMode.PUSH,
         rep: Representation = Representation.NATIVE_STRUCT,
-        static_cost: float = 0.2,
+        static_cost: Optional[float] = None,
+        cost_config: Optional[CatalogCostConfig] = None,
     ):
-        super().__init__(comp_id=comp_id, static_cost=static_cost)
+        cfg = cost_config or DEFAULT_CONFIG.catalog_costs
+        super().__init__(
+            comp_id=comp_id,
+            static_cost=static_cost if static_cost is not None else cfg.inject,
+        )
         self.inject_slot = inject_slot
         self.inject_color = inject_color
         self.inject_value = inject_value
@@ -777,11 +889,16 @@ class FanOutBlock(WymorianComponent):
         n_outputs: int = 2,
         mode: TransferMode = TransferMode.PUSH,
         rep: Representation = Representation.NATIVE_STRUCT,
-        static_cost: float = 0.2,
+        static_cost: Optional[float] = None,
         slot: str = "val",
         shape: Optional[MessageShape] = None,
+        cost_config: Optional[CatalogCostConfig] = None,
     ):
-        super().__init__(comp_id=comp_id, static_cost=static_cost)
+        cfg = cost_config or DEFAULT_CONFIG.catalog_costs
+        super().__init__(
+            comp_id=comp_id,
+            static_cost=static_cost if static_cost is not None else cfg.fan_out,
+        )
         self.n_outputs = n_outputs
         self.slot = slot
         shape_io = shape or MessageShape.single(color, slot=slot, reps=(rep,))
@@ -815,10 +932,15 @@ class FanInBlock(WymorianComponent):
         n_inputs: int = 2,
         mode: TransferMode = TransferMode.PUSH,
         rep: Representation = Representation.NATIVE_STRUCT,
-        static_cost: float = 0.2,
+        static_cost: Optional[float] = None,
         slot: str = "val",
+        cost_config: Optional[CatalogCostConfig] = None,
     ):
-        super().__init__(comp_id=comp_id, static_cost=static_cost)
+        cfg = cost_config or DEFAULT_CONFIG.catalog_costs
+        super().__init__(
+            comp_id=comp_id,
+            static_cost=static_cost if static_cost is not None else cfg.fan_in,
+        )
         self.n_inputs = n_inputs
         self.slot = slot
         shape = MessageShape.single(color, slot=slot, reps=(rep,))
@@ -850,14 +972,20 @@ class JoinBlock(WymorianComponent):
         window: int = 1,
         mode: TransferMode = TransferMode.PUSH,
         rep: Representation = Representation.NATIVE_STRUCT,
-        static_cost: float = 0.8,
+        static_cost: Optional[float] = None,
+        use_provenance_timestamp: bool = False,
+        cost_config: Optional[CatalogCostConfig] = None,
     ):
-        super().__init__(comp_id=comp_id, static_cost=static_cost)
+        cfg = cost_config or DEFAULT_CONFIG.catalog_costs
+        super().__init__(
+            comp_id=comp_id,
+            static_cost=static_cost if static_cost is not None else cfg.join,
+        )
         self.key_slot_left = key_slot_left
         self.key_slot_right = key_slot_right
         self.window = window
+        self.use_provenance_timestamp = use_provenance_timestamp
         out_slots = {**left_slots, **right_slots}
-        # Disambiguate colliding names
         for k in left_slots:
             if k in right_slots and k != key_slot_left:
                 out_slots[f"left_{k}"] = left_slots[k]
@@ -893,10 +1021,20 @@ class JoinBlock(WymorianComponent):
         left = self.interfaces["in_left"]
         right = self.interfaces["in_right"]
         if left.inbox is not None:
-            self.state["left_buf"].append((tick, left.inbox))
+            t_l = (
+                left.inbox.fields[self.key_slot_left].provenance.timestamp_tick
+                if self.use_provenance_timestamp
+                else tick
+            )
+            self.state["left_buf"].append((t_l, left.inbox))
             left.inbox = None
         if right.inbox is not None:
-            self.state["right_buf"].append((tick, right.inbox))
+            t_r = (
+                right.inbox.fields[self.key_slot_right].provenance.timestamp_tick
+                if self.use_provenance_timestamp
+                else tick
+            )
+            self.state["right_buf"].append((t_r, right.inbox))
             right.inbox = None
 
         # Drop aged
@@ -938,10 +1076,15 @@ class DeriveBlock(WymorianComponent):
         compute_fn: Callable[[Message, Dict[str, Any], int], Tuple[Optional[Message], Dict[str, Any]]],
         init_state_fn: Callable[[], Dict[str, Any]] = lambda: {},
         mode: TransferMode = TransferMode.PUSH,
-        static_cost: float = 2.0,
+        static_cost: Optional[float] = None,
         latency: float = 0.0,
+        cost_config: Optional[CatalogCostConfig] = None,
     ):
-        super().__init__(comp_id=comp_id, static_cost=static_cost)
+        cfg = cost_config or DEFAULT_CONFIG.catalog_costs
+        super().__init__(
+            comp_id=comp_id,
+            static_cost=static_cost if static_cost is not None else cfg.derive,
+        )
         self.compute_fn = compute_fn
         self.init_state_fn = init_state_fn
         self.latency = latency
@@ -979,10 +1122,15 @@ class FilterBlock(WymorianComponent):
         predicate: Callable[[Field], bool],
         mode: TransferMode = TransferMode.PUSH,
         rep: Representation = Representation.NATIVE_STRUCT,
-        static_cost: float = 0.4,
+        static_cost: Optional[float] = None,
         slot: str = "val",
+        cost_config: Optional[CatalogCostConfig] = None,
     ):
-        super().__init__(comp_id=comp_id, static_cost=static_cost)
+        cfg = cost_config or DEFAULT_CONFIG.catalog_costs
+        super().__init__(
+            comp_id=comp_id,
+            static_cost=static_cost if static_cost is not None else cfg.filter,
+        )
         self.predicate = predicate
         self.slot = slot
         shape = MessageShape.single(color, slot=slot, reps=(rep,))
@@ -1013,16 +1161,24 @@ class ProvVerifyBlock(WymorianComponent):
         assurance_out: str = "VERIFIED",
         mode: TransferMode = TransferMode.PUSH,
         rep: Representation = Representation.NATIVE_STRUCT,
-        static_cost: float = 0.5,
+        static_cost: Optional[float] = None,
         slot: str = "val",
+        cost_config: Optional[CatalogCostConfig] = None,
     ):
-        super().__init__(comp_id=comp_id, static_cost=static_cost)
+        cfg = cost_config or DEFAULT_CONFIG.catalog_costs
+        super().__init__(
+            comp_id=comp_id,
+            static_cost=static_cost if static_cost is not None else cfg.prov_verify,
+        )
         self.min_trust = min_trust
         self.assurance_out = assurance_out
         self.slot = slot
-        shape = MessageShape.single(color, slot=slot, reps=(rep,))
-        self.add_need("in", shape, mode=mode)
-        self.add_offer("out", shape, mode=mode, velocity=1.0 if mode == TransferMode.PUSH else 0.0)
+        shape_in = MessageShape.single(color, slot=slot, reps=(rep,))
+        shape_out = MessageShape.single(
+            color, slot=slot, reps=(rep,), min_trust=min_trust, required_assurance=assurance_out
+        )
+        self.add_need("in", shape_in, mode=mode)
+        self.add_offer("out", shape_out, mode=mode, velocity=1.0 if mode == TransferMode.PUSH else 0.0)
 
     def step(self, tick: int, env_inputs: Optional[Dict[str, Message]] = None) -> None:
         in_if = self.interfaces["in"]
@@ -1042,7 +1198,7 @@ class ProvVerifyBlock(WymorianComponent):
 
 
 class ProvTMRVoteBlock(WymorianComponent):
-    """Triple modular redundancy vote across three same-color inputs."""
+    """Triple modular redundancy vote across three same-color inputs (supports tolerance or exact vote)."""
 
     def __init__(
         self,
@@ -1050,16 +1206,32 @@ class ProvTMRVoteBlock(WymorianComponent):
         color: Color,
         mode: TransferMode = TransferMode.PUSH,
         rep: Representation = Representation.NATIVE_STRUCT,
-        static_cost: float = 1.5,
+        static_cost: Optional[float] = None,
         slot: str = "val",
         out_min_trust_shape: bool = True,
+        vote_tolerance: float = 1e-6,
+        cost_config: Optional[CatalogCostConfig] = None,
     ):
-        super().__init__(comp_id=comp_id, static_cost=static_cost)
+        cfg = cost_config or DEFAULT_CONFIG.catalog_costs
+        super().__init__(
+            comp_id=comp_id,
+            static_cost=static_cost if static_cost is not None else cfg.prov_tmr,
+        )
         self.slot = slot
+        self.vote_tolerance = vote_tolerance
+        self.cost_config = cfg
         shape_in = MessageShape.single(color, slot=slot, reps=(rep,))
-        shape_out = MessageShape.single(
-            color, slot=slot, reps=(rep,), min_trust=0.9, required_assurance="TMR_VOTED"
-        ) if out_min_trust_shape else shape_in
+        shape_out = (
+            MessageShape.single(
+                color,
+                slot=slot,
+                reps=(rep,),
+                min_trust=cfg.tmr_default_min_trust,
+                required_assurance="TMR_VOTED",
+            )
+            if out_min_trust_shape
+            else shape_in
+        )
         for i in range(3):
             self.add_need(f"in_{i}", shape_in, mode=mode)
         self.add_offer("out", shape_out, mode=mode, velocity=1.0 if mode == TransferMode.PUSH else 0.0)
@@ -1079,19 +1251,26 @@ class ProvTMRVoteBlock(WymorianComponent):
         buf: List[Optional[Field]] = self.state["buf"]
         if all(b is not None for b in buf):
             vals = [b.value for b in buf]  # type: ignore[union-attr]
-            # Majority vote on equality
-            winner = None
-            for v in vals:
-                if vals.count(v) >= 2:
-                    winner = v
+            winner_idx: Optional[int] = None
+            for idx_a, va in enumerate(vals):
+                agreements = 0
+                for vb in vals:
+                    if isinstance(va, (int, float)) and isinstance(vb, (int, float)):
+                        if abs(float(va) - float(vb)) <= self.vote_tolerance:
+                            agreements += 1
+                    elif va == vb:
+                        agreements += 1
+                if agreements >= 2:
+                    winner_idx = idx_a
                     break
-            if winner is not None:
-                base = next(b for b in buf if b is not None and b.value == winner)
-                others = [b.provenance for b in buf if b is not None and b is not base]
-                prov = base.provenance.merge_vote(others, self.comp_id, tick)
+            if winner_idx is not None:
+                base = buf[winner_idx]
+                assert base is not None
+                others = [b.provenance for i, b in enumerate(buf) if b is not None and i != winner_idx]
+                prov = base.provenance.merge_vote(others, self.comp_id, tick, cfg=self.cost_config)
                 out_if.outbox = Message.single(
                     Field(
-                        value=winner,
+                        value=base.value,
                         color=base.color,
                         dynamics=Dynamics(position=out_if.full_id, velocity=1.0),
                         representation=base.representation,
@@ -1101,11 +1280,16 @@ class ProvTMRVoteBlock(WymorianComponent):
                 )
                 self.state["buf"] = [None, None, None]
             else:
+                self.state["buf"] = [None, None, None]
                 self.disruption_events.append((tick, ResultCode.ERROR, "TMR disagree"))
 
 
 class MuxSwitchBlock(WymorianComponent):
-    """Online adaptive multi-source selector (parameterized active input index)."""
+    """
+    Online adaptive multi-source selector.
+    Supports either a static `active_index` or a dynamic `policy_fn(tick, inboxes, state) -> int`
+    for online runtime failover.
+    """
 
     def __init__(
         self,
@@ -1114,27 +1298,43 @@ class MuxSwitchBlock(WymorianComponent):
         n_inputs: int = 2,
         mode: TransferMode = TransferMode.PUSH,
         rep: Representation = Representation.NATIVE_STRUCT,
-        static_cost: float = 0.4,
+        static_cost: Optional[float] = None,
         slot: str = "val",
         active_index: int = 0,
+        policy_fn: Optional[Callable[[int, Dict[int, Optional[Message]], Dict[str, Any]], int]] = None,
+        cost_config: Optional[CatalogCostConfig] = None,
     ):
-        super().__init__(comp_id=comp_id, static_cost=static_cost)
+        cfg = cost_config or DEFAULT_CONFIG.catalog_costs
+        super().__init__(
+            comp_id=comp_id,
+            static_cost=static_cost if static_cost is not None else cfg.mux_switch,
+        )
         self.n_inputs = n_inputs
         self.slot = slot
+        self.initial_active_index = active_index
+        self.policy_fn = policy_fn
         self.state = {"active_index": active_index}
         shape = MessageShape.single(color, slot=slot, reps=(rep,))
         for i in range(n_inputs):
             self.add_need(f"in_{i}", shape, mode=mode)
         self.add_offer("out", shape, mode=mode, velocity=1.0 if mode == TransferMode.PUSH else 0.0)
 
+    def reset(self) -> None:
+        super().reset()
+        self.state = {"active_index": self.initial_active_index}
+
     def set_active(self, index: int) -> None:
-        self.state["active_index"] = max(0, min(self.n_inputs - 1, index))
+        self.initial_active_index = max(0, min(self.n_inputs - 1, index))
+        self.state["active_index"] = self.initial_active_index
 
     def step(self, tick: int, env_inputs: Optional[Dict[str, Message]] = None) -> None:
         out_if = self.interfaces["out"]
         out_if.outbox = None
+        inboxes = {i: self.interfaces[f"in_{i}"].inbox for i in range(self.n_inputs)}
+        if self.policy_fn is not None:
+            idx = self.policy_fn(tick, inboxes, self.state)
+            self.state["active_index"] = max(0, min(self.n_inputs - 1, idx))
         idx = self.state.get("active_index", 0)
-        # Drain non-active to avoid backlog
         for i in range(self.n_inputs):
             in_if = self.interfaces[f"in_{i}"]
             if in_if.inbox is not None:

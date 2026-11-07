@@ -2,6 +2,15 @@
 The Integration Game: Modular Python Reference Implementation.
 See ONTOLOGY.md for the authoritative Field / Interface / win-condition model.
 """
+from .config import (
+    CarrierCostConfig,
+    CatalogCostConfig,
+    ColorDistanceConfig,
+    DEFAULT_CONFIG,
+    GameConfig,
+    RewardMachineConfig,
+    ScoringConfig,
+)
 from .primitives import (
     AggregationKind,
     Carrier,
@@ -41,9 +50,30 @@ from .components import (
     StaleGateBlock,
     WymorianComponent,
 )
-from .ulsc import RMState, RewardMachine, RewardPulse, TBAEvaluationResult, UniversalLSC
+from .ulsc import (
+    CompositeLSC,
+    LSCMonitor,
+    RMState,
+    RewardMachine,
+    RewardPulse,
+    TBAEvaluationResult,
+    UniversalLSC,
+)
 from .board import Board, CompatibilityError
 from .scoring import BoardEvaluator, ScoreBreakdown, print_progression_table, rank_winning_plays
+from .sensitivity import (
+    CostAssertionReport,
+    SensitivitySweepPoint,
+    run_all_cost_assertions,
+    run_weight_sensitivity_sweep,
+    verify_a1_feasibility_dominance,
+    verify_a2_live_frontier_grounding,
+    verify_a3_stepwise_potential_monotonicity,
+    verify_a4_route_wiring_continuity,
+    verify_a5_tier3_behavioral_monotonicity,
+    verify_a6_dynamic_qos_monotonicity,
+    verify_a7_parsimony_monotonicity,
+)
 from .game import (
     AddOperator,
     AddRoute,
@@ -57,6 +87,13 @@ from .game import (
 )
 
 __all__ = [
+    "CarrierCostConfig",
+    "CatalogCostConfig",
+    "ColorDistanceConfig",
+    "DEFAULT_CONFIG",
+    "GameConfig",
+    "RewardMachineConfig",
+    "ScoringConfig",
     "AggregationKind",
     "Carrier",
     "Color",
@@ -95,6 +132,8 @@ __all__ = [
     "SourceBlock",
     "StaleGateBlock",
     "WymorianComponent",
+    "CompositeLSC",
+    "LSCMonitor",
     "RMState",
     "RewardMachine",
     "RewardPulse",
@@ -106,6 +145,17 @@ __all__ = [
     "ScoreBreakdown",
     "print_progression_table",
     "rank_winning_plays",
+    "CostAssertionReport",
+    "SensitivitySweepPoint",
+    "run_all_cost_assertions",
+    "run_weight_sensitivity_sweep",
+    "verify_a1_feasibility_dominance",
+    "verify_a2_live_frontier_grounding",
+    "verify_a3_stepwise_potential_monotonicity",
+    "verify_a4_route_wiring_continuity",
+    "verify_a5_tier3_behavioral_monotonicity",
+    "verify_a6_dynamic_qos_monotonicity",
+    "verify_a7_parsimony_monotonicity",
     "AddOperator",
     "AddRoute",
     "FinalizeBoard",

@@ -8,7 +8,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, FrozenSet, List, Optional, Tuple, Union
+from typing import Any, Dict, FrozenSet, List, Optional, Tuple
+
+from .config import (
+    CarrierCostConfig,
+    CatalogCostConfig,
+    ColorDistanceConfig,
+    DEFAULT_CONFIG,
+)
 
 
 class TransferMode(str, Enum):
@@ -22,6 +29,9 @@ class Representation(str, Enum):
     BYTE_BLOB_JSON = "BYTE_BLOB_JSON"
     BYTE_BLOB_PROTO = "BYTE_BLOB_PROTO"
     MIL_STD_1553 = "MIL_STD_1553"
+    CDR_DDS = "CDR_DDS"
+    XML_UTF8 = "XML_UTF8"
+    ASN1_BER = "ASN1_BER"
 
 
 class AggregationKind(str, Enum):
@@ -36,13 +46,17 @@ class Carrier(str, Enum):
     GENERIC_TREE = "GENERIC_TREE"
     IPC_SERIALIZED = "IPC_SERIALIZED"
 
+    def cost_with_config(self, cfg: Optional[CarrierCostConfig] = None) -> float:
+        c = cfg or DEFAULT_CONFIG.carrier_costs
+        return {
+            Carrier.IN_PROCESS: c.in_process,
+            Carrier.GENERIC_TREE: c.generic_tree,
+            Carrier.IPC_SERIALIZED: c.ipc_serialized,
+        }[self]
+
     @property
     def cost(self) -> float:
-        return {
-            Carrier.IN_PROCESS: 0.0,
-            Carrier.GENERIC_TREE: 0.5,
-            Carrier.IPC_SERIALIZED: 3.0,
-        }[self]
+        return self.cost_with_config()
 
 
 class ResultCode(str, Enum):
@@ -61,16 +75,33 @@ class Color:
     L: str
     P: str
 
-    def distance_to(self, target: "Color") -> float:
+    def distance_to(
+        self,
+        target: "Color",
+        cfg: Optional[ColorDistanceConfig] = None,
+    ) -> float:
+        c_cfg = cfg or DEFAULT_CONFIG.color_distance
         dist = 0.0
         if self.C != target.C:
-            self_root = self.C.split(".")[0]
-            tgt_root = target.C.split(".")[0]
-            dist += 0.6 if self_root == tgt_root else 1.0
+            self_parts = self.C.split(".")
+            tgt_parts = target.C.split(".")
+            common = 0
+            for sp, tp in zip(self_parts, tgt_parts):
+                if sp == tp:
+                    common += 1
+                else:
+                    break
+            if common == 0:
+                dist += c_cfg.c_diff_root_penalty
+            elif common == 1:
+                dist += c_cfg.c_same_root_penalty
+            else:
+                # Deeper shared hierarchy in UDDL entity path (e.g. Engine.Cylinder.Piston)
+                dist += round(max(0.2, c_cfg.c_same_root_penalty * (0.7 ** (common - 1))), 4)
         if self.L != target.L:
-            dist += 1.0
+            dist += c_cfg.l_mismatch_penalty
         if self.P != target.P:
-            dist += 1.0
+            dist += c_cfg.p_mismatch_penalty
         return dist
 
     def __str__(self) -> str:
@@ -80,10 +111,12 @@ class Color:
 @dataclass(frozen=True)
 class Dynamics:
     """
-    Load-bearing kinematics:
-      - position: where the data resides on the board
-      - velocity: >0 PUSH (kinetic), ==0 PULL (potential)
-      - acceleration: Cache applies a<0; Pump applies a>0; burst ramps change a continuously
+    Data kinematics state k = (x, v, a):
+      - position (x): locus of the datum on the board (component, interface, or route).
+      - velocity (v): >0 for kinetic PUSH flows; ==0 for stationary PULL potential data.
+      - acceleration (a = dv/dt): posits the rate of velocity change, interpreted as
+        impulsive mode transitions at stores (a < 0 decelerating push to rest) and
+        pumps (a > 0 accelerating rest to push), or continuous rate ramps during bursts.
     """
     position: str = "unplaced"
     velocity: float = 0.0
@@ -116,25 +149,37 @@ class Provenance:
         tick: int,
         trust_multiplier: float = 1.0,
         assurance_level: Optional[str] = None,
+        update_timestamp: bool = False,
     ) -> "Provenance":
         return Provenance(
             sources=self.sources,
             ops_applied=self.ops_applied + (op_id,),
-            timestamp_tick=tick,
+            timestamp_tick=tick if update_timestamp else self.timestamp_tick,
             trust_score=round(self.trust_score * trust_multiplier, 4),
             assurance_level=assurance_level if assurance_level is not None else self.assurance_level,
         )
 
-    def merge_vote(self, others: List["Provenance"], op_id: str, tick: int) -> "Provenance":
+    def merge_vote(
+        self,
+        others: List["Provenance"],
+        op_id: str,
+        tick: int,
+        cfg: Optional[CatalogCostConfig] = None,
+    ) -> "Provenance":
+        c_cfg = cfg or DEFAULT_CONFIG.catalog_costs
         all_sources: List[str] = list(self.sources)
         for o in others:
             all_sources.extend(o.sources)
         min_trust = min([self.trust_score] + [o.trust_score for o in others])
+        voted_trust = min(
+            1.0,
+            max(c_cfg.tmr_trust_floor, min_trust + c_cfg.tmr_trust_boost),
+        )
         return Provenance(
             sources=tuple(dict.fromkeys(all_sources)),
             ops_applied=self.ops_applied + (op_id,),
             timestamp_tick=tick,
-            trust_score=round(min(1.0, max(0.95, min_trust + 0.25)), 4),
+            trust_score=round(voted_trust, 4),
             assurance_level="TMR_VOTED",
         )
 
@@ -230,11 +275,13 @@ class MessageShape:
         cls,
         alternatives: Dict[str, Color],
         reps: Tuple[Representation, ...] = (Representation.NATIVE_STRUCT,),
+        min_trust: float = 0.0,
     ) -> "MessageShape":
         return cls(
             kind=AggregationKind.CHOICE,
             choice_alternatives=dict(alternatives),
             allowed_reps=frozenset(reps),
+            min_trust_score=min_trust,
         )
 
     @property

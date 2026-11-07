@@ -2,20 +2,22 @@
 board.py
 Integration Game Board and resultant coupled system RSY(Board).
 Routes enforce Color, Representation, Provenance predicates, and Push/Pull compatibility.
-Offers may fan-out to multiple Needs (non-destructive PUSH copy).
+Includes topological execution ordering and live-frontier reachability analysis.
 """
 from __future__ import annotations
 
 import copy
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
-from .primitives import Carrier, Message, MessageShape, TransferMode
+from .config import CarrierCostConfig, DEFAULT_CONFIG
+from .primitives import Carrier, Message, TransferMode
 from .interfaces import Interface, Route
 from .components import (
     CacheStoreBlock,
     ConsumerBoundary,
     ProducerBoundary,
     PumpBlock,
+    SourceBlock,
     WymorianComponent,
 )
 
@@ -32,7 +34,7 @@ class Board:
         self._execution_order: List[str] = []
 
     def clone(self, new_name: Optional[str] = None) -> "Board":
-        """Deep-ish clone of structure (fresh component instances via deepcopy)."""
+        """Deep clone of board structure and component configurations."""
         cloned = copy.deepcopy(self)
         if new_name:
             cloned.name = new_name
@@ -48,7 +50,6 @@ class Board:
     def remove_component(self, comp_id: str) -> None:
         if comp_id not in self.components:
             raise ValueError(f"Unknown component '{comp_id}'")
-        # Remove incident routes
         to_remove = [
             rid
             for rid, r in self.routes.items()
@@ -83,13 +84,8 @@ class Board:
             reasons.append(f"mode mismatch {src_if.mode.value}->{tgt_if.mode.value}")
         if not src_if.shape.compatible_with(tgt_if.shape):
             reasons.append("shape/color/representation incompatibility")
-        # Provenance predicates are on Need shape; Offer shape may declare min_trust as capability floor
-        # Static check: offer's declared min_trust should be >= need's required min_trust when known
         if tgt_if.shape.min_trust_score > 0.0:
-            # At connect-time we only know shape contracts; runtime still checks message provenance
             if src_if.shape.min_trust_score < tgt_if.shape.min_trust_score:
-                # Soft warning for static capability: allow connect but note potential Tier1 risk
-                # For strict boards we treat as mismatch when require_exact and offer advertises lower floor
                 if require_exact_transfer and src_if.shape.min_trust_score > 0.0:
                     reasons.append(
                         f"provenance trust floor {src_if.shape.min_trust_score} "
@@ -108,6 +104,7 @@ class Board:
         carrier_cost: Optional[float] = None,
         allow_incompatible: bool = True,
         strict: bool = False,
+        carrier_config: Optional[CarrierCostConfig] = None,
     ) -> Route:
         """
         Add Offer→Need route.
@@ -116,11 +113,11 @@ class Board:
         """
         if strict:
             allow_incompatible = False
-        # carrier_cost retained for backward compat; prefer Carrier enum
+        c_cfg = carrier_config or DEFAULT_CONFIG.carrier_costs
         if carrier_cost is not None:
-            if carrier_cost >= 3.0:
+            if carrier_cost >= c_cfg.ipc_threshold:
                 carrier = Carrier.IPC_SERIALIZED
-            elif carrier_cost >= 0.5:
+            elif carrier_cost >= c_cfg.generic_tree_threshold:
                 carrier = Carrier.GENERIC_TREE
             else:
                 carrier = Carrier.IN_PROCESS
@@ -133,17 +130,12 @@ class Board:
             raise ValueError(f"Route target '{target_if_id}' must be a Need interface.")
 
         reasons = self.check_route_compatibility(source_if_id, target_if_id)
-        # Mode/color mismatches are the teaching cases — allow_incompatible for demos
         if reasons and not allow_incompatible:
-            # Always allow connect for progressive pedagogy if only mode/color differ;
-            # still raise on Offer/Need direction errors (already handled).
-            # Strict mode: raise CompatibilityError
             raise CompatibilityError(
                 f"Cannot connect {source_if_id} → {target_if_id}: " + "; ".join(reasons)
             )
 
         if tgt_if.connected_route_id is not None:
-            # Replace previous route into this Need
             self._disconnect_route(tgt_if.connected_route_id)
 
         route_id = f"{source_if_id}-->{target_if_id}"
@@ -179,12 +171,87 @@ class Board:
 
     @property
     def interior_blocks(self) -> List[WymorianComponent]:
-        # Honor deterministic execution order
-        return [
-            self.components[cid]
+        """Return interior blocks in topological causal order (with insertion order tie-break)."""
+        interior_ids = [
+            cid
             for cid in self._execution_order
-            if cid in self.components and not self.components[cid].is_boundary
+            if cid in self.components
+            and not isinstance(self.components[cid], (ProducerBoundary, ConsumerBoundary))
         ]
+        if len(interior_ids) <= 1:
+            return [self.components[cid] for cid in interior_ids]
+
+        id_set = set(interior_ids)
+        order_index = {cid: idx for idx, cid in enumerate(interior_ids)}
+        adj: Dict[str, List[str]] = {cid: [] for cid in interior_ids}
+        in_deg: Dict[str, int] = {cid: 0 for cid in interior_ids}
+
+        for r in self.routes.values():
+            u = r.source_if.split(".", 1)[0]
+            v = r.target_if.split(".", 1)[0]
+            if u in id_set and v in id_set and u != v:
+                if v not in adj[u]:
+                    adj[u].append(v)
+                    in_deg[v] += 1
+
+        ready = [cid for cid in interior_ids if in_deg[cid] == 0]
+        ready.sort(key=lambda c: order_index[c])
+        sorted_ids: List[str] = []
+
+        while len(sorted_ids) < len(interior_ids):
+            if not ready:
+                remaining = [cid for cid in interior_ids if cid not in sorted_ids]
+                ready.append(remaining[0])
+            curr = ready.pop(0)
+            if curr in sorted_ids:
+                continue
+            sorted_ids.append(curr)
+            for nxt in adj[curr]:
+                if nxt not in sorted_ids:
+                    in_deg[nxt] -= 1
+                    if in_deg[nxt] <= 0 and nxt not in ready:
+                        ready.append(nxt)
+                        ready.sort(key=lambda c: order_index[c])
+
+        return [self.components[cid] for cid in sorted_ids]
+
+    def live_offers(self) -> List[Interface]:
+        """
+        Compute the set of Offer interfaces grounded in a genuine data source
+        (ProducerBoundary, SourceBlock, or boundary component with Offers) via
+        connected upstream routes. Prevents disconnected interior blocks from
+        spoofing Tier-1 semantic proximity (Axiom A2).
+        """
+        live_comp_ids: Set[str] = set()
+        for cid, comp in self.components.items():
+            if isinstance(comp, (ProducerBoundary, SourceBlock)) or (comp.is_boundary and len(comp.offers) > 0):
+                live_comp_ids.add(cid)
+
+        changed = True
+        while changed:
+            changed = False
+            for cid, comp in self.components.items():
+                if cid in live_comp_ids or len(comp.offers) == 0:
+                    continue
+                # An interior component's offers become live if at least one of its Needs
+                # is connected to an Offer on an already-live component.
+                has_live_input = False
+                for need_if in comp.needs.values():
+                    if need_if.connected_route_id and need_if.connected_route_id in self.routes:
+                        r = self.routes[need_if.connected_route_id]
+                        src_cid = r.source_if.split(".", 1)[0]
+                        if src_cid in live_comp_ids:
+                            has_live_input = True
+                            break
+                if has_live_input:
+                    live_comp_ids.add(cid)
+                    changed = True
+
+        result: List[Interface] = []
+        for cid in self._execution_order:
+            if cid in live_comp_ids and cid in self.components:
+                result.extend(self.components[cid].offers.values())
+        return result
 
     def simulate(
         self,
@@ -196,58 +263,81 @@ class Board:
 
         for tick in range(horizon):
             env_at_tick = scenario_inputs.get(tick, {})
+            pulled_routes_this_tick: Set[str] = set()
+
+            # 1. Step boundary producers and propagate their PUSH emissions
             for prod in self.producers:
                 prod.step(tick, env_at_tick)
-            # Also step SourceBlocks that are interior but produce spontaneously
-            self._propagate_routes(tick)
+                self._propagate_push_from(prod.comp_id, tick)
+
+            # 2. Step interior blocks in topological order
             for block in self.interior_blocks:
-                block.step(tick)
-                self._propagate_routes(tick)
+                self._propagate_pull_into(block.comp_id, tick, pulled_routes_this_tick)
+                block.step(tick, env_at_tick)
+                self._propagate_push_from(block.comp_id, tick)
+
+            # 3. Step boundary consumers (pulling first if in PULL mode)
             for cons in self.consumers:
-                cons.step(tick)
+                self._propagate_pull_into(cons.comp_id, tick, pulled_routes_this_tick)
+                cons.step(tick, env_at_tick)
 
         return {
             cons.full_need_id: dict(cons.state.get("received_history", {}))
             for cons in self.consumers
         }
 
-    def _propagate_routes(self, tick: int) -> None:
-        for route in list(self.routes.values()):
+    def _propagate_push_from(self, src_comp_id: str, tick: int) -> None:
+        """Propagate PUSH offers originating from `src_comp_id` along all compatible fan-out routes."""
+        src_comp = self.components[src_comp_id]
+        for src_if in src_comp.offers.values():
+            if src_if.mode != TransferMode.PUSH or src_if.outbox is None:
+                continue
+            msg = src_if.outbox
+            fan_routes = [rid for rid in (src_if.connected_route_ids or []) if rid in self.routes]
+            for rid in fan_routes:
+                route = self.routes[rid]
+                tgt_if = self.get_interface(route.target_if)
+                if not self._is_route_compatible(src_if, tgt_if):
+                    continue
+                if not msg.satisfies_provenance(tgt_if.shape):
+                    continue
+                tgt_if.inbox = msg
+            # Clear outbox once fan-out propagation completes for this source interface
+            if fan_routes:
+                src_if.outbox = None
+
+    def _propagate_pull_into(
+        self,
+        tgt_comp_id: str,
+        tick: int,
+        pulled_routes_this_tick: Set[str],
+    ) -> None:
+        """Propagate PULL requests into `tgt_comp_id` at most once per route per tick."""
+        tgt_comp = self.components[tgt_comp_id]
+        for tgt_if in tgt_comp.needs.values():
+            if tgt_if.mode != TransferMode.PULL or tgt_if.connected_route_id is None:
+                continue
+            rid = tgt_if.connected_route_id
+            if rid in pulled_routes_this_tick or rid not in self.routes:
+                continue
+            route = self.routes[rid]
             src_if = self.get_interface(route.source_if)
-            tgt_if = self.get_interface(route.target_if)
             src_comp = self.components[src_if.component_id]
-            tgt_comp = self.components[tgt_if.component_id]
 
             if not self._is_route_compatible(src_if, tgt_if):
                 continue
 
-            if src_if.mode == TransferMode.PUSH and tgt_if.mode == TransferMode.PUSH:
-                if src_if.outbox is not None:
-                    msg = src_if.outbox
-                    if not msg.satisfies_provenance(tgt_if.shape):
-                        continue
-                    # Fan-out: copy to target; clear outbox only after all fan-out targets served
-                    tgt_if.inbox = msg
-                    fan_routes = src_if.connected_route_ids or [route.route_id]
-                    # Mark this route served this tick via transient tag on message id
-                    served = getattr(src_if, "_served_routes_tick", None)
-                    if served is None or served[0] != tick:
-                        src_if._served_routes_tick = (tick, set())  # type: ignore[attr-defined]
-                    src_if._served_routes_tick[1].add(route.route_id)  # type: ignore[attr-defined]
-                    if src_if._served_routes_tick[1] >= set(fan_routes):  # type: ignore[attr-defined]
-                        src_if.outbox = None
-
-            elif src_if.mode == TransferMode.PULL and tgt_if.mode == TransferMode.PULL:
-                wants_pull = True
-                if hasattr(tgt_comp, "wants_to_pull"):
-                    wants_pull = tgt_comp.wants_to_pull(tick)
-                if wants_pull:
-                    if isinstance(src_comp, CacheStoreBlock):
-                        pulled_msg = src_comp.on_pulled()
-                    else:
-                        pulled_msg = src_if.outbox
-                    if pulled_msg is not None and pulled_msg.satisfies_provenance(tgt_if.shape):
-                        tgt_if.inbox = pulled_msg
+            wants_pull = True
+            if hasattr(tgt_comp, "wants_to_pull"):
+                wants_pull = tgt_comp.wants_to_pull(tick)
+            if wants_pull:
+                pulled_routes_this_tick.add(rid)
+                if isinstance(src_comp, CacheStoreBlock):
+                    pulled_msg = src_comp.on_pulled()
+                else:
+                    pulled_msg = src_if.outbox
+                if pulled_msg is not None and pulled_msg.satisfies_provenance(tgt_if.shape):
+                    tgt_if.inbox = pulled_msg
 
     @staticmethod
     def _is_route_compatible(src_if: Interface, tgt_if: Interface) -> bool:

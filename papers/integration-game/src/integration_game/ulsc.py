@@ -2,13 +2,15 @@
 ulsc.py
 IOR encoded as Universal Live Sequence Charts, compiled into an explicit
 Timed Büchi Automaton / Reward Machine monitor.
+Supports both single-Need `UniversalLSC` and multi-Need `CompositeLSC`.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, Sequence, Union
 
+from .config import DEFAULT_CONFIG, RewardMachineConfig
 from .primitives import Message
 
 
@@ -62,11 +64,15 @@ class RewardMachine:
     (SILENCE_CHECK is transient on ticks with output while obligations idle.)
     """
 
-    R_PROG = 1.0
-    R_GOAL = 5.0
-    R_BREACH = -10000.0  # Ω catastrophic
+    R_PROG = DEFAULT_CONFIG.reward_machine.r_prog
+    R_GOAL = DEFAULT_CONFIG.reward_machine.r_goal
+    R_BREACH = DEFAULT_CONFIG.reward_machine.r_breach
 
-    def __init__(self) -> None:
+    def __init__(self, config: Optional[RewardMachineConfig] = None) -> None:
+        cfg = config or DEFAULT_CONFIG.reward_machine
+        self.r_prog = cfg.r_prog
+        self.r_goal = cfg.r_goal
+        self.r_breach = cfg.r_breach
         self.state = RMState.IDLE_WAIT_PRE
         self.trace: List[RMState] = [RMState.IDLE_WAIT_PRE]
         self.pulses: List[RewardPulse] = []
@@ -79,18 +85,18 @@ class RewardMachine:
         if self.state in (RMState.IDLE_WAIT_PRE, RMState.COMPLETED, RMState.SILENCE_CHECK):
             self._goto(RMState.PRE_MATCHING)
             self._goto(RMState.MAIN_ACTIVE)
-            self.pulses.append(RewardPulse(tick, self.R_PROG, "pre_chart_matched", self.state))
+            self.pulses.append(RewardPulse(tick, self.r_prog, "pre_chart_matched", self.state))
         elif self.state == RMState.MAIN_ACTIVE:
-            self.pulses.append(RewardPulse(tick, self.R_PROG, "additional_obligation", self.state))
+            self.pulses.append(RewardPulse(tick, self.r_prog, "additional_obligation", self.state))
 
     def on_proper_fulfillment(self, tick: int, remaining_open: int) -> None:
-        self.pulses.append(RewardPulse(tick, self.R_PROG, "main_chart_progress", self.state))
+        self.pulses.append(RewardPulse(tick, self.r_prog, "main_chart_progress", self.state))
         if remaining_open == 0:
-            self.pulses.append(RewardPulse(tick, self.R_GOAL, "main_chart_complete", RMState.COMPLETED))
+            self.pulses.append(RewardPulse(tick, self.r_goal, "main_chart_complete", RMState.COMPLETED))
             self._goto(RMState.COMPLETED)
 
     def on_breach(self, tick: int, reason: str) -> None:
-        self.pulses.append(RewardPulse(tick, self.R_BREACH, reason, RMState.BREACH))
+        self.pulses.append(RewardPulse(tick, self.r_breach, reason, RMState.BREACH))
         self._goto(RMState.BREACH)
 
     def on_silence_ok(self, tick: int) -> None:
@@ -122,20 +128,31 @@ class UniversalLSC:
         horizon: int,
         pre_trigger_fn: Callable[[int, Dict[str, Message]], Optional[Message]],
         value_distance_fn: Callable[[Message, Message], float],
-        tolerance: float = 1e-3,
-        min_delay: int = 0,
-        max_delay: int = 2,
+        tolerance: Optional[float] = None,
+        min_delay: Optional[int] = None,
+        max_delay: Optional[int] = None,
         enforce_silence: bool = True,
+        rm_config: Optional[RewardMachineConfig] = None,
     ):
+        cfg = rm_config or DEFAULT_CONFIG.reward_machine
         self.name = name
         self.target_need_id = target_need_id
         self.horizon = horizon
         self.pre_trigger_fn = pre_trigger_fn
         self.value_distance_fn = value_distance_fn
-        self.tolerance = tolerance
-        self.min_delay = min_delay
-        self.max_delay = max_delay
+        self.tolerance = tolerance if tolerance is not None else cfg.default_tolerance
+        self.min_delay = min_delay if min_delay is not None else cfg.default_min_delay
+        self.max_delay = max_delay if max_delay is not None else cfg.default_max_delay
         self.enforce_silence = enforce_silence
+        self.rm_config = cfg
+
+    def evaluate_board_outputs(
+        self,
+        scenario_inputs: Dict[int, Dict[str, Message]],
+        outputs_by_consumer: Dict[str, Dict[int, Message]],
+    ) -> TBAEvaluationResult:
+        target_outputs = outputs_by_consumer.get(self.target_need_id, {})
+        return self.evaluate_trace(scenario_inputs, target_outputs)
 
     def evaluate_trace(
         self,
@@ -149,7 +166,7 @@ class UniversalLSC:
         total_clock_overrun = 0.0
         total_value_error = 0.0
         diagnostics: List[str] = []
-        rm = RewardMachine()
+        rm = RewardMachine(self.rm_config)
 
         for tick in range(self.horizon):
             env_at_tick = scenario_inputs.get(tick, {})
@@ -165,13 +182,6 @@ class UniversalLSC:
                 )
                 rm.on_pre_trigger(tick)
 
-            # Expire windows that have passed max_tick without proper fulfillment
-            for win in windows:
-                if not win.fulfilled and not win.breached and tick > win.max_tick:
-                    # Still allow late delivery this tick if output arrives; mark provisional miss
-                    # Actual miss is finalized if no output matches below.
-                    pass
-
             out_msg = consumer_outputs.get(tick)
             if out_msg is not None:
                 open_windows = [
@@ -183,7 +193,7 @@ class UniversalLSC:
                         silence_violations += 1
                         hot_breaches += 1
                         diagnostics.append(
-                            f"Tick {tick}: Hot Silence Breach (unsolicited output)."
+                            f"[{self.name}] Tick {tick}: Hot Silence Breach (unsolicited output)."
                         )
                         rm.on_breach(tick, "silence_breach")
                 else:
@@ -201,7 +211,7 @@ class UniversalLSC:
                         missed_deadlines += 1
                         hot_breaches += 1
                         diagnostics.append(
-                            f"Tick {tick}: Deadline overrun by {overrun:.0f} "
+                            f"[{self.name}] Tick {tick}: Deadline overrun by {overrun:.0f} "
                             f"(trigger at {win.trigger_tick})."
                         )
                         rm.on_breach(tick, "deadline_overrun")
@@ -209,7 +219,7 @@ class UniversalLSC:
                     if value_bad:
                         hot_breaches += 1
                         diagnostics.append(
-                            f"Tick {tick}: Value envelope breach "
+                            f"[{self.name}] Tick {tick}: Value envelope breach "
                             f"(error={val_err:.4f} > tol={self.tolerance})."
                         )
                         rm.on_breach(tick, "value_breach")
@@ -240,7 +250,7 @@ class UniversalLSC:
                 total_clock_overrun += overrun
                 win.breached = True
                 diagnostics.append(
-                    f"End of Horizon: Unfulfilled obligation from trigger at tick {win.trigger_tick}."
+                    f"[{self.name}] End of Horizon: Unfulfilled obligation from trigger at tick {win.trigger_tick}."
                 )
                 rm.on_breach(self.horizon - 1, "unfulfilled_at_horizon")
 
@@ -269,3 +279,59 @@ class UniversalLSC:
             total_rm_reward=round(rm.total_reward, 4),
             diagnostics=diagnostics,
         )
+
+
+class CompositeLSC:
+    """
+    Conjunction of multiple UniversalLSC specifications across concurrent consumer Needs
+    or internal lifelines. Satisfied if and only if every constituent chart is satisfied.
+    """
+
+    def __init__(self, name: str, charts: Sequence[UniversalLSC]):
+        if not charts:
+            raise ValueError("CompositeLSC requires at least one UniversalLSC.")
+        self.name = name
+        self.charts = list(charts)
+        self.horizon = max(c.horizon for c in self.charts)
+        self.target_need_id = ",".join(c.target_need_id for c in self.charts)
+
+    def evaluate_board_outputs(
+        self,
+        scenario_inputs: Dict[int, Dict[str, Message]],
+        outputs_by_consumer: Dict[str, Dict[int, Message]],
+    ) -> TBAEvaluationResult:
+        sub_results = [
+            c.evaluate_board_outputs(scenario_inputs, outputs_by_consumer)
+            for c in self.charts
+        ]
+        satisfied = all(r.satisfied for r in sub_results)
+        hot_breaches = sum(r.hot_breaches for r in sub_results)
+        missed_deadlines = sum(r.missed_deadlines for r in sub_results)
+        silence_violations = sum(r.silence_violations for r in sub_results)
+        total_clock_overrun = sum(r.total_clock_overrun for r in sub_results)
+        total_value_error = sum(r.total_value_error for r in sub_results)
+        cut_progress_ratio = sum(r.cut_progress_ratio for r in sub_results) / float(len(sub_results))
+        all_traces: List[RMState] = []
+        all_pulses: List[RewardPulse] = []
+        all_diag: List[str] = []
+        for r in sub_results:
+            all_traces.extend(r.rm_state_trace)
+            all_pulses.extend(r.reward_pulses)
+            all_diag.extend(r.diagnostics)
+        total_rm_reward = sum(r.total_rm_reward for r in sub_results)
+        return TBAEvaluationResult(
+            satisfied=satisfied,
+            hot_breaches=hot_breaches,
+            missed_deadlines=missed_deadlines,
+            silence_violations=silence_violations,
+            total_clock_overrun=round(total_clock_overrun, 4),
+            total_value_error=round(total_value_error, 4),
+            cut_progress_ratio=round(cut_progress_ratio, 4),
+            rm_state_trace=all_traces,
+            reward_pulses=all_pulses,
+            total_rm_reward=round(total_rm_reward, 4),
+            diagnostics=all_diag,
+        )
+
+
+LSCMonitor = Union[UniversalLSC, CompositeLSC]

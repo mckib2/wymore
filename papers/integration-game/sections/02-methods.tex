@@ -14,9 +14,9 @@ three-tier UDDL hierarchy of Section~\ref{sec:bg-uddl}:
 \end{equation}
 where $C$ identifies the conceptual path in a CDM, $L$ the logical measurement
 system/frame/units in an LDM, and $P$ the platform type/layout in a PDM.
-\emph{Dynamics} $\mathbf{k} = (x, v, a)$ record where the datum resides ($x$),
-whether it is kinetic push ($v>0$) or potential pull ($v=0$), and acceleration
-$a=\Delta v/\Delta t$ realized by stores ($a<0$) and pumps ($a>0$).
+\emph{Dynamics} $\mathbf{k} = (x, v, a)$ record where the datum resides on the board ($x$),
+whether it is a kinetic push flow ($v>0$) or a stationary pull potential ($v=0$), and its kinematic acceleration
+$a=\Delta v/\Delta t$. Positing the existence of $a$ in $\mathbf{k}$ provides a unified physical interpretation for two mediation phenomena: (i)~impulsive mode transitions where a store/cache decelerates a push stream to rest ($a < 0$) or an active pump accelerates a resting pull value into a periodic push stream ($a > 0$), and (ii)~rate ramps across multi-rate boundaries, where non-zero net flow acceleration implies a transient rate mismatch $\Delta v$ that directly dictates downstream buffer sizing to prevent overflow ($\mathsf{No\_Space}$) or starvation ($\mathsf{No\_Data}$).
 The \emph{ABox} $\mathbf{d}$ carries the runtime value together with
 representation $\rho$ (serialization/framing) and provenance $\pi$ (lineage and
 trust). Values are never edited ad hoc: they change only as the consequence of
@@ -210,9 +210,21 @@ In realistic engineering contexts, multiple candidate plays may satisfy all thre
 
 Combining these terms over a distribution of operational scenarios $\mathcal{D}(ITR)$ yields the expected composite cost functional:
 \begin{equation}
-    \mathcal{J}(\mathcal{P}) = C_{\text{static}}(\mathcal{P}) + \mathbb{E}_{f \sim \mathcal{D}(ITR)}\!\Big[ C_{\text{dyn}}(\mathcal{P}, f) + C_{\text{breach}}(\mathcal{P}, f) \Big].
+    \mathcal{J}(\mathcal{P}) = \mathcal{J}_{\text{tier1}}(\mathcal{P}) + \mathcal{J}_{\text{tier2}}(\mathcal{P}) + C_{\text{static}}(\mathcal{P}) + \mathbb{E}_{f \sim \mathcal{D}(ITR)}\!\Big[ C_{\text{dyn}}(\mathcal{P}, f) + C_{\text{breach}}(\mathcal{P}, f) \Big].
     \label{eq:j-total}
 \end{equation}
+For partial plays during synthesis, $\mathcal{J}_{\text{tier1}}$ and $\mathcal{J}_{\text{tier2}}$ evaluate each open Need $N_j$ against the \emph{live offer frontier} $\mathcal{F}_{\text{live}}(\mathcal{P})$---the set of Offers reachable via directed paths from genuine boundary producers or sources---using the same pairwise semantic/representation distance $\Delta_{\text{tier1}}(O, N_j)$ and kinematic mismatch $\Delta_{\text{tier2}}(O, N_j)$ applied to connected routes, plus an open-port penalty $w_{\text{unconnected}}$.
+
+To ensure that $\mathcal{J}(\mathcal{P})$ and its human-readable $C^1$-smooth fitness transform $\mathcal{S}(\mathcal{P}) \in (0, 100]$ behave reliably across arbitrary domains and weight configurations (\texttt{GameConfig}), we enforce seven technology-independent cost assertions:
+\begin{enumerate}[label=\textbf{(A\arabic*)}, leftmargin=2.4em, topsep=2pt, itemsep=1pt]
+    \item \textbf{Lexicographic Feasibility Dominance:} Every winning play ($\mathcal{J}_{\text{tier1}}=\mathcal{J}_{\text{tier2}}=C_{\text{breach}}=0$) achieves strictly lower $\mathcal{J}$ and strictly higher $\mathcal{S}$ than every losing play.
+    \item \textbf{Live-Frontier Grounding:} Placing an unwired interior operator that is disconnected from upstream sources leaves $\mathcal{F}_{\text{live}}(\mathcal{P})$ unchanged and strictly increases $\mathcal{J}$ by $c_{\text{op}}(v) > 0$.
+    \item \textbf{Monotonic Potential Reduction:} Resolving each mismatch axis ($\Delta\rho, \Delta C, \Delta L, \Delta P, \Delta\pi, \Delta\text{mode}$) along $\mathcal{F}_{\text{live}}$ strictly decreases $\mathcal{J}_{\text{tier1}}+\mathcal{J}_{\text{tier2}}+C_{\text{static}}$ and increases $\mathcal{S}$.
+    \item \textbf{Route-Wiring Continuity:} Wiring an Offer $O^* \in \mathcal{F}_{\text{live}}$ that realizes the frontier minimum to an open Need $N_j$ reduces $\mathcal{J}_{\text{tier1}}$ by exactly $w_{\text{unconnected}}$ with zero wiring penalty spike.
+    \item \textbf{Strict Tier-3 Behavioral Gradient Monotonicity:} $C_{\text{breach}}$ and $-\mathcal{S}$ are uncapped and strictly monotonic in cut-progress deficiency, deadline overrun, value error $d_{\text{val}}$, and silence violations.
+    \item \textbf{Dynamic QoS Monotonicity:} Among winning plays of equal static cost, increasing operator latency, precision loss, or disruption events strictly increases $C_{\text{dyn}}$ and $\mathcal{J}$.
+    \item \textbf{Parsimony (Occam's Razor):} Appending a redundant identity operator or higher-cost route carrier to a winning play strictly increases $C_{\text{static}}$ and $\mathcal{J}$.
+\end{enumerate}
 When $\Omega$ is chosen sufficiently large relative to $C_{\text{static}}$ and $C_{\text{dyn}}$, minimizing $\mathcal{J}(\mathcal{P})$ enforces a lexicographic preference order that prioritizes Tier~3 behavioral feasibility ($C_{\text{breach}} = 0$) before trading off operational performance against architectural cost, while still providing a smooth gradient signal ($d_{\text{val}}$) for infeasible candidate plays during learning. Alternatively, the components of $\mathcal{J}(\mathcal{P})$ can be treated as a vector objective to recover the Pareto frontier or formulated as a Constrained Markov Decision Process (CMDP)~\cite{Altman1999CMDP}.
 
 \subsection{Reinforcement Learning Formulations and uLSC Reward Machines} \label{sec:meth-rl}

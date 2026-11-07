@@ -175,3 +175,77 @@ def test_representation_mismatch_blocks_transfer():
         }
     }
     assert board.simulate(scenario, 1)["C.in"] == {}
+
+
+def test_topological_execution_order_independence():
+    """Adding interior blocks in reverse vs forward causal order yields identical simulation output."""
+    c1 = Color("Nav.Pos", "cm", "int32")
+    c2 = Color("Nav.Pos", "cm", "float64")
+    c3 = Color("Nav.Pos", "m", "float64")
+    scenario = {
+        0: {
+            "P.out": Message.single(
+                Field(250, c1, Dynamics("P", 1.0), provenance=Provenance(timestamp_tick=0))
+            )
+        }
+    }
+
+    # Board 1: Forward insertion order (R1 then R2)
+    b_fwd = Board("fwd")
+    b_fwd.add_component(ProducerBoundary("P", "out", c1))
+    b_fwd.add_component(ConsumerBoundary("C", "in", MessageShape.single(c3)))
+    b_fwd.add_component(RecolorBlock("R1", c1, c2, value_fn=float))
+    b_fwd.add_component(RecolorBlock("R2", c2, c3, value_fn=lambda x: x / 100.0))
+    b_fwd.connect("P.out", "R1.in")
+    b_fwd.connect("R1.out", "R2.in")
+    b_fwd.connect("R2.out", "C.in")
+
+    # Board 2: Reverse insertion order (R2 added BEFORE R1!)
+    b_rev = Board("rev")
+    b_rev.add_component(ProducerBoundary("P", "out", c1))
+    b_rev.add_component(ConsumerBoundary("C", "in", MessageShape.single(c3)))
+    b_rev.add_component(RecolorBlock("R2", c2, c3, value_fn=lambda x: x / 100.0))
+    b_rev.add_component(RecolorBlock("R1", c1, c2, value_fn=float))
+    b_rev.connect("P.out", "R1.in")
+    b_rev.connect("R1.out", "R2.in")
+    b_rev.connect("R2.out", "C.in")
+
+    out_fwd = b_fwd.simulate(scenario, 1)
+    out_rev = b_rev.simulate(scenario, 1)
+    assert 0 in out_fwd["C.in"] and 0 in out_rev["C.in"]
+    assert out_fwd["C.in"][0].first_field().value == pytest.approx(2.5)
+    assert out_rev["C.in"][0].first_field().value == pytest.approx(2.5)
+
+
+def test_single_pull_per_tick_with_multiple_interior_blocks():
+    """A PULL route from a consume-on-read CacheStoreBlock pops at most 1 item per tick."""
+    c = Color("Q.Item", "idx", "int32")
+    b = Board("single_pull")
+    b.add_component(ProducerBoundary("P", "out", c))
+    b.add_component(CacheStoreBlock("FIFO", c, retain_on_read=False, capacity=4))
+    # Add several unrelated interior blocks to ensure _propagate_pull_into does not over-pop
+    for i in range(4):
+        b.add_component(RecolorBlock(f"Dummy_{i}", c, c))
+    b.add_component(ConsumerBoundary("C", "in", MessageShape.single(c), mode=TransferMode.PULL))
+    b.connect("P.out", "FIFO.in")
+    b.connect("FIFO.out", "C.in")
+
+    scenario = {
+        0: {"P.out": Message.single(Field(10, c, Dynamics("P", 1.0), provenance=Provenance(timestamp_tick=0)))},
+        1: {"P.out": Message.single(Field(20, c, Dynamics("P", 1.0), provenance=Provenance(timestamp_tick=1)))},
+    }
+    out = b.simulate(scenario, 2)
+    assert out["C.in"][0].first_field().value == 10
+    assert out["C.in"][1].first_field().value == 20
+
+
+def test_uddl_hierarchical_color_distance():
+    """Multi-level dot-path hierarchy in C gives graded semantic distances."""
+    c_p1 = Color("Engine.Cylinder1.Piston.CrownTemp", "K", "f64")
+    c_p2 = Color("Engine.Cylinder1.Piston.SkirtTemp", "K", "f64")
+    c_cyl2 = Color("Engine.Cylinder2.Piston.CrownTemp", "K", "f64")
+    c_air = Color("Airframe.Nacelle.MountTemp", "K", "f64")
+
+    # Deeper shared prefix (Engine.Cylinder1.Piston.*) is closer than (Engine.*) which is closer than (Airframe.*)
+    assert 0.0 < c_p1.distance_to(c_p2) < c_p1.distance_to(c_cyl2) < c_p1.distance_to(c_air)
+
