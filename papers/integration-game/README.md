@@ -25,7 +25,8 @@ pytest
 - **Tier 1** — color / representation / provenance structural compatibility  
 - **Tier 2** — push/pull kinematics (Cache decelerates, Pump accelerates)  
 - **Tier 3** — uLSC → Reward Machine (deadlines, value envelopes, silence)  
-- Progressive move sequences for **Examples 1–12** where fitness rises toward a three-tier win, including intentional Tier-1+2-pass / Tier-3-fail traps
+- Progressive move sequences for **Examples 1–15** where fitness rises toward a three-tier win, including intentional Tier-1+2-pass / Tier-3-fail traps
+- Offline synthesis MDP (`integration_game.rl`) with random/greedy/beam/REINFORCE baselines
 
 ## Game API (offline synthesis)
 

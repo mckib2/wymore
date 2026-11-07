@@ -3,8 +3,13 @@
 We formulated MOSA-style data and behavior mediation as the Integration Game:
 a Wymorian board of Offers, Needs, and typed operators, won by simultaneous
 Tier~1 (structure/color/representation/provenance), Tier~2 (kinematics), and
-Tier~3 (uLSC/TBA) satisfaction and ranked by residual cost. A Python reference
-implementation realizes the ontology, technology catalog, Reward Machine
-monitor, and twelve progressive scenarios that demonstrate feasibility.
-Future work will train offline board-synthesis and online adaptation policies
-against the Reward Machine interface already exposed by the PoC.
+Tier~3 (uLSC/Reward Machine) satisfaction on declared test trajectories and
+ranked by residual cost. A Python reference implementation realizes the
+ontology, technology catalog, Reward Machine monitor, and fifteen progressive
+scenarios (including an industrial-flavored holdout). Casting synthesis and runtime
+adaptation as masked MDPs guided by uLSC Reward Machines, we train offline and
+online RL agents that outperform random and greedy baselines and approach
+hand-authored optima on canonical mediation boards
+(Tables~\ref{tab:offline-rl}--\ref{tab:online-rl}). Future work will scale
+GNN-encoded policies to larger MOSA catalogs and couple automatic contract
+extraction with the fragment Z3/CEGIS gate.

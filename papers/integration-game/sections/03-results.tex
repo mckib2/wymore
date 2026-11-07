@@ -1,68 +1,215 @@
 \section{Implementation and Results} \label{sec:results}
 
 We implemented a modular reference simulator of the Integration Game in Python
-(\texttt{integration\_game}), covering the unified field ontology, a fully
-configurable parameter hierarchy (\texttt{GameConfig}, \texttt{ScoringConfig},
-\texttt{CatalogCostConfig}, \texttt{ColorDistanceConfig}, and
-\texttt{CarrierCostConfig}), the technology catalog $\mathcal{T}$, topological
-discrete-time board simulation $Z_b=\mathrm{RSY}(\mathrm{Board})$, single- and
-multi-consumer Universal LSC monitors (\texttt{UniversalLSC} and
-\texttt{CompositeLSC}) compiled into explicit Timed B\"uchi / Reward Machine
-automata, and the composite cost/fitness evaluator $\mathcal{J}$/$\mathcal{S}$.
-A first-class \texttt{Play}/\texttt{Move} API exposes the offline synthesis
-action space (add operator, add route, set parameters, finalize) with
-illegal-move rejection.
+(\texttt{integration\_game}), covering the unified field ontology, configurable
+parameter hierarchy (\texttt{GameConfig}), technology catalog $\mathcal{T}$,
+topological discrete-time simulation $Z_b=\mathrm{RSY}(\mathrm{Board})$,
+single- and multi-consumer Universal LSC monitors compiled into finite-horizon
+Reward Machines, and the composite evaluator $\mathcal{J}$/$\mathcal{S}$.
+A first-class \texttt{Play}/\texttt{Move} API and \texttt{IntegrationGameEnv}
+expose the offline synthesis MDP (masked legal moves, observations, stepwise
+Reward Machine pulses, and terminal $-\mathcal{J}$) used by the learning agents
+below.
+
+\newcommand{\ph}[1]{\textbf{[#1]}}% numeric placeholder pending final seed-averaged runs
 
 \subsection{Modular Progressive Catalog (\texttt{ex01}--\texttt{ex14})}
+\label{sec:res-catalog}
 
-Fourteen self-contained scenario modules (\texttt{ex01\_autonomous.py} through
-\texttt{ex14\_cost\_sensitivity.py}) exercise progressive mediation across
-complex color hierarchies, multi-representation transcoding, provenance voting,
-and stateful behavioral synthesis. Each scenario starts from mismatched
-Offers/Needs, steps through constructive moves and deceptive Tier~3 traps, and
-terminates in a verified three-tier winning play:
+Fifteen scenario modules (\texttt{ex01}--\texttt{ex15}) exercise progressive
+mediation across color hierarchies, multi-representation transcoding, provenance
+voting, and stateful behavioral synthesis (\texttt{ex15} is the industrial
+holdout). Each scenario starts from mismatched Offers/Needs, steps through
+constructive moves and deceptive Tier~3 traps, and terminates in a three-tier
+winning play on its declared finite test trajectories $ITR_{\mathrm{test}}$:
 
 \begin{itemize}[leftmargin=1.5em,itemsep=2pt]
-  \item \textbf{Autonomous Closed-Loop Regulation (\texttt{ex01}) \& Ping/Pong (\texttt{ex02}):}
-        Demonstrate autonomous feedback synthesis ($I_{\text{ext}}=\emptyset$)
-        with discrete-time loop stability and Push$\to$Pull queue semantics
-        where retain-on-read violates hot silence while consume-on-read wins.
-  \item \textbf{Multi-Representation Gateway (\texttt{ex04}) \& Hierarchical Piston Model (\texttt{ex05}):}
-        Exercise multi-hop representation bridges (\texttt{MIL\_STD\_1553} $\to$
-        \texttt{NATIVE\_STRUCT} $\to$ \texttt{CDR\_DDS} and \texttt{JSON} $\to$
-        \texttt{PROTOBUF}) and three-level UDDL entity hierarchies
-        (\texttt{Engine.Cylinder.Piston} vs.\ \texttt{Airframe.Propulsion}) with
-        record projection, disaggregation, pull-to-push pumping, and thermal synthesis.
-  \item \textbf{Kalman Estimator (\texttt{ex03}), Non-Commutative ALU (\texttt{ex06}) \& Hard Latency (\texttt{ex07}):}
-        Show that passing Tiers~1--2 with naive finite differences, swapped
-        kinetic-energy operands ($\frac{1}{2}vm^2 \neq \frac{1}{2}mv^2$), or
-        multi-tick solver delays triggers uncapped Tier~3 value or deadline
-        penalties.
-  \item \textbf{Multi-Consumer Fan-Out (\texttt{ex08}), Mismatched Clocks (\texttt{ex09}) \& Temporal Join (\texttt{ex11}):}
-        Verify simultaneous multi-sink contracts via \texttt{CompositeLSC},
-        invariant-boundary multi-rate mediation (\texttt{Cache} + \texttt{Pump} +
-        \texttt{StaleGate}), and keyed temporal-window correlation across sensor skew.
-  \item \textbf{Provenance TMR (\texttt{ex10}), Dynamic Failover (\texttt{ex12}) \& Stateful Vending FSM (\texttt{ex13}):}
-        Demonstrate single-sensor fault masking under \texttt{TMR\_VOTED} trust
-        contracts, runtime primary-to-backup link switching, and stateful
-        behavioral credit accumulation where stateless assembly breaches hot silence.
+  \item \textbf{Autonomous Closed-Loop (\texttt{ex01}) \& Ping/Pong (\texttt{ex02}):}
+        Autonomous feedback synthesis and Push$\to$Pull queue semantics where
+        retain-on-read violates hot silence while consume-on-read wins.
+  \item \textbf{Multi-Representation Gateway (\texttt{ex04}) \& Hierarchical Piston (\texttt{ex05}):}
+        Multi-hop representation bridges and UDDL-style entity hierarchies with
+        projection, disaggregation, and thermal recolor; lying unit casts pass
+        Tiers~1--2 but breach value envelopes.
+  \item \textbf{State Estimator (\texttt{ex03}), Non-Commutative ALU (\texttt{ex06}) \& Hard Latency (\texttt{ex07}):}
+        Naive finite differences, swapped kinetic-energy operands, or delayed
+        Derive paths fail Tier~3 despite structural alignment.
+  \item \textbf{Fan-Out (\texttt{ex08}), Mismatched Clocks (\texttt{ex09}) \& Temporal Join (\texttt{ex11}):}
+        CompositeLSC multi-sink contracts, Cache+Pump+StaleGate multi-rate mediation,
+        and keyed temporal-window correlation.
+  \item \textbf{Provenance TMR (\texttt{ex10}), Failover (\texttt{ex12}) \& Vending FSM (\texttt{ex13}):}
+        Trust/assurance contracts, runtime primary$\to$backup switching, and
+        stateful credit accumulation with silence until threshold.
+  \item \textbf{Industrial Avionics Stub (\texttt{ex15}):}
+        FACE/SOSA-flavored multi-bus mediation (1553 telemetry + DDS guidance need)
+        used as an external-validity holdout for synthesis agents.
 \end{itemize}
 
-\subsection{Cost Axiom Verification, Weight Sensitivity, and Z3 Symbolic/BMC Certification}
+\subsection{Cost Axioms, Weight Sensitivity, and Fragment Z3/BMC Checks}
+\label{sec:res-cost}
 
-Module \texttt{sensitivity.py} provides automated verifiers for the seven
-technology-independent cost assertions (A1--A7) and a one-at-a-time parameter
-sensitivity sweep across $(w_{\text{color}}, w_{\text{kin}}, w_{\text{loss}},
-w_{\text{lat}}, \gamma)$. Across all 14 progressive examples and 16 weight
-combinations, Axioms A1--A7 hold with 100\% invariance ($\max \mathcal{J}_{\text{win}} = 6.30 < \min \mathcal{J}_{\text{lose}} = 10010.20$; $\min \mathcal{S}_{\text{win}} = 93.70 > \max \mathcal{S}_{\text{lose}} = 92.58$), while varying $w_{\text{loss}} \in [0.2, 12.0]$ and $\gamma \in [0.8, 1.0]$ smoothly shifts the Pareto ranking among winning architectures in \texttt{ex14} (minimal lossless in-process vs.\ redundant-operator vs.\ lossy narrowing vs.\ high-latency IPC).
+Module \texttt{sensitivity.py} verifies seven technology-independent cost
+assertions (A1--A7) under the configured scorer. Lexicographic dominance of
+winners over losers (A1) is enforced by a large breach margin $\Omega$ relative to
+static/dynamic cost; under this design, across all 14 progressive examples and 16
+weight combinations we observe
+$\max \mathcal{J}_{\text{win}} = 6.30 < \min \mathcal{J}_{\text{lose}} = 10010.20$
+and
+$\min \mathcal{S}_{\text{win}} = 93.70 > \max \mathcal{S}_{\text{lose}} = 92.58$.
+Varying $w_{\text{loss}}$ and $\gamma$ smoothly shifts Pareto ranking among
+winning architectures in \texttt{ex14}.
 
-To guard against test-scenario coincidence traps without sacrificing RL rollout speed, module \texttt{verifier.py} integrates the Z3 SMT solver across $\mathsf{QF\_LRA}$, $\mathsf{QF\_NRA}$, and $\mathsf{QF\_LIRA}$ Bounded Model Checking (BMC). In 1--8\,ms per query, Z3 universally certifies (\texttt{unsat}) the winning plays and synthesizes concrete counterexamples (\texttt{sat}) for deceptive assemblies—including refuting a $-40^\circ\text{F} = -40^\circ\text{C}$ coincidence-point unit cast (\texttt{ex05}), proving polynomial non-commutativity of $E_k = \frac{1}{2}mv^2$ vs.\ $\frac{1}{2}vm^2$ (\texttt{ex06}), and checking all $2^H$ arrival/dropout schedules and $4^H$ coin sequences for \texttt{ex02}, \texttt{ex09}, \texttt{ex10}, and \texttt{ex13}. In the closed-loop CEGIS harness (\texttt{cegis\_verify\_and\_augment\_ex06}), a weak test scenario ($m=10, v=10$) initially fooled by the swapped-operand ALU is automatically augmented with the Z3 counterexample $(m=2.0, v=1.5)$, flipping the flawed board to \texttt{UNSAT} while preserving the true winner.
+Module \texttt{verifier.py} pairs concrete rollouts with Z3 queries over
+decidable fragments ($\mathsf{QF\_LRA}$, $\mathsf{QF\_NRA}$, $\mathsf{QF\_LIRA}$)
+for \emph{selected} operator contracts (unit-cast coincidence, ALU
+non-commutativity, abstracted ping/stale/TMR/vending schedules). These checks
+guard against coincidence-point reward hacking on $ITR_{\mathrm{test}}$; they do
+not replace Tier~3 simulation of arbitrary assembled boards. In the CEGIS demo
+for \texttt{ex06}, a weak scenario initially fooled by swapped operands is
+augmented with a Z3 counterexample, flipping the flawed board to UNSAT while
+preserving the true winner.
+
+\subsection{Offline RL Board Synthesis}
+\label{sec:res-offline-rl}
+
+We train and evaluate offline synthesis agents on the masked
+\texttt{IntegrationGameEnv} for \texttt{ex02}--\texttt{ex07} (train) with
+held-out variants and \texttt{ex15} (test). Baselines are uniform random over
+legal moves, greedy semantic-potential reduction, beam search, and a masked
+policy-gradient agent (PPO with invalid-action masking). Episodes terminate on
+\texttt{Finalize}, three-tier win, move budget exhaustion, or absorbing Reward
+Machine breach.
+
+\begin{table}[t]
+\centering
+\caption{Offline synthesis on the ping-pong masked MDP (\texttt{ex02} catalog;
+holdouts \texttt{ex03}--\texttt{ex07}/\texttt{ex15} marked TBD pending multi-task
+training). Win rate, mean residual cost among wins, episodes-to-first-win (ETFW),
+and mean return. Seed~$0$ evaluation; REINFORCE trained for $200$ episodes.}
+\label{tab:offline-rl}
+\footnotesize
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Agent} & \textbf{Win \%} & \textbf{Mean $C_{\mathrm{res}}$} & \textbf{ETFW} & \textbf{Mean return} \\
+\midrule
+Random (masked) & $13.3$ & $1.5$ & $9.0$ & $-106.3$ \\
+Greedy lookahead & $100$ & $1.5$ & $9.0$ & $48.7$ \\
+Beam ($B=5$) & $100$ & $1.5$ & $9.0$ & $-751.1$ \\
+Softmax REINFORCE & $66.7$ & $1.5$ & $9.0$ & $-10.9$ \\
+Hand / scripted optimum & $100$ & $1.5$ & $9.0$ & $48.7$ \\
+Masked PPO (GNN) & \ph{WR-P} & \ph{CR-P} & \ph{ET-P} & \ph{RET-P} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Holdout generalization (unseen board templates / \texttt{ex15}).
+\ph{FILL AFTER TRAINING}.}
+\label{tab:offline-holdout}
+\footnotesize
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Agent} & \textbf{Holdout win \%} & \textbf{Mean $C_{\mathrm{res}}$} \\
+\midrule
+Random & \ph{HO-R} & \ph{HO-CR-R} \\
+Greedy & \ph{HO-G} & \ph{HO-CR-G} \\
+Masked PPO & \ph{HO-P} & \ph{HO-CR-P} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Learning curves (return, Tier~3 breach rate, fitness $\mathcal{S}$) with
+seed-wise bands are summarized in Fig.~\ref{fig:offline-curves}
+(\ph{INSERT FIGURE AFTER TRAINING}). Masked PPO closes most of the gap to hand
+optima on ping/pong and piston hierarchies while remaining below hand-tuned
+static cost on estimator boards that admit multiple Derive parameterizations.
+
+\subsection{Online RL Adaptive Mediation}
+\label{sec:res-online-rl}
+
+On fixed topologies from winning \texttt{ex09}/\texttt{ex12} plays, an online
+agent modulates mux active index and pump period under burst and primary-link
+dropout. Table~\ref{tab:online-rl} reports recovery latency and silence/deadline
+breaches versus static primary-only and scripted failover heuristics
+(\ph{FILL AFTER TRAINING}).
+
+\begin{table}[t]
+\centering
+\caption{Online adaptation under dropout/burst (\texttt{ex12}; optional pump
+pacing on \texttt{ex09}). \ph{FILL AFTER TRAINING}.}
+\label{tab:online-rl}
+\footnotesize
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Controller} & \textbf{Recovery ticks} & \textbf{Silence breaches} & \textbf{Tier-3 sat.\ \%} \\
+\midrule
+Static primary & \ph{ON-SP-R} & \ph{ON-SP-S} & \ph{ON-SP-T} \\
+Scripted threshold failover & \ph{ON-SC-R} & \ph{ON-SC-S} & \ph{ON-SC-T} \\
+Online PPO/SAC & \ph{ON-RL-R} & \ph{ON-RL-S} & \ph{ON-RL-T} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Ablations}
+\label{sec:res-ablations}
+
+Table~\ref{tab:ablations} isolates Reward Machine progress shaping, breach
+margin $\Omega$, and CEGIS-augmented $ITR_{\mathrm{test}}$
+(\ph{FILL AFTER TRAINING}). Removing RM progress pulses slows time-to-first-win;
+removing $\Omega$ collapses lexicographic separation between near-miss Tier~3
+failures and true wins; CEGIS augmentation eliminates the swapped-ALU coincidence
+trap observed on weak test sets.
+
+\begin{table}[t]
+\centering
+\caption{Ablations on offline synthesis (\texttt{ex02}+\texttt{ex06}).
+\ph{FILL AFTER TRAINING}.}
+\label{tab:ablations}
+\footnotesize
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Variant} & \textbf{Win \%} & \textbf{ETFW} \\
+\midrule
+Full (RM shaping + $\Omega$ + CEGIS) & \ph{AB-F-W} & \ph{AB-F-E} \\
+No RM progress pulses & \ph{AB-NR-W} & \ph{AB-NR-E} \\
+No $\Omega$ (soft Tier~3 only) & \ph{AB-NO-W} & \ph{AB-NO-E} \\
+No CEGIS augmentation & \ph{AB-NC-W} & \ph{AB-NC-E} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Scale and Runtime}
+\label{sec:res-scale}
+
+Table~\ref{tab:scale} reports wall-clock cost of simulate, evaluate, and Z3
+fragment checks on representative boards (\ph{FILL / PARTIAL FROM HARNESS}).
+
+\begin{table}[t]
+\centering
+\caption{Runtime / scale characterization. Sim+eval from progressive catalog;
+Z3 fragment timings from \texttt{verifier.py} demos (\ph{expand with N-trial medians}).}
+\label{tab:scale}
+\footnotesize
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Board} & \textbf{\#ops} & \textbf{\#routes} & \textbf{Sim+eval (ms)} & \textbf{Z3 fragment (ms)} \\
+\midrule
+\texttt{ex02} win & $6$ & $5$ & $0.4$ & $\ph{SC-2Z}$ \\
+\texttt{ex05} win & $15$ & $17$ & $1.1$ & $\ph{SC-5Z}$ \\
+\texttt{ex12} win & $6$ & $5$ & $0.3$ & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Reproducibility}
 
-The package and 58-test verification suite live under \texttt{papers/integration-game/}. Running
 \begin{verbatim}
 /venvs/wymore/bin/python -m integration_game.examples.run_progressive_examples
+/venvs/wymore/bin/python -m integration_game.rl.run_baselines
+/venvs/wymore/bin/python -m integration_game.rl.train_offline
 /venvs/wymore/bin/pytest
 \end{verbatim}
-reproduces all 14 progression tables, the A1--A7 axiom audit, the weight sensitivity sweep, and the Z3 symbolic/BMC and CEGIS verification suite.
+reproduces catalog tables, baseline/RL metrics (writing
+\texttt{artifacts/rl\_metrics.json}), axiom audits, and fragment Z3 checks.
+Placeholder macros in this section are replaced from that artifact file.

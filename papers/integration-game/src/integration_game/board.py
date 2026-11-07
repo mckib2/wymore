@@ -84,16 +84,29 @@ class Board:
             reasons.append(f"mode mismatch {src_if.mode.value}->{tgt_if.mode.value}")
         if not src_if.shape.compatible_with(tgt_if.shape):
             reasons.append("shape/color/representation incompatibility")
-        if tgt_if.shape.min_trust_score > 0.0:
+        if require_exact_transfer and tgt_if.shape.min_trust_score > 0.0:
             if src_if.shape.min_trust_score < tgt_if.shape.min_trust_score:
-                if require_exact_transfer and src_if.shape.min_trust_score > 0.0:
-                    reasons.append(
-                        f"provenance trust floor {src_if.shape.min_trust_score} "
-                        f"< need {tgt_if.shape.min_trust_score}"
-                    )
-        if tgt_if.shape.required_assurance and src_if.shape.required_assurance:
+                reasons.append(
+                    f"provenance trust floor {src_if.shape.min_trust_score} "
+                    f"< need {tgt_if.shape.min_trust_score}"
+                )
+        if require_exact_transfer and tgt_if.shape.required_assurance:
             if src_if.shape.required_assurance != tgt_if.shape.required_assurance:
-                reasons.append("assurance level mismatch")
+                reasons.append(
+                    f"assurance level mismatch "
+                    f"(offer={src_if.shape.required_assurance!r}, "
+                    f"need={tgt_if.shape.required_assurance!r})"
+                )
+        if require_exact_transfer and tgt_if.shape.required_source:
+            need_src = tgt_if.shape.required_source
+            offer_declares = src_if.shape.required_source == need_src
+            producer_matches = src_if.component_id == need_src
+            if not (offer_declares or producer_matches):
+                reasons.append(
+                    f"required_source mismatch (need={need_src!r}, "
+                    f"offer_decl={src_if.shape.required_source!r}, "
+                    f"comp={src_if.component_id!r})"
+                )
         return reasons
 
     def connect(

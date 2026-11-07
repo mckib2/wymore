@@ -5,6 +5,7 @@ All default static costs and intrinsic parameters are sourced from CatalogCostCo
 """
 from __future__ import annotations
 
+import copy
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
 from .config import CatalogCostConfig, DEFAULT_CONFIG
@@ -695,6 +696,11 @@ class AssembleBlock(WymorianComponent):
             mode=mode,
             velocity=1.0 if mode == TransferMode.PUSH else 0.0,
         )
+        self._assemble_mode = mode
+
+    def wants_to_pull(self, tick: int) -> bool:
+        # Pull-mode assemble must actively request upstream offers each tick.
+        return self._assemble_mode == TransferMode.PULL
 
     def reset(self) -> None:
         super().reset()
@@ -919,7 +925,8 @@ class FanOutBlock(WymorianComponent):
             msg = in_if.inbox
             in_if.inbox = None
             for i in range(self.n_outputs):
-                self.interfaces[f"out_{i}"].outbox = msg
+                # Deep-copy so downstream consumers cannot mutate siblings.
+                self.interfaces[f"out_{i}"].outbox = copy.deepcopy(msg)
 
 
 class FanInBlock(WymorianComponent):

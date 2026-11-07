@@ -1,8 +1,4 @@
-"""Registry and compatibility exports for the 14 Progressive Integration Game Examples.
-
-Each example resides in its own dedicated module (`ex01_autonomous` .. `ex14_cost_sensitivity`)
-and returns a `List[ScoreBreakdown]` evaluated by `BoardEvaluator`.
-"""
+"""Registry for progressive Integration Game examples (ex01–ex15)."""
 
 from __future__ import annotations
 
@@ -30,6 +26,7 @@ from integration_game.examples.ex11_temporal_join import example_11_temporal_joi
 from integration_game.examples.ex12_failover import example_12_failover
 from integration_game.examples.ex13_vending_machine import example_13_vending_machine
 from integration_game.examples.ex14_cost_sensitivity import example_14_cost_sensitivity
+from integration_game.examples.ex15_industrial_avionics import example_15_industrial_avionics
 from integration_game.scoring import ScoreBreakdown
 
 
@@ -48,6 +45,7 @@ ALL_EXAMPLES: List[Tuple[str, Callable[[], List[ScoreBreakdown]]]] = [
     ("Ex12: Dynamic Runtime Failover Multiplexer", example_12_failover),
     ("Ex13: Stateful Reactive Vending Machine FSM", example_13_vending_machine),
     ("Ex14: Cost Sensitivity & Pareto Architecture Ranking", example_14_cost_sensitivity),
+    ("Ex15: Industrial Avionics 1553→DDS Holdout", example_15_industrial_avionics),
 ]
 
 __all__ = [
@@ -69,5 +67,6 @@ __all__ = [
     "example_12_failover",
     "example_13_vending_machine",
     "example_14_cost_sensitivity",
+    "example_15_industrial_avionics",
     "ALL_EXAMPLES",
 ]

@@ -82,6 +82,8 @@ class RewardMachine:
         self.trace.append(new_state)
 
     def on_pre_trigger(self, tick: int) -> None:
+        if self.state == RMState.BREACH:
+            return  # absorbing
         if self.state in (RMState.IDLE_WAIT_PRE, RMState.COMPLETED, RMState.SILENCE_CHECK):
             self._goto(RMState.PRE_MATCHING)
             self._goto(RMState.MAIN_ACTIVE)
@@ -90,22 +92,25 @@ class RewardMachine:
             self.pulses.append(RewardPulse(tick, self.r_prog, "additional_obligation", self.state))
 
     def on_proper_fulfillment(self, tick: int, remaining_open: int) -> None:
+        if self.state == RMState.BREACH:
+            return  # absorbing: cannot heal to COMPLETED
         self.pulses.append(RewardPulse(tick, self.r_prog, "main_chart_progress", self.state))
         if remaining_open == 0:
             self.pulses.append(RewardPulse(tick, self.r_goal, "main_chart_complete", RMState.COMPLETED))
             self._goto(RMState.COMPLETED)
 
     def on_breach(self, tick: int, reason: str) -> None:
+        if self.state == RMState.BREACH:
+            self.pulses.append(RewardPulse(tick, 0.0, f"repeat_{reason}", RMState.BREACH))
+            return
         self.pulses.append(RewardPulse(tick, self.r_breach, reason, RMState.BREACH))
         self._goto(RMState.BREACH)
 
     def on_silence_ok(self, tick: int) -> None:
-        if self.state == RMState.COMPLETED:
-            return
-        if self.state == RMState.MAIN_ACTIVE:
+        if self.state in (RMState.COMPLETED, RMState.BREACH, RMState.MAIN_ACTIVE):
             return
         self._goto(RMState.SILENCE_CHECK)
-        self._goto(RMState.IDLE_WAIT_PRE if self.state != RMState.BREACH else RMState.BREACH)
+        self._goto(RMState.IDLE_WAIT_PRE)
 
     @property
     def total_reward(self) -> float:
@@ -259,12 +264,17 @@ class UniversalLSC:
         if total_triggers == 0:
             cut_progress = 1.0 if hot_breaches == 0 else 0.0
         else:
-            cut_progress = proper / float(total_triggers)
+            # Silence breaches must dilute cut-progress so readers cannot see
+            # cut=1.0 alongside hot silence failures.
+            denom = float(total_triggers + silence_violations)
+            cut_progress = proper / denom if denom > 0 else 0.0
 
         satisfied = (hot_breaches == 0) and (total_triggers > 0 or not self.enforce_silence)
         if satisfied and rm.state != RMState.BREACH:
             if rm.state != RMState.COMPLETED:
                 rm._goto(RMState.COMPLETED)
+        elif hot_breaches > 0 and rm.state != RMState.BREACH:
+            rm._goto(RMState.BREACH)
 
         return TBAEvaluationResult(
             satisfied=satisfied,

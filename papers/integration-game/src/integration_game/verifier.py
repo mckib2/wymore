@@ -17,12 +17,24 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-import z3
+try:
+    import z3
+except ImportError:  # pragma: no cover
+    z3 = None  # type: ignore
 
 from .board import Board
 from .primitives import Color, Dynamics, Field, Message, Provenance
 from .scoring import BoardEvaluator, ScoreBreakdown
 from .ulsc import UniversalLSC
+
+
+def _require_z3() -> Any:
+    if z3 is None:
+        raise ImportError(
+            "z3-solver is required for verifier.py fragment checks. "
+            "Install with: pip install z3-solver"
+        )
+    return z3
 
 
 @dataclass

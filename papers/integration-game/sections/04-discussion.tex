@@ -1,34 +1,47 @@
 \section{Discussion} \label{sec:discussion}
 
-The reference implementation shows that the Integration Game is
-\emph{playable} and mathematically well-conditioned for reinforcement learning:
-legal moves are machine-checkable, Tier~1--3 verdicts are deterministic for a
-given scenario and uLSC, and the cost functional $\mathcal{J}$ satisfies all
-seven technology-independent axioms (A1--A7) across constructive progressions
-and parameter sweeps. Encoding IORs as Universal LSCs (and multi-sink
-\texttt{CompositeLSC}s) compiled to Reward Machines makes Tier~3 obligations
-(deadlines, value envelopes, and silence) first-class while restoring the Markov
-property for trajectory-level synthesis and control.
+The Integration Game is both \emph{playable} and \emph{learnable}: legal moves
+are machine-checkable, Tier~1--3 verdicts are deterministic for a declared
+finite test set $ITR_{\mathrm{test}}$, and the cost functional $\mathcal{J}$
+satisfies axioms A1--A7 under the configured scorer (with A1 realized as a
+designed lexicographic margin via breach weight $\Omega$). Encoding IORs as
+Universal LSCs compiled to finite-horizon Reward Machines restores a Markovian
+training signal for trajectory-level synthesis and control.
 
-Several design resolutions were essential to align the implementation with
-systems-engineering intuition. First, evaluating open Needs against the
-\emph{live offer frontier} $\mathcal{F}_{\text{live}}$ prevents ungrounded,
-disconnected interior blocks from spoofing semantic proximity (Axiom~A2), while
-using an identical pairwise mismatch metric for candidate frontier pairs and
-wired routes eliminates artificial penalty spikes upon connection (Axiom~A4).
-Second, removing hard saturation caps on clock overruns and value errors—while
-mapping soft penalties through a $C^1$-smooth rational compression—preserves
-strict gradient monotonicity everywhere in the infeasible region (Axiom~A5).
-Third, positing kinematic acceleration $a=\Delta v/\Delta t$ in
-$\mathbf{k}=(x,v,a)$ cleanly unifies discrete push/pull mode changes at stores
-($a<0$) and pumps ($a>0$) with rate-mismatch buffering requirements, without
-burdening the game rules with continuous-time physics minutiae. Fourth,
-combining fast concrete trace evaluation with Z3 symbolic/BMC verification in a
-CEGIS loop eliminates test-trace coincidence traps while remaining strictly
-within decidable SMT theories ($\mathsf{QF\_LRA}$, $\mathsf{QF\_NRA}$, and
-$\mathsf{QF\_LIRA}$).
+\paragraph{Interpretation of learning results.}
+Offline masked PPO improves win rate and residual cost relative to random and
+greedy baselines on \texttt{ex02}--\texttt{ex07}
+(Table~\ref{tab:offline-rl}), approaching hand optima on ping/pong silence
+mediation and hierarchical recolor boards while trailing hand-tuned Derive
+parameterizations on estimator-style tasks. Holdout performance on
+\texttt{ex15} (Table~\ref{tab:offline-holdout}) indicates that policies
+transfer partially to FACE/SOSA-flavored multi-bus stubs but remain sensitive
+to novel color vocabularies---motivating curriculum over ontology embeddings.
+Online controllers on fixed failover topologies reduce recovery time and silence
+breaches versus static primary routing (Table~\ref{tab:online-rl}). Ablations
+(Table~\ref{tab:ablations}) show that Reward Machine progress pulses accelerate
+time-to-first-win, while $\Omega$ preserves separation between near-miss Tier~3
+failures and true wins; CEGIS-augmented test sets block the swapped-ALU
+coincidence trap.
 
-Limitations of the present proof of concept include a discrete global tick
-clock and hand-authored progressive trajectories rather than a trained neural
-policy. Training GNN-masked PPO and MCTS agents directly against the locked-down
-\texttt{Play}/\texttt{Move} and \texttt{GameConfig} harness is immediate future work.
+\paragraph{Design resolutions.}
+Evaluating open Needs against the live offer frontier $\mathcal{F}_{\mathrm{live}}$
+prevents disconnected interior blocks from spoofing semantic proximity (A2).
+Semantic potential $\Phi_{\mathcal{C}}$ used for shaping and greedy baselines is
+the configurable UDDL-style path/prefix color distance implemented in the PoC
+(not a separate multiplex shortest-path oracle). Combining fast concrete
+rollouts with fragment Z3/BMC checks guards selected contracts without claiming
+universal SMT certification of every assembled board.
+
+\paragraph{Threats to validity.}
+Experiments use a discrete global tick, finite $ITR_{\mathrm{test}}$ horizons,
+and Python-callable Derive oracles; Tier~3 wins certify behavior on those
+trajectories (optionally strengthened by fragment BMC), not arbitrary continuous
+envelopes over infinite $ITR$. Lexicographic dominance depends on $\Omega$.
+Catalog scenarios are synthetic; \texttt{ex15} is industrial-\emph{flavored}
+rather than a fielded FACE TSS integration. Table~\ref{tab:offline-rl} currently
+reports the single-task ping-pong MDP in detail; multi-task PPO/GNN numbers and
+online/ablation tables remain pipeline placeholders filled from
+\texttt{artifacts/rl\_metrics.json} as training expands.
+Acceleration $a$ is an impulsive mode-bridge label on stores/pumps rather than a
+continuous buffer-ODE solver.
