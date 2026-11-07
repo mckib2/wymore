@@ -1,4 +1,6 @@
 from .env import (
+    OBS_KEYS,
+    TASK_NAME_TO_FACTORY,
     IntegrationGameEnv,
     SynthTask,
     make_calculator_task,
@@ -27,9 +29,25 @@ from .online_env import (
     train_online_controller,
 )
 
+def __getattr__(name: str):
+    # Lazy import so core package works without the optional [rl] gymnasium extra.
+    if name in {
+        "IntegrationGameGymEnv",
+        "OnlineMediationGymEnv",
+        "make_offline_gym_env",
+        "make_online_gym_env",
+    }:
+        from . import gym_env as _gym
+
+        return getattr(_gym, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
 __all__ = [
     "IntegrationGameEnv",
     "SynthTask",
+    "OBS_KEYS",
+    "TASK_NAME_TO_FACTORY",
     "make_ping_pong_task",
     "make_kalman_task",
     "make_gateway_task",
@@ -52,4 +70,8 @@ __all__ = [
     "OnlinePPOController",
     "train_online_controller",
     "evaluate_online_controller",
+    "IntegrationGameGymEnv",
+    "OnlineMediationGymEnv",
+    "make_offline_gym_env",
+    "make_online_gym_env",
 ]

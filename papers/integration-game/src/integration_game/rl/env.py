@@ -52,6 +52,32 @@ ACTION_FEATURE_KEYS: Tuple[str, ...] = (
     "finalize_ready",
 )
 
+OBS_KEYS: Tuple[str, ...] = (
+    "n_unmet",
+    "tier1",
+    "tier2",
+    "tier3",
+    "static",
+    "S",
+    "rm_state",
+    "moves",
+    "n_components",
+    "n_routes",
+    "cut",
+    "breaches",
+)
+
+# Named rebuild registry so SynthTask / env factories pickle for vector workers.
+TASK_REBUILDERS: Dict[str, Callable[..., "SynthTask"]] = {}
+
+
+def _rebuild_synth_task(fn_name: str, kwargs: Dict[str, Any]) -> "SynthTask":
+    return TASK_REBUILDERS[fn_name](**kwargs)
+
+
+def register_task_rebuilder(fn_name: str, fn: Callable[..., "SynthTask"]) -> None:
+    TASK_REBUILDERS[fn_name] = fn
+
 
 @dataclass
 class SynthTask:
@@ -63,6 +89,15 @@ class SynthTask:
     ulsc: Union[UniversalLSC, CompositeLSC]
     max_moves: int = 12
     scripted_moves: Optional[List[Tuple[str, Any]]] = None
+    rebuild_fn: Optional[str] = None
+    rebuild_kwargs: Dict[str, Any] = field(default_factory=dict)
+
+    def __reduce__(self):
+        if not self.rebuild_fn:
+            raise TypeError(
+                f"SynthTask {self.name!r} is not picklable (missing rebuild_fn)"
+            )
+        return (_rebuild_synth_task, (self.rebuild_fn, dict(self.rebuild_kwargs)))
 
 
 def make_ping_pong_task(include_trap: bool = False) -> SynthTask:
@@ -180,7 +215,15 @@ def make_ping_pong_task(include_trap: bool = False) -> SynthTask:
         ("connect", ("Queue.out", "PongSink.in")),
     ]
     return SynthTask(
-        "ex02_ping_pong", initial, catalog, scenario, ulsc, max_moves=14, scripted_moves=scripted
+        "ex02_ping_pong",
+        initial,
+        catalog,
+        scenario,
+        ulsc,
+        max_moves=14,
+        scripted_moves=scripted,
+        rebuild_fn="make_ping_pong_task",
+        rebuild_kwargs={"include_trap": include_trap},
     )
 
 
@@ -289,7 +332,15 @@ def make_kalman_task(include_trap: bool = True) -> SynthTask:
         ("connect", ("KalmanFilter.out", "Tracker.in")),
     ]
     return SynthTask(
-        "ex03_kalman", initial, catalog, scenario, ulsc, max_moves=10, scripted_moves=scripted
+        "ex03_kalman",
+        initial,
+        catalog,
+        scenario,
+        ulsc,
+        max_moves=10,
+        scripted_moves=scripted,
+        rebuild_fn="make_kalman_task",
+        rebuild_kwargs={"include_trap": include_trap},
     )
 
 
@@ -388,7 +439,15 @@ def make_gateway_task() -> SynthTask:
         ("connect", ("PackDDS.out", "C2_DDS.in")),
     ]
     return SynthTask(
-        "ex04_multi_rep", initial, catalog, scenario, ulsc, max_moves=12, scripted_moves=scripted
+        "ex04_multi_rep",
+        initial,
+        catalog,
+        scenario,
+        ulsc,
+        max_moves=12,
+        scripted_moves=scripted,
+        rebuild_fn="make_gateway_task",
+        rebuild_kwargs={},
     )
 
 
@@ -466,7 +525,15 @@ def make_piston_task(include_trap: bool = True) -> SynthTask:
         ("connect", ("HonestF2K.out", "PropMonitor.in")),
     ]
     return SynthTask(
-        "ex05_piston", initial, catalog, scenario, ulsc, max_moves=10, scripted_moves=scripted
+        "ex05_piston",
+        initial,
+        catalog,
+        scenario,
+        ulsc,
+        max_moves=10,
+        scripted_moves=scripted,
+        rebuild_fn="make_piston_task",
+        rebuild_kwargs={"include_trap": include_trap},
     )
 
 
@@ -596,7 +663,18 @@ def make_calculator_task(
         ("connect", ("ALU_True.out", "EnergySink.in")),
     ]
     return SynthTask(
-        "ex06_calculator", initial, catalog, scenario, ulsc, max_moves=10, scripted_moves=scripted
+        "ex06_calculator",
+        initial,
+        catalog,
+        scenario,
+        ulsc,
+        max_moves=10,
+        scripted_moves=scripted,
+        rebuild_fn="make_calculator_task",
+        rebuild_kwargs={
+            "include_trap": include_trap,
+            "weak_coincidence_scenario": weak_coincidence_scenario,
+        },
     )
 
 
@@ -692,7 +770,15 @@ def make_latency_task(include_trap: bool = True) -> SynthTask:
         ("connect", ("FastSolver.out", "Autopilot.in")),
     ]
     return SynthTask(
-        "ex07_latency", initial, catalog, scenario, ulsc, max_moves=8, scripted_moves=scripted
+        "ex07_latency",
+        initial,
+        catalog,
+        scenario,
+        ulsc,
+        max_moves=8,
+        scripted_moves=scripted,
+        rebuild_fn="make_latency_task",
+        rebuild_kwargs={"include_trap": include_trap},
     )
 
 
@@ -822,6 +908,8 @@ def make_industrial_holdout_task(include_trap: bool = True) -> SynthTask:
         ulsc,
         max_moves=15,
         scripted_moves=scripted,
+        rebuild_fn="make_industrial_holdout_task",
+        rebuild_kwargs={"include_trap": include_trap},
     )
 
 
@@ -835,6 +923,32 @@ def make_training_tasks(include_traps: bool = True) -> List[SynthTask]:
         make_calculator_task(include_trap=include_traps, weak_coincidence_scenario=False),
         make_latency_task(include_trap=include_traps),
     ]
+
+
+register_task_rebuilder("make_ping_pong_task", make_ping_pong_task)
+register_task_rebuilder("make_kalman_task", make_kalman_task)
+register_task_rebuilder("make_gateway_task", make_gateway_task)
+register_task_rebuilder("make_piston_task", make_piston_task)
+register_task_rebuilder("make_calculator_task", make_calculator_task)
+register_task_rebuilder("make_latency_task", make_latency_task)
+register_task_rebuilder("make_industrial_holdout_task", make_industrial_holdout_task)
+
+TASK_NAME_TO_FACTORY: Dict[str, Callable[..., SynthTask]] = {
+    "ex02": make_ping_pong_task,
+    "ex02_ping_pong": make_ping_pong_task,
+    "ex03": make_kalman_task,
+    "ex03_kalman": make_kalman_task,
+    "ex04": make_gateway_task,
+    "ex04_multi_rep": make_gateway_task,
+    "ex05": make_piston_task,
+    "ex05_piston": make_piston_task,
+    "ex06": make_calculator_task,
+    "ex06_calculator": make_calculator_task,
+    "ex07": make_latency_task,
+    "ex07_latency": make_latency_task,
+    "ex15": make_industrial_holdout_task,
+    "ex15_industrial_avionics": make_industrial_holdout_task,
+}
 
 
 @dataclass
@@ -863,6 +977,7 @@ class IntegrationGameEnv:
         use_rm_shaping: bool = True,
         use_omega_breach: bool = True,
         config: Optional[GameConfig] = None,
+        raise_on_illegal: bool = False,
     ):
         self.task = task
         self.step_penalty = step_penalty
@@ -872,6 +987,7 @@ class IntegrationGameEnv:
         self.use_rm_shaping = use_rm_shaping
         self.use_omega_breach = use_omega_breach
         self.config = config or DEFAULT_CONFIG
+        self.raise_on_illegal = raise_on_illegal
         self.evaluator = BoardEvaluator(game_config=self.config)
         self.play: Optional[Play] = None
         self.moves_taken = 0
@@ -879,8 +995,26 @@ class IntegrationGameEnv:
         self._last_potential = 0.0
         self._catalog_used: set = set()
         self._catalog_map: Dict[str, Callable[[], WymorianComponent]] = dict(task.catalog)
+        self._seed: Optional[int] = None
 
-    def reset(self) -> Dict[str, float]:
+    def __reduce__(self):
+        """Pickle via task rebuild (fresh env); mid-episode board state is not serialized."""
+        if not self.task.rebuild_fn:
+            raise TypeError("IntegrationGameEnv requires a picklable SynthTask.rebuild_fn")
+        init_kwargs = {
+            "step_penalty": self.step_penalty,
+            "rm_shaping_weight": self.rm_shaping_weight,
+            "potential_shaping_weight": self.potential_shaping_weight,
+            "gamma": self.gamma,
+            "use_rm_shaping": self.use_rm_shaping,
+            "use_omega_breach": self.use_omega_breach,
+            "raise_on_illegal": self.raise_on_illegal,
+        }
+        return (_rebuild_integration_env, (self.task.rebuild_fn, dict(self.task.rebuild_kwargs), init_kwargs))
+
+    def reset(self, seed: Optional[int] = None) -> Dict[str, float]:
+        if seed is not None:
+            self._seed = int(seed)
         self.play = Play(board=self.task.make_initial_board())
         self.moves_taken = 0
         self._catalog_used = set()
@@ -889,6 +1023,43 @@ class IntegrationGameEnv:
         self._last_rm_reward = float(score0.tba_result.total_rm_reward)
         self._last_potential = -float(score0.tier1_struct_penalty + score0.tier2_kin_penalty)
         return self.observe(score=score0)
+
+    def get_state(self) -> Dict[str, Any]:
+        """Snapshot MDP bookkeeping + Play for MCTS/beam (deepcopy)."""
+        assert self.play is not None
+        return {
+            "play": self.play.clone(),
+            "moves_taken": self.moves_taken,
+            "catalog_used": set(self._catalog_used),
+            "last_rm_reward": self._last_rm_reward,
+            "last_potential": self._last_potential,
+        }
+
+    def set_state(self, state: Dict[str, Any]) -> None:
+        self.play = state["play"].clone()
+        self.moves_taken = int(state["moves_taken"])
+        self._catalog_used = set(state["catalog_used"])
+        self._last_rm_reward = float(state["last_rm_reward"])
+        self._last_potential = float(state["last_potential"])
+
+    def clone(self) -> "IntegrationGameEnv":
+        """Deep copy suitable for tree search / lookahead."""
+        twin = IntegrationGameEnv(
+            task=self.task,
+            step_penalty=self.step_penalty,
+            rm_shaping_weight=self.rm_shaping_weight,
+            potential_shaping_weight=self.potential_shaping_weight,
+            gamma=self.gamma,
+            use_rm_shaping=self.use_rm_shaping,
+            use_omega_breach=self.use_omega_breach,
+            config=self.config,
+            raise_on_illegal=self.raise_on_illegal,
+        )
+        twin._seed = self._seed
+        twin._catalog_map = dict(self._catalog_map)
+        if self.play is not None:
+            twin.set_state(self.get_state())
+        return twin
 
     def observe(self, score: Optional[ScoreBreakdown] = None) -> Dict[str, float]:
         assert self.play is not None
@@ -919,6 +1090,11 @@ class IntegrationGameEnv:
             self.play.board, self.task.ulsc, self.task.scenario, "env"
         )
 
+    def structural_score(self) -> ScoreBreakdown:
+        """Cheap Tier-1/2 + static score without TBA simulate (lookahead / MCTS)."""
+        assert self.play is not None
+        return self.evaluator.evaluate_structural(self.play.board, "structural")
+
     def legal_moves(self) -> List[Tuple[str, Any]]:
         """Return list of (kind, payload) legal actions. Empty if Play is finalized."""
         assert self.play is not None
@@ -927,7 +1103,6 @@ class IntegrationGameEnv:
         moves: List[Tuple[str, Any]] = []
         board = self.play.board
 
-        # 1. Add catalog operators not yet placed
         for name, factory in self.task.catalog:
             if name in self._catalog_used:
                 continue
@@ -935,7 +1110,6 @@ class IntegrationGameEnv:
             if probe.comp_id not in board.components:
                 moves.append(("add", name))
 
-        # 2. Compatible strict routes
         offers: List[str] = []
         needs: List[str] = []
         for comp in board.components.values():
@@ -952,7 +1126,6 @@ class IntegrationGameEnv:
                     if rid not in board.routes:
                         moves.append(("connect", (o, n)))
 
-        # 3. Finalize board
         moves.append(("finalize", None))
         return moves
 
@@ -981,14 +1154,12 @@ class IntegrationGameEnv:
         live_offer_ifs = board.live_offers()
         live_offer_ids = {iface.full_id for iface in live_offer_ifs}
 
-        # Boundary consumer needs that are currently unmet
         unmet_consumer_ifs = [
             iface
             for c in board.consumers
             for iface in c.needs.values()
             if iface.connected_route_id is None
         ]
-        # All currently unconnected needs (interior + boundary)
         all_unmet_ifs = [
             iface
             for comp in board.components.values()
@@ -1014,7 +1185,6 @@ class IntegrationGameEnv:
             probe_needs = list(probe.needs.values())
             probe_offers = list(probe.offers.values())
 
-            # Fraction of operator's Need ports immediately wireable from a live Offer
             if probe_needs and live_offer_ifs:
                 matched = 0
                 for pn in probe_needs:
@@ -1025,7 +1195,6 @@ class IntegrationGameEnv:
                         matched += 1
                 feats["input_live_match"] = float(matched) / float(len(probe_needs))
 
-            # How much the operator's Offer reduces gap toward unmet consumer needs
             if probe_offers and unmet_consumer_ifs and live_offer_ifs:
                 best_gain = 0.0
                 for cn in unmet_consumer_ifs:
@@ -1049,7 +1218,6 @@ class IntegrationGameEnv:
                 feats["need_progress"] = 1.0
                 feats["completes_chain"] = 1.0 if is_live_src else 0.2
             else:
-                # Interior block: check if its offer gets closer to an unmet consumer need
                 comp_offers = list(tgt_comp.offers.values())
                 if comp_offers and unmet_consumer_ifs:
                     cur_gap = min(self._interface_gap(src_if, cn) for cn in unmet_consumer_ifs)
@@ -1075,44 +1243,68 @@ class IntegrationGameEnv:
         """Canonical task-scoped signature for a candidate legal move."""
         return f"{self.task.name}:{kind}:{payload}"
 
-    def step(self, action_index: int) -> StepResult:
+    def apply_only(self, kind: str, payload: Any) -> None:
+        """
+        Mutate the board with a legal move without scoring or reward shaping.
+        Used by structural lookahead / MCTS expansion.
+        """
+        assert self.play is not None
+        if kind == "add":
+            factory = self._catalog_map[payload]
+            comp = factory()
+            self.play.apply(AddOperator(comp))
+            self._catalog_used.add(payload)
+        elif kind == "connect":
+            src, tgt = payload
+            self.play.apply(AddRoute(src, tgt, strict=True))
+        elif kind == "finalize":
+            self.play.apply(FinalizeBoard())
+        else:
+            raise IllegalMoveError(f"unknown_kind:{kind}")
+        self.moves_taken += 1
+
+    def step_move(self, kind: str, payload: Any) -> StepResult:
+        """Apply a concrete (kind, payload) move; used by Gymnasium stable-slot adapter."""
         assert self.play is not None
         legal = self.legal_moves()
         if not legal:
-            return StepResult(self.observe(), -1.0, True, {"error": "no_legal_moves"})
-        action_index = max(0, min(action_index, len(legal) - 1))
-        kind, payload = legal[action_index]
+            return StepResult(
+                self.observe(),
+                -1.0,
+                True,
+                {"error": "no_legal_moves", "terminal_reason": "no_legal_moves"},
+            )
+        if not any(k == kind and p == payload for k, p in legal):
+            return self._illegal_step(f"masked_or_unknown:{(kind, payload)}")
 
         reward = -self.step_penalty
         info: Dict[str, Any] = {"action": kind, "payload": payload}
         done = False
+        terminated = False
+        truncated = False
 
         try:
             if kind == "add":
-                name = payload
-                factory = self._catalog_map[name]
-                comp = factory()
-                self.play.apply(AddOperator(comp))
-                self._catalog_used.add(name)
-                reward -= float(comp.static_cost) * 0.1
+                factory = self._catalog_map[payload]
+                # Cost shaping uses static_cost before apply_only consumes the factory
+                probe = factory()
+                reward -= float(probe.static_cost) * 0.1
+                self.play.apply(AddOperator(probe))
+                self._catalog_used.add(payload)
             elif kind == "connect":
                 src, tgt = payload
                 self.play.apply(AddRoute(src, tgt, strict=True))
             elif kind == "finalize":
                 self.play.apply(FinalizeBoard())
                 done = True
+            else:
+                return self._illegal_step(f"unknown_kind:{kind}")
         except IllegalMoveError as exc:
-            reward -= 1.0
-            info["illegal"] = str(exc)
-            self.moves_taken += 1
-            return StepResult(
-                self.observe(), reward, self.moves_taken >= self.task.max_moves, info
-            )
+            return self._illegal_step(str(exc))
 
         self.moves_taken += 1
         score = self._quick_score()
 
-        # 1. Exact telescoping uLSC Reward Machine pulse delta & potential shaping
         rm_total = float(score.tba_result.total_rm_reward)
         new_potential = -float(score.tier1_struct_penalty + score.tier2_kin_penalty)
         if self.use_rm_shaping and self.use_omega_breach:
@@ -1123,39 +1315,94 @@ class IntegrationGameEnv:
         self._last_rm_reward = rm_total
         self._last_potential = new_potential
 
-        # 3. Terminal evaluation
         struct_complete = (
             len(self.play.unmet_needs()) == 0
             and (score.tier1_struct_penalty + score.tier2_kin_penalty) == 0.0
         )
+        terminal_reason: Optional[str] = None
         if self.use_omega_breach:
             if score.is_winning_play:
                 reward += 50.0 - float(score.residual_cost)
                 done = True
+                terminated = True
+                terminal_reason = "win"
                 info["win"] = True
             elif struct_complete or (done and kind == "finalize"):
-                # A structurally complete wiring that fails Tier 3 (e.g. a Tier-3 trap operator)
-                # or an explicit premature Finalize triggers an immediate Tier-3 breach penalty.
                 reward -= 20.0 + 0.001 * float(score.total_cost_J)
                 done = True
+                terminated = True
+                terminal_reason = "breach"
                 info["breach"] = True
             elif self.moves_taken >= self.task.max_moves:
                 done = True
+                truncated = True
+                terminal_reason = "max_moves"
                 reward -= 10.0 + 0.001 * float(score.total_cost_J)
         else:
-            # Ablation: No Omega (soft Tier-3 penalty only, no lexicographic win/breach margin)
             if struct_complete:
-                # Without Omega, any Tier-1/2 complete wiring looks like a high-reward play
-                # where static cost savings outweigh the unscaled soft Tier-3 residual!
                 soft_t3 = 0.0 if score.is_winning_play else 0.5
                 soft_cost = float(score.residual_cost * 8.0 + soft_t3)
                 reward += 50.0 - soft_cost
                 done = True
+                terminated = True
+                terminal_reason = "win" if score.is_winning_play else "soft_complete"
                 info["win"] = score.is_winning_play
-            elif done or self.moves_taken >= self.task.max_moves:
+            elif self.moves_taken >= self.task.max_moves:
                 done = True
+                truncated = True
+                terminal_reason = "max_moves"
+                reward -= 10.0
+            elif done and kind == "finalize":
+                done = True
+                terminated = True
+                terminal_reason = "finalize"
                 reward -= 10.0
 
         info["score"] = score
         info["n_legal"] = len(legal)
+        info["terminal_reason"] = terminal_reason
+        info["terminated"] = terminated
+        info["truncated"] = truncated
         return StepResult(self.observe(score=score), reward, done, info)
+
+    def _illegal_step(self, reason: str) -> StepResult:
+        if self.raise_on_illegal:
+            raise IllegalMoveError(reason)
+        assert self.play is not None
+        reward = -1.0 - self.step_penalty
+        self.moves_taken += 1
+        done = self.moves_taken >= self.task.max_moves
+        info: Dict[str, Any] = {
+            "illegal": reason,
+            "terminal_reason": "max_moves" if done else None,
+            "terminated": False,
+            "truncated": done,
+        }
+        return StepResult(self.observe(), reward, done, info)
+
+    def step(self, action_index: int) -> StepResult:
+        assert self.play is not None
+        legal = self.legal_moves()
+        if not legal:
+            return StepResult(
+                self.observe(),
+                -1.0,
+                True,
+                {
+                    "error": "no_legal_moves",
+                    "terminal_reason": "no_legal_moves",
+                    "terminated": True,
+                    "truncated": False,
+                },
+            )
+        if action_index < 0 or action_index >= len(legal):
+            return self._illegal_step(f"oob_action_index:{action_index}")
+        kind, payload = legal[action_index]
+        return self.step_move(kind, payload)
+
+
+def _rebuild_integration_env(
+    rebuild_fn: str, rebuild_kwargs: Dict[str, Any], init_kwargs: Dict[str, Any]
+) -> IntegrationGameEnv:
+    task = _rebuild_synth_task(rebuild_fn, rebuild_kwargs)
+    return IntegrationGameEnv(task=task, **init_kwargs)

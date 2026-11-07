@@ -114,27 +114,26 @@ def _greedy_index(env: IntegrationGameEnv, legal: List[Tuple[str, Any]]) -> int:
 
     for i, (kind, payload) in enumerate(legal):
         feats = env.action_features(kind, payload)
-        saved_play = env.play.clone()
-        saved_used = set(env._catalog_used)
-        saved_moves = env.moves_taken
-        saved_rm = env._last_rm_reward
-        saved_pot = env._last_potential
-
-        step = env.step(i)
-        score = step.info.get("score")
-        unmet_after = len(env.play.unmet_needs())
-
-        env.play = saved_play
-        env._catalog_used = saved_used
-        env.moves_taken = saved_moves
-        env._last_rm_reward = saved_rm
-        env._last_potential = saved_pot
+        saved = env.get_state()
 
         if kind == "finalize":
             # Only finalize when all boundary needs are wired
+            env.set_state(saved)
             if unmet_before == 0:
                 return i
             key = (2, 1e9, 1e9, 0.0, 1e9)
+            unmet_after = unmet_before
+            score = None
+        else:
+            # Cheap structural lookahead (Tier-1/2 + static) without full TBA simulate
+            twin = env.clone()
+            twin.apply_only(kind, payload)
+            score = twin.structural_score()
+            unmet_after = len(twin.play.unmet_needs()) if twin.play is not None else 0
+            env.set_state(saved)
+
+        if kind == "finalize":
+            pass
         elif kind == "connect":
             # Prefer connecting live offers that reduce Tier-1/Tier-2 penalties
             t12 = float(score.tier1_struct_penalty + score.tier2_kin_penalty) if score else 1e9
@@ -177,19 +176,10 @@ def _beam_search(
     env.reset()
     assert env.play is not None
 
-    # Beam tuple: (play_clone, catalog_used, moves, last_rm, last_pot, return_sum, done, last_score)
-    BeamNode = Tuple[Any, set, int, float, float, float, bool, Optional[Any]]
+    # Beam tuple: (mdp_state, return_sum, done, last_score)
+    BeamNode = Tuple[Dict[str, Any], float, bool, Optional[Any]]
     beam: List[BeamNode] = [
-        (
-            env.play.clone(),
-            set(env._catalog_used),
-            env.moves_taken,
-            env._last_rm_reward,
-            env._last_potential,
-            0.0,
-            False,
-            env._quick_score(),
-        )
+        (env.get_state(), 0.0, False, env._quick_score())
     ]
     best_win: Optional[EpisodeStats] = None
 
@@ -198,9 +188,8 @@ def _beam_search(
         any_expanded = False
 
         for node in beam:
-            play, used, moves, last_rm, last_pot, ret, is_done, prev_score = node
+            mdp_state, ret, is_done, prev_score = node
             if is_done:
-                # Keep terminal node in candidate pool without re-stepping it
                 s_val = prev_score.fitness_score_S if prev_score else 0.0
                 t12 = (
                     prev_score.tier1_struct_penalty + prev_score.tier2_kin_penalty
@@ -210,19 +199,13 @@ def _beam_search(
                 candidates.append(((-s_val, t12, -ret), node))
                 continue
 
-            env.play = play.clone()
-            env._catalog_used = set(used)
-            env.moves_taken = moves
-            env._last_rm_reward = last_rm
-            env._last_potential = last_pot
-
+            env.set_state(mdp_state)
             legal = env.legal_moves()
             if not legal:
                 continue
             any_expanded = True
 
-            # Prioritize non-finalize moves until all needs are met
-            unmet_cnt = len(env.play.unmet_needs())
+            unmet_cnt = len(env.play.unmet_needs()) if env.play is not None else 0
             idxs = [
                 i
                 for i, (k, _) in enumerate(legal)
@@ -232,12 +215,7 @@ def _beam_search(
                 idxs = rng.sample(idxs, beam_width * 3)
 
             for i in idxs:
-                env.play = play.clone()
-                env._catalog_used = set(used)
-                env.moves_taken = moves
-                env._last_rm_reward = last_rm
-                env._last_potential = last_pot
-
+                env.set_state(mdp_state)
                 step = env.step(i)
                 score = step.info.get("score")
                 new_ret = ret + step.reward
@@ -266,16 +244,7 @@ def _beam_search(
                 candidates.append(
                     (
                         priority,
-                        (
-                            env.play.clone(),
-                            set(env._catalog_used),
-                            env.moves_taken,
-                            env._last_rm_reward,
-                            env._last_potential,
-                            new_ret,
-                            step.done,
-                            score,
-                        ),
+                        (env.get_state(), new_ret, step.done, score),
                     )
                 )
 
@@ -285,20 +254,16 @@ def _beam_search(
             break
         candidates.sort(key=lambda x: x[0])
         beam = [c[1] for c in candidates[:beam_width]]
-        if all(node[6] for node in beam):
+        if all(node[2] for node in beam):
             break
 
-    play, used, moves, last_rm, last_pot, ret, _, last_score = beam[0]
-    env.play = play
-    env._catalog_used = used
-    env.moves_taken = moves
-    env._last_rm_reward = last_rm
-    env._last_potential = last_pot
+    mdp_state, ret, _, last_score = beam[0]
+    env.set_state(mdp_state)
     score = last_score or env._quick_score()
     return EpisodeStats(
         score.is_winning_play,
         ret,
-        moves,
+        env.moves_taken,
         float(score.residual_cost) if score.is_winning_play else 1e9,
         float(score.fitness_score_S),
     )

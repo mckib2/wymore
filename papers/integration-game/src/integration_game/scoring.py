@@ -126,17 +126,13 @@ class BoardEvaluator:
         self.gamma = self.cfg.gamma
         self.use_omega = self.cfg.use_omega
 
-    def evaluate(
-        self,
-        board: Board,
-        ulsc: LSCMonitor,
-        scenario_inputs: Dict[int, Dict[str, Message]],
-        snapshot_label: str = "Snapshot",
-    ) -> ScoreBreakdown:
+    def _structural_tier_penalties(
+        self, board: Board
+    ) -> Tuple[float, float, List[str]]:
+        """Tier-1/2 chain evaluation without simulation (lookahead / MCTS hook)."""
         notes: List[str] = []
         live_offers = board.live_offers()
 
-        # Identify root Consumer Needs (boundary Needs if any exist, else all Needs)
         root_needs: List[Interface] = []
         for comp in board.components.values():
             if comp.is_boundary:
@@ -164,7 +160,6 @@ class BoardEvaluator:
             tier1_penalty += t1
             tier2_penalty += t2
 
-        # Also check any forward-wired routes not yet connected to a root consumer Need
         for rid, route in board.routes.items():
             if rid in visited_routes:
                 continue
@@ -174,6 +169,68 @@ class BoardEvaluator:
             tier1_penalty += t1
             tier2_penalty += t2
             notes.extend(r_notes)
+
+        return tier1_penalty, tier2_penalty, notes
+
+    def evaluate_structural(
+        self,
+        board: Board,
+        snapshot_label: str = "Structural",
+    ) -> ScoreBreakdown:
+        """
+        Cheap Tier-1/2 + static cost score without board.simulate / TBA.
+        Intended for greedy/MCTS one-step lookahead; not a win certificate.
+        """
+        from .ulsc import TBAEvaluationResult
+
+        tier1_penalty, tier2_penalty, notes = self._structural_tier_penalties(board)
+        tier1_ok = round(tier1_penalty, 6) == 0.0
+        tier2_ok = round(tier2_penalty, 6) == 0.0
+        static_cost = sum(c.static_cost for c in board.interior_blocks) + sum(
+            r.carrier.cost_with_config(self.carrier_cfg) for r in board.routes.values()
+        )
+        tba_res = TBAEvaluationResult(
+            satisfied=False,
+            hot_breaches=0,
+            missed_deadlines=0,
+            silence_violations=0,
+            total_clock_overrun=0.0,
+            total_value_error=0.0,
+            cut_progress_ratio=0.0,
+            diagnostics=["structural_only"],
+        )
+        residual = static_cost
+        soft_J = tier1_penalty + tier2_penalty + residual
+        fitness_S = round(self._soft_j_to_fitness(soft_J), 2)
+        total_J = round(tier1_penalty + tier2_penalty + residual, 4)
+        return ScoreBreakdown(
+            board_name=board.name,
+            snapshot_label=snapshot_label,
+            tier1_struct_penalty=round(tier1_penalty, 2),
+            tier2_kin_penalty=round(tier2_penalty, 2),
+            tier3_tba_penalty=0.0,
+            static_cost=round(static_cost, 2),
+            dynamic_cost=0.0,
+            total_cost_J=round(total_J, 2),
+            fitness_score_S=fitness_S,
+            tier1_satisfied=tier1_ok,
+            tier2_satisfied=tier2_ok,
+            tier3_satisfied=False,
+            tba_result=tba_res,
+            notes=notes + ["structural_only"],
+            residual_cost=round(residual, 2),
+        )
+
+    def evaluate(
+        self,
+        board: Board,
+        ulsc: LSCMonitor,
+        scenario_inputs: Dict[int, Dict[str, Message]],
+        snapshot_label: str = "Snapshot",
+    ) -> ScoreBreakdown:
+        notes: List[str] = []
+        tier1_penalty, tier2_penalty, struct_notes = self._structural_tier_penalties(board)
+        notes.extend(struct_notes)
 
         tier1_ok = round(tier1_penalty, 6) == 0.0
         tier2_ok = round(tier2_penalty, 6) == 0.0

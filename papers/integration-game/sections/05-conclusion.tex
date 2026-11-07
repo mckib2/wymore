@@ -1,15 +1,3 @@
 \section{Conclusion} \label{sec:conclusion}
 
-We formulated MOSA-style data and behavior mediation as the Integration Game:
-a Wymorian board of Offers, Needs, and typed operators, won by simultaneous
-Tier~1 (structure/color/representation/provenance), Tier~2 (kinematics), and
-Tier~3 (uLSC/Reward Machine) satisfaction on declared test trajectories and
-ranked by residual cost. A Python reference implementation realizes the
-ontology, technology catalog, Reward Machine monitor, and fifteen progressive
-scenarios (including an industrial-flavored holdout). Casting synthesis and runtime
-adaptation as masked MDPs guided by uLSC Reward Machines, we train offline and
-online RL agents that outperform random and greedy baselines and approach
-hand-authored optima on canonical mediation boards
-(Tables~\ref{tab:offline-rl}--\ref{tab:online-rl}). Future work will scale
-GNN-encoded policies to larger MOSA catalogs and couple automatic contract
-extraction with the fragment Z3/CEGIS gate.
+This paper introduced \emph{The Integration Game}, a formal systems-engineering methodology for automated, semantically enabled interface mediation inspired by A.~Wayne Wymore's Tricotyledon Theory of System Design (T3SD). Addressing our three research questions, we first demonstrated (\textbf{RQ1}) that enriching Wymorian buildability catalogs with three-tier UDDL Semantic Colors $c = (C, L, P)$, Flow Kinematics $\mathbf{k} = (x, v, a)$, and structured Mediation Operator families yields a typed coupling algebra in which legal Plays correspond directly to well-formed System Coupling Recipes over $TYR_{\mathcal{C}}$. Second (\textbf{RQ2}), we proved the exact behavioral correspondence between Wymorian Input/Output Requirements and assertional Universal Live Sequence Charts, establishing a Three-Tier Winning Condition that unites static semantic alignment, kinematic flow compatibility, and trajectory-level behavioral satisfaction with symbolic CEGIS verification over decidable SMT fragments. Third (\textbf{RQ3}), we formulated an axiomatic Integration Cost Functional governed by seven technology-independent trade-off axioms and compiled uLSC contracts into finite-state Reward Machines, enabling Reinforcement Learning agents to synthesize verified mediation architectures offline and regulate fault-tolerant routing policies online. Empirical evaluation across a fifteen-scenario progressive verification suite confirms that relational Masked PPO reliably overcomes deceptive behavioral traps that defeat myopic type-matching heuristics, transfers learned mediation strategies zero-shot to unseen avionics integration problems, and maintains behavioral contract guarantees under runtime link disruptions.

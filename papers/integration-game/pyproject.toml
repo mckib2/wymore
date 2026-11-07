@@ -12,6 +12,7 @@ dependencies = ["z3-solver>=4.12"]
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0", "z3-solver>=4.12"]
+rl = ["gymnasium>=0.29", "numpy>=1.24"]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
