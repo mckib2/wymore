@@ -1,2 +1,24 @@
 \section{Discussion} \label{sec:discussion}
-% Placeholder for discussion of empirical findings, scalability, and broader systems engineering implications.
+
+The reference implementation shows that the Integration Game is
+\emph{playable}: legal moves are machine-checkable, Tier~1--3 verdicts are
+deterministic for a given scenario and uLSC, and fitness improves along
+instructive mediation sequences. Encoding IORs as Universal LSCs compiled to
+Reward Machines makes Tier~3 obligations (deadlines, envelopes, silence)
+first-class and prepares the offline synthesis MDP for reinforcement learning
+without changing the game semantics.
+
+Several design resolutions were required to keep claims honest.
+Representation $\rho$ is an ABox packaging axis distinct from platform color
+$P$; carrier remains a route cost attribute. Dynamics are load-bearing:
+caches apply $a<0$, pumps apply $a>0$, and Tier~2 penalizes mode mismatches.
+Provenance predicates gate both static scoring and runtime transfer.
+Cut-progress in the TBA advances only on proper (on-time and in-tolerance)
+fulfillment, so progress metrics cannot mask hot breaches.
+
+Limitations of the present PoC include a discrete global clock, a single
+primary monitored Need per uLSC instance, and hand-authored progressive
+snapshots rather than a trained policy. Scaling to industrial MOSA graphs,
+continuous-time bindings of TSR, and hierarchical offline/online RL remain
+future work---but they can reuse the same Play/Move API and Reward Machine
+interface demonstrated here.

@@ -4,16 +4,37 @@ To make automated MOSA integration amenable to formal verification and reinforce
 
 \subsection{Semantic Port Typing and the Wymorian Isomorphism} \label{sec:meth-isomorphism}
 
-The atomic unit of mediated information in the game is a \emph{field} $x = (v, c, \mu)$, consisting of a runtime value $v$ (possibly absent), a semantic \emph{color} $c \in \mathcal{C}$, and optional metadata $\mu$ (such as a timestamp or sequence key). The color space $\mathcal{C} = \mathbb{C} \times \mathbb{L} \times \mathbb{P}$ mirrors the three-tier UDDL hierarchy of Section~\ref{sec:bg-uddl}:
+The atomic unit of mediated information in the game is a \emph{field}
+$f = (\mathbf{c}, \mathbf{k}, \mathbf{d})$ with three orthogonal layers.
+The \emph{TBox color} $\mathbf{c} = (C, L, P) \in \mathcal{C}$ mirrors the
+three-tier UDDL hierarchy of Section~\ref{sec:bg-uddl}:
 \begin{equation}
     c = (C, L, P) \in \mathbb{C} \times \mathbb{L} \times \mathbb{P},
     \label{eq:color-triple}
 \end{equation}
-where $C \in \mathbb{C}$ identifies the conceptual path or observable in a CDM, $L \in \mathbb{L}$ specifies the logical measurement system, coordinate frame, and units in an LDM, and $P \in \mathbb{P}$ specifies the platform data type and bit layout in a PDM. Each field is additionally accompanied by a transport \emph{carrier} tag (e.g., native in-memory structure vs.\ serialized byte buffer). For transport and interface packaging, fields are grouped into named \emph{messages} whose static structure is described by a \emph{message shape}—an aggregation of named field slots typed by their colors, supporting product aggregations (\texttt{Record}), ordered collections (\texttt{Sequence}), and tagged unions (\texttt{Choice}).
+where $C$ identifies the conceptual path in a CDM, $L$ the logical measurement
+system/frame/units in an LDM, and $P$ the platform type/layout in a PDM.
+\emph{Dynamics} $\mathbf{k} = (x, v, a)$ record where the datum resides ($x$),
+whether it is kinetic push ($v>0$) or potential pull ($v=0$), and acceleration
+$a=\Delta v/\Delta t$ realized by stores ($a<0$) and pumps ($a>0$).
+The \emph{ABox} $\mathbf{d}$ carries the runtime value together with
+representation $\rho$ (serialization/framing) and provenance $\pi$ (lineage and
+trust). Values are never edited ad hoc: they change only as the consequence of
+declared Recolor/Derive contracts. \emph{Carrier} is \emph{not} a color axis; it
+is a route transport attribute (in-process, introspectable tree, or IPC) that
+contributes only to static cost.
 
-A modular system boundary is characterized by its exposed ports. A producer exposes an \emph{Offer} $O_i = (\mathcal{S}_{\text{out}}, \phi_{\text{out}})$, declaring an output message shape $\mathcal{S}_{\text{out}}$ (the colors of all offered fields) together with \emph{flow attributes} $\phi_{\text{out}}$ describing delivery mechanics (transfer mode $\in \{\mathsf{PUSH}, \mathsf{PULL}\}$, emission rate, and multiplicity). Dually, a consumer exposes a \emph{Need} $N_j = (\mathcal{S}_{\text{in}}, \phi_{\text{in}})$, declaring its required field colors $\mathcal{S}_{\text{in}}$ and expected flow attributes $\phi_{\text{in}}$.
+Fields are packaged into \emph{messages} whose shapes support
+\texttt{Record}, \texttt{Sequence}, and \texttt{Choice} aggregations.
+Interfaces obey Need--XOR--Offer exclusivity: a Need declares required colors,
+push/pull mode, acceptable $\rho$, and provenance predicates; an Offer declares
+the dual. Routes are Offer$\to$Need only and never alter color, $\rho$, or values.
 
-The \emph{Board} $\mathcal{B} = (\mathcal{O}, \mathcal{N}, \mathcal{V}_{\text{op}}, \mathcal{E}_{\text{route}})$ is a directed mediation graph whose boundary nodes are the producer offers $\mathcal{O}$ and consumer needs $\mathcal{N}$, whose interior vertices $\mathcal{V}_{\text{op}}$ are parameterized mediation operators and state stores selected from a catalog, and whose directed edges $\mathcal{E}_{\text{route}}$ (\emph{routes}) connect output ports to input ports. A fundamental rule of the game is that \emph{routes merely transport messages and cannot alter field colors}; any change in $(C, L, P)$ or flow mechanics must be performed explicitly by an interior operator move. A complete wiring and parameterization of the board constitutes a \emph{Play} $\mathcal{P}$.
+The \emph{Board} $\mathcal{B} = (\mathcal{O}, \mathcal{N}, \mathcal{V}_{\text{op}}, \mathcal{E}_{\text{route}})$
+is a directed mediation graph whose interior vertices are operators from the
+technology catalog $\mathcal{T}$ (themselves Wymorian components $Z$).
+A complete wiring constitutes a \emph{Play} $\mathcal{P}$; composition yields
+$Z_b = \mathrm{RSY}(\mathrm{Board})$.
 
 Although classical T3SD treats component ports as untyped sets, enriching port constraints with field colors $(C, L, P)$ preserves the algebraic structure of Wymorian coupling:
 
@@ -32,7 +53,7 @@ Proposition~\ref{prop:wymore-iso} provides the theoretical justification for our
 To bridge the mediation gap between producer offers and consumer needs without burdening the specification with domain-specific code, all interior operators are classified into four foundational move families (Table~\ref{tab:legal-moves}):
 
 \begin{enumerate}[topsep=2pt, itemsep=1pt, leftmargin=1.8em]
-    \item \textbf{Semantic and Representation Recoloring:} Operators that transform a field along one or more axes of $\mathcal{C} = (C, L, P)$. A \emph{Conceptual Recolor} ($\Delta C$) maps a field between equivalent or related CDM concepts; a \emph{Logical Recolor} ($\Delta L$) converts units, reference frames, or coordinate systems via a defined value conversion function; a \emph{Platform Recolor} ($\Delta P$) widens, narrows, or repacks data types across PDM encodings; and a \emph{Carrier Change} adapts physical serialization without altering $(C, L, P)$.
+    \item \textbf{Semantic and Representation Recoloring:} Operators that transform a field along one or more axes of $\mathcal{C} = (C, L, P)$. A \emph{Conceptual Recolor} ($\Delta C$) maps a field between equivalent or related CDM concepts; a \emph{Logical Recolor} ($\Delta L$) converts units, reference frames, or coordinate systems via a defined value conversion function; a \emph{Platform Recolor} ($\Delta P$) widens, narrows, or repacks data types across PDM encodings; and a \emph{Representation Transcode} changes $\rho$ (e.g., JSON$\leftrightarrow$native) without altering $(C, L, P)$.
     \item \textbf{Structural Aggregation:} Because messages are convenience containers for transport, \emph{Assemble} and \emph{Disassemble} moves pack fields into messages or split messages into constituent fields, while \emph{Project} and \emph{Inject} select subsets of slots or insert constant/derived fields, strictly preserving per-field colors.
     \item \textbf{Computational Derivation and Filtering:} \emph{Derive} is the general multi-input compute move: it consumes $N \ge 1$ fields (potentially joined from distinct offers) and synthesizes $M \ge 1$ output fields with declared output colors (e.g., combining host position, attitude quaternion, and lever-arm offset to derive sensor position, or executing a state estimator update). \emph{Filter/Validate} drops or forwards messages based on deterministic predicates over values or metadata.
     \item \textbf{Topology, Storage, and Flow Mediation:} Moves that orchestrate interaction mechanics while leaving field colors invariant. \emph{Fan-out}, \emph{Fan-in}, and \emph{Join} alter flow multiplicity and correlate messages by key; \emph{Stores} (latest-value caches, bounded FIFO queues, or keyed maps) retain state across time; \emph{Flow Mode Changes} bridge mismatched interaction modes (e.g., a push-to-pull store adapter or a scheduled pull-to-push \emph{pump}); and \emph{Temporal Control} enforces freshness via stale gates and rate adaptation.
@@ -47,7 +68,7 @@ To bridge the mediation gap between producer offers and consumer needs without b
 \toprule
 \textbf{Move Family} & \textbf{Operators} & \textbf{Color Effect $(C,L,P)$} & \textbf{Flow \& State Effect in Resultant $Z_b = \mathrm{RSY}(SCR)$} \\
 \midrule
-Recoloring & Conceptual, Logical, Platform, Carrier & Modifies declared axis ($\Delta C$, $\Delta L$, or $\Delta P$) & Stateless synchronous value conversion; may document precision narrowing. \\
+Recoloring & Conceptual, Logical, Platform, Transcode~$\rho$ & Modifies declared axis ($\Delta C$, $\Delta L$, or $\Delta P$) or representation $\rho$ & Stateless synchronous value/format conversion; may document precision narrowing. \\
 \addlinespace[2pt]
 Structural Aggregation & Assemble, Disassemble, Project, Inject & Preserves colors of constituent fields & Repackages field slots between producer and consumer message shapes. \\
 \addlinespace[2pt]
