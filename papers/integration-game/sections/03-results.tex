@@ -48,7 +48,7 @@ terminates in a verified three-tier winning play:
         behavioral credit accumulation where stateless assembly breaches hot silence.
 \end{itemize}
 
-\subsection{Cost Axiom Verification and Weight Sensitivity Analysis}
+\subsection{Cost Axiom Verification, Weight Sensitivity, and Z3 Symbolic/BMC Certification}
 
 Module \texttt{sensitivity.py} provides automated verifiers for the seven
 technology-independent cost assertions (A1--A7) and a one-at-a-time parameter
@@ -56,11 +56,13 @@ sensitivity sweep across $(w_{\text{color}}, w_{\text{kin}}, w_{\text{loss}},
 w_{\text{lat}}, \gamma)$. Across all 14 progressive examples and 16 weight
 combinations, Axioms A1--A7 hold with 100\% invariance ($\max \mathcal{J}_{\text{win}} = 6.30 < \min \mathcal{J}_{\text{lose}} = 10010.20$; $\min \mathcal{S}_{\text{win}} = 93.70 > \max \mathcal{S}_{\text{lose}} = 92.58$), while varying $w_{\text{loss}} \in [0.2, 12.0]$ and $\gamma \in [0.8, 1.0]$ smoothly shifts the Pareto ranking among winning architectures in \texttt{ex14} (minimal lossless in-process vs.\ redundant-operator vs.\ lossy narrowing vs.\ high-latency IPC).
 
+To guard against test-scenario coincidence traps without sacrificing RL rollout speed, module \texttt{verifier.py} integrates the Z3 SMT solver across $\mathsf{QF\_LRA}$, $\mathsf{QF\_NRA}$, and $\mathsf{QF\_LIRA}$ Bounded Model Checking (BMC). In 1--8\,ms per query, Z3 universally certifies (\texttt{unsat}) the winning plays and synthesizes concrete counterexamples (\texttt{sat}) for deceptive assemblies—including refuting a $-40^\circ\text{F} = -40^\circ\text{C}$ coincidence-point unit cast (\texttt{ex05}), proving polynomial non-commutativity of $E_k = \frac{1}{2}mv^2$ vs.\ $\frac{1}{2}vm^2$ (\texttt{ex06}), and checking all $2^H$ arrival/dropout schedules and $4^H$ coin sequences for \texttt{ex02}, \texttt{ex09}, \texttt{ex10}, and \texttt{ex13}. In the closed-loop CEGIS harness (\texttt{cegis\_verify\_and\_augment\_ex06}), a weak test scenario ($m=10, v=10$) initially fooled by the swapped-operand ALU is automatically augmented with the Z3 counterexample $(m=2.0, v=1.5)$, flipping the flawed board to \texttt{UNSAT} while preserving the true winner.
+
 \subsection{Reproducibility}
 
-The package and 50-test verification suite live under \texttt{papers/integration-game/}. Running
+The package and 58-test verification suite live under \texttt{papers/integration-game/}. Running
 \begin{verbatim}
 /venvs/wymore/bin/python -m integration_game.examples.run_progressive_examples
 /venvs/wymore/bin/pytest
 \end{verbatim}
-reproduces all 14 progression tables, the A1--A7 axiom audit, and the weight sensitivity sweep.
+reproduces all 14 progression tables, the A1--A7 axiom audit, the weight sensitivity sweep, and the Z3 symbolic/BMC and CEGIS verification suite.

@@ -5,6 +5,7 @@ from __future__ import annotations
 from integration_game.examples.catalog import ALL_EXAMPLES
 from integration_game.scoring import print_progression_table, rank_winning_plays
 from integration_game.sensitivity import run_all_cost_assertions, run_weight_sensitivity_sweep
+from integration_game.verifier import cegis_verify_and_augment_ex06, run_all_z3_verifications
 
 
 def main() -> None:
@@ -49,6 +50,24 @@ def main() -> None:
             f"  {pt.parameter_name:<8} = {pt.parameter_value:<6.2f} | "
             f"Axioms={str(pt.all_axioms_passed):<5} | Winner Order: {rank_summary}"
         )
+
+    print("\n" + "=" * 98)
+    print("Z3 SYMBOLIC & BOUNDED MODEL CHECKING VERIFICATION (QF_LRA / QF_NRA / QF_LIRA)")
+    print("=" * 98)
+    for zres in run_all_z3_verifications():
+        status = "CERTIFIED (UNSAT)" if zres.verified else "REFUTED   (SAT)  "
+        print(
+            f"[{status}] {zres.name:<46} | {zres.theory:<7} | "
+            f"{zres.wall_time_ms:5.2f} ms | {zres.summary}"
+        )
+
+    cegis = cegis_verify_and_augment_ex06()
+    print("-" * 98)
+    print(
+        f"CEGIS Loop Demo (Ex06): Weak Scenario Fooled by Swapped ALU = {cegis['weak_scenario_fooled_by_swapped']} -> "
+        f"Z3 Counterexample {cegis['z3_swapped_result'].counterexample} -> "
+        f"Post-CEGIS Swapped Wins = {cegis['post_cegis_swapped_wins']}, Correct Wins = {cegis['post_cegis_correct_wins']}"
+    )
     print("=" * 98)
 
 

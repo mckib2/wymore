@@ -8,10 +8,10 @@ version = "0.1.0"
 description = "Reference implementation of the Wymorian Integration Game PoC"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = ["z3-solver>=4.12"]
 
 [project.optional-dependencies]
-dev = ["pytest>=7.0"]
+dev = ["pytest>=7.0", "z3-solver>=4.12"]
 
 [tool.setuptools]
 package-dir = {"" = "src"}

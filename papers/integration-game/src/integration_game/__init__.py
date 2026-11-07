@@ -74,6 +74,17 @@ from .sensitivity import (
     verify_a6_dynamic_qos_monotonicity,
     verify_a7_parsimony_monotonicity,
 )
+from .verifier import (
+    Z3VerificationResult,
+    cegis_verify_and_augment_ex06,
+    run_all_z3_verifications,
+    verify_noncommutative_alu_z3,
+    verify_ping_pong_queue_bmc_z3,
+    verify_stale_gate_bmc_z3,
+    verify_symbolic_recolor_chain_z3,
+    verify_tmr_voter_bmc_z3,
+    verify_vending_fsm_bmc_z3,
+)
 from .game import (
     AddOperator,
     AddRoute,

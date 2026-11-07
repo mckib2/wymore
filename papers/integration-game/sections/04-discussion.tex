@@ -22,7 +22,11 @@ strict gradient monotonicity everywhere in the infeasible region (Axiom~A5).
 Third, positing kinematic acceleration $a=\Delta v/\Delta t$ in
 $\mathbf{k}=(x,v,a)$ cleanly unifies discrete push/pull mode changes at stores
 ($a<0$) and pumps ($a>0$) with rate-mismatch buffering requirements, without
-burdening the game rules with continuous-time physics minutiae.
+burdening the game rules with continuous-time physics minutiae. Fourth,
+combining fast concrete trace evaluation with Z3 symbolic/BMC verification in a
+CEGIS loop eliminates test-trace coincidence traps while remaining strictly
+within decidable SMT theories ($\mathsf{QF\_LRA}$, $\mathsf{QF\_NRA}$, and
+$\mathsf{QF\_LIRA}$).
 
 Limitations of the present proof of concept include a discrete global tick
 clock and hand-authored progressive trajectories rather than a trained neural
