@@ -1,4 +1,55 @@
-"""RL environment, baselines, and training entry points for the Integration Game."""
-from .env import IntegrationGameEnv, SynthTask, make_ping_pong_task
+from .env import (
+    IntegrationGameEnv,
+    SynthTask,
+    make_calculator_task,
+    make_gateway_task,
+    make_industrial_holdout_task,
+    make_kalman_task,
+    make_latency_task,
+    make_ping_pong_task,
+    make_piston_task,
+    make_training_tasks,
+)
+from .baselines import EpisodeStats, evaluate_policy, run_episode
+from .train_offline import (
+    MaskedPPOAgent,
+    SoftmaxAgent,
+    evaluate_masked_ppo,
+    evaluate_reinforce,
+    train_masked_ppo,
+    train_multitask_ppo,
+    train_reinforce,
+)
+from .online_env import (
+    OnlineMediationEnv,
+    OnlinePPOController,
+    evaluate_online_controller,
+    train_online_controller,
+)
 
-__all__ = ["IntegrationGameEnv", "SynthTask", "make_ping_pong_task"]
+__all__ = [
+    "IntegrationGameEnv",
+    "SynthTask",
+    "make_ping_pong_task",
+    "make_kalman_task",
+    "make_gateway_task",
+    "make_piston_task",
+    "make_calculator_task",
+    "make_latency_task",
+    "make_industrial_holdout_task",
+    "make_training_tasks",
+    "EpisodeStats",
+    "run_episode",
+    "evaluate_policy",
+    "SoftmaxAgent",
+    "MaskedPPOAgent",
+    "train_reinforce",
+    "evaluate_reinforce",
+    "train_masked_ppo",
+    "train_multitask_ppo",
+    "evaluate_masked_ppo",
+    "OnlineMediationEnv",
+    "OnlinePPOController",
+    "train_online_controller",
+    "evaluate_online_controller",
+]

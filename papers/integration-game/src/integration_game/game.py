@@ -74,8 +74,8 @@ class Play:
         return Play(board=b, history=list(self.history), finalized=self.finalized)
 
     def apply(self, move: Move) -> "Play":
-        if self.finalized and not isinstance(move, FinalizeBoard):
-            raise IllegalMoveError("Play is finalized; no further topology moves allowed.")
+        if self.finalized:
+            raise IllegalMoveError("Play is already finalized; no further moves allowed.")
         if isinstance(move, AddOperator):
             try:
                 self.board.add_component(move.component)

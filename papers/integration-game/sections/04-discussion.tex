@@ -39,9 +39,8 @@ and Python-callable Derive oracles; Tier~3 wins certify behavior on those
 trajectories (optionally strengthened by fragment BMC), not arbitrary continuous
 envelopes over infinite $ITR$. Lexicographic dominance depends on $\Omega$.
 Catalog scenarios are synthetic; \texttt{ex15} is industrial-\emph{flavored}
-rather than a fielded FACE TSS integration. Table~\ref{tab:offline-rl} currently
-reports the single-task ping-pong MDP in detail; multi-task PPO/GNN numbers and
-online/ablation tables remain pipeline placeholders filled from
-\texttt{artifacts/rl\_metrics.json} as training expands.
+rather than a fielded FACE TSS integration. All offline, holdout, online, and
+ablation tables in Section~\ref{sec:results} are reproducibly generated into
+\texttt{artifacts/rl\_metrics.json} via \texttt{run\_baselines.py}.
 Acceleration $a$ is an impulsive mode-bridge label on stores/pumps rather than a
 continuous buffer-ODE solver.

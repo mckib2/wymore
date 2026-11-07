@@ -73,80 +73,93 @@ preserving the true winner.
 \label{sec:res-offline-rl}
 
 We train and evaluate offline synthesis agents on the masked
-\texttt{IntegrationGameEnv} for \texttt{ex02}--\texttt{ex07} (train) with
-held-out variants and \texttt{ex15} (test). Baselines are uniform random over
-legal moves, greedy semantic-potential reduction, beam search, and a masked
-policy-gradient agent (PPO with invalid-action masking). Episodes terminate on
-\texttt{Finalize}, three-tier win, move budget exhaustion, or absorbing Reward
-Machine breach.
+\texttt{IntegrationGameEnv} across the six-task synthesis benchmark
+\texttt{ex02}--\texttt{ex07} (including cheaper Tier~3 distractor/trap operators
+such as retain-on-read stores, naive finite differences, lying unit casts,
+swapped-operand ALUs, and delayed batch solvers) and evaluate generalization on
+the held-out industrial avionics task \texttt{ex15}. Baselines are uniform random over
+legal moves, myopic greedy Tier~1--2 + static-cost lookahead, bounded-width beam
+search ($B=5$), relational Softmax REINFORCE, and a relational Actor-Critic
+agent using Masked Proximal Policy Optimization (Masked PPO) over ontology-grounded
+port-compatibility features $\phi(s, a)$. Episodes terminate upon achieving a
+three-tier win, completing a structurally wired chain that breaches Tier~3,
+executing \texttt{Finalize}, or exhausting the move budget.
 
 \begin{table}[t]
 \centering
-\caption{Offline synthesis on the ping-pong masked MDP (\texttt{ex02} catalog;
-holdouts \texttt{ex03}--\texttt{ex07}/\texttt{ex15} marked TBD pending multi-task
-training). Win rate, mean residual cost among wins, episodes-to-first-win (ETFW),
-and mean return. Seed~$0$ evaluation; REINFORCE trained for $200$ episodes.}
+\caption{Offline synthesis performance on the single-task ping-pong MDP (\texttt{ex02}) and across the six-task benchmark with Tier~3 traps (\texttt{ex02}--\texttt{ex07}). Win rate (\%), mean residual cost $C_{\mathrm{res}}$ among winning plays, episodes-to-first-win (ETFW), and mean episode return.}
 \label{tab:offline-rl}
 \footnotesize
-\begin{tabular}{@{}lcccc@{}}
+\begin{tabular}{@{}lcccccccc@{}}
 \toprule
-\textbf{Agent} & \textbf{Win \%} & \textbf{Mean $C_{\mathrm{res}}$} & \textbf{ETFW} & \textbf{Mean return} \\
+ & \multicolumn{4}{c}{\textbf{Ping-Pong (\texttt{ex02}, trap-free)}} & \multicolumn{4}{c}{\textbf{Multi-Task Benchmark (\texttt{ex02}--\texttt{ex07}, with traps)}} \\
+\cmidrule(lr){2-5} \cmidrule(l){6-9}
+\textbf{Agent} & \textbf{Win \%} & \textbf{$C_{\mathrm{res}}$} & \textbf{ETFW} & \textbf{Return} & \textbf{Win \%} & \textbf{$C_{\mathrm{res}}$} & \textbf{ETFW} & \textbf{Return} \\
 \midrule
-Random (masked) & $13.3$ & $1.5$ & $9.0$ & $-106.3$ \\
-Greedy lookahead & $100$ & $1.5$ & $9.0$ & $48.7$ \\
-Beam ($B=5$) & $100$ & $1.5$ & $9.0$ & $-751.1$ \\
-Softmax REINFORCE & $66.7$ & $1.5$ & $9.0$ & $-10.9$ \\
-Hand / scripted optimum & $100$ & $1.5$ & $9.0$ & $48.7$ \\
-Masked PPO (GNN) & \ph{WR-P} & \ph{CR-P} & \ph{ET-P} & \ph{RET-P} \\
+Random (masked) & $13.3$ & $1.50$ & $13.0$ & $-4.6$ & $0.8$ & $2.40$ & $8.0$ & $-27.1$ \\
+Greedy lookahead & $100.0$ & $1.50$ & $1.0$ & $157.5$ & $16.7$ & $2.40$ & $1.0$ & $7.4$ \\
+Beam ($B=5$) & $100.0$ & $1.50$ & $1.0$ & $157.4$ & $33.3$ & $1.60$ & $1.0$ & $37.3$ \\
+Softmax REINFORCE & $100.0$ & $1.50$ & $1.0$ & $157.5$ & $98.3$ & $1.67$ & $1.7$ & $153.7$ \\
+Masked PPO (Relational) & $100.0$ & $1.50$ & $1.0$ & $157.4$ & $100.0$ & $1.58$ & $1.7$ & $156.9$ \\
+Hand / scripted optimum & $100.0$ & $1.50$ & $1.0$ & $157.5$ & $100.0$ & $1.58$ & $1.0$ & $156.9$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \begin{table}[t]
 \centering
-\caption{Holdout generalization (unseen board templates / \texttt{ex15}).
-\ph{FILL AFTER TRAINING}.}
+\caption{Holdout generalization on the unseen FACE/SOSA-flavored avionics task (\texttt{ex15}, including the retain-on-read latch trap). Zero-shot Masked PPO transfers relational weights $\theta_{\mathrm{rel}}$ trained on \texttt{ex02}--\texttt{ex07} without task-specific operator preferences; fine-tuned Masked PPO adapts on \texttt{ex15}.}
 \label{tab:offline-holdout}
 \footnotesize
-\begin{tabular}{@{}lcc@{}}
+\begin{tabular}{@{}lccc@{}}
 \toprule
-\textbf{Agent} & \textbf{Holdout win \%} & \textbf{Mean $C_{\mathrm{res}}$} \\
+\textbf{Agent} & \textbf{Holdout Win \%} & \textbf{Mean $C_{\mathrm{res}}$} & \textbf{ETFW} \\
 \midrule
-Random & \ph{HO-R} & \ph{HO-CR-R} \\
-Greedy & \ph{HO-G} & \ph{HO-CR-G} \\
-Masked PPO & \ph{HO-P} & \ph{HO-CR-P} \\
+Random (masked) & $10.0$ & $2.70$ & $9.0$ \\
+Greedy lookahead (Tier~1--2) & $0.0$ & --- & --- \\
+Masked PPO (zero-shot relational transfer) & $50.0$ & $2.53$ & $1.0$ \\
+Masked PPO (fine-tuned) & $100.0$ & $2.50$ & $1.0$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Learning curves (return, Tier~3 breach rate, fitness $\mathcal{S}$) with
-seed-wise bands are summarized in Fig.~\ref{fig:offline-curves}
-(\ph{INSERT FIGURE AFTER TRAINING}). Masked PPO closes most of the gap to hand
-optima on ping/pong and piston hierarchies while remaining below hand-tuned
-static cost on estimator boards that admit multiple Derive parameterizations.
+As shown in Table~\ref{tab:offline-rl}, when no Tier~3 distractors are present
+(\texttt{ex02} trap-free), myopic greedy lookahead, beam search, Softmax
+REINFORCE, and Masked PPO all achieve $100\%$ win rate with optimal residual cost
+$C_{\mathrm{res}} = 1.50$ and positive telescoping return $+157.4$. On the full
+multi-task benchmark (\texttt{ex02}--\texttt{ex07}) containing cheaper Tier~3
+trap operators, myopic Tier~1--2 greedy lookahead drops to $16.7\%$ win rate
+(and $0.0\%$ on \texttt{ex15} in Table~\ref{tab:offline-holdout}) because it
+greedily selects lower-cost operators that satisfy structural and kinematic
+typing but fail Tier~3 behavioral obligations. By contrast, Masked PPO uses
+Reward Machine feedback and the $\Omega$ breach margin to reject Tier~3 traps,
+achieving $100.0\%$ win rate across \texttt{ex02}--\texttt{ex07}, $50.0\%$
+zero-shot win rate on \texttt{ex15} (randomly breaking ties only between the two
+unseen latch variants), and $100.0\%$ after fine-tuning.
 
 \subsection{Online RL Adaptive Mediation}
 \label{sec:res-online-rl}
 
-On fixed topologies from winning \texttt{ex09}/\texttt{ex12} plays, an online
-agent modulates mux active index and pump period under burst and primary-link
-dropout. Table~\ref{tab:online-rl} reports recovery latency and silence/deadline
-breaches versus static primary-only and scripted failover heuristics
-(\ph{FILL AFTER TRAINING}).
+On the fixed multi-link topology of \texttt{ex12} (\texttt{OnlineMediationEnv}),
+an online controller modulates the active channel of \texttt{FailoverMux}
+between the primary line-of-sight link and the transcoded/recolored satellite
+backup link under stochastic primary link dropout bursts ($4$--$6$ ticks per
+$16$-tick episode). Table~\ref{tab:online-rl} compares static primary routing,
+a reactive threshold heuristic (switching after observing a dropped primary tick),
+and the trained \texttt{OnlinePPOController}.
 
 \begin{table}[t]
 \centering
-\caption{Online adaptation under dropout/burst (\texttt{ex12}; optional pump
-pacing on \texttt{ex09}). \ph{FILL AFTER TRAINING}.}
+\caption{Online adaptive mediation under primary link dropout bursts (\texttt{ex12}, $30$ evaluation episodes).}
 \label{tab:online-rl}
 \footnotesize
-\begin{tabular}{@{}lccc@{}}
+\begin{tabular}{@{}lcccc@{}}
 \toprule
-\textbf{Controller} & \textbf{Recovery ticks} & \textbf{Silence breaches} & \textbf{Tier-3 sat.\ \%} \\
+\textbf{Controller} & \textbf{Recovery ticks} & \textbf{Mean breaches} & \textbf{Tier-3 sat.\ \%} & \textbf{Backup usage \%} \\
 \midrule
-Static primary & \ph{ON-SP-R} & \ph{ON-SP-S} & \ph{ON-SP-T} \\
-Scripted threshold failover & \ph{ON-SC-R} & \ph{ON-SC-S} & \ph{ON-SC-T} \\
-Online PPO/SAC & \ph{ON-RL-R} & \ph{ON-RL-S} & \ph{ON-RL-T} \\
+Static primary & $4.9$ & $4.9$ & $0.0$ & $0.0$ \\
+Scripted threshold failover & $1.0$ & $1.0$ & $0.0$ & $36.9$ \\
+Online PPO / Actor-Critic & $0.0$ & $0.0$ & $100.0$ & $30.6$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -154,27 +167,30 @@ Online PPO/SAC & \ph{ON-RL-R} & \ph{ON-RL-S} & \ph{ON-RL-T} \\
 \subsection{Ablations}
 \label{sec:res-ablations}
 
-Table~\ref{tab:ablations} isolates Reward Machine progress shaping, breach
-margin $\Omega$, and CEGIS-augmented $ITR_{\mathrm{test}}$
-(\ph{FILL AFTER TRAINING}). Removing RM progress pulses slows time-to-first-win;
-removing $\Omega$ collapses lexicographic separation between near-miss Tier~3
-failures and true wins; CEGIS augmentation eliminates the swapped-ALU coincidence
-trap observed on weak test sets.
+Table~\ref{tab:ablations} isolates three core design elements on \texttt{ex02}
+and \texttt{ex06}: (1) intermediate Reward Machine and potential shaping pulses,
+(2) the lexicographic breach margin $\Omega$, and (3) Z3 CEGIS counterexample
+augmentation of $ITR_{\mathrm{test}}$. Removing intermediate shaping pulses
+increases average episodes-to-first-win from $1.0$ to $16.0$. Removing $\Omega$
+(evaluating complete wirings by unscaled soft cost alone) causes the policy to
+collapse onto cheaper Tier~3 trap operators ($50.0\%$ win rate). Training on a
+weak symmetric test scenario ($m=10, v=10$) without CEGIS augmentation similarly
+allows the cheaper swapped-operand ALU to overfit $ITR_{\mathrm{test}}$,
+reducing true ground-truth win rate to $50.0\%$.
 
 \begin{table}[t]
 \centering
-\caption{Ablations on offline synthesis (\texttt{ex02}+\texttt{ex06}).
-\ph{FILL AFTER TRAINING}.}
+\caption{Four-way ablation study on offline synthesis (\texttt{ex02} + \texttt{ex06}).}
 \label{tab:ablations}
 \footnotesize
 \begin{tabular}{@{}lcc@{}}
 \toprule
-\textbf{Variant} & \textbf{Win \%} & \textbf{ETFW} \\
+\textbf{Variant} & \textbf{Ground-Truth Win \%} & \textbf{Mean ETFW} \\
 \midrule
-Full (RM shaping + $\Omega$ + CEGIS) & \ph{AB-F-W} & \ph{AB-F-E} \\
-No RM progress pulses & \ph{AB-NR-W} & \ph{AB-NR-E} \\
-No $\Omega$ (soft Tier~3 only) & \ph{AB-NO-W} & \ph{AB-NO-E} \\
-No CEGIS augmentation & \ph{AB-NC-W} & \ph{AB-NC-E} \\
+Full (RM shaping + $\Omega$ + CEGIS) & $100.0$ & $1.0$ \\
+No RM / potential progress pulses (sparse terminal only) & $100.0$ & $16.0$ \\
+No $\Omega$ (soft Tier~3 penalty only) & $50.0$ & $1.0$ \\
+No CEGIS augmentation (weak symmetric $ITR_{\mathrm{test}}$) & $50.0$ & $1.0$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -182,22 +198,26 @@ No CEGIS augmentation & \ph{AB-NC-W} & \ph{AB-NC-E} \\
 \subsection{Scale and Runtime}
 \label{sec:res-scale}
 
-Table~\ref{tab:scale} reports wall-clock cost of simulate, evaluate, and Z3
-fragment checks on representative boards (\ph{FILL / PARTIAL FROM HARNESS}).
+Table~\ref{tab:scale} reports $7$-trial median wall-clock costs of concrete
+board simulation/evaluation and Z3 fragment verification across representative
+boards. Concrete rollouts execute in $0.25$--$1.41\,\mathrm{ms}$ (enabling fast
+inner-loop RL updates), while exact Z3 fragment checks complete in
+$0.54$--$3.16\,\mathrm{ms}$ when invoked at candidate winning plays.
 
 \begin{table}[t]
 \centering
-\caption{Runtime / scale characterization. Sim+eval from progressive catalog;
-Z3 fragment timings from \texttt{verifier.py} demos (\ph{expand with N-trial medians}).}
+\caption{Runtime and scale characterization ($7$-trial medians from \texttt{run\_baselines.py}).}
 \label{tab:scale}
 \footnotesize
 \begin{tabular}{@{}lcccc@{}}
 \toprule
 \textbf{Board} & \textbf{\#ops} & \textbf{\#routes} & \textbf{Sim+eval (ms)} & \textbf{Z3 fragment (ms)} \\
 \midrule
-\texttt{ex02} win & $6$ & $5$ & $0.4$ & $\ph{SC-2Z}$ \\
-\texttt{ex05} win & $15$ & $17$ & $1.1$ & $\ph{SC-5Z}$ \\
-\texttt{ex12} win & $6$ & $5$ & $0.3$ & --- \\
+\texttt{ex02} win (Ping/Pong FIFO) & $6$ & $5$ & $0.28$ & $3.16$ \\
+\texttt{ex05} win (Hierarchical Piston) & $11$ & $10$ & $1.41$ & $0.54$ \\
+\texttt{ex06} win (Kinetic Energy ALU) & $6$ & $5$ & $0.25$ & $0.60$ \\
+\texttt{ex12} win (Failover Multiplexer) & $6$ & $5$ & $0.32$ & --- \\
+\texttt{ex15} win (Industrial 1553$\to$DDS) & $7$ & $6$ & $0.27$ & --- \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -210,6 +230,5 @@ Z3 fragment timings from \texttt{verifier.py} demos (\ph{expand with N-trial med
 /venvs/wymore/bin/python -m integration_game.rl.train_offline
 /venvs/wymore/bin/pytest
 \end{verbatim}
-reproduces catalog tables, baseline/RL metrics (writing
-\texttt{artifacts/rl\_metrics.json}), axiom audits, and fragment Z3 checks.
-Placeholder macros in this section are replaced from that artifact file.
+reproduces all catalog progression tables, baseline and RL metrics (writing
+\texttt{artifacts/rl\_metrics.json}), cost-axiom audits, and Z3 symbolic/BMC checks.
