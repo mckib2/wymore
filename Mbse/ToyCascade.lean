@@ -253,6 +253,21 @@ noncomputable def toyMissionOut (f : ITZ Bool) : ITZ Bool := fun t =>
   toyMissionReadout
     (generateStateTrajectory toyMissionSpec toyFedInit (liftInput f) t)
 
+/--
+  Computable twin of the two-cell Moore cascade (sensor→actor).
+
+  Simultaneous rsy update: sensor' = in, actor' = sensor (pre-update).
+  Boundary readout is actor value, so `out(0)=out(1)=false` and
+  `out(t+2)=f(t)`.  Used by techdoc LSC presentation eval.
+-/
+def toyMissionOut_eval (f : ITZ Bool) : ITZ Bool := fun t =>
+  let rec state : Nat → Bool × Bool
+    | 0 => (false, false)
+    | n + 1 =>
+      let sens := (state n).1
+      (f n, sens)
+  (state t).2
+
 noncomputable def toyMissionIOR : InputOutputRequirement Bool Bool :=
   functionalIOR toyMissionOut
 

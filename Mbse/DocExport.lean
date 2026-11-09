@@ -55,12 +55,37 @@ structure CouplingDoc where
   boundaryPorts : List BoundaryPortDoc := []
   deriving Repr, Inhabited
 
+/-- One diagrammatic LSC element (string-labelled for JSON / TikZ). -/
+structure LscElementDoc where
+  kind : String  -- inMsg | outMsg | outSymbolic | condition | tickSync | silenceOut
+  temp : String := ""  -- cold | hot | ""
+  tick : Option Nat := none
+  value : String := ""
+  label : String := ""
+  deriving Repr, Inhabited
+
+/-- One presentation / unroll path. -/
+structure LscPathDoc where
+  id : String
+  elements : List LscElementDoc := []
+  deriving Repr, Inhabited
+
 structure LscDoc where
   chartName : String := ""
   preCondition : String := ""
   mainCondition : String := ""
   inMessage : String := ""
   outMessage : String := ""
+  /-- Named envelope law, e.g. `g = pipelineOut f`. -/
+  law : String := ""
+  /-- Presentation-window note when paths do not cover all of ITR. -/
+  horizonNote : String := ""
+  /-- Primary path body (usually `paths[0].elements`). -/
+  elements : List LscElementDoc := []
+  /-- Concrete presentation / unroll paths. -/
+  paths : List LscPathDoc := []
+  /-- True when `paths`/`elements` came from evaluable ψ presentation samples. -/
+  fromPresentation : Bool := false
   deriving Repr, Inhabited
 
 structure IorDoc where
@@ -142,13 +167,37 @@ private def couplingToJson (c : CouplingDoc) : Json :=
     ("boundaryPorts", Json.arr (c.boundaryPorts.map boundaryToJson).toArray)
   ]
 
+private def optNatToJson : Option Nat → Json
+  | none => Json.null
+  | some n => Json.num n
+
+private def lscElementToJson (e : LscElementDoc) : Json :=
+  Json.mkObj [
+    ("kind", Json.str e.kind),
+    ("temp", Json.str e.temp),
+    ("tick", optNatToJson e.tick),
+    ("value", Json.str e.value),
+    ("label", Json.str e.label)
+  ]
+
+private def lscPathToJson (p : LscPathDoc) : Json :=
+  Json.mkObj [
+    ("id", Json.str p.id),
+    ("elements", Json.arr (p.elements.map lscElementToJson).toArray)
+  ]
+
 private def lscToJson (l : LscDoc) : Json :=
   Json.mkObj [
     ("chartName", Json.str l.chartName),
     ("preCondition", Json.str l.preCondition),
     ("mainCondition", Json.str l.mainCondition),
     ("inMessage", Json.str l.inMessage),
-    ("outMessage", Json.str l.outMessage)
+    ("outMessage", Json.str l.outMessage),
+    ("law", Json.str l.law),
+    ("horizonNote", Json.str l.horizonNote),
+    ("elements", Json.arr (l.elements.map lscElementToJson).toArray),
+    ("paths", Json.arr (l.paths.map lscPathToJson).toArray),
+    ("fromPresentation", Json.bool l.fromPresentation)
   ]
 
 private def iorToJson (i : IorDoc) : Json :=

@@ -1,5 +1,6 @@
 import Lean
 import Mbse.DocExport
+import Mbse.LscPresentation
 import Mbse.TechdocAttr
 
 /-!
@@ -11,6 +12,7 @@ to fill the JSON DTO consumed by `scripts/techdoc`.
 
 open Lean Meta Core
 open Mbse.DocExport
+open Mbse.LscPresentation
 open Mbse.TechdocAttr
 
 namespace Mbse.TechdocDerive
@@ -206,6 +208,55 @@ structure WireEnds where
   toIdx : Nat
   deriving Repr
 
+/--
+  First field of `Sigma.mk` / `Subtype.mk` / `Prod.mk` / `PSigma.mk` (`⟨fst, snd⟩`).
+  Non-dependent `Σ _ : Fin n, Port` often elaborates as `Prod`.
+-/
+def pairFst? (e : Expr) : Option Expr :=
+  let e := strip e
+  if e.isAppOf ``Sigma.mk || e.isAppOf ``PSigma.mk || e.isAppOf ``Subtype.mk
+      || e.isAppOf ``Prod.mk then
+    let args := e.getAppArgs
+    if args.size ≥ 2 then some args[args.size - 2]! else none
+  else
+    none
+
+/--
+  Fin index from a wire endpoint `⟨i, port⟩` or bare `Fin` value.
+  Unfolds abbreviations like `i0`; never reads the `n` from a `Fin n` type alone.
+-/
+partial def finIndex? (e : Expr) : MetaM (Option Nat) := do
+  let e ← whnf (strip e)
+  if let some fst := pairFst? e then
+    return ← finIndex? fst
+  if e.isConst then
+    if let some c := e.constName? then
+      if let some v ← constValue? c then
+        return ← finIndex? v
+  match strip e with
+  | .lit (.natVal n) => return some n
+  | e =>
+    if e.isAppOf ``OfNat.ofNat then
+      -- OfNat.ofNat α n inst — index is `n` (2nd explicit arg).
+      let args := e.getAppArgs
+      if h : 1 < args.size then
+        match strip args[1] with
+        | .lit (.natVal n) => return some n
+        | nExpr => return ← finIndex? nExpr
+      else
+        return none
+    else if e.isAppOf ``Fin.mk then
+      -- Fin.mk {n} val isLt — `val` is the component index.
+      let args := e.getAppArgs
+      if args.size ≥ 2 then
+        match strip args[args.size - 2]! with
+        | .lit (.natVal n) => return some n
+        | valExpr => return ← finIndex? valExpr
+      else
+        return none
+    else
+      return none
+
 def wireEndsFromExpr (wireName : Name) (e : Expr) : MetaM WireEnds := do
   let e ← whnf e
   let e := strip e
@@ -214,10 +265,10 @@ def wireEndsFromExpr (wireName : Name) (e : Expr) : MetaM WireEnds := do
     throwDerive s!"wire `{wireName}`: expected Prod, got:\n{e}"
   let left := args[args.size - 2]!
   let right := args[args.size - 1]!
-  let fromIdx ← match natLit? (← whnf left) with
+  let fromIdx ← match ← finIndex? left with
     | some n => pure n
     | none => throwDerive s!"wire `{wireName}`: cannot read source Fin from\n{left}"
-  let toIdx ← match natLit? (← whnf right) with
+  let toIdx ← match ← finIndex? right with
     | some n => pure n
     | none => throwDerive s!"wire `{wireName}`: cannot read target Fin from\n{right}"
   return { name := shortName wireName, fromIdx, toIdx }
@@ -282,21 +333,22 @@ def cellAliases (scr : Name) (n : Nat) : MetaM (Array String) := do
 
   let mut cellFns : Array Name := #[]
   if let some scrVal ← constValue? scr then
-    let scrVal ← whnf scrVal
+    let scrVal ← unfoldConstOnce (strip scrVal)
     if let some vscr ← findFieldRhs `VSCR scrVal then
-      let vscr ← whnf vscr
+      let vscr ← unfoldConstOnce (strip vscr)
       if let some z ← findFieldRhs `Z vscr then
-        let z ← whnf z
+        let z := strip z
         if let some c := z.getAppFn.constName? then
           cellFns := cellFns.push c
-        else if let .lam _ _ body _ := strip z then
-          if let some c := body.getAppFn.constName? then
+        else if let .lam _ _ body _ := z then
+          if let some c := (strip body).getAppFn.constName? then
             cellFns := cellFns.push c
   for cand in #["rleCell", "toyCell", "fedCell"] do
     let full := mod ++ Name.mkSimple cand
     if env.contains full then cellFns := cellFns.push full
-    let simple := Name.mkSimple cand
-    if env.contains simple then cellFns := cellFns.push simple
+    -- Namespace-qualified cells (e.g. `Saint.fedCell`) live beside the SCR decl.
+    let near := scr.getPrefix ++ Name.mkSimple cand
+    if env.contains near then cellFns := cellFns.push near
 
   let moduleConsts := env.constants.fold (init := #[]) fun acc name info =>
     if moduleOf? env name == some mod then
@@ -305,13 +357,17 @@ def cellAliases (scr : Name) (n : Nat) : MetaM (Array String) := do
       | _ => acc
     else acc
 
+  -- Do not `whnf` alias bodies: `def TP := fedCell 0` must stay an app of `fedCell`.
   for (name, val) in moduleConsts do
-    let val ← whnf val
+    let val := strip val
     for cellFn in cellFns do
       if val.isAppOf cellFn then
-        if let some k := natLit? val then
-          if k < n then
-            names := names.set! k (shortName name)
+        -- Index is the last argument (`fedCell 0` / `fedCell ⟨0, _⟩`).
+        let args := val.getAppArgs
+        if h : 0 < args.size then
+          if let some k ← finIndex? args[args.size - 1] then
+            if k < n then
+              names := names.set! k (shortName name)
   return names
 
 /-- Type-head constant of a declaration, avoiding `whnf` so abbrevs like `Technology` remain. -/
@@ -391,7 +447,109 @@ def iorAlphabet (ior : Name) : MetaM (String × String) := do
         return (toString ir, toString or_)
   return ("", "")
 
-def deriveIsrPackage (id : String) : MetaM IsrPackageDoc := do
+/-- Leaf string of a hierarchical name. -/
+def nameLeaf (n : Name) : String :=
+  match n with
+  | .str _ s => s
+  | _ => n.toString
+
+/-- Peel apps to find `functionalIOR ψ` and return the ψ constant name. -/
+partial def functionalPsiConst? (e : Expr) : MetaM (Option Name) := do
+  let e := strip e
+  if e.isAppOf nm_functionalIOR || (e.getAppFn.constName?.map shortName) == some "functionalIOR" then
+    match e.getAppArgs.back? with
+    | some ψ =>
+      let ψ := strip ψ
+      match ψ.getAppFn.constName? with
+      | some n => return some n
+      | none =>
+        -- η-expanded `fun f => ψ f` / `fun f t => ψ f t`
+        match ψ with
+        | .lam _ _ body _ =>
+          let body := strip body
+          if let some n := body.getAppFn.constName? then return some n
+          else if body.isApp then
+            match (strip body.appFn!).getAppFn.constName? with
+            | some n => return some n
+            | none => return none
+          else return none
+        | _ => return none
+    | none => return none
+  else if let some c := e.constName? then
+    if let some v ← constValue? c then
+      functionalPsiConst? v
+    else
+      return none
+  else if e.isApp then
+    -- Named alias applied: unfold head const once
+    if let some c := e.getAppFn.constName? then
+      if let some v ← constValue? c then
+        functionalPsiConst? (mkAppN v e.getAppArgs)
+      else
+        return none
+    else
+      return none
+  else
+    return none
+
+/-- Prefer a computable `{ψ}_eval` twin when present; else `ψ` itself. -/
+def resolvePsiEval (ψ : Name) : MetaM Name := do
+  let env ← getEnv
+  let leaf := nameLeaf ψ
+  let twin := Name.str ψ.getPrefix (leaf ++ "_eval")
+  if env.contains twin then return twin else return ψ
+
+/-- Optional `{ψEval}_lsc_prefix : List IR` stim for non-Bool LSC presentation. -/
+def resolvePsiLscPrefix (evalΨ : Name) : MetaM (Option Name) := do
+  let env ← getEnv
+  let leaf := nameLeaf evalΨ
+  let prefixName := Name.str evalΨ.getPrefix (leaf ++ "_lsc_prefix")
+  if env.contains prefixName then return some prefixName else return none
+
+/--
+  Build `LscDoc` from IOR: recover law from `functionalIOR ψ`, evaluate a
+  computable ψ (or `_eval` twin) on the default Bool sample policy when IR is Bool.
+-/
+unsafe def loadLscDoc (ior : Name) (iorName ir or_ : String) : MetaM LscDoc := do
+  let some iorVal ← constValue? ior
+    | return schematicLscDoc iorName ir or_ "g ∈ er f"
+  let some ψ ← functionalPsiConst? iorVal
+    | return schematicLscDoc iorName ir or_ s!"g ∈ {iorName}.er f"
+  let law := s!"g = {shortName ψ} f"
+  let evalΨ ← resolvePsiEval ψ
+  let ψExpr := mkConst evalΨ
+  let irIsBool := ir == "Bool" || ir.endsWith "Bool"
+  let orIsPair := or_ == "Pair" || or_.endsWith "Pair"
+  let H : Nat := if irIsBool && orIsPair then 6 else 4
+  if irIsBool then
+    try
+      let docExpr ← mkAppM ``Mbse.LscPresentation.lscDocFromBoolPsi
+        #[mkStrLit iorName, mkStrLit or_, mkStrLit (shortName ψ), mkNatLit H, ψExpr]
+      evalExpr LscDoc (mkConst ``Mbse.DocExport.LscDoc) docExpr
+    catch e =>
+      let msg ← e.toMessageData.toString
+      let doc := schematicLscDoc iorName ir or_ law
+      return { doc with horizonNote := s!"presentation eval failed for `{evalΨ}`: {msg}" }
+  else
+    -- Prefer explicit stim prefix when `{ψ}_lsc_prefix` exists; else Inhabited default.
+    try
+      match ← resolvePsiLscPrefix evalΨ with
+      | some prefName =>
+        let docExpr ← mkAppM ``Mbse.LscPresentation.lscDocFromPrefixPsi
+          #[mkStrLit iorName, mkStrLit ir, mkStrLit or_, mkStrLit (shortName ψ),
+            mkConst prefName, ψExpr]
+        evalExpr LscDoc (mkConst ``Mbse.DocExport.LscDoc) docExpr
+      | none =>
+        let docExpr ← mkAppM ``Mbse.LscPresentation.lscDocFromInhabitedPsi
+          #[mkStrLit iorName, mkStrLit ir, mkStrLit or_, mkStrLit (shortName ψ),
+            mkNatLit H, ψExpr]
+        evalExpr LscDoc (mkConst ``Mbse.DocExport.LscDoc) docExpr
+    catch e =>
+      let msg ← e.toMessageData.toString
+      let doc := schematicLscDoc iorName ir or_ law
+      return { doc with horizonNote := s!"presentation eval failed for `{evalΨ}`: {msg}" }
+
+unsafe def deriveIsrPackage (id : String) : MetaM IsrPackageDoc := do
   let env ← getEnv
   let some attr ← techdocAttrRef.get
     | throwDerive "techdocAttr not initialized"
@@ -493,6 +651,7 @@ def deriveIsrPackage (id : String) : MetaM IsrPackageDoc := do
   let horizon ← iorHorizon ior
   let (ir, or_) ← iorAlphabet ior
   let formalRefs := #[root, tyr, scr, ior].map (·.toString) |>.toList
+  let lsc ← loadLscDoc ior (shortName ior) ir or_
 
   return {
     id := id
@@ -511,13 +670,7 @@ def deriveIsrPackage (id : String) : MetaM IsrPackageDoc := do
       outputType := or_
       horizon := horizon
       description := ""
-      lsc := some {
-        chartName := s!"LSC_{shortName ior}"
-        preCondition := s!"f ∈ {shortName ior}.itr"
-        mainCondition := s!"g ∈ {shortName ior}.er f"
-        inMessage := s!"in(f(t)) : {ir}"
-        outMessage := s!"out(g(t)) : {or_}"
-      }
+      lsc := some lsc
     }
     functionalSystem := functionalSystem
     buildableSystem := buildableSystem
@@ -531,14 +684,28 @@ def deriveIsrPackage (id : String) : MetaM IsrPackageDoc := do
     formalRefs := formalRefs
   }
 
-unsafe def withMbseMeta {α : Type} (k : MetaM α) : IO α := do
+/--
+  Run `k` in a Meta context after importing `mods` (with extension initializers).
+  Consumer packages (e.g. `SaintMbse`) pass their root module so `@[techdoc]` ISR
+  roots outside `Mbse` are visible to `deriveIsrPackage`.
+-/
+unsafe def withImportedModules {α : Type} (mods : Array Name) (k : MetaM α) : IO α := do
   initSearchPath (← findSysroot)
   enableInitializersExecution
-  let env ← importModules #[{ module := `Mbse }] {} (trustLevel := 1024) (loadExts := true)
+  -- Always load LSC presentation builders for `loadLscDoc` evalExpr.
+  let mods :=
+    if mods.any (· == `Mbse.LscPresentation) then mods
+    else mods.push `Mbse.LscPresentation
+  let imports : Array Import := mods.map fun m => { module := m }
+  let env ← importModules imports {} (trustLevel := 1024) (loadExts := true)
   let ctx : Core.Context := { fileName := "<techdoc>", fileMap := default }
   let state : Core.State := { env }
   Prod.fst <$> CoreM.toIO (ctx := ctx) (s := state) do
     MetaM.run' k
+
+/-- Meta context with the core `Mbse` library (built-in techdoc ids: `toy`, `rle`, …). -/
+unsafe def withMbseMeta {α : Type} (k : MetaM α) : IO α :=
+  withImportedModules #[`Mbse] k
 
 def listIds : MetaM (List String) := do
   let env ← getEnv

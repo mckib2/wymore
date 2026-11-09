@@ -10,6 +10,7 @@ import Mbse.WymoreRequirements
 import Mbse.IORTemporalFragment
 import Mbse.LSC
 import Mbse.IORToLSC
+import Mbse.LscPresentation
 import Mbse.WymoreTechnology
 import Mbse.WymoreTechnologyImpl
 import Mbse.Notation

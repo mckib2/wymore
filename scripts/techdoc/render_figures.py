@@ -8,7 +8,7 @@ import subprocess
 from collections import defaultdict, deque
 from pathlib import Path
 
-from .models import ComponentDoc, IsrPackageDoc, WireDoc
+from .models import ComponentDoc, IsrPackageDoc, LscElementDoc, LscDoc, WireDoc
 from . import theme
 
 
@@ -167,12 +167,13 @@ def _order_components(comps: list[ComponentDoc], wires: list[WireDoc], boundary_
         rank[s] = 0
         queue.append(s)
 
+    # First-visit BFS only.  Relaxing to a longer path (`new_r > rank[v]`)
+    # diverges on cyclic SCRs (e.g. SAINT SPM ↔ WMRH feedback).
     while queue:
         u = queue.popleft()
         for v in adj[u]:
-            new_r = rank[u] + 1
-            if v not in rank or new_r > rank[v]:
-                rank[v] = new_r
+            if v not in rank:
+                rank[v] = rank[u] + 1
                 queue.append(v)
 
     pipeline = sorted([name for name in comp_names if name in rank], key=lambda n: (rank[n], comp_names.index(n)))
@@ -408,98 +409,173 @@ def poi_tikz(doc: IsrPackageDoc) -> str:
 
 
 def _format_lsc_cond(cond: str) -> str:
-    """Format an LSC condition string nicely for LaTeX math mode."""
-    s = cond.strip()
-    s = s.replace("∈", r"\in ").replace("∉", r"\notin ")
+    """Format an LSC condition / law string for LaTeX text mode."""
+    return _escape(cond.strip())
 
-    # Check for <ior>.itr
-    m_itr = re.search(r"^(.*?)\s*(\\in|\\notin)\s*([\w]+)\.itr\s*$", s)
-    if m_itr:
-        var = m_itr.group(1).strip()
-        rel = m_itr.group(2)
-        ior_id = _escape(m_itr.group(3))
-        return f"{var} {rel} \\mathtt{{{ior_id}.itr}}"
 
-    # Check for <ior>.er <var>
-    m_er = re.search(r"^(.*?)\s*(\\in|\\notin)\s*([\w]+)\.er\s+([\w]+)\s*$", s)
-    if m_er:
-        var_out = m_er.group(1).strip()
-        rel = m_er.group(2)
-        ior_id = _escape(m_er.group(3))
-        var_in = m_er.group(4).strip()
-        return f"{var_out} {rel} \\mathtt{{{ior_id}.er}}({var_in})"
+def _primary_elements(lsc: LscDoc | None) -> list[LscElementDoc]:
+    if lsc is None:
+        return []
+    if lsc.elements:
+        return lsc.elements
+    if lsc.paths:
+        return lsc.paths[0].elements
+    return []
 
-    return _escape(s)
+
+def _lsc_row_tikz(e: LscElementDoc, y: float) -> str:
+    """One horizontal row for a chart element at vertical position `y`."""
+    tick = e.tick
+    tick_s = f"t={tick}" if tick is not None else ""
+    val = _escape(e.value) if e.value else ""
+    label = _format_lsc_cond(e.label) if e.label else ""
+    kind = e.kind
+
+    if kind == "inMsg":
+        msg = f"in({val})" if val else "in"
+        return (
+            f"\\draw[-{{Stealth}}, dashed, thick, draw=coldBlue] (0, {y}) --\n"
+            f"  node[above=1pt, font=\\scriptsize\\sffamily, text=coldBlue]"
+            f" {{\\texttt{{{msg}}}\\ {tick_s}}} (7.4, {y});\n"
+        )
+    if kind == "outMsg":
+        msg = f"out({val})" if val else "out"
+        return (
+            f"\\draw[-{{Stealth}}, solid, thick, draw=hotRed] (7.4, {y}) --\n"
+            f"  node[above=1pt, font=\\scriptsize\\sffamily, text=hotRed]"
+            f" {{\\texttt{{{msg}}}\\ {tick_s}}} (0, {y});\n"
+        )
+    if kind == "outSymbolic":
+        binder = val or "y"
+        return (
+            f"\\draw[-{{Stealth}}, solid, thick, draw=hotRed] (7.4, {y}) --\n"
+            f"  node[above=1pt, font=\\scriptsize\\sffamily, text=hotRed]"
+            f" {{\\texttt{{out({_escape(binder)})}}\\ {tick_s}}} (0, {y});\n"
+        )
+    if kind == "tickSync":
+        return (
+            f"\\draw[dashdotted, thick, black!40] (-0.5, {y}) --\n"
+            f"  node[above=0.5pt, font=\\tiny\\sffamily, text=black!55]"
+            f" {{tick {tick_s}}} (7.9, {y});\n"
+        )
+    if kind == "silenceOut":
+        return (
+            f"\\node[font=\\scriptsize\\sffamily, text=hotRed] at (3.7, {y})"
+            f" {{silence (no out) {tick_s}}};\n"
+        )
+    if kind == "condition":
+        color = "hotRed" if e.temp == "hot" else "coldBlue"
+        style = "solid, thick" if e.temp == "hot" else "dashed"
+        body = label or val or "condition"
+        return (
+            f"\\node[lsccond, draw={color}, {style}, font=\\scriptsize\\sffamily] at (3.7, {y})"
+            f" {{{body}}};\n"
+        )
+    return f"% unknown element kind {kind}\n"
 
 
 def lsc_tikz(doc: IsrPackageDoc) -> str:
-    """Render publication-quality Universal Live Sequence Chart (LSC) corresponding to the IOR."""
+    """Render Universal LSC from presentation elements (or schematic fallback)."""
     ior = doc.ior
     lsc = ior.lsc
 
     chart_name = _escape((lsc.chart_name if lsc and lsc.chart_name else f"LSC_{ior.name}"))
-    in_type = _escape(ior.input_type or "IR")
-    out_type = _escape(ior.output_type or "OR")
     horizon = _escape(ior.horizon or "infinite")
     ior_name = _escape(ior.name)
+    law = (lsc.law if lsc and lsc.law else f"g ∈ {ior.name}.er f")
+    law_fmt = _format_lsc_cond(law)
+    horizon_note = _escape(lsc.horizon_note if lsc and lsc.horizon_note else "")
+    from_pres = bool(lsc and lsc.from_presentation)
+    path_id = ""
+    if lsc and lsc.paths:
+        path_id = _escape(lsc.paths[0].id)
 
-    raw_pre = lsc.pre_condition if lsc and lsc.pre_condition else f"f ∈ {ior.name}.itr"
-    raw_main = lsc.main_condition if lsc and lsc.main_condition else f"g ∈ {ior.name}.er f"
-    pre_cond = _format_lsc_cond(raw_pre)
-    main_cond = _format_lsc_cond(raw_main)
-    in_msg = _escape((lsc.in_message if lsc and lsc.in_message else f"in(f(t)) : {ior.input_type}"))
-    out_msg = _escape((lsc.out_message if lsc and lsc.out_message else f"out(g(t)) : {ior.output_type}"))
+    elems = _primary_elements(lsc)
+    path_count = len(lsc.paths) if lsc and lsc.paths else 0
+
+    # Vertical layout: header, then one row per element, then law footer.
+    y = -1.4
+    row_dy = 0.55
+    rows = ""
+    if elems:
+        for e in elems:
+            rows += _lsc_row_tikz(e, y)
+            y -= row_dy
+    else:
+        # Schematic fallback (no presentation companion)
+        pre = _format_lsc_cond(
+            lsc.pre_condition if lsc and lsc.pre_condition else f"f ∈ {ior.name}.itr"
+        )
+        main = _format_lsc_cond(
+            lsc.main_condition if lsc and lsc.main_condition else f"g ∈ {ior.name}.er f"
+        )
+        rows = (
+            f"\\draw[-{{Stealth}}, dashed, thick, draw=coldBlue] (0, {y}) --\n"
+            f"  node[above=1pt, font=\\scriptsize\\sffamily, text=coldBlue]"
+            f" {{\\texttt{{in(f(t))}}}} (7.4, {y});\n"
+        )
+        y -= row_dy
+        rows += (
+            f"\\node[lsccond, draw=coldBlue, dashed] at (3.7, {y}) {{{pre}}};\n"
+        )
+        y -= row_dy
+        rows += (
+            f"\\draw[-{{Stealth}}, solid, thick, draw=hotRed] (7.4, {y}) --\n"
+            f"  node[above=1pt, font=\\scriptsize\\sffamily, text=hotRed]"
+            f" {{\\texttt{{out(g(t))}}}} (0, {y});\n"
+        )
+        y -= row_dy
+        rows += (
+            f"\\node[lsccond, draw=hotRed, solid, thick] at (3.7, {y}) {{{main}}};\n"
+        )
+        y -= row_dy
+
+    y_law = y - 0.15
+    y_bottom = y_law - 0.9
+    path_note = ""
+    if path_id:
+        path_note = f"Path: \\texttt{{{path_id}}}"
+        if path_count > 1:
+            path_note += f" \\,(+{path_count - 1} more in report)"
+
+    footer = (
+        "Presentation window from evaluable $\\psi$ samples; "
+        "assertional $\\mathrm{Satisfies}\\iff\\mathrm{SatisfiesIOR}$ "
+        "(\\texttt{Mbse.IORToLSC})"
+        if from_pres
+        else "Schematic characteristic only (no evaluable presentation window)"
+    )
 
     body = f"""\\begin{{tikzpicture}}[
 {theme.TIKZ_BASE_STYLE}
 ]
-% Lifeline Heads
 \\node[lifelinehead] (env) at (0, 0) {{\\textbf{{Env}}}};
 \\node[lifelinehead] (sys) at (7.4, 0) {{\\textbf{{Sys}}}};
 
-% Pre-Chart (Cold Trigger Region)
-\\node[coldframe, minimum width=9.2cm, minimum height=2.2cm, anchor=north] (pre_box) at (3.7, -1.25) {{}};
-\\node[font=\\footnotesize\\sffamily\\bfseries, text=coldBlue, anchor=south west] at (pre_box.north west)
-  {{Pre-Chart: Cold Trigger ($f \\in \\mathrm{{ITR}}$)}};
+\\node[font=\\footnotesize\\sffamily\\bfseries, text=coldBlue, anchor=west] at (-0.2, -0.55)
+  {{Cold pre / Hot main (trajectory window)}};
+\\node[font=\\tiny\\sffamily, text=black!60, anchor=east] at (7.6, -0.55)
+  {{Horizon: {horizon}}};
 
-% Main-Chart (Hot Guarantee Region)
-\\node[hotframe, minimum width=9.2cm, minimum height=2.9cm, anchor=north] (main_box) at (3.7, -4.25) {{}};
-\\node[font=\\footnotesize\\sffamily\\bfseries, text=hotRed, anchor=south west] at (main_box.north west)
-  {{Main-Chart: Hot Guarantee ($g \\in \\mathrm{{ER}}(f)$)}};
+\\draw[dashed, thick, black!45] (env.south) -- (0, {y_bottom});
+\\draw[dashed, thick, black!45] (sys.south) -- (7.4, {y_bottom});
 
-% Vertical Lifeline Rays (drawn on top of chart fills so they are continuously visible)
-\\draw[dashed, thick, black!45] (env.south) -- (0, -7.8);
-\\draw[dashed, thick, black!45] (sys.south) -- (7.4, -7.8);
+{rows}
+\\node[lsccond, draw=hotRed, solid, thick, font=\\small\\sffamily] at (3.7, {y_law})
+  {{\\textbf{{Law:}} {law_fmt}}};
 
-% Cold Input Message (Env -> Sys)
-\\draw[-{{Stealth}}, dashed, thick, draw=coldBlue] (0, -1.95) --
-  node[above=2pt, font=\\scriptsize\\sffamily, text=coldBlue] {{\\texttt{{{in_msg}}}}} (7.4, -1.95);
-
-% Cold Guard Condition
-\\node[lsccond, draw=coldBlue, dashed] at (3.7, -2.75)
-  {{\\textbf{{Cold Condition:}} ${pre_cond}$\\\\[1pt]\\scriptsize(Eligible Input Trajectory)}};
-
-% Tick Synchronization
-\\draw[dashdotted, thick, black!40] (-0.7, -4.9) --
-  node[above=1pt, font=\\tiny\\sffamily, text=black!60] {{Discrete Tick Sync $t \\in \\mathrm{{TSR}}$ \\quad (Horizon: {horizon})}} (8.1, -4.9);
-
-% Hot Output Message (Sys -> Env)
-\\draw[-{{Stealth}}, solid, thick, draw=hotRed] (7.4, -5.6) --
-  node[above=2pt, font=\\scriptsize\\sffamily, text=hotRed] {{\\texttt{{{out_msg}}}}} (0, -5.6);
-
-% Hot Envelope Condition
-\\node[lsccond, draw=hotRed, solid, thick] at (3.7, -6.45)
-  {{\\textbf{{Hot Guarantee:}} ${main_cond}$\\\\[1pt]\\scriptsize(Full Envelope Membership)}};
-
-% Outer Universal LSC Frame
+\\coordinate (bot) at (3.7, {y_bottom});
 \\begin{{scope}}[on background layer]
-\\node[draw=black!55, thick, rounded corners=6pt, fit=(env)(sys)(pre_box)(main_box), inner sep=16pt,
-      label={{[anchor=south west, font=\\small\\sffamily\\bfseries, text=black!85]north west:Universal LSC: \\texttt{{{chart_name}}} \\enspace$\\vert$\\enspace $\\mathcal{{L}}(\\mathtt{{{ior_name}}})$}}] (chart_frame) {{}};
+\\node[draw=black!55, thick, rounded corners=6pt, fit=(env)(sys)(bot), inner sep=12pt,
+      label={{[anchor=south west, font=\\small\\sffamily\\bfseries, text=black!85]north west:%
+        Universal LSC: \\texttt{{{chart_name}}} \\enspace$\\vert$\\enspace $\\mathcal{{L}}(\\mathtt{{{ior_name}}})$}}]
+      (chart_frame) {{}};
 \\end{{scope}}
 
-% Semantic Equivalence Footer
-\\node[font=\\scriptsize\\sffamily, text=black!70, anchor=north] at ($(chart_frame.south)+(0,-0.25)$)
-  {{Assertional Semantics: $\\mathrm{{Satisfies}}(Z, \\mathcal{{L}}(\\mathrm{{IOR}})) \\iff \\mathrm{{SatisfiesIOR}}(Z, \\mathrm{{IOR}})$ \\enspace(\\texttt{{Mbse.IORToLSC}})}};
+\\node[font=\\scriptsize\\sffamily, text=black!70, anchor=north] at ($(chart_frame.south)+(0,-0.15)$)
+  {{{footer}}};
+\\node[font=\\tiny\\sffamily, text=black!55, anchor=north] at ($(chart_frame.south)+(0,-0.45)$)
+  {{{path_note}{(" \\quad " + horizon_note) if horizon_note else ""}}};
 
 \\end{{tikzpicture}}
 """

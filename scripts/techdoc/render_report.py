@@ -166,16 +166,19 @@ $wire_rows
 \section{Input/Output Requirement (IOR)}
 \begin{figure}[H]
   \centering
-  \adjustimage{max width=0.88\linewidth, max height=0.38\textheight, keepaspectratio}{figures/lsc.pdf}
-  \caption{Universal Live Sequence Chart (LSC) corresponding to requirement \texttt{$ior_name}.}
+  \adjustimage{max width=0.92\linewidth, max height=0.42\textheight, keepaspectratio}{figures/lsc.pdf}
+  \caption{Universal Live Sequence Chart for \texttt{$ior_name} (primary presentation path).}
 \end{figure}
 
 \begin{itemize}\setlength{\itemsep}{2pt}
   \item \textbf{Requirement Name:} \texttt{$ior_name}
   \item \textbf{Alphabet:} \texttt{$ior_in} $$\longrightarrow$$ \texttt{$ior_out}
   \item \textbf{Horizon:} $ior_horizon
-  \item \textbf{Universal LSC Encoding:} $$\mathcal{L}(\mathtt{$ior_name})$$ (\texttt{Mbse.IORToLSC})
-  \item \textbf{Semantic Equivalence:} $$\mathrm{Satisfies}(Z, \mathcal{L}(\mathrm{IOR})) \iff \mathrm{SatisfiesIOR}(Z, \mathrm{IOR})$$
+  \item \textbf{Envelope law:} \texttt{$ior_law}
+  \item \textbf{Presentation note:} $ior_horizon_note
+  \item \textbf{LSC paths:} $ior_paths
+  \item \textbf{Assertional bridge:} $$\mathrm{Satisfies}(Z, \mathcal{L}(\mathrm{IOR})) \iff \mathrm{SatisfiesIOR}(Z, \mathrm{IOR})$$
+        (\texttt{Mbse.IORToLSC}; figure shows a presentation window unless noted)
   \item \textbf{Description:} $ior_desc
 \end{itemize}
 
@@ -285,6 +288,21 @@ def write_report_tex(doc: IsrPackageDoc, out_dir: Path) -> Path:
         impl_notes_sec = f"\n\\subsection*{{Implementation Notes}}\n{markdown_to_latex(doc.implements.notes)}\n"
 
     ior_desc_val = markdown_to_latex(doc.ior.description) if doc.ior.description else "\\textemdash"
+    lsc = doc.ior.lsc
+    ior_law = _escape_latex(lsc.law) if lsc and lsc.law else "\\textit{g $\\in$ er f (schematic)}"
+    ior_hnote = (
+        _escape_latex(lsc.horizon_note)
+        if lsc and lsc.horizon_note
+        else "\\textit{schematic characteristic only}"
+    )
+    if lsc and lsc.paths:
+        ior_paths = ", ".join(
+            f"\\texttt{{{_escape_latex(p.id)}}}" for p in lsc.paths
+        )
+    elif lsc and lsc.from_presentation:
+        ior_paths = "\\textit{(elements only)}"
+    else:
+        ior_paths = "\\textit{none (schematic characteristic only)}"
 
     tex = _REPORT_TEMPLATE.substitute(
         color_defs=theme.COLOR_DEFS,
@@ -297,6 +315,9 @@ def write_report_tex(doc: IsrPackageDoc, out_dir: Path) -> Path:
         ior_horizon=_escape_latex(doc.ior.horizon),
         ior_in=_escape_latex(doc.ior.input_type or "---"),
         ior_out=_escape_latex(doc.ior.output_type or "---"),
+        ior_law=ior_law,
+        ior_horizon_note=ior_hnote,
+        ior_paths=ior_paths,
         ior_desc=ior_desc_val,
         functional_system=_escape_latex(doc.functional_system),
         buildable_system=_escape_latex(doc.buildable_system),

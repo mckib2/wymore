@@ -83,12 +83,32 @@ class CouplingDoc:
 
 
 @dataclass
+class LscElementDoc:
+    kind: str  # inMsg | outMsg | outSymbolic | condition | tickSync | silenceOut
+    temp: str = ""
+    tick: int | None = None
+    value: str = ""
+    label: str = ""
+
+
+@dataclass
+class LscPathDoc:
+    id: str
+    elements: list[LscElementDoc] = field(default_factory=list)
+
+
+@dataclass
 class LscDoc:
     chart_name: str = ""
     pre_condition: str = ""
     main_condition: str = ""
     in_message: str = ""
     out_message: str = ""
+    law: str = ""
+    horizon_note: str = ""
+    elements: list[LscElementDoc] = field(default_factory=list)
+    paths: list[LscPathDoc] = field(default_factory=list)
+    from_presentation: bool = False
 
 
 @dataclass
@@ -226,12 +246,58 @@ def load_isr_package(data: dict[str, Any]) -> IsrPackageDoc:
     lsc_obj = None
     lsc_raw = ior_raw.get("lsc")
     if isinstance(lsc_raw, dict):
+        def _parse_elem(raw: Any, ctx: str) -> LscElementDoc:
+            if not isinstance(raw, dict):
+                raise SchemaError(f"{ctx}: element must be an object")
+            tick_raw = raw.get("tick")
+            tick: int | None
+            if tick_raw is None:
+                tick = None
+            elif isinstance(tick_raw, int) and not isinstance(tick_raw, bool):
+                tick = tick_raw
+            elif isinstance(tick_raw, float) and tick_raw == int(tick_raw):
+                tick = int(tick_raw)
+            else:
+                raise SchemaError(f"{ctx}: tick must be int or null")
+            return LscElementDoc(
+                kind=_req_str(raw, "kind", ctx),
+                temp=_opt_str(raw, "temp"),
+                tick=tick,
+                value=_opt_str(raw, "value"),
+                label=_opt_str(raw, "label"),
+            )
+
+        def _parse_path(raw: Any, ctx: str) -> LscPathDoc:
+            if not isinstance(raw, dict):
+                raise SchemaError(f"{ctx}: path must be an object")
+            elems = [
+                _parse_elem(e, f"{ctx}.elements")
+                for e in raw.get("elements", [])
+            ]
+            return LscPathDoc(id=_req_str(raw, "id", ctx), elements=elems)
+
+        elems = [
+            _parse_elem(e, "ior.lsc.elements")
+            for e in lsc_raw.get("elements", [])
+        ]
+        paths = [
+            _parse_path(p, "ior.lsc.paths")
+            for p in lsc_raw.get("paths", [])
+        ]
+        from_pres = lsc_raw.get("fromPresentation", False)
+        if not isinstance(from_pres, bool):
+            raise SchemaError("ior.lsc.fromPresentation must be a bool")
         lsc_obj = LscDoc(
             chart_name=_opt_str(lsc_raw, "chartName"),
             pre_condition=_opt_str(lsc_raw, "preCondition"),
             main_condition=_opt_str(lsc_raw, "mainCondition"),
             in_message=_opt_str(lsc_raw, "inMessage"),
             out_message=_opt_str(lsc_raw, "outMessage"),
+            law=_opt_str(lsc_raw, "law"),
+            horizon_note=_opt_str(lsc_raw, "horizonNote"),
+            elements=elems,
+            paths=paths,
+            from_presentation=from_pres,
         )
 
     ior = IorDoc(
