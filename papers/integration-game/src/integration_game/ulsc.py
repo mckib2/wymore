@@ -59,7 +59,7 @@ class TBAEvaluationResult:
 
 class RewardMachine:
     """
-    Explicit Reward Machine compiled from a Universal LSC.
+    Explicit Reward Machine compiled from a uLSC.
     States: IDLE_WAIT_PRE → PRE_MATCHING → MAIN_ACTIVE → COMPLETED | BREACH
     (SILENCE_CHECK is transient on ticks with output while obligations idle.)
     """

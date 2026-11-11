@@ -2,14 +2,13 @@
 Example 4: Multi-Representation Tactical Data Link Gateway.
 Exercises:
   - Producer 1 (Legacy 1553 Bus): offers TrueAirspeed in (Knots, FixedPoint_Q12.4)
-    packaged as MIL_STD_1553 word representation.
+    as a PyObject ABI payload on a MIL-STD-1553 Route Carrier.
   - Producer 2 (Weather Service): offers WindSpeed in (Knots, float32)
-    with multi-representation capability (XML_UTF8, BYTE_BLOB_JSON).
-  - Consumer (Modern Mission Display): has two Needs (`tas_in` and `wind_in`),
-    each accepting multiple modern binary representations {BYTE_BLOB_PROTO, CDR_DDS}
-    in `float32`.
-  - Requires two-stage transcode + platform widening on Stream 1
-    (1553 -> NATIVE_STRUCT -> float32 -> CDR_DDS) and JSON -> PROTOBUF on Stream 2,
+    with multi-ABI capability (XML_UTF8 / BYTE_BLOB_JSON Python objects).
+  - Consumer (Modern Mission Display): Needs accept DDS language bindings /
+    protobuf-backed objects {BYTE_BLOB_PROTO, DDS_BINDING} in float32.
+  - Requires multi-hop ABI marshaling + platform widening on Stream 1
+    (PyObject -> C_ABI -> float32 -> DDS_BINDING) and JSON-object -> PROTO on Stream 2,
     monitored simultaneously by a CompositeLSC.
 """
 from __future__ import annotations
@@ -42,7 +41,7 @@ def example_04_multi_rep() -> List[ScoreBreakdown]:
     c_tas_f32 = Color("Airframe.TrueAirspeed", "Knots", "float32")
     c_wind = Color("Atmosphere.WindSpeed", "Knots", "float32")
 
-    modern_reps = (Representation.BYTE_BLOB_PROTO, Representation.CDR_DDS)
+    modern_reps = (Representation.BYTE_BLOB_PROTO, Representation.DDS_BINDING)
     horizon = 4
 
     # Q12.4 fixed-point encoding: integer raw = int(round(knots * 16))
@@ -53,7 +52,7 @@ def example_04_multi_rep() -> List[ScoreBreakdown]:
                     int((250.0 + 5.0 * t) * 16),
                     c_tas_q,
                     Dynamics("Bus1553.out", 1.0),
-                    representation=Representation.MIL_STD_1553,
+                    representation=Representation.PY_OBJECT,
                     provenance=Provenance(("Bus1553",), timestamp_tick=t),
                 )
             ),
@@ -102,7 +101,7 @@ def example_04_multi_rep() -> List[ScoreBreakdown]:
                 "Bus1553",
                 "out",
                 c_tas_q,
-                rep=Representation.MIL_STD_1553,
+                rep=Representation.PY_OBJECT,
             )
         )
         b.add_component(
@@ -146,14 +145,14 @@ def example_04_multi_rep() -> List[ScoreBreakdown]:
     b1.connect("JSON2Proto.out", "DisplayWind.in")
     snaps.append(ev.evaluate(b1, comp_lsc, scenario, "S1: Wind JSON->Protobuf wired (50% cut)"))
 
-    # S2: Stream 1 unpacked (1553 -> NATIVE_STRUCT) and widened (Q12.4 -> float32), but still NATIVE_STRUCT
+    # S2: Stream 1 unpacked (PyObject -> C_ABI) and widened (Q12.4 -> float32); still needs DDS binding
     b2 = b1.clone("Ex4_S2")
     b2.add_component(
         RepresentationBridgeBlock(
             "Unpack1553",
             c_tas_q,
-            Representation.MIL_STD_1553,
-            Representation.NATIVE_STRUCT,
+            Representation.PY_OBJECT,
+            Representation.C_ABI,
             decode_fn=int,
         )
     )
@@ -163,20 +162,21 @@ def example_04_multi_rep() -> List[ScoreBreakdown]:
             c_tas_q,
             c_tas_f32,
             value_fn=lambda raw: float(raw) / 16.0,
+            rep=Representation.C_ABI,
         )
     )
     b2.connect("Bus1553.out", "Unpack1553.in")
     b2.connect("Unpack1553.out", "WidenQ12_4.in")
     snaps.append(ev.evaluate(b2, comp_lsc, scenario, "S2: +1553 unpack & Q12.4->f32 (rep gap)"))
 
-    # S3: Append NATIVE_STRUCT -> CDR_DDS serializer on Stream 1 and wire to DisplayTAS (WIN)
+    # S3: Append C_ABI -> DDS_BINDING marshaling on Stream 1 and wire to DisplayTAS (WIN)
     b3 = b2.clone("Ex4_S3")
     b3.add_component(
         RepresentationBridgeBlock(
             "Nat2CDR",
             c_tas_f32,
-            Representation.NATIVE_STRUCT,
-            Representation.CDR_DDS,
+            Representation.C_ABI,
+            Representation.DDS_BINDING,
             decode_fn=float,
         )
     )

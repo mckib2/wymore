@@ -1,7 +1,7 @@
 """
 Example 15: Industrial-flavored FACE/SOSA-style multi-bus holdout.
-MIL-STD-1553 aircraft status (JSON-wrapped on a legacy bus) must feed a
-DDS/native guidance consumer needing airspeed in knots as float64.
+PyObject ABI payloads transported on a MIL-STD-1553 Route Carrier must feed a
+C-ABI guidance consumer needing airspeed in knots as float64.
 Used as external-validity holdout for offline synthesis agents.
 """
 from __future__ import annotations
@@ -45,7 +45,7 @@ def example_15_industrial_avionics() -> List[ScoreBreakdown]:
                     json.dumps({"ias_mps": v}),
                     c_bus,
                     Dynamics("Bus1553.out", 1.0),
-                    representation=Representation.MIL_STD_1553,
+                    representation=Representation.PY_OBJECT,
                     provenance=Provenance(("Bus1553",), timestamp_tick=t, trust_score=0.85),
                 )
             )
@@ -77,14 +77,14 @@ def example_15_industrial_avionics() -> List[ScoreBreakdown]:
                 "Bus1553",
                 "out",
                 c_bus,
-                rep=Representation.MIL_STD_1553,
+                rep=Representation.PY_OBJECT,
             )
         )
         b.add_component(
             ConsumerBoundary(
                 "Guidance",
                 "in",
-                MessageShape.single(c_dds_kt64, reps=(Representation.NATIVE_STRUCT,)),
+                MessageShape.single(c_dds_kt64, reps=(Representation.C_ABI,)),
                 mode=TransferMode.PULL,
                 pull_schedule=lambda t: True,
             )
@@ -104,16 +104,28 @@ def example_15_industrial_avionics() -> List[ScoreBreakdown]:
             RepresentationBridgeBlock(
                 "1553_Decode",
                 c_bus,
-                Representation.MIL_STD_1553,
-                Representation.NATIVE_STRUCT,
+                Representation.PY_OBJECT,
+                Representation.C_ABI,
                 decode_fn=lambda s: float(json.loads(s)["ias_mps"]),
             )
         )
-        b.add_component(RecolorBlock("Recolor_C", c_bus, c_dds_ms, value_fn=float))
         b.add_component(
-            RecolorBlock("Recolor_L", c_dds_ms, c_dds_kt, value_fn=lambda x: round(x * 1.94384, 4))
+            RecolorBlock("Recolor_C", c_bus, c_dds_ms, value_fn=float, rep=Representation.C_ABI)
         )
-        b.add_component(RecolorBlock("Recolor_P", c_dds_kt, c_dds_kt64, value_fn=float))
+        b.add_component(
+            RecolorBlock(
+                "Recolor_L",
+                c_dds_ms,
+                c_dds_kt,
+                value_fn=lambda x: round(x * 1.94384, 4),
+                rep=Representation.C_ABI,
+            )
+        )
+        b.add_component(
+            RecolorBlock(
+                "Recolor_P", c_dds_kt, c_dds_kt64, value_fn=float, rep=Representation.C_ABI
+            )
+        )
         b.connect("Bus1553.out", "1553_Decode.in")
         b.connect("1553_Decode.out", "Recolor_C.in")
         b.connect("Recolor_C.out", "Recolor_L.in")
@@ -128,7 +140,9 @@ def example_15_industrial_avionics() -> List[ScoreBreakdown]:
     b3 = Board("Ex15_S3")
     bounds(b3)
     chain(b3)
-    b3.add_component(CacheStoreBlock("Latch", c_dds_kt64, retain_on_read=False))
+    b3.add_component(
+        CacheStoreBlock("Latch", c_dds_kt64, retain_on_read=False, rep=Representation.C_ABI)
+    )
     b3.connect("Recolor_P.out", "Latch.in")
     b3.connect("Latch.out", "Guidance.in")
     snaps.append(ev.evaluate(b3, ulsc, scenario, "S3: +Consume latch (WIN)"))

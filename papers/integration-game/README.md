@@ -1,7 +1,7 @@
 # The Integration Game — Python Reference Implementation
 
 Proof-of-concept simulator for the Wymorian **Integration Game**: place mediation
-components, wire Offer→Need routes, and evaluate plays against a Universal LSC
+components, wire Offer→Need routes, and evaluate plays against a uLSC
 compiled into a Timed Büchi / Reward Machine monitor.
 
 Authoritative ontology: [`src/integration_game/ONTOLOGY.md`](src/integration_game/ONTOLOGY.md).

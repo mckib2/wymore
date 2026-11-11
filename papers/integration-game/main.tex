@@ -5,80 +5,46 @@
 % systems-engineering terminology and mathematical notation:
 %
 % 1. INTERACTING SYSTEMS & BOUNDARY PORTS
-%    - Producer (Z_A) and Consumer (Z_B): Discrete component systems whose
-%      interfaces are to be integrated. Avoid "sender/receiver" or "source/sink"
-%      when referring to the boundary systems.
-%    - Offer (O_i \in \mathcal{O}) and Need (N_j \in \mathcal{N}): Directional
-%      interface declarations exposed by a Producer (Offer) or required by a
-%      Consumer (Need). An Offer or Need comprises one or more typed Fields.
-%    - Field (f = (c, \mathbf{k}, \mathbf{d})): The atomic unit of mediated
-%      information, characterized by its Semantic Color c, Flow Kinematics
-%      \mathbf{k}, and Runtime Payload Metadata \mathbf{d} (representation
-%      encoding \rho and provenance \pi).
-%    - Message: A structured aggregation of Fields (Record, Sequence, or Choice)
-%      conveyed across a port boundary.
+%    - Producer / Consumer: Roles of discrete component systems w.r.t. a data
+%      exchange (a subsystem may be both). Avoid "sender/receiver".
+%    - Offer (O_i \in \mathcal{O}) / Need (N_j \in \mathcal{N}): Output / input
+%      interface contracts comprising typed Fields.
+%    - Message: Record / Sequence / Choice aggregation of Fields.
+%    - Field: Atomic mediated unit typed by Stateful Color \kappa, carrying
+%      runtime value v_val.
 %
-% 2. SEMANTIC COLOR & FLOW KINEMATICS
-%    - Semantic Color (c = (C, L, P) \in \mathcal{C}): The three-tier UDDL
-%      semantic type of a Field:
-%        * Conceptual Entity (C \in \mathbb{C}): Observable phenomenon and
-%          entity-association path in the Conceptual Data Model (CDM).
-%        * Logical Frame (L \in \mathbb{L}): Measurement system, coordinate
-%          reference frame, value domain, and unit in the Logical Data Model (LDM).
-%        * Platform Realization (P \in \mathbb{P}): Numerical precision, bit
-%          layout, and data type in the Platform Data Model (PDM).
-%    - Flow Kinematics (\mathbf{k} = (x, v, a)): The interaction flow profile
-%      of a Field at a port, recording topological locus x, flow velocity v
-%      (kinetic push flow v > 0 vs. stationary pull potential v = 0), and flow
-%      acceleration a = \Delta v / \Delta t (impulsive mode transitions across
-%      stores/pumps and rate-mismatch exposure across multi-rate boundaries).
-%    - Route Carrier: The transport medium of a connection (e.g., in-process,
-%      shared-memory tree, or inter-process channel), distinct from Semantic Color.
+% 2. UNIFIED STATEFUL COLOR
+%    - Stateful Color \kappa = (C, L, P, \rho, k, \pi) \in \mathcal{K}:
+%        * (C, L, P): UDDL Conceptual / Logical / Platform axes.
+%        * \rho \in \mathbb{R}_{rep}: In-memory / language-ABI realization
+%          (C-ABI, PyObject*, JVM, DDS binding) — NOT wire serialization.
+%          Platform P is abstract machine type/precision (e.g. binary64).
+%        * k = (x, v, a): Flow Kinematics (locus, push/pull velocity, accel.).
+%        * \pi: Provenance / lineage / assurance.
+%    - Route Carrier (r \in \mathcal{E}_{route}): Transport edge (shared memory,
+%      ring buffer, DDS topic, MIL-STD-1553, …); incurs c_carrier(r); never
+%      alters \kappa. Distinct from Mediation Operators which may recolor.
 %
 % 3. MEDIATION ARCHITECTURE & WYMORIAN COUPLING
-%    - Technology Catalog (TYR_{\mathcal{C}}): The color-refined Wymorian
-%      buildability catalog containing Producer/Consumer capabilities and
-%      reusable Mediation Operators.
-%    - Mediation Operator (v \in \mathcal{V}_{\text{op}}): A discrete component
-%      system from TYR_{\mathcal{C}} placed on the interior of the board,
-%      classified into four move families:
-%        (i)   Semantic & Representation Recoloring (\Delta C, \Delta L, \Delta P, \Delta \rho)
-%        (ii)  Structural Aggregation (Assemble, Disassemble, Project, Inject)
-%        (iii) Computational Derivation & Filtering (Derive, Filter/Validate)
-%        (iv)  Topology, Storage & Flow Mediation (Fan/Join, Store, Mode Bridge, Stale Gate)
-%    - Mediation Board (\mathcal{B} = (\mathcal{O}, \mathcal{N}, \mathcal{V}_{\text{op}}, \mathcal{E}_{\text{route}})):
-%      The directed mediation graph under construction.
-%    - Play (\mathcal{P}): A candidate wiring on the Mediation Board, forming a
-%      semantics-refined System Coupling Recipe SCR = (VSCR, CSCR).
-%    - Coupled Resultant (Z_b = \mathrm{RSY}(\mathcal{P})): The unique discrete
-%      system induced by synchronous composition of the Play.
+%    - Technology Catalog TYR_{\mathcal{K}}: Color-refined buildability catalog.
+%    - Mediation Operator families: (i) Stateful Recoloring incl. \Delta\rho
+%      Runtime Representation Binding/Marshaling; (ii) Structural Aggregation;
+%      (iii) Derivation & Filtering; (iv) Topology, Storage & Flow Mediation.
+%    - Mediation Board \mathcal{B} = (\mathcal{O}, \mathcal{N}, \mathcal{V}_{op},
+%      \mathcal{E}_{route}); Play \mathcal{P}; Coupled Resultant Z_b = RSY(P).
 %
 % 4. BEHAVIORAL CONTRACTS, WINNING CONDITIONS, AND TRADE-OFF COST
-%    - Input/Output Requirement (IOR = (OLR, IR, ITR, OR, OTR, ER)): Wymore's
-%      problem-space behavioral specification over operational horizon TSR.
-%    - Universal Live Sequence Chart (uLSC, \mathcal{L}(IOR) = (\tau, \mathcal{P}_{\text{in}}, \mathcal{A}_{\text{out}})):
-%      Behavioral contract pairing a cold Pre-Chart trigger
-%      (\mathcal{P}_{\text{in}}) with a hot Main-Chart guarantee (\mathcal{A}_{\text{out}}).
-%    - Hot Breach: Any violation of the Main-Chart value envelope, delivery
-%      deadline, or quiet-tick silence obligation following Pre-Chart activation.
-%    - Three-Tier Winning Condition:
-%        * Tier 1 (Static Semantic & Structural Compatibility): Complete Field
-%          coverage with aligned Semantic Colors (C, L, P), representations \rho,
-%          and provenance \pi.
-%        * Tier 2 (Flow & Kinematic Compatibility): Mutually compatible push/pull
-%          transfer modes, positive buffer capacities, and consistent time bases.
-%        * Tier 3 (Behavioral Contract Satisfaction): Zero Hot Breaches of
-%          \mathcal{L}(IOR) by the Coupled Resultant Z_b over the verification
-%          suite ITR_{\text{test}} (and across all trajectories in the certified
-%          symbolic fragment).
-%    - Integration Cost Functional (\mathcal{J}(\mathcal{P})) and Fitness Score (\mathcal{S}(\mathcal{P})):
-%      Generalized Wymorian trade-off functional combining Tier 1/2 frontier
-%      potentials, Static Construction Cost C_{\text{static}}, Dynamic Operational
-%      Cost C_{\text{dyn}}, and Behavioral Breach Penalty C_{\text{breach}},
-%      governed by axioms (A1)--(A7).
-%    - uLSC Reward Machine (\mathcal{M}_{\text{LSC}}): The finite-state monitor
-%      automaton compiled from \mathcal{L}(IOR) whose state u_t augments the
-%      environment state \tilde{s}_t = (s_t, u_t) to restore the Markov property.
+%    - IOR = (OLR, IR, ITR, OR, OTR, ER) with OLR \in \mathbb{N}^+ \cup \{\infty\}
+%      and TSR = \{t \in \mathbb{N} | t < OLR\} (so OLR=\infty \Rightarrow TSR=\mathbb{N}).
+%    - uLSC \mathcal{L}(IOR) = (\tau, \mathcal{P}_{in}, \mathcal{A}_{out}): cold
+%      Pre-Chart / hot Main-Chart over \omega-trajectories; equiv. to IOR even
+%      for infinite horizons (Theorem thm:ior-lsc).
+%    - Winning tiers: (1) Stateful Color match; (2) kinematics; (3) SatisfiesLSC.
+%    - \mathcal{J}(\mathcal{P}) with explicit J_{tier1,2} via \Delta_\kappa; fitness
+%      \mathcal{S}(\mathcal{P}) strictly decreasing map of soft-\mathcal{J}.
+%    - Finite TYR_{\mathcal{K}} \Rightarrow decidable Breach reachability even for
+%      OLR=\infty; CEGIS bridges ITR_test vs symbolic certification.
+%    - uLSC Reward Machine \mathcal{M}_{LSC}: monitor state u_t augments MDP.
 % =============================================================================
 
 \documentclass{cser27}
@@ -139,7 +105,7 @@
 \maketitle
 
 \begin{abstract}
-The adoption of a Modular Open Systems Approach (MOSA) is intended to enable rapid capability insertion and multi-vendor interoperability across complex cyber-physical systems.  In practice, however, conformance to open architectural standards alone has not yielded plug-and-play integration: modular interfaces routinely diverge across semantics, measurement frames, platform encodings, and interaction dynamics.  Resolving these discrepancies remains a predominantly manual and often costly systems engineering activity.  To this end, we introduce \emph{The Integration Game}, a methodology for automated, semantically-enabled system integration based on A.~Wayne Wymore's Tricotyledon Theory of System Design (T3SD) using ontologies modeled using the Open Universal Domain Description Language (UDDL)\textsuperscript{\textregistered}.  We formulate data Producers, Consumers, and Mediation Operators as Wymorian buildable technologies in which interfaces are typed by a multi-dimensional Semantic Color (Conceptual, Logical, and Platform) together with Flow Kinematics.  Behavioral satisfiability of the Coupled Resultant is evaluated against an Input/Output Requirement (IOR), represented by a Universal Live Sequence Chart (uLSC).  We use a finite-state Reward Machine and trajectory evaluation with Counterexample-Guided Inductive Synthesis (CEGIS) to guide automated system integration, demonstrating across a fifteen-scenario verification suite that learning-guided synthesis reliably finds satisfiable and efficient system couplings under MOSA principles.
+The adoption of a Modular Open Systems Approach (MOSA) is intended to enable rapid capability insertion and multi-vendor interoperability across complex cyber-physical systems.  In practice, however, conformance to open architectural standards alone has not yielded plug-and-play integration: modular interfaces routinely diverge across semantics, measurement frames, platform encodings, and interaction dynamics.  Resolving these discrepancies remains a predominantly manual and often costly systems engineering activity.  To this end, we introduce \emph{The Integration Game}, a methodology for automated, semantically-enabled system integration based on A.~Wayne Wymore's Tricotyledon Theory of System Design (T3SD) using ontologies based on the Open Universal Domain Description Language (UDDL)\textsuperscript{\textregistered}.  We formulate data Producers, Consumers, and Mediation Operators as Wymorian buildable technologies whose interfaces are typed by a stateful Color $\kappa = (C, L, P, \rho, k, \pi)$ combining UDDL Conceptual/Logical/Platform axes with runtime representation, Flow Kinematics, and provenance.  Behavioral satisfiability of the Coupled Resultant is evaluated against an Input/Output Requirement (IOR), represented equivalently by a Universal Live Sequence Chart (uLSC).  We use a finite-state Reward Machine and Counterexample-Guided Inductive Synthesis (CEGIS) to guide automated system integration, demonstrating across a fifteen-scenario verification suite that learning-guided synthesis reliably finds satisfiable and efficient system couplings under MOSA principles.
 \end{abstract}
 
 \keywords{modular open systems approach, systems integration, Tricotyledon Theory of System Design, UDDL, Live Sequence Charts, reinforcement learning}
@@ -152,7 +118,7 @@ The adoption of a Modular Open Systems Approach (MOSA) is intended to enable rap
 \input{sections/04-discussion.tex}
 \input{sections/05-conclusion.tex}
 
-% Acknowledgments (if added) must be wrapped so the Makefile word count
+% Acknowledgments (if present) should be wrapped so the Makefile word count
 % excludes them:
 %   %TC:ignore
 %   \section*{Acknowledgments}

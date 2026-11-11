@@ -329,7 +329,7 @@ class RecolorBlock(WymorianComponent):
 
 
 class RepresentationBridgeBlock(WymorianComponent):
-    """Transcode_Rep: change ρ without altering (C,L,P). Supports single-slot or full RECORD shapes."""
+    """Runtime Representation Binding/Marshaling (Δρ): change ABI ρ without altering (C,L,P)."""
 
     def __init__(
         self,

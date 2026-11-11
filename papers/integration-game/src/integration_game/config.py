@@ -26,10 +26,13 @@ class ColorDistanceConfig:
 
 @dataclass(frozen=True)
 class CarrierCostConfig:
-    """Static route transport costs per Carrier kind."""
+    """Static Route Carrier transport costs (never Color axes)."""
     in_process: float = 0.0
+    shared_memory: float = 0.2
     generic_tree: float = 0.5
     ipc_serialized: float = 3.0
+    mil_std_1553: float = 4.0
+    dds_topic: float = 2.5
     generic_tree_threshold: float = 0.5
     ipc_threshold: float = 3.0
 

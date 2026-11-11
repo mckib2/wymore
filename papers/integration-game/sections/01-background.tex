@@ -2,13 +2,7 @@
 
 \subsection{Data Semantics} \label{sec:bg-uddl}
 
-Open architecture standards such as FACE and SOSA~\cite{OpenGroup2023FACE, SOSAConsortium2023} provide portable component and sensor reference architectures that include data-model provisions, yet syntactic interface definitions alone cannot guarantee semantic interoperability.  For example, while two subsystems may exchange message structures containing identical 32-bit floating-point vectors, they may disagree on whether those values represent geodetic coordinates or body-frame velocities, whether angles are measured in radians or degrees, whether the reported quantity characterizes the host vehicle or a tracked target, etc.  To eliminate these ambiguities, the Open Universal Domain Description Language (UDDL)\textsuperscript{\textregistered} defines a layered data modeling architecture that separates domain meaning from measurement convention and machine representation~\cite{OpenGroup2023UDDL}:
-
-\begin{itemize}[topsep=2pt, itemsep=1pt, leftmargin=1.8em]
-    \item \textbf{Conceptual Data Model (CDM):} Captures abstract domain phenomena.  Its primitives are \emph{Observables} (fundamental phenomena such as position, velocity, or temperature).  Domain concepts are modeled as \emph{Entities} (which compose Observables or other Entities via directed \emph{Compositions}) and \emph{Associations} (reified $n$-ary relations).  A conceptual \emph{Query} projects characteristics of Entities along navigational paths through the CDM to establish the exact semantic context of a datum (e.g., ``the position of a sensor mounted on an aircraft'')~\cite{OpenGroup2023UDDL}.
-    \item \textbf{Logical Data Model (LDM):} Realizes conceptual elements by supplying the frames of reference required to interpret values, specifying \emph{Measurement Systems}, \emph{Coordinate Systems}, \emph{Reference Points}, \emph{Value Domains}, and \emph{Units} (e.g., WGS84 geodetic coordinates versus an aircraft body-centered North--East--Down frame).
-    \item \textbf{Platform Data Model (PDM):} Realizes logical elements in concrete computational representations, specifying primitive data types and numerical precision.
-\end{itemize}
+Open architecture standards such as FACE and SOSA~\cite{OpenGroup2023FACE, SOSAConsortium2023} provide portable component and sensor reference architectures that include data-model provisions, as syntactic interface definitions alone do not in general guarantee semantic interoperability.  The Open Universal Domain Description Language (UDDL)\textsuperscript{\textregistered} addresses semantic interoperability with a layered data modeling architecture~\cite{OpenGroup2023UDDL}: a Conceptual Data Model (CDM) of Entities, Observables, and Associations; a Logical Data Model (LDM) of measurement systems, coordinate frames, value domains, and units; and a Platform Data Model (PDM) of abstract machine types and numerical precision.  Queries point to specific semantic paths in the model, establishing a context for data and meaning.  Fig.~\ref{fig:uddl-three-tier} illustrates how an aircraft-mounted sensor Offer and Need can diverge across these tiers even when both sides expose floating-point position vectors.  We will use the concept of layered data semantics $(C, L, P)$ in a broader Stateful Color (Section~\ref{sec:meth-isomorphism}) that will additionally consider runtime representation, flow kinematics, and provenance.
 
 \begin{figure}[t]
 \centering
@@ -23,26 +17,21 @@ Open architecture standards such as FACE and SOSA~\cite{OpenGroup2023FACE, SOSAC
     tierdelta/.style={<->, dashed, semithick, draw=black!50},
     gaparrow/.style={<->, very thick, dashed, draw=hotRed}
 ]
-    % CDM Layer
     \node[cdmnode] (c1) at (0, 3.0) {\textbf{CDM Concept $C_1$}\\[0pt]\scriptsize \texttt{Aircraft.position}};
     \node[cdmnode] (c2) at (9.2, 3.0) {\textbf{CDM Concept $C_2$}\\[0pt]\scriptsize \texttt{Aircraft.sensor.position}};
     \draw[->, thick, draw=poiPurple!80!black] (c1.east) -- node[above=1pt, font=\scriptsize] {\texttt{.sensor} composition ($\Delta C$)} (c2.west);
 
-    % LDM Layer
     \node[ldmnode] (l1) at (0, 1.65) {\textbf{LDM Frame $L_1$}\\[0pt]\scriptsize WGS84 Geodetic (rad, m)};
     \node[ldmnode] (l2) at (9.2, 1.65) {\textbf{LDM Frame $L_2$}\\[0pt]\scriptsize Body Frame NED (m)};
     \draw[tierdelta, draw=fsrBlue!75!black] (l1.east) -- node[above=1pt, font=\scriptsize, text=fsrBlue!85!black] {Frame \& Unit Conversion ($\Delta L$)} (l2.west);
 
-    % PDM Layer
     \node[pdmnode] (p1) at (0, 0.30) {\textbf{PDM Encoding $P_1$}\\[0pt]\scriptsize IEEE-754 \texttt{binary64} struct};
     \node[pdmnode] (p2) at (9.2, 0.30) {\textbf{PDM Encoding $P_2$}\\[0pt]\scriptsize IEEE-754 \texttt{binary32} array};
     \draw[tierdelta, draw=bsrTeal!75!black] (p1.east) -- node[above=1pt, font=\scriptsize, text=bsrTeal!85!black] {Type \& Precision Cast ($\Delta P$)} (p2.west);
 
-    % Producer Offer and Consumer Need
-    \node[portbox, draw=techNavy] (offer) at (0, -1.10) {\textbf{Producer Offer Port}\\[0pt]\scriptsize Semantic Color $(C_1, L_1, P_1)$ $\vert$ \texttt{PUSH @ 50Hz}};
-    \node[portbox, draw=boundGreen] (need) at (9.2, -1.10) {\textbf{Consumer Need Port}\\[0pt]\scriptsize Semantic Color $(C_2, L_2, P_2)$ $\vert$ \texttt{PULL (On-Demand)}};
+    \node[portbox, draw=techNavy] (offer) at (0, -1.10) {\textbf{Producer Offer Port}\\[0pt]\scriptsize Stateful Color $\kappa$ incl.\ $(C_1, L_1, P_1)$ $\vert$ \texttt{PUSH}};
+    \node[portbox, draw=boundGreen] (need) at (9.2, -1.10) {\textbf{Consumer Need Port}\\[0pt]\scriptsize Stateful Color $\kappa$ incl.\ $(C_2, L_2, P_2)$ $\vert$ \texttt{PULL}};
 
-    % Realization arrows
     \draw[realize] (c1) -- node[left=2pt, font=\scriptsize] {realizes} (l1);
     \draw[realize] (l1) -- node[left=2pt, font=\scriptsize] {realizes} (p1);
     \draw[realize] (p1) -- node[left=2pt, font=\scriptsize] {exposes} (offer);
@@ -51,33 +40,22 @@ Open architecture standards such as FACE and SOSA~\cite{OpenGroup2023FACE, SOSAC
     \draw[realize] (l2) -- node[right=2pt, font=\scriptsize] {realizes} (p2);
     \draw[realize] (p2) -- node[right=2pt, font=\scriptsize] {requires} (need);
 
-    % Integration gap
-    \draw[gaparrow] (offer.east) -- node[above=1.5pt, font=\scriptsize\bfseries, text=hotRed] {Mediation Gap: $\Delta C, \Delta L, \Delta P$ + Flow} (need.west);
+    \draw[gaparrow] (offer.east) -- node[above=1.5pt, font=\scriptsize\bfseries, text=hotRed] {Mediation Gap over $\kappa$} (need.west);
 
-    % Layer labels on left
     \node[anchor=east, font=\scriptsize\bfseries, text=poiPurple!85!black] at (-2.2, 3.0) {Conceptual ($C$)};
     \node[anchor=east, font=\scriptsize\bfseries, text=fsrBlue!85!black] at (-2.2, 1.65) {Logical ($L$)};
     \node[anchor=east, font=\scriptsize\bfseries, text=bsrTeal!85!black] at (-2.2, 0.30) {Platform ($P$)};
     \node[anchor=east, font=\scriptsize\bfseries, text=compBorder] at (-2.2, -1.10) {Boundary Flow};
 \end{tikzpicture}
-\caption{The layered UDDL refinement hierarchy (Conceptual ($C$), Logical ($L$), and Platform ($P$)), illustrating how a Producer Offer and a Consumer Need can diverge across semantic context, coordinate frame, platform data type, and interaction flow kinematics.}
+\caption{UDDL refinement hierarchy (Conceptual, Logical, Platform) and the resulting Offer--Need mediation gap for an aircraft versus sensor-on-aircraft position exchange.}
 \label{fig:uddl-three-tier}
 \end{figure}
 
-In Fig.~\ref{fig:uddl-three-tier} we show how UDDL concepts relate to the methodology developed in this work.  Every \emph{Field} exposed at a component boundary is characterized along its semantic dimensions by a triple $c = (C, L, P)$, which we term its \emph{Semantic Color}.  Integration requires reconciling any differences across $(C, L, P)$.
-
 \subsection{T3SD} \label{sec:bg-t3sd}
 
-A.~Wayne Wymore's Tricotyledon Theory of System Design (T3SD) provides a comprehensive mathematical treatment of systems engineering that separates problem-space behavioral requirements from solution-space component assemblies~\cite{Wymore1993}.  Contemporary MBSE interpretations connect these T3SD constructs to state machines and model-based requirements engineering~\cite{salado2019wymore, salado2019mbse}.  In T3SD, a discrete system is a deterministic Moore-type port automaton defined by a quintuple $Z = (S, I, O, \delta, \rho)$, where $S$ is a nonempty state set, $I$ and $O$ are the input and output alphabets, $\delta : S \times I \to S$ is the next-state transition function, and $\rho : S \to O$ is the state readout map.  Given an initial state $s_0 \in S$ and an input trajectory $f : \mathbb{N} \to I$ over discrete ticks $t \in \mathbb{N}$, iterating $\delta$ produces a state trajectory $g(t)$ (with $g(0)=s_0$ and $g(t+1)=\delta(g(t),f(t))$) and a boundary output trajectory $y_Z(s_0, f)(t) = \rho(g(t))$.  Because $\rho$ depends solely on the current state $g(t)$, every discrete system obeys Moore causality: an input arriving at tick $t$ influences the readout output no earlier than tick $t+1$.
+A.~Wayne Wymore's Tricotyledon Theory of System Design (T3SD) separates problem-space behavioral requirements from solution-space component assemblies~\cite{Wymore1993}.  Contemporary MBSE interpretations connect these constructs to state machines and model-based requirements~\cite{salado2019wymore, salado2019mbse}.  In T3SD, a discrete system is a deterministic Moore-type port automaton $Z = (S, I, O, \delta, \rho_{\text{out}})$ whose readout depends only on the current state (Moore causality).
 
-T3SD organizes system design around three interacting spaces of systems, or \emph{cotyledons} (Fig.~\ref{fig:t3sd-mosa-bridge}).  Readers are heartily recommended to consult the original work, but we provide a brief refresher below:
-\begin{enumerate}[topsep=2pt, itemsep=1pt, leftmargin=1.8em]
-    \item \textbf{Functionality Cotyledon $\mathrm{CTL}(IOR)$:} Behavioral requirements are stated via an \emph{Input/Output Requirement} 6-tuple $IOR = (OLR,\allowbreak IR,\allowbreak ITR,\allowbreak OR,\allowbreak OTR,\allowbreak ER)$, where $OLR \in \mathbb{N}^+ \cup \{\infty\}$ specifies the operational length (inducing the operational time scale $TSR = \{t \in \mathbb{N} \mid t < OLR\}$), $IR$ and $OR$ are the required boundary I/O alphabets, $ITR \subseteq IR^{TSR}$ and $OTR \subseteq OR^{TSR}$ are admissible I/O trajectories, and $ER : ITR \to \mathcal{P}(OTR)$ is the \emph{eligibility relation} assigning to each admissible input trajectory $f \in ITR$ a nonempty envelope of acceptable output trajectories $ER(f) \subseteq OTR$.  A system $Z$ (initialized at $s_0 \in S$) satisfies $IOR$ over $T \subseteq TSR$, written $\mathrm{SatisfiesIOR}(Z, IOR, s_0, T)$, if for every scenario $f \in ITR$ and every total extension $h : \mathbb{N} \to IR$ agreeing with $f$ on $TSR$, there exists an eligible trajectory $g \in ER(f)$ such that $y_Z(s_0, h)(t) = g(t)$ for all $t \in T$.  The collection of all satisfying designs $D_f = (Z_f, s_0, T)$ form the functionality cotyledon $\mathrm{CTL}(IOR)$.
-
-    \item \textbf{Buildability Cotyledon $\mathrm{CTL}(TYR)$:} Solution-space architectures are assembled from a \emph{technology} catalog $TYR$ of available component systems.  A \emph{System Coupling Recipe} $SCR$ selects  component instances from $TYR$ and specifies how to connect component output ports to compatible input ports.  Composition of the connected components produces a unique \emph{Coupled Resultant} system $Z_b = \mathrm{RSY}(SCR)$.  All buildable designs $D_b = (Z_b, SCR)$ constructible from $TYR$ form the buildability cotyledon $\mathrm{CTL}(TYR)$.  Under MOSA, the catalog of modular components corresponds directly to $TYR$, while an integration architecture corresponds to a coupling recipe $SCR$.
-
-    \item \textbf{Implementability Cotyledon $\mathrm{CTL}(IOR, TYR)$:} Because a buildable Coupled Resultant $Z_b = \mathrm{RSY}(SCR)$ contains impementation details that may not be present in the abstract functional specification $Z_f \in \mathrm{CTL}(IOR)$, T3SD links the two spaces via \emph{system modes} and \emph{homomorphisms}.  A system $Z_m = (S_m, I_m, O_m, \delta_m, \rho_m)$ is a system mode of $Z_b$ ($Z_m \in \mathrm{SYSMO}(Z_b)$) if it embeds into $Z_b$ within an invariant operational regime.  A functional system $Z_f$ is a homomorphic image of $Z_m$ ($Z_m \twoheadrightarrow Z_f$) if there exist surjective maps $(h_S, h_I, h_O)$ that commute with transitions and readouts: $h_S(\delta_m(x, p)) = \delta_f(h_S(x), h_I(p))$ and $h_O(\rho_m(x)) = \rho_f(h_S(x))$.  Whenever such a mode and homomorphism exist, $Z_b$ \emph{implements} $Z_f$, placing $(D_f, D_b)$ in $\mathrm{CTL}(IOR, TYR)$.  When $Z_m$ and $Z_f$ share alphabets $(IR, OR)$ under identity port maps, any state homomorphism $h_S$ preserves $IOR$ satisfaction: $\mathrm{SatisfiesIOR}(Z_m, IOR, s_0, T) \iff \mathrm{SatisfiesIOR}(Z_f, IOR, h_S(s_0), T)$.  Consequently, if an operational mode $Z_m$ of the Coupled Resultant directly satisfies $IOR$ at its exterior ports, $Z_m$ is itself a member of $\mathrm{CTL}(IOR)$ and implements itself via the identity homomorphism, establishing implementability without requiring manual construction of an intermediate functional state machine $Z_f$.  To rank competing implementable designs, T3SD introduces \emph{Performance Requirements} ($PR$), \emph{Cost Requirements} ($CR$), and \emph{Trade-off Requirements} ($TR$).
-\end{enumerate}
+System design in T3SD is organized around three cotyledons (or spaces of system designs) (Fig.~\ref{fig:t3sd-mosa-bridge}).  The functionality cotyledon $\mathrm{CTL}(IOR)$ collects designs that satisfy an Input/Output Requirement $IOR = (OLR, IR, ITR, OR, OTR, ER)$, where $OLR \in \mathbb{N}^+ \cup \{\infty\}$ induces the operational timescale $TSR = \{t \in \mathbb{N} \mid t < OLR\}$ (so $OLR = \infty$ yields $TSR = \mathbb{N}$), and $ER$ assigns each admissible input trajectory an envelope of acceptable outputs.  The buildability cotyledon $\mathrm{CTL}(TYR)$ comprises Coupled Resultants $Z_b = \mathrm{RSY}(SCR)$ assembled from a technology catalog $TYR$ via System Coupling Recipes; under MOSA, modular components play the role of $TYR$.  The implementability cotyledon $\mathrm{CTL}(IOR, TYR)$ links the two spaces.  When an operational mode of $Z_b$ already satisfies $IOR$ at its exterior ports under shared alphabets, it implements itself via the identity homomorphism, i.e., no intermediate functional state machine need be constructed by hand.  Competing implementable designs can then be ranked by Performance, Cost, and Trade-off Requirements ($PR$, $CR$, $TR$).
 
 \begin{figure}[t]
 \centering
@@ -89,132 +67,47 @@ T3SD organizes system design around three interacting spaces of systems, or \emp
     isrbox/.style={draw=poiPurple, fill=poiPurple!8, thick, rounded corners=4pt, minimum width=8.6cm, minimum height=1.05cm, align=center},
     rlbox/.style={draw=accentAmber!90!black, fill=accentAmber!10, very thick, rounded corners=4pt, minimum width=5.4cm, minimum height=1.00cm, align=center}
 ]
-    % Top Left: Functionality
     \node[fsrbox] (fsr) at (0, 2.5) {
         \textbf{Functionality Space $\mathrm{CTL}(IOR)$}\\[1pt]
         {\scriptsize $IOR = (OLR, IR, ITR, OR, OTR, ER) \to \mathcal{L}(IOR)$}
     };
-
-    % Top Right: Buildability (MOSA)
     \node[bsrbox] (bsr) at (9.6, 2.5) {
         \textbf{Buildability Space $\mathrm{CTL}(TYR_{\mathcal{C}})$}\\[1pt]
         {\scriptsize Technology Catalog $TYR_{\mathcal{C}} \to Z_b = \mathrm{RSY}(\mathcal{P})$}
     };
-
-    % Center: RL Engine
     \node[rlbox] (rl) at (4.8, 0.85) {
         \textbf{Integration Game \& RL Policy $\pi_\theta$}\\[1pt]
         {\scriptsize Synthesizes Play $\mathcal{P}$ \& Runtime Control}
     };
-
-    % Bottom: Implementability
     \node[isrbox] (isr) at (4.8, -0.75) {
         \textbf{Implementable System Design $\mathrm{CTL}(IOR, TYR_{\mathcal{C}})$}\\[1pt]
-        {\scriptsize $Z_m \in \mathrm{SYSMO}(Z_b)$ satisfies $\mathcal{L}(IOR)$ and optimizes Trade-off $\mathcal{J}$ ($PR, CR, TR$)}
+        {\scriptsize $Z_b$ satisfies $\mathcal{L}(IOR)$ and optimizes Trade-off $\mathcal{J}$ ($PR, CR, TR$)}
     };
-
-    % Arrows
     \draw[->, thick, draw=fsrBlue] (fsr.south) |- (rl.west) node[pos=0.30, left=3pt, font=\scriptsize, text=fsrBlue!90!black] {uLSC Reward Machine};
     \draw[->, thick, draw=bsrTeal] (bsr.south) |- (rl.east) node[pos=0.30, right=3pt, font=\scriptsize, text=bsrTeal!90!black] {Legal Moves ($TYR_{\mathcal{C}}$)};
     \draw[->, very thick, draw=poiPurple] (rl.south) -- node[right=4pt, font=\scriptsize\bfseries, text=poiPurple!90!black] {Certifies \& Optimizes} (isr.north);
-    \draw[<->, dashed, thick, draw=black!60] (fsr.east) -- node[above=1.5pt, font=\scriptsize] {Classical T3SD:} node[below=1.5pt, font=\scriptsize] {Manual $h : Z_m \twoheadrightarrow Z_f$} (bsr.west);
+    \draw[<->, dashed, thick, draw=black!60] (fsr.east) -- node[above=1.5pt, font=\scriptsize] {Classical T3SD:} node[below=1.5pt, font=\scriptsize] {Manual coupling \& $h$} (bsr.west);
 \end{tikzpicture}
-\caption{Adaptation of Wymore's T3SD cotyledons to automated MOSA integration.  Instead of manually designing a System Coupling Recipe $SCR$ and constructing a state-space homomorphism $h$, \emph{The Integration Game} uses Reinforcement Learning guided by a Reward Machine to synthesize an implementable Play $\mathcal{P}$ and Coupled Resultant $Z_b = \mathrm{RSY}(\mathcal{P})$.}
+\caption{Adaptation of Wymore's T3SD to automated MOSA integration.  Instead of manually designing a System Coupling Recipe and constructing a state-space homomorphism, \emph{The Integration Game} synthesizes an implementable Play $\mathcal{P}$ and Coupled Resultant $Z_b = \mathrm{RSY}(\mathcal{P})$ under a Reward Machine--guided policy.}
 \label{fig:t3sd-mosa-bridge}
 \end{figure}
 
-\subsection{Universal Live Sequence Charts} \label{sec:bg-ulsc}
+\subsection{Live Sequence Charts} \label{sec:bg-ulsc}
 
-Live Sequence Charts (LSCs)~\cite{DammHarel2001, HarelMarelly2003} extend Message Sequence Charts~\cite{ITUTZ120} with universal quantification and \emph{cold} (provisional) versus \emph{hot} (mandatory) temperatures.  To encode Wymorian $IOR$s without loss of generality, we define a \emph{Universal Live Sequence Chart} (uLSC) fragment over two boundary lifelines: the external environment ($\mathsf{Env}$) and the system ($\mathsf{Sys}$):
-
-\begin{definition}[Universal Live Sequence Chart (uLSC)] \label{def:ulsc}
-A uLSC over input alphabet $IR$ and output alphabet $OR$ is a tuple $\mathcal{L} = (\tau, \mathcal{P}_{\text{in}}, \mathcal{A}_{\text{out}})$, where $\tau \subseteq \mathbb{N}$ is the discrete operational horizon, $\mathcal{P}_{\text{in}} \subseteq IR^{\mathbb{N}}$ is the \emph{cold Pre-Chart} predicate specifying the set of eligible environmental input trajectories that activate the contract, and $\mathcal{A}_{\text{out}} : IR^{\mathbb{N}} \times OR^{\mathbb{N}} \to \{\mathrm{true}, \mathrm{false}\}$ is the \emph{hot Main-Chart} relation specifying admissible input--output trajectory pairs (including value tolerances, delivery deadlines, and quiet-output \emph{silence} obligations).
-\end{definition}
-
-A discrete system $Z = (S, IR, OR, \delta, \rho)$ initialized at $s_0 \in S$ \emph{satisfies} a uLSC $\mathcal{L}$ on timescale $T \subseteq \tau$, written $\mathrm{SatisfiesLSC}(Z, \mathcal{L}, s_0, T)$, when $T \neq \emptyset$ and every Pre-Chart activation forces a Main-Chart fulfillment:
-\begin{equation}
-    \forall f \in \mathcal{P}_{\text{in}},\; \forall h \in IR^{\mathbb{N}},\; \big(\forall t \in \tau,\; h(t) = f(t)\big) \implies \exists g \in OR^{\mathbb{N}},\; \mathcal{A}_{\text{out}}(f, g) \wedge \big(\forall t \in T,\; y_Z(s_0, h)(t) = g(t)\big).
-    \label{eq:lsc-sat}
-\end{equation}
-If an input trajectory $h$ fails to match $\mathcal{P}_{\text{in}}$ on $\tau$, the cold Pre-Chart is vacated without penalty; conversely, if the Pre-Chart matches on $\tau$ but no allowed output trajectory $g$ agrees with $y_Z(s_0, h)$ on $T$, a \emph{Hot Breach} occurs.  Given any Wymorians input/output requirement $IOR = (OLR, IR, ITR, OR, OTR, ER)$, we construct its \emph{characteristic uLSC} $\mathcal{L}(IOR)$ by setting $\tau = TSR(IOR)$, $\mathcal{P}_{\text{in}} = ITR$, and $\mathcal{A}_{\text{out}}(f, g) \Longleftrightarrow g \in ER(f)$ (Fig.~\ref{fig:ulsc-diagram}).
-
-\begin{theorem}[Correspondence Between $IOR$s and uLSCs] \label{thm:ior-lsc}
-For every Input/Output Requirement $IOR = (OLR, IR, ITR, OR, OTR, ER)$, discrete system $Z = (S, IR, OR, \delta, \rho)$, initial state $s_0 \in S$, and evaluation timescale $T \subseteq \mathbb{N}$,
-\begin{equation}
-    \mathrm{SatisfiesLSC}(Z, \mathcal{L}(IOR), s_0, T) \iff \mathrm{SatisfiesIOR}(Z, IOR, s_0, T).
-    \label{eq:ior-lsc-equiv}
-\end{equation}
-Moreover, a Hot Breach occurs on an input scenario $f \in ITR$ (with extension $h$ agreeing with $f$ on $TSR$) if and only if $Z$ fails to satisfy $IOR$ on $f$.
-\end{theorem}
-
-\begin{proof}[Proof Sketch]
-By definition of $\mathcal{L}(IOR)$, $\tau = TSR(IOR)$, $\mathcal{P}_{\text{in}} = ITR$, and $\mathcal{A}_{\text{out}}(f, g) \iff g \in ER(f)$. Substituting these directly into~\eqref{eq:lsc-sat} yields the exact trajectory quantification of Wymore's $\mathrm{SatisfiesIOR}$: $T \neq \emptyset$, $T \subseteq TSR(IOR)$, and for every $f \in ITR$ and extension $h$ agreeing with $f$ on $TSR(IOR)$, there exists $g \in ER(f)$ matching $y_Z(s_0, h)(t)$ at all $t \in T$.  Defining $\mathcal{A}_{\text{out}}$ via full envelope membership $g \in ER(f)$ is essential: a pointwise projection requiring only $y_Z(s_0, h)(t) \in \{g(t) \mid g \in ER(f)\}$ at each tick $t$ independently is strictly weaker whenever $ER(f)$ couples outputs across ticks. Negating~\eqref{eq:lsc-sat} immediately yields the Hot Breach condition.
-\end{proof}
-
-\begin{figure}[t]
-\centering
-\begin{tikzpicture}[
-    >=Stealth,
-    font=\footnotesize\sffamily,
-    lifelinehead/.style={draw=compBorder, fill=compFill, thick, rounded corners=3pt, minimum width=2.8cm, minimum height=0.68cm, align=center, font=\footnotesize\sffamily\bfseries},
-    coldframe/.style={draw=coldBlue, dashed, thick, fill=coldBlue!4, rounded corners=4pt},
-    hotframe/.style={draw=hotRed, solid, thick, fill=hotRed!4, rounded corners=4pt},
-    lsccond/.style={draw=black!30, fill=white, rounded corners=3pt, font=\scriptsize\sffamily, inner sep=3.5pt, align=center}
-]
-    % Lifeline Heads
-    \node[lifelinehead] (env) at (0, 0) {$\mathsf{Env}$};
-    \node[lifelinehead] (sys) at (8.4, 0) {$\mathsf{Sys}$};
-
-    % Pre-Chart (Cold Trigger Region): y from -0.85 to -2.75
-    \node[coldframe, minimum width=10.2cm, minimum height=1.90cm, anchor=north] (pre_box) at (4.2, -0.85) {};
-    \node[font=\scriptsize\sffamily\bfseries, text=coldBlue, anchor=south west] at ([yshift=1pt]pre_box.north west)
-      {Pre-Chart: Cold Trigger ($f \in ITR$)};
-
-    % Main-Chart (Hot Guarantee Region): y from -3.30 to -5.70
-    \node[hotframe, minimum width=10.2cm, minimum height=2.40cm, anchor=north] (main_box) at (4.2, -3.30) {};
-    \node[font=\scriptsize\sffamily\bfseries, text=hotRed, anchor=south west] at ([yshift=1pt]main_box.north west)
-      {Main-Chart: Hot Guarantee ($g \in ER(f)$)};
-
-    % Vertical Lifeline Rays
-    \draw[dashed, thick, black!45] (env.south) -- (0, -5.95);
-    \draw[dashed, thick, black!45] (sys.south) -- (8.4, -5.95);
-
-    % Cold Input Message (Env -> Sys)
-    \draw[-{Stealth}, dashed, thick, draw=coldBlue] (0, -1.45) --
-      node[above=1.5pt, font=\scriptsize\sffamily, text=coldBlue] {\texttt{OfferMsg}$(f(t)) : (C_{\text{in}}, L_{\text{in}}, P_{\text{in}})$} (8.4, -1.45);
-
-    % Cold Guard Condition
-    \node[lsccond, draw=coldBlue, dashed, thick] at (4.2, -2.22)
-      {\textbf{Cold Condition:} $f \in ITR$ (Eligible Producer Scenario)};
-
-    % Tick Synchronization
-    \draw[dashdotted, thick, black!45] (-0.5, -3.90) --
-      node[above=1.5pt, font=\scriptsize\sffamily, text=black!70] {Discrete Tick Synchronization $t \in TSR$ / Deadline Window $[t, t+\Delta]$} (8.9, -3.90);
-
-    % Hot Output Message (Sys -> Env)
-    \draw[-{Stealth}, solid, thick, draw=hotRed] (8.4, -4.52) --
-      node[above=1.5pt, font=\scriptsize\sffamily, text=hotRed] {\texttt{NeedMsg}$(g(t)) : (C_{\text{out}}, L_{\text{out}}, P_{\text{out}})$} (0, -4.52);
-
-    % Hot Envelope Condition
-    \node[lsccond, draw=hotRed, solid, thick] at (4.2, -5.20)
-      {\textbf{Hot Guarantee:} $g \in ER(f)$ \enspace$\wedge$\enspace $\mathrm{silenceOut}$ on quiet ticks (Violation $=$ \textbf{Hot Breach})};
-\end{tikzpicture}
-\caption{Diagrammatic structure of the characteristic uLSC $\mathcal{L}(IOR)$.  A match on the dashed blue Cold Pre-Chart triggers the solid red Hot Main-Chart obligation; any violation of the output value envelope, timing window, or silence constraint induces a Hot Breach.}
-\label{fig:ulsc-diagram}
-\end{figure}
+Live Sequence Charts (LSCs)~\cite{DammHarel2001, HarelMarelly2003} extend Message Sequence Charts~\cite{ITUTZ120} with universal quantification and \emph{cold} (provisional) versus \emph{hot} (mandatory) temperatures.  A cold Pre-Chart specifies the environmental trigger that activates a contract; a hot Main-Chart specifies the obligations that must then hold (value envelopes, deadlines, and quiet-tick silence).  In Section~\ref{sec:meth-contracts} we formalize a Universal Live Sequence Chart (uLSC) fragment over environment and system lifelines and prove its exact correspondence with Wymorian $IOR$s, including the infinite-horizon case $OLR = \infty$ (Fig.~\ref{fig:ulsc-diagram}).
 
 \subsection{Related Work} \label{sec:bg-literature}
 
 Automating systems integration sits at the intersection of four research traditions (Table~\ref{tab:related-work}).  We briefly review each and provide context for the current work.
 
 \paragraph{Schema Mapping, Ontology Alignment, and Query Translation.}
-In database theory and the semantic web, integrating heterogeneous sources is classically modeled via Global-as-View (GAV), Local-as-View (LAV), and GLAV schema mappings~\cite{lenzerini2002data}, automatic schema matching~\cite{rahm2001schema}, probabilistic schema mappings~\cite{dong2009data}, and Ontology-Based Data Access (OBDA)~\cite{calvanese2007tractable, xiao2018ontology}.  Within the systems engineering and MOSA literature, related concerns appear as persistent SoS integration and interoperability challenges even under open-architecture mandates~\cite{madni2014system, esper2019modular, zimmerman2019considerations}.  While these methods identify static semantic correspondences between schemas (or motivate the need for such correspondences in acquisition practice) they do not synthesize generalized stateful mediation architectures.
+Heterogeneous sources are classically integrated via Global-as-View (GAV)/Local-as-View (LAV)/Global-as-Local-as-View (GLAV) schema mappings~\cite{lenzerini2002data}, automatic schema matching~\cite{rahm2001schema}, probabilistic mappings~\cite{dong2009data}, and Ontology-Based Data Access~\cite{calvanese2007tractable, xiao2018ontology}.  Within systems engineering and MOSA, related concerns appear as persistent SoS interoperability challenges under open-architecture mandates~\cite{madni2014system, esper2019modular, zimmerman2019considerations}.  These methods identify static semantic correspondences but do not synthesize generalized stateful mediation architectures.
 
-\paragraph{Protocol Mediation, Interface Theories, and Formal Solvers.}
-In formal methods and software architecture, component interoperability has been studied through Interface Automata~\cite{deAlfaroHenzinger2001}, assume/guarantee contracts~\cite{BenvenisteEtAl2018}, mediating connector patterns~\cite{SpalazzeseInverardi2010}, and reactive controller synthesis~\cite{PnueliRosner1989}.  Satisfiability Modulo Theories (SMT) solvers such as Z3~\cite{deMouraZ32008} provide a general decision procedure for encoding and discharging verification conditions arising in such analyses, while mixed-integer linear programming has been applied to combinatorial join-order optimization in databases---an instructive analogy for selecting among alternative mediation paths~\cite{trummer2017solving}.  Purely monolithic symbolic synthesis, however, struggles to scale when integration requires combining multi-tier semantic conversions $(C, L, P)$, continuous value transformations, bounded queueing dynamics, and multi-objective cost trade-offs.
+\paragraph{Protocol Mediation, Interface Theories, and Automated Reasoning.}
+Component interoperability has been studied through Interface Automata~\cite{deAlfaroHenzinger2001}, assume/guarantee contracts~\cite{BenvenisteEtAl2018}, mediating connector patterns~\cite{SpalazzeseInverardi2010}, and reactive controller synthesis~\cite{PnueliRosner1989}.  Beyond protocol theories, Counterexample-Guided Inductive Synthesis (CEGIS)~\cite{SolarLezama2008Sketch} and Syntax-Guided Synthesis (SyGuS)~\cite{AlurEtAl2013SyGuS} provide general strategies that alternate candidate construction with automated verification, while bounded model checking and SMT-based decision procedures discharge verification conditions over decidable theories~\cite{BaierKatoen2008}.  Mixed-integer programming for combinatorial join-order optimization offers an instructive analogy for selecting among alternative mediation paths~\cite{trummer2017solving}.  Purely monolithic symbolic synthesis, however, struggles when integration jointly requires multi-tier semantic conversions, continuous transforms, bounded queueing, and multi-objective cost trade-offs.
 
 \paragraph{Reinforcement Learning and Reward Machines.}
-Reinforcement learning~\cite{SuttonBarto2018} has demonstrated strong capability in navigating large discrete search spaces, with instructive analogues in circuit macro placement~\cite{Mirhoseini2021} and combinatorial game search~\cite{Silver2018AlphaZero}, as well as continuous operational control via policy-gradient and actor--critic methods~\cite{Schulman2017PPO, Haarnoja2018SAC}.  To bridge formal temporal specifications and RL, Toro Icarte et al.~\cite{ToroIcarte2018, ToroIcarte2022} introduced \emph{Reward Machines}: finite-state automata that expose the structure of non-Markovian tasks to the learning agent, enabling potential-based reward shaping~\cite{NgHaradaRussell1999}. Building on the temporal-logic and model-checking tradition~\cite{Pnueli1977, BaierKatoen2008}, subsequent work compiles Linear Temporal Logic and related formal languages into Reward Machines for specification-guided learning~\cite{Camacho2019LTL}.  These techniques have not previously been unified with T3SD, interface semantics, or MOSA system coupling.
+Reinforcement learning~\cite{SuttonBarto2018} navigates large discrete search spaces, with instructive analogues in circuit macro placement~\cite{Mirhoseini2021} and combinatorial game search~\cite{Silver2018AlphaZero}, as well as continuous control via policy-gradient and actor--critic methods~\cite{Schulman2017PPO, Haarnoja2018SAC}.  Reward Machines expose non-Markovian task structure for potential-based shaping~\cite{ToroIcarte2018, ToroIcarte2022, NgHaradaRussell1999}.  Building on temporal logic and model checking~\cite{Pnueli1977, BaierKatoen2008}, subsequent work compiles LTL and related languages into Reward Machines~\cite{Camacho2019LTL}.  These techniques have not previously been unified with T3SD, interface semantics, or MOSA system coupling.
 
 \begin{table}[t]
 \centering
@@ -227,9 +120,9 @@ Reinforcement learning~\cite{SuttonBarto2018} has demonstrated strong capability
 \midrule
 Ontology Alignment \& Query Translation~\cite{rahm2001schema, lenzerini2002data, xiao2018ontology, mckibben2026alignment, mckibben2026nearring} & Aligns static conceptual schemas and rewrites navigational queries across models. & Does not synthesize stateful flow mediation, logical/platform value transforms, or runtime timing guarantees. \\
 \addlinespace[2pt]
-Interface Automata \& Symbolic Synthesis~\cite{deAlfaroHenzinger2001, BenvenisteEtAl2018, SpalazzeseInverardi2010, deMouraZ32008} & Verifies protocol handshakes and characterizes mediating connectors; SMT solvers support formal analysis of encodings of these theories. & Poorly suited to multi-objective cost trade-offs, multi-tier semantic distance metrics, and adaptive runtime control. \\
+Interface Theories \& Automated Reasoning~\cite{deAlfaroHenzinger2001, BenvenisteEtAl2018, SpalazzeseInverardi2010, SolarLezama2008Sketch, AlurEtAl2013SyGuS} & Verifies protocol handshakes; CEGIS/SyGuS and model checking discharge formal obligations. & Poorly suited alone to multi-objective MOSA cost trade-offs, multi-tier semantic distance metrics, and adaptive runtime control. \\
 \addlinespace[2pt]
-Classical Wymore T3SD~\cite{Wymore1993, salado2019wymore} \& DEVS~\cite{ZeiglerPraehoferKim2000, wach2021devs} & Provable coupling algebra ($\mathrm{RSY}$), behavioral $IOR$s, and $PR/CR/TR$ trade-offs (Wymore); DEVS provides a related discrete-event lineage. & Unstructured port alphabets (no $(C,L,P)$ semantics); relies on manual coupling design and homomorphism construction without automated search. \\
+Classical Wymore T3SD~\cite{Wymore1993, salado2019wymore} \& DEVS~\cite{ZeiglerPraehoferKim2000, wach2021devs} & Provable coupling algebra ($\mathrm{RSY}$), behavioral $IOR$s, and $PR/CR/TR$ trade-offs (Wymore); DEVS provides a related discrete-event lineage. & Unstructured port alphabets (no Stateful Color); relies on manual coupling design without automated search. \\
 \addlinespace[2pt]
 RL \& Reward Machines~\cite{Mirhoseini2021, ToroIcarte2022, Camacho2019LTL, Schulman2017PPO, Huang2022Masking} & Scalable search over combinatorial graphs and non-Markovian temporal tasks; invalid-action masking for constrained action spaces. & Lacks domain-specific port typing, semantic distance metrics, and systems-theoretic buildability semantics. \\
 \bottomrule

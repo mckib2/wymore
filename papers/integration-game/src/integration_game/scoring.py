@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 from .config import ColorDistanceConfig, DEFAULT_CONFIG, GameConfig, ScoringConfig
-from .primitives import Message, TransferMode
+from .primitives import Message, TransferMode, representation_sets_compatible
 from .interfaces import Interface
 from .board import Board
 from .components import ProvTMRVoteBlock
@@ -419,7 +419,9 @@ class BoardEvaluator:
 
         assert best_off is not None
         c_dist = self._shape_color_distance(best_off, need_if, self.color_cfg)
-        has_rep = bool(best_off.shape.allowed_reps & need_if.shape.allowed_reps)
+        has_rep = representation_sets_compatible(
+            best_off.shape.allowed_reps, need_if.shape.allowed_reps
+        )
         note = (
             f"Unconnected Need '{need_if.full_id}' "
             f"(closest live offer='{best_off.full_id}', color_dist={c_dist:.2f}, rep_match={has_rep})"
@@ -480,8 +482,10 @@ class BoardEvaluator:
             if route_id:
                 pair_notes.append(f"Color mismatch on {label} (distance={c_dist:.2f})")
 
-        # 2. Representation compatibility
-        if not (src_if.shape.allowed_reps & need_if.shape.allowed_reps):
+        # 2. Representation compatibility (ABI aliases: C_ABI↔NATIVE_STRUCT, DDS_BINDING↔CDR_DDS)
+        if not representation_sets_compatible(
+            src_if.shape.allowed_reps, need_if.shape.allowed_reps
+        ):
             t1 += self.cfg.w_rep
             if route_id:
                 pair_notes.append(f"Representation mismatch on {label}")

@@ -1,24 +1,24 @@
 \section{Results} \label{sec:results}
 
-To evaluate \emph{The Integration Game} across our three research questions, we developed a reference implementation in Python paired with the Z3 SMT solver~\cite{deMouraZ32008}. The implementation realizes the three-tier Semantic Color ontology, the configurable Technology Catalog $TYR_{\mathcal{C}}$, synchronous discrete-time simulation of the Coupled Resultant $Z_b = \mathrm{RSY}(\mathcal{P})$, single- and multi-Consumer uLSC monitors compiled into finite-horizon Reward Machines, symbolic fragment verification, and the offline and online Markov Decision Process environments.
+To evaluate our proposed methodology across our three research questions, we developed a reference implementation in Python paired with the Z3 SMT solver~\cite{deMouraZ32008} as the symbolic backend.  The implementation realizes Color $\kappa$, the configurable Technology Catalog $TYR_{\mathcal{K}}$, synchronous discrete-time simulation of the Coupled Resultant $Z_b = \mathrm{RSY}(\mathcal{P})$, single- and multi-Consumer uLSC monitors compiled into Reward Machines, symbolic fragment verification, and the offline and online Markov Decision Process environments.
 
 \subsection{Progressive Verification Suite (Scenarios S1--S15)} \label{sec:res-catalog}
 
-We designed a fifteen-scenario progressive verification suite (Scenarios S1--S15) that systematically isolates canonical systems-integration anomalies across semantic hierarchies, wire representations, Flow Kinematics, provenance assurance, and stateful behavioral contracts (with Scenario S15 reserved as an unseen industrial avionics holdout). Each scenario begins with incompatible Producer Offers and Consumer Needs, exposes deceptive Tier~3 behavioral traps—lower-cost Mediation Operators that satisfy Tier~1 semantic alignment and Tier~2 kinematic compatibility but violate trajectory-level obligations—and admits a verified three-tier winning Play:
+We designed a fifteen-scenario verification suite (Scenarios S1--S15) that systematically isolates canonical systems-integration anomalies across Color axes and stateful behavioral contracts (with Scenario S15 reserved as an unseen industrial avionics holdout).  Each scenario begins with incompatible Producer Offers and Consumer Needs, exposes deceptive Tier~3 behavioral traps (e.g., lower-cost Mediation Operators that satisfy Tier~1 Color alignment and Tier~2 kinematic compatibility but violate trajectory-level obligations) and admits a verified winning Play:
 
 \begin{itemize}[leftmargin=1.5em,itemsep=2pt]
   \item \textbf{Closed-Loop Autonomy (S1) \& Causal Ping-Pong Handshake (S2):}
         Evaluates autonomous feedback coupling and push-to-pull queue mediation in which a retain-on-read latch violates quiet-tick silence obligations, whereas a consume-on-read FIFO queue satisfies the uLSC Main-Chart.
   \item \textbf{Multi-Representation Gateway (S4) \& Hierarchical Entity Recoloring (S5):}
-        Evaluates multi-hop representation transcoding ($\Delta \rho$) and UDDL entity-composition projection, disaggregation, and affine thermal unit conversion ($\Delta C, \Delta L, \Delta P$); uncalibrated identity casts pass Tiers~1 and~2 but trigger a Hot Breach on the behavioral value envelope.
+        Evaluates multi-hop runtime ABI marshaling ($\Delta\rho$; e.g., C-ABI $\leftrightarrow$ Python-object $\leftrightarrow$ DDS language binding) together with UDDL entity-composition projection and affine thermal conversion ($\Delta C, \Delta L, \Delta P$). Route Carriers handle bus/transport edges; uncalibrated identity casts that ignore ABI mismatch pass superficial typing but trigger Hot Breaches on the value envelope.
   \item \textbf{Dynamic State Estimation (S3), Non-Commutative Derivation (S6) \& Hard Deadline Synthesis (S7):}
         Evaluates multi-input computational derivations where naive finite-difference estimators, swapped-operand kinetic-energy derivations ($\frac{1}{2}v m^2$ versus $\frac{1}{2}m v^2$), or high-latency batch solvers satisfy static port typing but breach accuracy or deadline invariants.
   \item \textbf{Multi-Consumer Fan-Out (S8), Multi-Rate Clock Bridging (S9) \& Temporal Window Join (S11):}
         Evaluates composite multi-Consumer uLSC contracts, multi-rate mediation across stores, pumps, and freshness gates, and bounded-window correlation across asynchronous streams.
   \item \textbf{Provenance Triple-Modular Redundancy (S10), Redundant Link Failover (S12), Stateful Transaction FSM (S13) \& Pareto Trade Study (S14):}
-        Evaluates provenance-weighted majority voting, runtime failover multiplexing between primary and backup links, stateful accumulation with silence invariants prior to threshold fulfillment, and multi-objective Pareto trade-offs across competing winning architectures.
+        Evaluates provenance-weighted majority voting, runtime failover multiplexing between primary and backup Route Carriers, stateful accumulation with silence invariants prior to threshold fulfillment, and multi-objective Pareto trade-offs across competing winning architectures.
   \item \textbf{Avionics Multi-Bus Holdout (S15):}
-        Models a FACE/SOSA-inspired avionics integration coupling MIL-STD-1553 navigation telemetry to an on-demand Data Distribution Service (DDS) guidance Consumer across representation, coordinate-frame, and push-to-pull discrepancies, serving as an external generalization holdout.
+        Models a FACE/SOSA-inspired avionics integration that couples navigation telemetry over a MIL-STD-1553 Route Carrier to an on-demand DDS guidance Consumer, requiring ABI marshaling $\Delta\rho$, coordinate-frame recoloring $\Delta L$, and push-to-pull mediation as an external generalization holdout.
 \end{itemize}
 
 \subsection{Cost Axiom Verification, Sensitivity Analysis, and Symbolic CEGIS} \label{sec:res-cost}
@@ -100,21 +100,21 @@ Online Actor--Critic (PPO) & $0.0$ & $0.0$ & $100.0$ & $30.6$ \\
 
 \subsection{Ablation Study and Computational Scalability} \label{sec:res-ablations}
 
-Table~\ref{tab:ablations} reports a four-way ablation study on Scenarios S2 and S6 isolating three core methodological components: (1)~intermediate Reward Machine and potential-based shaping pulses, (2)~the lexicographic breach margin $\Omega$, and (3)~symbolic CEGIS counterexample augmentation of $ITR_{\text{test}}$. Removing intermediate shaping pulses (relying solely on sparse terminal returns) increases mean episodes-to-first-win sixteen-fold (from $1.0$ to $16.0$). Removing the lexicographic breach margin $\Omega$ (evaluating complete Plays by unscaled soft error alone) causes the policy to collapse onto lower-cost Tier~3 trap operators, reducing the ground-truth win rate to $50.0\%$. Similarly, disabling symbolic CEGIS augmentation when $ITR_{\text{test}}$ contains only symmetric test inputs allows the swapped-operand derivation to pass empirical evaluation, halving the true ground-truth win rate to $50.0\%$.
+Table~\ref{tab:ablations} reports a four-way ablation study isolating three core methodological components on Scenarios S2 and S6 separately: (1)~intermediate Reward Machine and potential-based shaping pulses, (2)~the lexicographic breach margin $\Omega$, and (3)~symbolic CEGIS counterexample augmentation of $ITR_{\text{test}}$. Removing intermediate shaping pulses increases mean episodes-to-first-win sixteen-fold on both scenarios (from $1.0$ to $16.0$) while preserving wins. Removing $\Omega$ collapses the policy onto lower-cost Tier~3 traps on S6 (win $0\%$) while S2 remains solvable ($100\%$), so the pooled $50\%$ figure simply means one of two scenarios failed entirely. Disabling CEGIS when $ITR_{\text{test}}$ contains only symmetric inputs likewise leaves S2 intact but allows the swapped-operand derivation to pass S6's empirical suite ($0\%$ ground-truth win on S6).
 
 \begin{table}[t]
 \centering
-\caption{Ablation study isolating the contributions of Reward Machine shaping, lexicographic breach dominance $\Omega$, and symbolic CEGIS counterexample generation (Scenarios S2 and S6).}
+\caption{Ablation study isolating Reward Machine shaping, lexicographic breach dominance $\Omega$, and symbolic CEGIS (per-scenario ground-truth win \% on S2 and S6; Mean ETFW averaged over solved runs).}
 \label{tab:ablations}
 \footnotesize
-\begin{tabular}{@{}lcc@{}}
+\begin{tabular}{@{}lcccc@{}}
 \toprule
-\textbf{Ablation Configuration} & \textbf{Ground-Truth Win \%} & \textbf{Mean ETFW} \\
+\textbf{Ablation Configuration} & \textbf{S2 Win \%} & \textbf{S6 Win \%} & \textbf{Pooled} & \textbf{Mean ETFW} \\
 \midrule
-Full Methodology (RM Shaping + $\Omega$ + Symbolic CEGIS) & $100.0$ & $1.0$ \\
-Without RM / Potential Shaping (Sparse Terminal Return Only) & $100.0$ & $16.0$ \\
-Without Lexicographic Margin $\Omega$ (Soft Breach Penalty Only) & $50.0$ & $1.0$ \\
-Without Symbolic CEGIS Augmentation (Symmetric $ITR_{\mathrm{test}}$) & $50.0$ & $1.0$ \\
+Full Methodology (RM + $\Omega$ + CEGIS) & $100.0$ & $100.0$ & $100.0$ & $1.0$ \\
+Without RM / Potential Shaping & $100.0$ & $100.0$ & $100.0$ & $16.0$ \\
+Without Lexicographic Margin $\Omega$ & $100.0$ & $0.0$ & $50.0$ & $1.0$ \\
+Without Symbolic CEGIS Augmentation & $100.0$ & $0.0$ & $50.0$ & $1.0$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -123,7 +123,7 @@ Finally, Table~\ref{tab:scale} characterizes the computational cost of concrete 
 
 \begin{table}[t]
 \centering
-\caption{Computational runtime characterization across representative winning Plays ($7$-trial medians).}
+\caption{Computational runtime characterization across representative winning Plays ($7$-trial medians). SMT Check is omitted (---) for S12, an online stochastic link-control benchmark without a dedicated decidable symbolic fragment in the current suite, and for S15, whose holdout certification uses trajectory evaluation and CEGIS patterns transferred from training scenarios rather than a scenario-specific SMT encoding.}
 \label{tab:scale}
 \footnotesize
 \begin{tabular}{@{}lcccc@{}}

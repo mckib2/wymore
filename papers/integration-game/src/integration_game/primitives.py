@@ -1,8 +1,9 @@
 """
 primitives.py
-Authoritative Field ontology: TBox Color (C,L,P), Dynamics (x,v,a),
-ABox (value, Representation ρ, Provenance π), and Message aggregations
-(Record / Sequence / Choice). Carrier is a route attribute, not a color axis.
+Authoritative Field ontology: Unified Stateful Color axes —
+TBox (C,L,P), Dynamics k=(x,v,a), runtime ABI Representation ρ, Provenance π —
+plus Message aggregations (Record / Sequence / Choice).
+Carrier is a Route Carrier attribute (transport), not a color axis.
 """
 from __future__ import annotations
 
@@ -24,14 +25,58 @@ class TransferMode(str, Enum):
 
 
 class Representation(str, Enum):
-    NATIVE_STRUCT = "NATIVE_STRUCT"
+    """
+    Runtime language / ABI in-memory realization of a Field value (ρ).
+
+    Distinct from Platform P (UDDL PDM abstract machine type/precision) and from
+    Route Carrier (bus/transport). Prefer the ABI-named members; legacy names are
+    retained as aliases so existing scenarios keep compiling.
+    """
+
+    # Preferred ABI / language-binding names
+    C_ABI = "C_ABI"
+    PY_OBJECT = "PY_OBJECT"
+    NATIVE_STRUCT = "NATIVE_STRUCT"  # in-process C-layout / POD ABI
+    DDS_BINDING = "DDS_BINDING"  # DDS language binding (e.g. CDR-backed object)
+    JVM_OBJECT = "JVM_OBJECT"
+
+    # Legacy aliases (reinterpreted as ABI / binding; not wire transport)
     GENERIC_TREE = "GENERIC_TREE"
-    BYTE_BLOB_JSON = "BYTE_BLOB_JSON"
+    BYTE_BLOB_JSON = "BYTE_BLOB_JSON"  # Python-runtime encoded object
     BYTE_BLOB_PROTO = "BYTE_BLOB_PROTO"
-    MIL_STD_1553 = "MIL_STD_1553"
-    CDR_DDS = "CDR_DDS"
+    CDR_DDS = "CDR_DDS"  # alias semantics of DDS_BINDING
     XML_UTF8 = "XML_UTF8"
     ASN1_BER = "ASN1_BER"
+    MIL_STD_1553 = "MIL_STD_1553"  # deprecated as ρ; prefer Carrier.MIL_STD_1553
+
+
+# Equivalent in-memory ABI / language-binding families (ρ aliases).
+_REP_EQUIV_CLASSES: Tuple[FrozenSet[Representation], ...] = (
+    frozenset({Representation.C_ABI, Representation.NATIVE_STRUCT}),
+    frozenset({Representation.DDS_BINDING, Representation.CDR_DDS}),
+)
+
+
+def _expand_rep_aliases(reps: FrozenSet[Representation]) -> FrozenSet[Representation]:
+    out = set(reps)
+    for cls in _REP_EQUIV_CLASSES:
+        if out & cls:
+            out |= set(cls)
+    return frozenset(out)
+
+
+def representation_sets_compatible(
+    a: FrozenSet[Representation], b: FrozenSet[Representation]
+) -> bool:
+    """True iff the two allowed-ρ sets share a member under ABI aliasing."""
+    return bool(_expand_rep_aliases(a) & _expand_rep_aliases(b))
+
+
+def representation_accepted(
+    rep: Representation, allowed: FrozenSet[Representation]
+) -> bool:
+    """True iff `rep` is admitted by `allowed` under ABI aliasing."""
+    return representation_sets_compatible(frozenset({rep}), allowed)
 
 
 class AggregationKind(str, Enum):
@@ -41,17 +86,24 @@ class AggregationKind(str, Enum):
 
 
 class Carrier(str, Enum):
-    """Route transport attribute (not a color axis)."""
+    """Route Carrier: transport medium; never alters Stateful Color κ."""
+
     IN_PROCESS = "IN_PROCESS"
+    SHARED_MEMORY = "SHARED_MEMORY"
     GENERIC_TREE = "GENERIC_TREE"
     IPC_SERIALIZED = "IPC_SERIALIZED"
+    MIL_STD_1553 = "MIL_STD_1553"
+    DDS_TOPIC = "DDS_TOPIC"
 
     def cost_with_config(self, cfg: Optional[CarrierCostConfig] = None) -> float:
         c = cfg or DEFAULT_CONFIG.carrier_costs
         return {
             Carrier.IN_PROCESS: c.in_process,
+            Carrier.SHARED_MEMORY: c.shared_memory,
             Carrier.GENERIC_TREE: c.generic_tree,
             Carrier.IPC_SERIALIZED: c.ipc_serialized,
+            Carrier.MIL_STD_1553: c.mil_std_1553,
+            Carrier.DDS_TOPIC: c.dds_topic,
         }[self]
 
     @property
@@ -296,7 +348,7 @@ class MessageShape:
     def compatible_with(self, other: "MessageShape") -> bool:
         if self.kind != other.kind:
             return False
-        if not (self.allowed_reps & other.allowed_reps):
+        if not representation_sets_compatible(self.allowed_reps, other.allowed_reps):
             return False
         if self.kind == AggregationKind.RECORD:
             if set(self.slots.keys()) != set(other.slots.keys()):
@@ -366,12 +418,13 @@ class Message:
                 return False
             return all(
                 self.fields[s].color == shape.slots[s]
-                and self.fields[s].representation in shape.allowed_reps
+                and representation_accepted(self.fields[s].representation, shape.allowed_reps)
                 for s in shape.slots
             )
         if self.kind == AggregationKind.SEQUENCE:
             return all(
-                f.color == shape.sequence_item_color and f.representation in shape.allowed_reps
+                f.color == shape.sequence_item_color
+                and representation_accepted(f.representation, shape.allowed_reps)
                 for f in self.sequence
             )
         if self.choice_tag is None or self.choice_field is None:
@@ -380,7 +433,7 @@ class Message:
         return (
             expected is not None
             and self.choice_field.color == expected
-            and self.choice_field.representation in shape.allowed_reps
+            and representation_accepted(self.choice_field.representation, shape.allowed_reps)
         )
 
     def satisfies_provenance(self, shape: MessageShape) -> bool:

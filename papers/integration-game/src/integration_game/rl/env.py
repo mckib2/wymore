@@ -35,6 +35,7 @@ from integration_game.primitives import (
     Provenance,
     Representation,
     TransferMode,
+    representation_sets_compatible,
 )
 from integration_game.scoring import BoardEvaluator, ScoreBreakdown
 from integration_game.ulsc import CompositeLSC, RMState, UniversalLSC
@@ -345,7 +346,7 @@ def make_kalman_task(include_trap: bool = True) -> SynthTask:
 
 
 def make_gateway_task() -> SynthTask:
-    """Ex04: Multi-representation gateway (MIL-STD-1553 -> NATIVE -> CDR_DDS)."""
+    """Ex04: Multi-ABI gateway — PyObject* pack on MIL-STD-1553 carrier → C-ABI → DDS binding."""
     c_1553 = Color("Link16.Track.Alt", "ft_Q12_4", "uint16")
     c_si = Color("C2.Track.Alt", "meters", "float64")
 
@@ -357,14 +358,14 @@ def make_gateway_task() -> SynthTask:
                 "out",
                 c_1553,
                 mode=TransferMode.PUSH,
-                rep=Representation.MIL_STD_1553,
+                rep=Representation.PY_OBJECT,
             )
         )
         b.add_component(
             ConsumerBoundary(
                 "C2_DDS",
                 "in",
-                MessageShape.single(c_si, reps=(Representation.CDR_DDS,)),
+                MessageShape.single(c_si, reps=(Representation.DDS_BINDING,)),
                 mode=TransferMode.PUSH,
             )
         )
@@ -377,7 +378,7 @@ def make_gateway_task() -> SynthTask:
                     16000,  # Q12.4 for 1000.0 ft
                     c_1553,
                     Dynamics("Link16.out", 1.0),
-                    representation=Representation.MIL_STD_1553,
+                    representation=Representation.PY_OBJECT,
                     provenance=Provenance(("Link16",), timestamp_tick=t),
                 )
             )
@@ -404,8 +405,8 @@ def make_gateway_task() -> SynthTask:
             lambda: RepresentationBridgeBlock(
                 "Unpack1553",
                 c_1553,
-                Representation.MIL_STD_1553,
-                Representation.NATIVE_STRUCT,
+                Representation.PY_OBJECT,
+                Representation.C_ABI,
                 decode_fn=lambda w: float(w) / 16.0,
             ),
         ),
@@ -416,6 +417,7 @@ def make_gateway_task() -> SynthTask:
                 c_1553,
                 c_si,
                 value_fn=lambda ft: round(float(ft) * 0.3048, 4),
+                rep=Representation.C_ABI,
             ),
         ),
         (
@@ -423,8 +425,8 @@ def make_gateway_task() -> SynthTask:
             lambda: RepresentationBridgeBlock(
                 "PackDDS",
                 c_si,
-                Representation.NATIVE_STRUCT,
-                Representation.CDR_DDS,
+                Representation.C_ABI,
+                Representation.DDS_BINDING,
                 decode_fn=lambda m: json.dumps({"alt_m": float(m)}),
             ),
         ),
@@ -784,8 +786,8 @@ def make_latency_task(include_trap: bool = True) -> SynthTask:
 
 def make_industrial_holdout_task(include_trap: bool = True) -> SynthTask:
     """
-    Ex15: Industrial FACE/SOSA-flavored multi-bus holdout (MIL-STD-1553 -> NATIVE -> knots -> float64 -> PULL).
-    Used to test zero-shot and fine-tuned transfer of relational policies trained on ex02..ex07.
+    Ex15: FACE/SOSA-flavored multi-bus holdout.
+    MIL-STD-1553 Route Carrier + PyObject ABI → C-ABI native → knots/float64 → PULL.
     """
     c_bus = Color("Aircraft.Status.IAS", "m_per_s", "float32")
     c_dds_ms = Color("Guidance.Airspeed", "m_per_s", "float32")
@@ -800,14 +802,14 @@ def make_industrial_holdout_task(include_trap: bool = True) -> SynthTask:
                 "out",
                 c_bus,
                 mode=TransferMode.PUSH,
-                rep=Representation.MIL_STD_1553,
+                rep=Representation.PY_OBJECT,
             )
         )
         b.add_component(
             ConsumerBoundary(
                 "Guidance",
                 "in",
-                MessageShape.single(c_dds_kt64, reps=(Representation.NATIVE_STRUCT,)),
+                MessageShape.single(c_dds_kt64, reps=(Representation.C_ABI,)),
                 mode=TransferMode.PULL,
                 pull_schedule=lambda t: True,
             )
@@ -822,7 +824,7 @@ def make_industrial_holdout_task(include_trap: bool = True) -> SynthTask:
                     json.dumps({"ias_mps": v}),
                     c_bus,
                     Dynamics("Bus1553.out", 1.0),
-                    representation=Representation.MIL_STD_1553,
+                    representation=Representation.PY_OBJECT,
                     provenance=Provenance(("Bus1553",), timestamp_tick=t, trust_score=0.85),
                 )
             )
@@ -850,24 +852,32 @@ def make_industrial_holdout_task(include_trap: bool = True) -> SynthTask:
             lambda: RepresentationBridgeBlock(
                 "1553_Decode",
                 c_bus,
-                Representation.MIL_STD_1553,
-                Representation.NATIVE_STRUCT,
+                Representation.PY_OBJECT,
+                Representation.C_ABI,
                 decode_fn=lambda s: float(json.loads(s)["ias_mps"]),
             ),
         ),
         (
             "recolor_c",
-            lambda: RecolorBlock("Recolor_C", c_bus, c_dds_ms, value_fn=float),
+            lambda: RecolorBlock(
+                "Recolor_C", c_bus, c_dds_ms, value_fn=float, rep=Representation.C_ABI
+            ),
         ),
         (
             "recolor_l",
             lambda: RecolorBlock(
-                "Recolor_L", c_dds_ms, c_dds_kt, value_fn=lambda x: round(float(x) * 1.94384, 4)
+                "Recolor_L",
+                c_dds_ms,
+                c_dds_kt,
+                value_fn=lambda x: round(float(x) * 1.94384, 4),
+                rep=Representation.C_ABI,
             ),
         ),
         (
             "recolor_p",
-            lambda: RecolorBlock("Recolor_P", c_dds_kt, c_dds_kt64, value_fn=float),
+            lambda: RecolorBlock(
+                "Recolor_P", c_dds_kt, c_dds_kt64, value_fn=float, rep=Representation.C_ABI
+            ),
         ),
     ]
     if include_trap:
@@ -875,7 +885,11 @@ def make_industrial_holdout_task(include_trap: bool = True) -> SynthTask:
             (
                 "latch_retain_trap",
                 lambda: CacheStoreBlock(
-                    "Latch_Retain", c_dds_kt64, retain_on_read=True, static_cost=0.2
+                    "Latch_Retain",
+                    c_dds_kt64,
+                    retain_on_read=True,
+                    static_cost=0.2,
+                    rep=Representation.C_ABI,
                 ),
             )
         )
@@ -883,7 +897,11 @@ def make_industrial_holdout_task(include_trap: bool = True) -> SynthTask:
         (
             "latch_consume",
             lambda: CacheStoreBlock(
-                "Latch", c_dds_kt64, retain_on_read=False, static_cost=0.5
+                "Latch",
+                c_dds_kt64,
+                retain_on_read=False,
+                static_cost=0.5,
+                rep=Representation.C_ABI,
             ),
         )
     )
@@ -1136,8 +1154,8 @@ class IntegrationGameEnv:
         gap = 0.0
         if c_offer is not None and c_need is not None:
             gap += c_offer.distance_to(c_need, self.config.color_distance)
-        if not set(offer_if.shape.allowed_reps).intersection(
-            set(need_if.shape.allowed_reps)
+        if not representation_sets_compatible(
+            frozenset(offer_if.shape.allowed_reps), frozenset(need_if.shape.allowed_reps)
         ):
             gap += 1.0
         if offer_if.mode != need_if.mode:
