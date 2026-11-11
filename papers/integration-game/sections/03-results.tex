@@ -1,6 +1,6 @@
-\section{Verification Suite and Empirical Evaluation} \label{sec:results}
+\section{Results} \label{sec:results}
 
-To evaluate \emph{The Integration Game} across our three research questions, we developed a reference implementation in Python paired with the Z3 SMT solver~\cite{deMouraZ32008}. The implementation realizes the three-tier Semantic Color ontology, the configurable Technology Catalog $TYR_{\mathcal{C}}$, synchronous discrete-time simulation of the Coupled Resultant $Z_b = \mathrm{RSY}(\mathcal{P})$, single- and multi-Consumer Universal LSC monitors compiled into finite-horizon Reward Machines, symbolic fragment verification, and the offline and online Markov Decision Process environments.
+To evaluate \emph{The Integration Game} across our three research questions, we developed a reference implementation in Python paired with the Z3 SMT solver~\cite{deMouraZ32008}. The implementation realizes the three-tier Semantic Color ontology, the configurable Technology Catalog $TYR_{\mathcal{C}}$, synchronous discrete-time simulation of the Coupled Resultant $Z_b = \mathrm{RSY}(\mathcal{P})$, single- and multi-Consumer uLSC monitors compiled into finite-horizon Reward Machines, symbolic fragment verification, and the offline and online Markov Decision Process environments.
 
 \subsection{Progressive Verification Suite (Scenarios S1--S15)} \label{sec:res-catalog}
 
@@ -35,7 +35,7 @@ To address \textbf{RQ3} in the offline architecture synthesis regime, we evaluat
     \item \emph{Greedy Lookahead:} Myopically selects moves that minimize static operator cost plus Tier~1--2 semantic and kinematic frontier potential $\Phi_{\mathcal{C}}$.
     \item \emph{Beam Search ($B=5$):} Expands a bounded frontier of partial Plays ranked by Tier~1--2 potential and static cost.
     \item \emph{Relational Softmax REINFORCE:} A policy-gradient agent parameterized over ontology-grounded relational compatibility features $\phi(s, a)$.
-    \item \emph{Relational Masked PPO:} An actor--critic agent trained via Masked Proximal Policy Optimization conditioned on $\phi(s, a)$, intermediate Reward Machine progress pulses, and potential-based shaping.
+    \item \emph{Relational Masked PPO:} An actor--critic agent trained via Masked Proximal Policy Optimization~\cite{Schulman2017PPO, Huang2022Masking} conditioned on $\phi(s, a)$, intermediate Reward Machine progress pulses, and potential-based shaping.
 \end{enumerate}
 
 \begin{table}[t]
