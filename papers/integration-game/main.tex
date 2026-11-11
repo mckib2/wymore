@@ -152,7 +152,16 @@ The adoption of a Modular Open Systems Approach (MOSA) is intended to enable rap
 \input{sections/04-discussion.tex}
 \input{sections/05-conclusion.tex}
 
-% Bibliography
+% Acknowledgments (if added) must be wrapped so the Makefile word count
+% excludes them:
+%   %TC:ignore
+%   \section*{Acknowledgments}
+%   ...
+%   %TC:endignore
+
+% Bibliography (excluded from word count; texcount -nobib is also default)
+%TC:ignore
 \printbibliography
+%TC:endignore
 
 \end{document}

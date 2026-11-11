@@ -8,18 +8,28 @@ DEPS      := $(wildcard *.tex *.bib *.cls *.sty *.png sections/*.tex figures/* i
 
 LATEXMK       ?= latexmk
 LATEXMK_FLAGS ?= -pdf -outdir=$(BUILD_DIR) -interaction=nonstopmode -halt-on-error
+TEXCOUNT      ?= texcount
+WORDCOUNT_PY  ?= scripts/wordcount.py
 
-.PHONY: all pdf clean clean-intermediates distclean view watch
+.PHONY: all pdf words clean clean-intermediates distclean view watch
 
 .DEFAULT_GOAL := all
 
 all: $(PDF)
+	@$(MAKE) --no-print-directory words
 
 pdf: $(PDF)
 
 $(PDF): $(DEPS)
 	@mkdir -p $(BUILD_DIR)
 	$(LATEXMK) $(LATEXMK_FLAGS) $(SRC)
+
+# Word count excluding References/bibliography and Acknowledgments.
+# Bibliography is omitted via texcount -nobib (and %TC:ignore around
+# \printbibliography). Section titles matching Acknowledgment(s)/References
+# are also dropped; wrap Acknowledgments with %TC:ignore ... %TC:endignore.
+words:
+	@$(TEXCOUNT) -merge -sub=section -nobib -sum $(SRC) 2>/dev/null | python3 $(WORDCOUNT_PY)
 
 # Clean intermediate files while preserving the PDF
 clean-intermediates:
