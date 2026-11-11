@@ -2,13 +2,13 @@
 scoring.py
 Tier-1/2/3 evaluation, cost functional J, fitness S, and ranking of winning plays.
 Designed to satisfy the 7 technology-independent cost assertions (A1–A7):
-  A1. Lexicographic Feasibility Dominance (Win > Lose)
-  A2. Live-Frontier Grounding (No Disconnected-Operator Credit)
-  A3. Monotonic Potential Reduction Under Useful Frontier Mediation
-  A4. Route-Wiring Continuity (No Wiring Penalty Spike)
-  A5. Strict Tier-3 Behavioral Gradient Monotonicity (Uncapped Overrun/Value/Cut/Silence)
-  A6. Dynamic QoS Monotonicity (Latency, InfoLoss, Disruptions with discount gamma)
-  A7. Parsimony / Redundancy Monotonicity (Occam's Razor)
+  A1. Feasibility Dominance (Win > Lose)
+  A2. Credit Only Connected Moves
+  A3. Prefer Useful Moves
+  A4. Close Ports Continuously
+  A5. Rank Breaches by Severity
+  A6. Prefer Better QoS
+  A7. Prefer Simpler Boards
 """
 from __future__ import annotations
 
