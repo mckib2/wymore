@@ -19,6 +19,7 @@ from typing import Any, Dict, List
 
 from integration_game.examples.ex02_ping_pong import example_02_ping_pong
 from integration_game.examples.ex05_piston_hierarchy import example_05_piston
+from integration_game.examples.ex06_calculator import example_06_calculator
 from integration_game.examples.ex12_failover import example_12_failover
 from integration_game.examples.ex15_industrial_avionics import example_15_industrial_avionics
 from integration_game.verifier import (
@@ -213,6 +214,7 @@ def _run_scale_timings(n_trials: int = 7) -> Dict[str, Any]:
 
     ex02_sim_ms = round(median_ms(example_02_ping_pong) / 5.0, 2)
     ex05_sim_ms = round(median_ms(example_05_piston) / 4.0, 2)
+    ex06_sim_ms = round(median_ms(example_06_calculator) / 4.0, 2)
     ex12_sim_ms = round(median_ms(example_12_failover) / 3.0, 2)
     ex15_sim_ms = round(median_ms(example_15_industrial_avionics) / 4.0, 2)
 
@@ -245,7 +247,7 @@ def _run_scale_timings(n_trials: int = 7) -> Dict[str, Any]:
     return {
         "ex02": {"ops": 6, "routes": 5, "sim_eval_ms": ex02_sim_ms, "z3_ms": ex02_z3_ms},
         "ex05": {"ops": 11, "routes": 10, "sim_eval_ms": ex05_sim_ms, "z3_ms": ex05_z3_ms},
-        "ex06": {"ops": 6, "routes": 5, "sim_eval_ms": 0.25, "z3_ms": ex06_z3_ms},
+        "ex06": {"ops": 6, "routes": 5, "sim_eval_ms": ex06_sim_ms, "z3_ms": ex06_z3_ms},
         "ex12": {"ops": 6, "routes": 5, "sim_eval_ms": ex12_sim_ms, "z3_ms": None},
         "ex15": {"ops": 7, "routes": 6, "sim_eval_ms": ex15_sim_ms, "z3_ms": None},
     }

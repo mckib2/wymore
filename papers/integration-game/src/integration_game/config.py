@@ -63,7 +63,7 @@ class CatalogCostConfig:
     fan_out: float = 0.2
     fan_in: float = 0.2
     join: float = 0.8
-    derive: float = 2.0
+    derive: float = 2.0  # multi-input Derive default; catalog band [0.5, 2.0]
     filter: float = 0.4
     prov_verify: float = 0.5
     prov_tmr: float = 1.5
